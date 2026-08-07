@@ -1,6 +1,6 @@
 # FightingGameEngine-Assets — Character Adding Guide
 
-This repo(s) hosts downloadable characters for the Fighting Game Engine.
+This repo hosts downloadable characters for the Fighting Game Engine.
 Characters are served via jsDelivr CDN (free, global) and downloaded
 on-demand when players select them in the game.
 
