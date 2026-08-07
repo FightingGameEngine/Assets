@@ -1,0 +1,894 @@
+
+[StateDef 100000]
+type = S
+MoveType = I
+Physics = S
+Juggle = 1
+velset = 0.0
+ctrl = 1
+
+;(Variable para personajes femeninos)
+
+[State -2, 1]
+type = varset
+trigger1 = p2name = "Gardevoir" 
+trigger2 = p4name = "Gardevoir"
+trigger3 = p2name = "Mileena"
+trigger4 = p4name = "Mileena"
+trigger5 = p2name = "Samus"
+trigger6 = p2name = "Haruka"
+trigger7 = p4name = "Samus"
+trigger8 = P4name = "Haruka"
+v = 58
+value = 1
+
+[STATE 10000, 1]
+type = Helper
+trigger1 = 1
+trigger1 = P2Life = 1
+trigger1 = NumHelper (7000) = 0; only appears if there is no other helper like this on the screen.
+ID = 7000
+pos = 0, 0
+postype = left
+stateno = 7000
+helpertype = normal
+name = "FINISH"
+keyctrl = 0
+ownpal = 1
+
+
+
+
+[State 10000 2]
+type = ChangeState
+trigger1 = AnimTime = 0 
+value = 0
+ctrl = 1
+
+[State 7010, 3]
+type = Helper
+triggerall = !var(55)
+trigger1 = NumHelper (7000) = 1; must be at least 1 Helper, which is P2 Trembling on the screen.
+trigger1 = NumHelper (7010) = 0; There can be no message "FINISH HIM!" on the screen.
+id = 7010
+stateno = 7010
+pos = 0, 0
+postype = left
+helpertype = normal
+name = "FINISH HIM!"
+keyctrl = 0
+
+[State 7010, 3]
+type = Helper
+trigger1 = var(55)
+trigger1 = NumHelper (7000) = 1; must be at least 1 Helper, which is P2 Trembling on the screen.
+trigger1 = NumHelper (7020) = 0;; There can be no message "FINISH HIM!" on the screen.
+id = 7020
+stateno = 7020
+pos = 0,0
+postype = LEFT
+helpertype = normal
+name = "FINISH HER!"
+keyctrl = 0
+
+
+
+
+
+
+Pantalla roja donde golpea al player2:
+[StateDef 7000]
+type = S
+movetype = A
+physics = S
+anim = 99999999 ;(Puedes poner el numero de la animacion que tu quieras)
+velset = 0,0
+ctrl = 1
+
+[State 7010, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = nomusic
+
+[State 7000, 1]
+type = HitDef
+triggerall = 1
+trigger1 = AnimElem = 1
+trigger1 = P2StateType != A
+attr = SCA, NA
+damage = 0,0
+animtype = Heavy
+hitflag = MA
+guardflag = 
+priority = 7,hit
+pausetime = 0,1
+sparkxy = 0,0
+sparkno = -1
+gurad.sparkno = -1
+hitsound = -1
+guardsound = -1
+ground.type = High
+ground.slidetime = 0
+ground.hittime = 0
+ground.velocity = 0
+air.velocity = 0
+air.fall = 1
+fall = 0
+p2stateno = 867031
+
+
+
+
+
+
+[State 7010, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = nomusic
+flAG3=timerfreeze
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = stateno = 8005
+flag = nobardisplay
+flag2 = nomusic
+
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = root,stateno=9100 
+;ignorehitpause = 
+;persistent =
+
+Cartel de Finish Him:
+
+;- "FINISH HIM!" - Message
+[Statedef 7010]
+type = A
+movetype= I
+physics = N
+velset = 0.0
+anim = 99999952 
+ctrl = 0
+SPRPRIORITY = 20
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+
+[State fatal seÃ±al]
+type = Explod
+trigger1= time= 0
+id = 70288
+anim = 99999996
+postype = left
+pos = 100,30
+scale=1,1
+bindtime = 9999
+removetime = 9999
+ownpal = 1
+ontop = 1
+
+[State 7010, 1]
+type = PlaySnd
+trigger1 = Time = 0
+value = 99,0 ;(Numero del sonido que tu elijas)
+abspan=1
+
+
+[State 7010, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = nomusic
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time= 140
+;ignorehitpause =
+;persistent =
+
+Cartel de finish her
+
+;- "FINISH HER!" - Message
+[Statedef 7020]
+type = A
+MoveType = I
+Physics = N
+Juggle = 1
+velset = 0.0
+anim = 99999952
+ctrl = 0
+SPRPRIORITY = 20
+
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+
+
+
+[State fatal seÃ±al]
+type = Explod
+trigger1= time= 0
+id = 70288
+anim =879879879
+postype = left
+pos = 160,30
+scale=1,1
+bindtime = 9999
+removetime = 9999
+ownpal = 1
+ontop = 1
+
+
+[State 7010, 1]
+type = PlaySnd
+trigger1 = Time = 1
+value = 99,4
+abspan=1
+
+
+[State 7010, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = nomusic
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = animelem = 6 
+;ignorehitpause = 
+;persistent =
+
+;--------------------
+[Statedef 867031]
+type = S
+MoveType = H
+Physics = S
+Juggle = 1
+ctrl = 0
+velset = 0.0
+
+[State 867031, 1]
+type = LifeSet
+trigger1 = 1
+value = 1
+
+[State 867031, 2]
+type = TargetLifeAdd
+trigger1 =P2life <= 1
+value = 1
+
+
+
+[State 867031, 3]
+type = SelfState
+trigger1 = Time = 4
+trigger1 = P2StateNo = 3000; Put here the numbers of fatalities on AIR.
+value = 5050
+ctrl = 0
+
+[State 867031, 4]
+type = LifeSet
+trigger1 = Time = 9999
+trigger1 = P2StateNO != 9100
+value = 0
+
+
+[State 867031, 5]
+type = ChangeState
+trigger1 = P2StateNo = 9100
+value = 867032 ;-> Enemy will be sent to this state when the "fatality" is performed.
+ctrl = 0
+
+
+
+[State 867031, 6]
+type = ChangeAnim
+trigger1 = AnimExist (5300)
+trigger1 = Anim != 5300
+value = 5300
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = life = 0 
+value = 5150
+
+;(Cuando el fatality se ejecuta)
+;---------------
+
+[Statedef 867032]
+type = S
+MoveType = H
+Physics = S
+Juggle = 1
+ctrl = 0
+velset = 0.0
+
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = time = 1199
+channel = -1
+
+
+[State 867032, 1]
+type = ChangeAnim
+trigger1 = AnimExist (5300)
+trigger1 = Anim != 5300
+value = 5300
+
+
+[statedef 8003]
+type = S
+MoveType = A
+Physics = S
+Juggle = 1
+velset = 0.0
+anim = 0 ;> The character makes the move to give the fatality.
+ctrl = 0
+
+;(El mensaje aparece)
+[State 7010, 3]
+type = Helper
+trigger1 = time = 100; P2 should be in this state for the message appears.
+id = 8002
+stateno = 8002
+pos = 160, -140
+postype = LEFT
+helpertype = normal
+name = "fatality"
+keyctrl = 0
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = anim = 0
+flag = nobardisplay
+flag2 = nomusic
+
+[State 0, ChangeState]
+type = Changestate
+trigger1 = time = 100
+value = 0
+ctrl = 1
+
+;(Es el mensaje)
+[Statedef 8002]
+type = S
+movetype = A
+physics = N
+anim = 99999955
+velset = 0,0
+ctrl = 1
+sprpriority = 9999
+
+
+
+
+
+[State 8002, SND]
+type = PlaySnd
+trigger1 = time = 100
+value = 99,3
+volume = 255
+abspan = 1
+
+[state 8100, Continua Escuro]
+type = bgPalFx
+trigger1 = Time >= 100
+add = -155,-155,-155
+time = 99999999
+
+[State 8100, sem LB]
+type = AssertSpecial
+trigger1 = Time>=0
+flag = NoBarDisplay
+
+[State 8002, sem A]
+type = AssertSpecial
+trigger1 = Time > 0
+flag = nobardisplay
+ignorehitpause = 1
+
+
+
+
+[state 8002, 2]
+type = AssertSpecial
+trigger1 = Time >= 0
+flag = noshadow
+FLAG2= NOMUSIC
+Ahora si lo que te interesa, el estado donde el personaje ejecuta el Fatality:
+
+[Statedef 9100]
+type = S
+MoveType = A
+Physics = S
+Juggle = 1
+velset = 0.0
+anim = 9000 ;> The character makes the move to give the fatality.
+ctrl = 0
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = 1
+x = 2
+y = -2
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = time = 0
+channel = -1
+;ignorehitpause = 
+;persistent = 
+
+;(Con esto el fondo se oscurece)
+[State 3000 2]
+type = bgPalFx
+trigger1 = Time = 8
+add = 0,0,0
+mul = 256,256,256
+sinadd = -155,-155,-155,300
+time = 200
+
+[state 8100, Continua Escuro]
+type = bgPalFx
+trigger1 = Time >= 100
+add = -155,-155,-155
+time = 99999999
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+flag2 = nomusic
+
+;(Esta es para la música del fatality)
+[State 1050, 0]
+type = PlaySnd
+trigger1 =time= 0
+value = S99,1
+abspan=1
+channel= 2
+volume = 255
+
+[State 0, Explod]
+type = Explod
+trigger1 = Anim = 9000
+trigger1 = AnimElem = 2
+anim = 99999999
+ID = 99999999
+pos = 0,0
+postype = left  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 30
+pausemovetime = 0
+scale = 1,1
+sprpriority = 9999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+;Cuando el Fatality termine
+[State 3000, 4]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 9101
+ctrl = 1
+
+
+[Statedef 9101]
+type = S
+MoveType = A
+Physics = S
+Juggle = 1
+velset = 0.0
+anim = 9002 ;> The character makes the move to give the fatality.
+ctrl = 0
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = Anim = 9002
+x = 2
+y = 0
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = P2BodyDist X <=10
+x = 0
+y = 0
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = Anim = 9002
+trigger1 = P2BodyDist X <=10
+value = 9003
+
+[State 0, Explod]
+type = Explod
+trigger1 = Anim = 9002
+trigger1 = Time = 0
+anim = 9007
+ID = 9007
+pos = -13,-72
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = -1
+pausemovetime = 0
+scale = .8,.8
+sprpriority = 0
+ontop = 1
+ownpal = 1
+supermove = 1
+pausemove = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = Anim = 9002
+trigger1 = Time = 0
+value = S6017,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = Anim = 9002
+trigger1 = Time = 0
+value = S10000,4
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = Anim = 9002
+trigger1 = AnimElem = 4
+id = 9007
+
+[State 0, Explod]
+type = Explod
+triggerall = Anim = 9003
+trigger1 = AnimElem = 1
+anim = 9007
+ID = 9007
+pos = -42,-72
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = -1
+pausemovetime = 0
+scale = .8,.8
+sprpriority = 0
+ontop = 1
+ownpal = 1
+supermove = 1
+pausemove = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = Anim = 9003
+trigger1 = AnimElem = 1
+value = S6017,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = Anim = 9003
+trigger1 = AnimElem = 1
+value = S10000,2
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+triggerall = Anim = 9003
+trigger1 = AnimElem = 2
+id = 9007
+
+
+;(Con esto el fondo se oscurece)
+[State 3000 2]
+type = bgPalFx
+trigger1 = Time = 8
+add = 0,0,0
+mul = 256,256,256
+sinadd = -155,-155,-155,300
+time = 200
+
+[state 8100, Continua Escuro]
+type = bgPalFx
+trigger1 = Time >= 100
+add = -155,-155,-155
+time = 99999999
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+flag2 = nomusic
+
+[State 0, Explod]
+type = Explod
+trigger1 = Anim = 9000
+trigger1 = AnimElem = 2
+anim = 99999999
+ID = 99999999
+pos = 0,0
+postype = left  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 30
+pausemovetime = 0
+scale = 1,1
+sprpriority = 9999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+;Cuando el Fatality termine
+[State 3000, 4]
+type = ChangeState
+trigger1 = Anim = 9003
+trigger1 = !AnimTime
+value = 9102
+ctrl = 1
+
+[Statedef 9102]
+type = S
+MoveType = A
+Physics = S
+Juggle = 1
+velset = 0.0
+anim = 9004 ;> The character makes the move to give the fatality.
+ctrl = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = S195,0
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 0
+value = S6018,0
+
+[State 0, Helper]
+type = Helper
+trigger1 = Time = 10
+trigger2 = TimeMod = 5,0
+helpertype = normal ;player
+name = "Super KameHameHa" 
+ID = 9006
+stateno = 9006
+pos = 30,-30
+postype = p1    ;p2,front,back,left,right
+facing = 1
+keyctrl = 0
+ownpal = 0
+supermovetime = 0
+pausemovetime = 0
+size.xscale = 1.4
+size.yscale =  .8
+
+
+
+;(Con esto el fondo se oscurece)
+[State 3000 2]
+type = bgPalFx
+trigger1 = Time = 8
+add = 0,0,0
+mul = 256,256,256
+sinadd = -155,-155,-155,300
+time = 200
+
+[state 8100, Continua Escuro]
+type = bgPalFx
+trigger1 = Time >= 100
+add = -155,-155,-155
+time = 99999999
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+flag2 = nomusic
+
+[State 0, Explod]
+type = Explod
+trigger1 = Anim = 9000
+trigger1 = AnimElem = 2
+anim = 99999999
+ID = 99999999
+pos = 0,0
+postype = left  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 30
+pausemovetime = 0
+scale = 1,1
+sprpriority = 9999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+
+;Cuando el Fatality termine
+[State 3000, 4]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 9103
+ctrl = 1
+
+[Statedef 9103]
+type = S
+MoveType = A
+Physics = S
+Juggle = 1
+velset = 0.0
+anim = 9005 ;> The character makes the move to give the fatality.
+ctrl = 0
+
+;(Con esto el fondo se oscurece)
+[State 3000 2]
+type = bgPalFx
+trigger1 = Time = 8
+add = 0,0,0
+mul = 256,256,256
+sinadd = -155,-155,-155,300
+time = 200
+
+[state 8100, Continua Escuro]
+type = bgPalFx
+trigger1 = Time >= 100
+add = -155,-155,-155
+time = 99999999
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+flag2 = nomusic
+
+[State 0, Explod]
+type = Explod
+trigger1 = Anim = 9000
+trigger1 = AnimElem = 2
+anim = 99999999
+ID = 99999999
+pos = 0,0
+postype = left  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = 30
+pausemovetime = 0
+scale = 1,1
+sprpriority = 9999
+ontop = 1
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+trigger2 = AnimElem = 6
+value = S9005,0
+
+[State 0, PosAdd]
+type = PosAdd
+trigger1 = AnimElem = 6
+x = 0
+y = 60
+
+;Cuando el Fatality termine
+[State 3000, 4]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 8003
+ctrl = 1
+
+[Statedef 9006]
+type = S
+MoveType = A
+Physics = S
+Juggle = 1
+velset = 0.0
+anim = 9006 ;> The character makes the move to give the fatality.
+ctrl = 0
+
+[State agarra]
+type = HitDef
+TRIGGER1= ANIM = 9006
+trigger1 = TimeMod = 5,0
+attr = SCA, NA
+damage= 0,0
+hitflag = MAF
+sparkno = -1
+p2stateno = 91002
+envshake.time = 40
+PalFX.time = 40
+PalFX.add = 0,0,100
+PalFX.mul = 256,256,256
+PalFX.sinadd = 0,0,0,10
+PalFX.invertall = 100
+PalFX.color = 256
+
+;Cuando el Fatality termine
+[State 3000, 4]
+type = DestroySelf
+trigger1 = Animtime = 0
+
+Ahora el estado que toma el jugador 2 cuando el jugador 1 le pega:
+
+[Statedef 91001]
+type = S
+MoveType = H
+Physics = S
+Juggle = 1
+velset = 0.0
+ctrl = 0
+
+
+[State 0, ChangeAnim2]
+type = ChangeAnim2
+trigger1 = time = 0
+value = 9001
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = Time = 0 
+y = 10
+;ignorehitpause = 
+;persistent = 
+
+
+[Statedef 91002]
+type = S
+MoveType = H
+Physics = S
+Juggle = 1
+velset = 0.0
+ctrl = 0
+
+[State 0, LifeSet]
+type = LifeSet
+trigger1 = time =0
+value = 0
+
+
+;(Esto es opcional si quieres hacer un efecto de que explota)
+[State 0, PosSet]
+type = PosSet
+trigger1 = time= 1
+y = 999999
+;ignorehitpause = 
+;persistent = 
+
+
+
+
+
+[State 0, SelfState]
+type = SelfState
+trigger1 = TIME= 30
+value =5150
+;anim =
+;ctrl =
+;ignorehitpause = 0
+;persistent = 1
