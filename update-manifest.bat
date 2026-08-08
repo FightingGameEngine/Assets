@@ -24,7 +24,7 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 echo ============================================================================
-echo  FightingGameEngine-Assets - Manifest Updater
+echo  Assets - Manifest Updater
 echo ============================================================================
 echo.
 
@@ -43,7 +43,7 @@ if errorlevel 1 (
 REM Check if we're in the right directory
 if not exist "chars" (
     if not exist "stages" (
-        echo  ERROR: This doesn't look like the FightingGameEngine-Assets repo.
+        echo  ERROR: This doesn't look like the Assets repo.
         echo  Expected to find a 'chars' or 'stages' folder.
         echo  Make sure this .bat file is in the root of the repo.
         echo.
@@ -119,7 +119,7 @@ if errorlevel 1 (
         echo.
         echo  jsDelivr CDN will update in 5-10 minutes.
         echo  To force-refresh, visit:
-        echo  https://purge.jsdelivr.net/gh/nawaf-al-hussain/FightingGameEngine-Assets@main/manifest.json
+        echo  https://purge.jsdelivr.net/gh/FightingGameEngine/Assets@main/manifest.json
         echo.
     ) else (
         echo.

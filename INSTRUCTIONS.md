@@ -1,4 +1,4 @@
-# FightingGameEngine-Assets — Character Adding Guide
+# Assets — Character Adding Guide
 
 This repo hosts downloadable characters for the Fighting Game Engine.
 Characters are served via jsDelivr CDN (free, global) and downloaded
@@ -112,7 +112,7 @@ Open `manifest.json` and add a new entry to the `characters` array:
   "description": "Short description shown in character select.",
   "sizeMB": 25,
   "bundled": false,
-  "cdnBase": "https://cdn.jsdelivr.net/gh/nawaf-al-hussain/FightingGameEngine-Assets@main/chars/YourCharName/",
+  "cdnBase": "https://cdn.jsdelivr.net/gh/FightingGameEngine/Assets@main/chars/YourCharName/",
   "files": [
     "YourCharName.def",
     "YourCharName.cns",
@@ -155,13 +155,13 @@ Open `manifest.json` and add a new entry to the `characters` array:
 
 Characters are served via two CDNs:
 
-1. **jsDelivr** (primary): `https://cdn.jsdelivr.net/gh/nawaf-al-hussain/FightingGameEngine-Assets@main/`
+1. **jsDelivr** (primary): `https://cdn.jsdelivr.net/gh/FightingGameEngine/Assets@main/`
    - Fast, global CDN
    - 50MB file size limit
    - Blocks .cmd files (403) — automatic fallback to GitHub raw
    - Caches for up to 7 days
 
-2. **GitHub raw** (fallback): `https://raw.githubusercontent.com/nawaf-al-hussain/FightingGameEngine-Assets/main/`
+2. **GitHub raw** (fallback): `https://raw.githubusercontent.com/FightingGameEngine/Assets/main/`
    - No file size limit
    - Serves all file types
    - Slightly slower than jsDelivr
@@ -169,7 +169,7 @@ Characters are served via two CDNs:
 
 After pushing changes, jsDelivr takes ~5-10 minutes to update its cache.
 To force-refresh, visit:
-`https://purge.jsdelivr.net/gh/nawaf-al-hussain/FightingGameEngine-Assets@main/manifest.json`
+`https://purge.jsdelivr.net/gh/FightingGameEngine/Assets@main/manifest.json`
 
 ## Current Characters
 

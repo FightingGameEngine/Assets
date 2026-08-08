@@ -24,7 +24,7 @@ set -e
 cd "$(dirname "$0")"
 
 echo "============================================================================"
-echo " FightingGameEngine-Assets — Manifest Updater"
+echo " Assets — Manifest Updater"
 echo "============================================================================"
 echo ""
 
@@ -45,7 +45,7 @@ fi
 
 # Check if we're in the right directory
 if [ ! -d "chars" ] && [ ! -d "stages" ]; then
-    echo " ERROR: This doesn't look like the FightingGameEngine-Assets repo."
+    echo " ERROR: This doesn't look like the Assets repo."
     echo " Expected to find a 'chars' or 'stages' folder."
     echo " Make sure this .sh file is in the root of the repo."
     echo ""
@@ -100,7 +100,7 @@ if ! git diff --quiet manifest.json 2>/dev/null; then
         echo ""
         echo " jsDelivr CDN will update in 5-10 minutes."
         echo " To force-refresh, visit:"
-        echo " https://purge.jsdelivr.net/gh/nawaf-al-hussain/FightingGameEngine-Assets@main/manifest.json"
+        echo " https://purge.jsdelivr.net/gh/FightingGameEngine/Assets@main/manifest.json"
         echo ""
     else
         echo ""
