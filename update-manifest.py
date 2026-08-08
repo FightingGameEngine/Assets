@@ -187,7 +187,23 @@ def parse_def_file(def_path, char_folder):
             seen.add(f)
             unique_files.append(f)
     result["files"] = unique_files
-    
+
+    # Filter out files that don't exist on disk. Some .def files reference
+    # common1.cns or other shared files stored in the engine's data/ folder.
+    # Including these would cause 404 download failures.
+    from pathlib import Path as _Path
+    char_folder_path = _Path(def_path).parent
+    existing_files = []
+    missing_files = []
+    for f in result["files"]:
+        if (char_folder_path / f).exists():
+            existing_files.append(f)
+        else:
+            missing_files.append(f)
+    if missing_files:
+        print(f'    NOTE: Skipping {len(missing_files)} missing file(s): {missing_files}')
+    result["files"] = existing_files
+
     return result
 
 
