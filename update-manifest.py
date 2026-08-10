@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-update-manifest.py — Auto-generate manifest.json for FightingGameEngine-Assets
+update-manifest.py — Auto-generate manifest.json for Assets
 
 USAGE:
-    python3 update-manifest.py [--repo /path/to/FightingGameEngine-Assets]
+    python3 update-manifest.py [--repo /path/to/Assets]
 
 WHAT IT DOES:
     1. Scans chars/ for character folders (each must contain a .def file)
@@ -20,7 +20,7 @@ WHAT IT DOES:
     7. Prints a summary of what changed
 
 WORKFLOW:
-    1. Clone FightingGameEngine-Assets to your desktop
+    1. Clone Assets to your desktop
     2. Add/remove character folders in chars/ and stage files in stages/
     3. Run this script: python3 update-manifest.py
     4. Review changes with: git diff manifest.json
@@ -431,12 +431,12 @@ def preserve_overrides(existing, new_entries, entry_type):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Auto-generate manifest.json for FightingGameEngine-Assets"
+        description="Auto-generate manifest.json for Assets"
     )
     parser.add_argument(
         "--repo",
         default=".",
-        help="Path to the FightingGameEngine-Assets repo (default: current directory)",
+        help="Path to the Assets repo (default: current directory)",
     )
     args = parser.parse_args()
     
@@ -446,7 +446,7 @@ def main():
     manifest_path = repo_path / "manifest.json"
     
     print("=" * 60)
-    print("FightingGameEngine-Assets — Manifest Generator")
+    print("Assets — Manifest Generator")
     print("=" * 60)
     print(f"Repo path: {repo_path}")
     print()
