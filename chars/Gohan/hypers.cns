@@ -1,0 +1,356 @@
+;---------------------------------------------------------------------------
+; Masenko (slow)
+[Statedef 3000]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+velset = 0,0
+anim = 3000
+ctrl = 0
+poweradd = -1000
+
+[State 3200, 1.1]
+type = SuperPause
+trigger1 = animelem= 1
+anim = -1
+time = 30
+movetime = 30
+darken = 1
+sound = S3000,0
+[State 3200, 1.2A]
+type = Explod
+trigger1 = animelem= 1
+anim = 8401
+pos = -1,-86
+postype = p1
+supermove = 1
+bindtime = 30
+ontop = 0
+ownpal = 1
+[State 3200, 1.2B]
+type = Explod
+trigger1 = animelem= 1
+anim = 8400
+pos = -1,-86
+postype = p1
+supermove = 1
+bindtime = 30
+ontop = 1
+ownpal = 1
+[State 3000, Super F] ;Invunerable to normal and special attacks for a bit
+type = NotHitBy
+trigger1 = Time = 2
+value = , NA, SA, AT
+time = 12
+
+[State 1000, Helper]
+type = Helper
+trigger1 = animelem = 20
+ID = 3005
+pos = 60,-56
+postype = p1
+stateno = 3005
+helpertype = normal
+name = "fireball_x"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 20
+value = S999,2
+
+[State 3000, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Masenko (fast)
+[Statedef 3010]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+velset = 0,0
+anim = 3000
+ctrl = 0
+poweradd = -1000
+
+[State 3200, 1.1]
+type = SuperPause
+trigger1 = animelem= 1
+anim = -1
+time = 30
+movetime = 30
+darken = 1
+sound = S3000,0
+[State 3200, 1.2A]
+type = Explod
+trigger1 = animelem= 1
+anim = 8401
+pos = -1,-86
+postype = p1
+supermove = 1
+bindtime = 30
+ontop = 0
+ownpal = 1
+[State 3200, 1.2B]
+type = Explod
+trigger1 = animelem= 1
+anim = 8400
+pos = -1,-86
+postype = p1
+supermove = 1
+bindtime = 30
+ontop = 1
+ownpal = 1
+[State 3000, Super F] ;Invunerable to normal and special attacks for a bit
+type = NotHitBy
+trigger1 = Time = 2
+value = , NA, SA, AT
+time = 12
+
+[State 1000, Helper]
+type = Helper
+trigger1 = animelem = 20
+ID = 3005
+pos = 60,-56
+postype = p1
+stateno = 3007
+helpertype = normal
+name = "fireball_x"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 20
+value = S999,2
+
+[State 3000, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;Fireball_x
+[StateDef 3005]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 3005
+sprpriority = 5
+[State 0, VelSet]
+type = VelSet
+trigger1 =1
+x =8
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 =1
+value = 1
+scale = 1,0.6
+
+[State 1005, 1]
+type = HitDef
+trigger1 = AnimElem = 1
+attr = S, HA
+damage = 160,6
+animtype = med
+guardflag = MA
+hitflag = MAF
+priority = 7, Hit
+sparkno = s8502
+guard.sparkno = s8506
+sparkxy = 0, 0
+pausetime = 0,7
+ground.slidetime = 9
+ground.hittime = 18
+ground.velocity = -8,-8
+air.velocity = -6,-8
+guard.velocity = -3.1
+guard.pausetime = 0,11
+guard.slidetime = 10
+guard.hittime = 20
+guard.ctrltime = 20
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+yaccel = .6
+fall = 1
+fall.recover = 0
+hitsound = S5,7
+guardsound =s6,0
+
+[State 0, Projectile]
+type = Projectile
+trigger1 =time = 0
+ProjID =666
+projanim =2361
+projscale = 1,1
+projremove = 1
+projremovetime =90
+velocity = 8,0
+offset = 0,0
+postype = p1
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time = 250
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = movecontact
+value = 3006
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = moveguarded
+trigger2 = root, numproj != 1
+value = 30006
+
+;Fireball_y
+[StateDef 3007]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 3005
+sprpriority = 5
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 =1
+flag = noshadow
+
+[State 0, VelSet]
+type = VelSet
+trigger1 =1
+x =10
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 =1
+value = 1
+scale = 1,0.6
+
+[State 1005, 1]
+type = HitDef
+trigger1 = AnimElem = 1
+attr = S, HA
+damage = 180,8
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 0,5
+sparkno = s8502
+guard.sparkno = s8506
+sparkxy = 0, 0
+ground.slidetime = 17
+ground.hittime = 17
+ground.velocity = -8,-8
+air.velocity = -3.5,-6
+guard.velocity = -6
+guard.pausetime = 0,11
+guard.slidetime = 18
+guard.hittime = 36
+guard.ctrltime = 36
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+guard.cornerpush.veloff =0
+yaccel = .4
+fall = 1
+fall.recover = 0
+hitsound = S5,7
+guardsound =s6,0
+
+[State 0, Projectile]
+type = Projectile
+trigger1 =time = 0
+ProjID =666
+projanim =2361
+projscale = 1,1
+projremove = 1
+projremovetime =90
+velocity = 9,0
+offset = 0,0
+postype = p1
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time = 250
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = movecontact
+value = 3006
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = moveguarded
+trigger2 = root, numproj != 1
+value = 30006
+
+;Fireball proj. contact
+[StateDef 3006]
+type = S
+movetype= I
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 3006
+sprpriority = 2
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 =1
+flag = noshadow
+[State 0, Pause]
+type = Pause
+trigger1 = time = 0
+trigger2 = time = 2
+trigger3 = time = 4
+trigger4 = time = 6
+trigger5 = time = 8
+trigger6 = time = 10
+trigger7 = time = 12
+trigger8 = time = 14
+trigger9 = time = 16
+trigger10 = time = 18
+trigger11 = time = 20
+trigger12 = time = 22
+trigger13 = time = 24
+trigger14 = time = 26
+trigger15 = time = 28
+trigger16 = time = 30
+time = 2
+movetime = 1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = Animtime =0
+
+;Fireball proj. guarded
+[StateDef 30006]
+type = S
+movetype= I
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 30006
+sprpriority = 2
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 =1
+flag = noshadow
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = Animtime =0
+
