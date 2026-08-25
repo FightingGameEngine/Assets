@@ -1,0 +1,3597 @@
+;===========================================================================
+; ヘルパー用のステート
+; States for Helpers
+;===========================================================================
+[Statedef 1]
+type            = A
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = Vel X,Vel Y
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = AttackMulSet
+trigger1   = 1
+value      = IfElse((Root,SysVar(1) & 2**16),Root,SysFVar(0),1)*(1+.25*!!Root,Var(31))*(1+.8/3*Root,NumExplod(6410))
+ignorehitpause = 1
+
+[State ]
+type       = ScreenBound
+trigger1   = 1
+value      = 0
+movecamera = 0,0
+ignorehitpause = 1
+
+[State ]
+type       = TargetDrop
+trigger1   = MoveHit = 1 && NumTarget > 1
+trigger1   = Var(0) := Target,GetHitVar(ChainID) && Var(1) := Var(0)-Var(0)%2 && !Target,IsHelper && NumEnemy < 2
+;trigger1   = Var(1)-302
+excludeID  = Var(0)
+keepone    = 1
+ignorehitpause = 1
+
+[State ]
+type       = TargetState
+trigger1   = MoveHit = 1 && NumTarget = 1
+trigger1   = Var(0) := Target,GetHitVar(ChainID) && Var(1) := Var(0)-Var(0)%2 && !Target,IsHelper
+;trigger1   = Var(1)-302
+value      = 5300
+ID         = Var(0)
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = IsHelper(2000) || IsHelper(3000)
+value      = 1998+1000*IsHelper(3000)
+ctrl       = 0
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+triggerall = !IsHelper(10000)
+triggerall = Var(53) := ((2**0)*(Root,StateType = S) | (2**1)*(Root,StateType = C) | (2**2)*(Root,StateType = A) | (2**3)*(Root,StateType = L))
+triggerall = Var(53) := (Var(53) | (2**4)*(Root,MoveType = I) | (2**5)*(Root,MoveType = A) | (2**6)*(Root,MoveType = H))
+triggerall = 1 || Var(56) := Root,Var(56) || Var(2) := (Root,SysVar(2) & (1 ^ -1)) || Var(29) := Root,Var(29) || Var(30) := Root,Var(30)
+trigger1   = NumPartner && Var(50) := 1
+trigger1   = 0 && Var(50) := (Root,ID <= Partner,ID)
+trigger2   = NumEnemy
+trigger2   = Var(53) := (Var(53) | (2**10)*(Enemy(0),StateType = S) | (2**11)*(Enemy(0),StateType = C) | (2**12)*(Enemy(0),StateType = A) | (2**13)*(Enemy(0),StateType = L))
+trigger2   = Var(53) := (Var(53) | (2**14)*(Enemy(0),MoveType = I) | (2**15)*(Enemy(0),MoveType = A) | (2**16)*(Enemy(0),MoveType = H))
+trigger2   = Var(53) := (Var(53) | (2**17)*(Enemy(0),HitDefAttr = SCA, NA, SA, HA || Enemy(0),HitDefAttr = , NA, SA, HA))
+trigger2   = Var(53) := (Var(53) | (2**18)*(Enemy(0),HitDefAttr = SCA, NT, ST, HT || Enemy(0),HitDefAttr = , NT, ST, HT))
+trigger2   = Var(53) := (Var(53) | (2**19)*(Enemy(0),HitDefAttr = SCA, NP, SP, HP || Enemy(0),HitDefAttr = , NP, SP, HP))
+trigger2   = 1 || FVar(10) := (Enemy(0),Vel X-FVar(12))*!!Enemy(0),Vel X*IfElse(Enemy(0),Vel X>0,Enemy(0),FrontEdgeBodyDist>0,Enemy(0),BackEdgeBodyDist>0)*(1-2*!(Facing=Enemy(0),Facing))
+trigger2   = 1 || FVar(11) := IfElse((Var(53) & 2**16)+(Enemy(0),StateNo=[120,155]),Enemy(0),GetHitVar(YAccel),Enemy(0),Const(Movement.YAccel))*!(Enemy(0),Pos Y < 0)*FVar(13)
+trigger2   = 1 || FVar(12) := Enemy(0),Vel X*!Enemy(0),Ctrl*IfElse(Enemy(0),Vel X>0,Enemy(0),FrontEdgeBodyDist>0,Enemy(0),BackEdgeBodyDist>0)*!(Enemy(0),Anim=[20,21])
+trigger2   = 1 || FVar(13) := Enemy(0),Vel Y
+trigger2   = 1 || FVar(14) := Enemy(0),Vel Z
+trigger2   = 1 || FVar(15) := IfElse(Facing=Enemy(0),Facing,IfElse((Var(53) & 2**12),Enemy(0),Const(Size.Air.Back),Enemy(0),Const(Size.Ground.Back)),-IfElse((Var(53) & 2**12),Enemy(0),Const(Size.Air.Front),Enemy(0),Const(Size.Ground.Front)))
+trigger2   = 1 || FVar(15) := (FVar(15)+Enemy(0),Pos X-Pos X)*Facing
+trigger2   = 1 || FVar(16) := Enemy(0),Pos Y-Pos Y
+trigger2   = !Enemy(0),Alive
+trigger2   = Var(53) := (Var(53) & ((2**10 | 2**11 | 2**12 | 2**13 | 2**14 | 2**15 | 2**16 | 2**17 | 2**18 | 2**19) ^ -1))
+trigger2   = FVar(10) := (FVar(11) := (FVar(12) := (FVar(13) := (FVar(14) := (FVar(15) := (FVar(16) := 0))))))
+trigger3   = NumEnemy > 1
+trigger3   = Var(53) := (Var(53) | (2**20)*(Enemy(1),StateType = S) | (2**21)*(Enemy(1),StateType = C) | (2**22)*(Enemy(1),StateType = A) | (2**23)*(Enemy(1),StateType = L))
+trigger3   = Var(53) := (Var(53) | (2**24)*(Enemy(1),MoveType = I) | (2**25)*(Enemy(1),MoveType = A) | (2**26)*(Enemy(1),MoveType = H))
+trigger3   = Var(53) := (Var(53) | (2**27)*(Enemy(1),HitDefAttr = SCA, NA, SA, HA || Enemy(1),HitDefAttr = , NA, SA, HA))
+trigger3   = Var(53) := (Var(53) | (2**28)*(Enemy(1),HitDefAttr = SCA, NT, ST, HT || Enemy(1),HitDefAttr = , NT, ST, HT))
+trigger3   = Var(53) := (Var(53) | (2**29)*(Enemy(1),HitDefAttr = SCA, NP, SP, HP || Enemy(1),HitDefAttr = , NP, SP, HP))
+trigger3   = 1 || FVar(20) := (Enemy(1),Vel X-FVar(22))*!!Enemy(1),Vel X*IfElse(Enemy(1),Vel X>0,Enemy(1),FrontEdgeBodyDist>0,Enemy(1),BackEdgeBodyDist>0)
+trigger3   = 1 || FVar(21) := IfElse((Var(53) & 2**26)+(Enemy(1),StateNo=[120,155]),Enemy(1),GetHitVar(YAccel),Enemy(1),Const(Movement.YAccel))*!((Enemy(1),Pos Y < 0)*FVar(23))
+trigger3   = 1 || FVar(22) := Enemy(1),Vel X*!Enemy(1),Ctrl*IfElse(Enemy(1),Vel X>0,Enemy(1),FrontEdgeBodyDist>0,Enemy(1),BackEdgeBodyDist>0)*!(Enemy(1),Anim=[20,21])
+trigger3   = 1 || FVar(23) := Enemy(1),Vel Y
+trigger3   = 1 || FVar(24) := Enemy(1),Vel Z
+trigger3   = 1 || FVar(25) := IfElse(Facing=Enemy(1),Facing,IfElse((Var(53) & 2**22),Enemy(1),Const(Size.Air.Back),Enemy(1),Const(Size.Ground.Back)),-IfElse((Var(53) & 2**22),Enemy(1),Const(Size.Air.Front),Enemy(1),Const(Size.Ground.Front)))
+trigger3   = 1 || FVar(25) := (FVar(25)+Enemy(1),Pos X-Pos X)*Facing
+trigger3   = 1 || FVar(26) := Enemy(1),Pos Y-Pos Y
+trigger3   = !Enemy(1),Alive || 0 && Var(2) := (Var(2) | ((Abs(FVar(25))<Abs(FVar(10))||!Enemy(0),Alive)&&Enemy(1),Alive))
+trigger3   = Var(53) := (Var(53) & ((2**20 | 2**21 | 2**22 | 2**23 | 2**24 | 2**25 | 2**26 | 2**27 | 2**28 | 2**29) ^ -1))
+trigger3   = FVar(20) := (FVar(21) := (FVar(22) := (FVar(23) := (FVar(24) := (FVar(25) := (FVar(26) := 0))))))
+trigger4   = NumEnemy > (Var(2) & 1)
+trigger4   = NumTarget || 0 && FVar(37) := Floor(Enemy(Var(2) & 1),Pos X-Pos X)*Facing && FVar(38) := Floor(Enemy(Var(2) & 1),Pos Y-Pos Y+Enemy(Var(2) & 1),Const(Size.Mid.Pos.Y))
+trigger4   = Target,Alive
+trigger4   = FVar(37) := Floor(Target,Pos X-Pos X)*Facing || FVar(38) := Floor(Target,Pos Y-Pos Y+Target,Const(Size.Mid.Pos.Y))
+trigger5   = 1
+sysvar(2)  = (Var(2) | (Root,SysVar(2) & 1073741824))
+ignorehitpause = 1
+
+[State ]
+type       = ChangeAnim
+trigger1   = 1 || Var(0) :=        6300*IsHelper(6300)+6301*IsHelper(6301)+6302*IsHelper(6302)+6303*IsHelper(6303)+6304*IsHelper(6304)+6308*IsHelper(6308)
+trigger1   = 1 || Var(0) := Var(0)+6500*IsHelper(6500)+6501*IsHelper(6501)+6502*IsHelper(6502)+6503*IsHelper(6503)+6504*IsHelper(6504)+6505*IsHelper(6505)+6506*IsHelper(6506)+6507*IsHelper(6507)+6508*IsHelper(6508)+6509*IsHelper(6509)+6510*IsHelper(6510)
+trigger1   = 1 || Var(0) := Var(0)+6600*IsHelper(6600)+6601*IsHelper(6601)+6602*IsHelper(6602)+6603*IsHelper(6603)+6604*IsHelper(6604)+6605*IsHelper(6605)+6606*IsHelper(6606)+6607*IsHelper(6607)+6608*IsHelper(6608)+6609*IsHelper(6609)+6610*IsHelper(6610)
+trigger1   = 1 || Var(0) := Var(0)+10000*IsHelper(10000)+10050*IsHelper(10050)+40000*IsHelper(40000)
+trigger1   = SelfAnimExist(Abs(Var(0))) && Anim-Var(0)
+value      = Var(0)
+elem       = 1
+ignorehitpause = 1
+
+[State ]
+type       = NotHitBy
+trigger1   = Anim < 6000
+value      = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+time       = -1
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = 1
+value      = StateNo+1
+ctrl       = (Var(29) := 0)
+ignorehitpause = 1
+persistent = 256
+
+
+;===========================================================================
+; 自爆ヘルパーステート
+; Self-Explosion Helper State
+;===========================================================================
+[Statedef 6002]
+type            = A
+movetype        = A
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = BindToParent
+trigger1   = !AnimElemTime(1)
+time       = 1
+facing     = 0
+pos        = 0,0
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+trigger1   = !AnimElemTime(1)
+trigger1   = PlayerIDExist(Parent,ID)
+sysvar(0)  = Parent,NumExplod(7300)*23+200*!Parent,NumExplod(7300)
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = !AnimElemTime(1)
+value          = s220,0
+volume         = 0
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.0
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 0
+
+[State ]
+type           = Explod
+trigger1       = !AnimElemTime(1)
+ID             = 6307
+anim           = 6307
+pos            = 0,-60
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = 1.8*Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,1.8*Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 2147483647*0
+supermovetime  = 2147483647*0
+ignorehitpause = 1
+
+[State ]
+type                       = HitDef
+trigger1                   = 1
+attr                       = , AA ,AT ,AP
+animtype                   = Up
+damage                     = Ceil(SysVar(0)),Ceil(SysVar(0))
+hitflag                    = MAFP
+guardflag                  = MA
+getpower                   = 0,0
+givepower                  = 0,0
+pausetime                  = 0,0
+guard.pausetime            = 0,0
+sparkno                    = -1
+guard.sparkno              = -1
+sparkxy                    = 0,0
+hitsound                   = -1,0
+guardsound                 = s4001,2
+ground.type                = High
+ground.slidetime           = 60
+ground.hittime             = 60
+ground.velocity            = 0,-5
+air.type                   = Trip
+guard.hittime              = 60
+guard.ctrltime             = 60
+guard.velocity             = -4
+air.hittime                = 60
+air.velocity               = 0,-5
+airguard.ctrltime          = 60
+airguard.velocity          = -1,-5
+ground.cornerpush.veloff   = 0
+air.cornerpush.veloff      = 0
+down.cornerpush.veloff     = 0
+guard.cornerpush.veloff    = 0
+airguard.cornerpush.veloff = 0
+priority                   = 7, Hit
+sprpriority                = 3
+;p1facing                   = 1
+p1getp2facing              = 0
+p2facing                   = 1
+;p1stateno                  = 
+;p2stateno                  = 5000
+;p2getp1state               = 0
+fall                       = 1
+fall.xvelocity             = 0.0
+fall.yvelocity             = 0.0
+fall.recover               = 0
+fall.recovertime           = 60
+fall.damage                = 0
+air.fall                   = 1
+ID                         = StateNo
+chainID                    = -1
+nochainID                  = StateNo
+hitonce                    = 0
+kill                       = 1
+guard.kill                 = 1
+fall.kill                  = 1
+numhits                    = 0
+guard.dist                 = 0
+palfx.time                 = 60
+palfx.add                  = 255,0,0
+affectteam                 = B
+ignorehitpause             = 0
+
+[State ]
+type       = DestroySelf
+trigger1   = !AnimTime
+ignorehitpause = 1
+
+[State ]
+type       = SelfState
+trigger1   = PlayerIDExist(ID)
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+
+;===========================================================================
+; アドバンシングガード押し判定
+;===========================================================================
+[Statedef 6010]
+type            = A
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = StateNo
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = VelSet
+trigger1   = 1
+x          = 15
+y          = 0
+ignorehitpause = 1
+
+[State ]
+type       = PosSet
+trigger1   = 1
+;x          = Pos X
+y          = 0
+ignorehitpause = 1
+
+[State ]
+type       = NotHitBy
+trigger1   = 1
+value      = SCA, NA ,SA ,HA ,NT ,ST ,HT ,NP ,SP ,HP ,AA ,AT ,AP
+time       = -1
+ignorehitpause = 1
+
+[State ]
+type       = PlayerPush
+trigger1   = 1
+value      = 1
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = !AnimElemTime(1)
+value          = s160,0
+volume         = 0
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.0
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+persistent     = 0
+
+[State ]
+type           = Explod
+trigger1       = !AnimElemTime(1)
+trigger1       = Root,ID = Parent,ID
+ID             = 6223
+anim           = 6223
+pos            = Ceil(RootDist X+30*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290),Ceil(RootDist Y-40*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290)
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = .50*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,.50*Parent,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = !AnimTime
+ignorehitpause = 1
+
+
+;===========================================================================
+; 
+; 
+;===========================================================================
+[Statedef 6230]
+type            = A
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = StateNo
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 4
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = NotHitBy
+trigger1   = 1
+value      = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+time       = 1
+ignorehitpause = 1
+
+[State ]
+type       = PosSet
+trigger1   = 1
+x          = Root,Pos X
+y          = Root,Pos Y+Root,Const(Size.Mid.Pos.Y)*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290
+ignorehitpause = 1
+
+[State ]
+type       = AngleSet
+trigger1   = !AnimElemTime(1)
+value      = 40*(Random%359)
+ignorehitpause = 1
+
+[State ]
+type       = AngleDraw
+trigger1   = 1
+scale      = 3.*AnimElemTime(1)/(AnimElemTime(1)-AnimTime),3.*AnimElemTime(1)/(AnimElemTime(1)-AnimTime)
+ignorehitpause = 1
+
+[State ]
+type       = Trans
+trigger1   = 1
+trans      = AddAlpha
+alpha      = Floor(256-256.*AnimElemTime(1)/(AnimElemTime(1)-AnimTime)),256
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = !AnimElemTime(1)
+value          = s412,1
+volume         = 0
+channel        = 3
+lowpriority    = 0
+freqmul        = 1.50
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 0
+
+[State ]
+type       = DestroySelf
+trigger1   = !AnimTime
+ignorehitpause = 1
+
+
+;===========================================================================
+; ガンマウェイブ／ガンマツナミ
+; Gamma Wave / Gamma Tsunami
+;===========================================================================
+[Statedef 6304]
+type            = A
+movetype        = A
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = VarSet
+trigger1   = PrevStateNo-StateNo
+sysvar(3)  = Parent,Anim+(Var(59) := 0)
+ignorehitpause = 1
+persistent = 0
+
+[State ]
+type       = VarSet
+trigger1   = PrevStateNo-StateNo
+sysvar(4)  = Parent,Anim%10+16*(SysVar(3) < 200 || SysVar(3) > 399)
+ignorehitpause = 1
+persistent = 0
+
+[State ]
+type       = ChangeAnim
+trigger1   = PrevStateNo-StateNo
+value      = StateNo+1
+elem       = 1
+ignorehitpause = 1
+persistent = 0
+
+[State ]
+type       = ParentVarSet
+trigger1   = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+var(25)    = SysVar(3)
+ignorehitpause = 1
+
+[State ]
+type       = ParentVarSet
+trigger1   = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+var(26)    = 0
+ignorehitpause = 1
+
+[State ]
+type       = ParentVarAdd
+trigger1   = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+var(30)    = 1
+ignorehitpause = 1
+
+[State ]
+type       = StateTypeSet
+trigger1   = 1
+movetype   = A
+ignorehitpause = 1
+
+[State ]
+type       = AssertSpecial
+trigger1   = 1
+flag       = Invisible
+ignorehitpause = 1
+
+[State ]
+type       = StateTypeSet
+trigger1   = Root,ProjContactTime(StateNo + 10 * ID + Var(59)) = 1 || (Var(50) & 2**Var(59))
+trigger1   = Var(50) := (Var(50) | 2**Var(59))
+movetype   = I
+ignorehitpause = 1
+
+[State ]
+type       = HitOverride
+trigger1   = 1
+attr       = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+slot       = 1
+stateno    = StateNo
+time       = 1
+forceair   = 0
+ignorehitpause = 1
+
+[State ]
+type       = NotHitBy
+trigger1   = Root,ProjContactTime(StateNo + 10 * ID + Var(59)) = 1 || (Var(50) & 2**Var(59))
+trigger1   = Var(50) := (Var(50) | 2**Var(59))
+trigger2   = 1
+value      = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+time       = -1
+ignorehitpause = 1
+
+[State ]
+type       = BindToParent
+trigger1   = !Var(58)
+time       = 1
+facing     = 1
+pos        = 0,0
+ignorehitpause = 1
+persistent = 0
+
+[State ]
+type           = PlaySnd
+trigger1       = !(Var(58)%(8-5*(SysVar(3) > 399))) && !Var(59) && Var(58) < (16+2.5*SysVar(4)-(SysVar(4) > 2))*(8.-5*(SysVar(3) > 399))/8
+value          = s360,0
+volume         = 200
+channel        = IfElse(SysVar(3) > 399,1 + Var(58)%7,-1)
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !(Var(58)%(8-5*(SysVar(3) > 399))) && !Var(59) && Var(58) < (16+2.5*SysVar(4)-(SysVar(4) > 2))*(8.-5*(SysVar(3) > 399))/8
+ID             = 36000
+anim           = 6304
+pos            = Ceil((60+(12+18*(SysVar(3) > 399))*Var(58))*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290),0
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = 0,-7
+accel          = 0,.4
+random         = 0,0
+scale          = (1+.2*(SysVar(3) > 399))*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,(1+.2*(SysVar(3) > 399))*Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 1
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !(Var(58)%(8-5*(SysVar(3) > 399))) && !Var(59) && Var(58) < (16+2.5*SysVar(4)-(SysVar(4) > 2))*(8.-5*(SysVar(3) > 399))/8
+ID             = 36001
+anim           = 6305
+pos            = Ceil((60+(12+18*(SysVar(3) > 399))*Var(58))*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290),0
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 1
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type       = RemoveExplod
+trigger1   = Var(58) > 12+48
+ID         = 36001
+ignorehitpause = 1
+
+[State ]
+type                       = Projectile
+trigger1                   = RoundState < 4 && SysVar(3) < 400 && MoveType = A && !(Var(50) & 2**Var(59)) && Root,ProjContactTime(StateNo + 10 * ID + Var(59)) < 0 && NumEnemy
+trigger1                   = 1 || FVar(37) := (EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Pos X-Pos X)*Facing
+trigger1                   = 1 || FVar(38) :=  EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Pos Y-Pos Y+EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Const(Size.Mid.Pos.Y)
+trigger1                   = 1 || FVar(0) := Root,SysFVar(4)
+projID                     = StateNo + 10 * ID + Var(59)
+projanim                   = StateNo
+projhitanim                = -1
+projremanim                = -1
+projcancelanim             = -1
+projscale                  = 0,0
+projremove                 = 1
+projremovetime             = 1
+affectteam                 = E
+velocity                   = 0,0
+remvelocity                = 0,0
+accel                      = 0,0
+velmul                     = 0,0
+projhits                   = 1
+projmisstime               = 1
+projpriority               = 5
+projsprpriority            = 2
+projedgebound              = 120
+projstagebound             = 120
+projheightbound            = -2000,1
+offset                     = Ceil((60+96*Var(59))*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290),Ceil(((-7+.5*.4*(Var(58)-8*Var(59)))*(Var(58)-8*Var(59)))*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290)
+postype                    = P1
+projshadow                 = 0,0,0
+attr                       = S, SP
+animtype                   = Hard
+priority                   = 1, Miss
+damage                     = Ceil(Ceil(40000*Root,SysFVar(1)*FVar(0)*IfElse(.900**Root,Var(30) > .300+.050*!!Root,NumExplod(6410),.900**Root,Var(30),.300+.050*!!Root,NumExplod(6410)))*1000./1000000),Ceil(Ceil(40000*Root,SysFVar(1)*.30)*1000./1000000)
+hitflag                    = MAFDP
+guardflag                  = MA
+getpower                   = Ceil(Ceil(40000*Root,SysFVar(1)*.80)*1000./1000000     *!Root,Var(31)),Ceil(Ceil(40000*Root,SysFVar(1)*.80)*1000./1000000*.625     *!Root,Var(31))
+givepower                  = Ceil(Ceil(40000*Root,SysFVar(1)*.80)*1000./1000000*.650              ),Ceil(Ceil(40000*Root,SysFVar(1)*.80)*1000./1000000*.650*.625              )
+pausetime                  = 0,1
+guard.pausetime            = 0,1
+sparkno                    = s6201
+guard.sparkno              = s6221
+sparkxy                    = 0,Ceil(FVar(38))
+hitsound                   = -1,0
+guardsound                 = -1,0
+ground.type                = High
+ground.slidetime           = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+ground.hittime             = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+ground.velocity            = -6.5,-6.5
+;air.type                   = Trip
+guard.hittime              = 30-2*(SysVar(4) > 1)-(SysVar(4) > 3)+TeamSide
+guard.ctrltime             = 30-2*(SysVar(4) > 1)-(SysVar(4) > 3)+TeamSide
+guard.velocity             = -1.5
+;air.type                   = Trip
+air.hittime                = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+air.velocity               = -6.5,-6.9
+airguard.ctrltime          = 30-2*(SysVar(4) > 1)-(SysVar(4) > 3)+TeamSide
+airguard.velocity          = -1.5,0
+down.velocity              = -6.5,-7.9
+ground.cornerpush.veloff   = 0
+air.cornerpush.veloff      = 0
+down.cornerpush.veloff     = 0
+guard.cornerpush.veloff    = 0
+airguard.cornerpush.veloff = 0
+yaccel                     = 2*Const(Movement.YAccel)
+sprpriority                = 3
+;p1facing                   = 1
+p1getp2facing              = 0
+p2facing                   = 1
+;p1stateno                  = 
+;p2stateno                  = 5000
+;p2getp1state               = 0
+fall                       = 1
+fall.xvelocity             = 0
+fall.yvelocity             = 0
+fall.recover               = 0
+fall.recovertime           = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+fall.damage                = 0
+air.fall                   = 1
+ID                         = 361+SysVar(4)-Root,Var(50)
+chainID                    = -1
+nochainID                  = -1
+hitonce                    = 0
+kill                       = 1
+guard.kill                 = 1
+fall.kill                  = 1
+numhits                    = 1
+guard.dist                 = 0
+ignorehitpause             = 0
+
+[State ]
+type                       = Projectile
+trigger1                   = SysVar(3) > 399 && MoveType = A && !(Var(50) & 2**Var(59)) && Root,ProjContactTime(StateNo + 10 * ID + Var(59)) < 0 && NumEnemy
+trigger1                   = 1 || FVar(37) := (EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Pos X-Pos X)*Facing
+trigger1                   = 1 || FVar(38) :=  EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Pos Y-Pos Y+EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Const(Size.Mid.Pos.Y)
+projID                     = StateNo + 10 * ID + Var(59)
+projanim                   = StateNo+1
+projhitanim                = -1
+projremanim                = -1
+projcancelanim             = -1
+projscale                  = 0,0
+projremove                 = 1
+projremovetime             = 1
+affectteam                 = E
+velocity                   = 0,0
+remvelocity                = 0,0
+accel                      = 0,0
+velmul                     = 0,0
+projhits                   = 1
+projmisstime               = 1
+projpriority               = 5
+projsprpriority            = 2
+projedgebound              = 120
+projstagebound             = 120
+projheightbound            = -2000,1
+offset                     = Ceil((60+90*Var(59))*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290),Ceil(((-7+.5*.4*(Var(58)-3*Var(59)))*(Var(58)-3*Var(59)))*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290)
+postype                    = P1
+projshadow                 = 0,0,0
+attr                       = S, HP
+animtype                   = Hard
+priority                   = 1, Miss
+damage                     = Ceil(Ceil(80000*Root,SysFVar(1)*IfElse(.900**Root,Var(30) > .500,.900**Root,Var(30),.500))*1000./1000000),Ceil(Ceil(80000*Root,SysFVar(1)*.30)*1000./1000000)
+hitflag                    = MAFDP
+guardflag                  = MA
+getpower                   = 0,0
+givepower                  = Ceil(Ceil(80000*Root,SysFVar(1)*.80)*1000./1000000*.650              ),Ceil(Ceil(80000*Root,SysFVar(1)*.80)*1000./1000000*.650*.625              )
+pausetime                  = 0,1
+guard.pausetime            = 0,1
+sparkno                    = s6201
+guard.sparkno              = s6221
+sparkxy                    = 0,Ceil(FVar(38))
+hitsound                   = -1,0
+guardsound                 = -1,0
+ground.type                = High
+ground.slidetime           = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+ground.hittime             = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+ground.velocity            = -9.5,-5.0
+;air.type                   = Trip
+guard.hittime              = 20+TeamSide
+guard.ctrltime             = 20+TeamSide
+guard.velocity             = -1.5
+;air.type                   = Trip
+air.hittime                = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+air.velocity               = -9.5,-5.0
+airguard.ctrltime          = 20+TeamSide
+airguard.velocity          = -1.5,0
+down.velocity              = -9.5,-5.0
+ground.cornerpush.veloff   = 0
+air.cornerpush.veloff      = 0
+down.cornerpush.veloff     = 0
+guard.cornerpush.veloff    = 0
+airguard.cornerpush.veloff = 0
+yaccel                     = 2*Const(Movement.YAccel)
+sprpriority                = 3
+;p1facing                   = 1
+p1getp2facing              = 0
+p2facing                   = 1
+;p1stateno                  = 
+;p2stateno                  = 5000
+;p2getp1state               = 0
+fall                       = 1
+fall.xvelocity             = 0
+fall.yvelocity             = 0
+fall.recover               = 0
+fall.recovertime           = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+fall.damage                = 0
+air.fall                   = 1
+ID                         = 401-Root,Var(50)
+chainID                    = -1
+nochainID                  = -1
+hitonce                    = 0
+kill                       = 1
+guard.kill                 = 1
+fall.kill                  = 1
+numhits                    = 1
+guard.dist                 = 0
+ignorehitpause             = 0
+
+[State ]
+type       = AttackDist
+trigger1   = 1
+value      = Ceil((75+60*Floor(.2*Var(58)))*Root,Const(Size.XScale)+60+Abs(Root,FVar(15+(Root,SysVar(2) & 1)*10)-Root,FVar(37)))
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+value          = s3,4
+volume         = 200
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = Root,ProjGuardedTime(StateNo + 10 * ID + Var(59)) = 1
+value          = s150,0
+volume         = 200
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = (Var(59) := Var(59)+1) < 1+Floor(1./(8-5*(SysVar(3) > 399))*Var(58)) && Var(59) < 2+.5*SysVar(4)
+value      = StateNo
+ctrl       = 0
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = (Var(58) := Var(58)+1) > 52+2.5*SysVar(4)-(SysVar(4) > 2) || Var(59) := 0
+ignorehitpause = 1
+
+
+;===========================================================================
+; ガンマクェイク
+; Gamma Quake
+;===========================================================================
+[Statedef 6327]
+type            = A
+movetype        = A
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = ChangeAnim
+trigger1   = PrevStateNo-StateNo
+value      = StateNo
+elem       = 1
+ignorehitpause = 1
+
+[State ]
+type       = BindToParent
+trigger1   = 1
+time       = 1
+facing     = 1
+pos        = 180*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,0
+ignorehitpause = 1
+persistent = 0
+
+[State ]
+type       = ChangeState
+trigger1   = Time > 18
+value      = StateNo+1
+ctrl       = (Var(58) := 0)
+ignorehitpause = 1
+
+
+;===========================================================================
+; ガンマクェイク
+; Gamma Quake
+;===========================================================================
+[Statedef 6328]
+type            = A
+movetype        = A
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = ParentVarSet
+trigger1   = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+var(25)    = 430
+ignorehitpause = 1
+
+[State ]
+type       = ParentVarSet
+trigger1   = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+var(26)    = 0
+ignorehitpause = 1
+
+[State ]
+type       = ParentVarAdd
+trigger1   = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+var(30)    = 1
+ignorehitpause = 1
+
+[State ]
+type       = StateTypeSet
+trigger1   = 1
+movetype   = A
+ignorehitpause = 1
+
+[State ]
+type       = StateTypeSet
+trigger1   = 0;Root,ProjContactTime(StateNo + 10 * ID + Var(59)) = 1 || (Var(50) & 2**Var(59))
+trigger1   = Var(50) := (Var(50) | 2**Var(59))
+movetype   = I
+ignorehitpause = 1
+
+[State ]
+type       = HitOverride
+trigger1   = 1
+attr       = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+slot       = 1
+stateno    = StateNo
+time       = 1
+forceair   = 0
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = (Root,ProjContactTime(StateNo + 10 * ID + Var(59)) = 1 || Var(Var(59)+12) > -40) && !(Var(50) & 2**Var(59)) && Var(58)
+value          = s430,1
+volume         = 200
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type       = NotHitBy
+trigger1   = Root,ProjContactTime(StateNo + 10 * ID + Var(59)) = 1 || (Var(50) & 2**Var(59)) || Var(Var(59)+12) > -40
+trigger1   = Var(50) := (Var(50) | 2**Var(59))
+trigger2   = 1
+value      = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+time       = -1
+ignorehitpause = 1
+
+[State ]
+type       = ModifyExplod
+trigger1   = NumExplod(43000 + 10 * Var(59))
+ID         = 43000 + 10 * Var(59)
+pos        = Var(Var(59)),Var(Var(59)+12)
+postype    = P1
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !(Var(58)%6) && !Var(59) && Var(58) < 68
+ID             = 43000 + 10 * Var(58) / 6
+anim           = 6327
+pos            = (Var(Var(58)/6) := Ceil(IfElse((Var(0) := -10+Random%91) < FrontEdgeDist,Var(0),FrontEdgeDist-40+Random%61)*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290)),(Var(Var(58)/6+12) := Ceil(-ScreenPos Y-150))
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 1
+removetime     = -1
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = NumExplod(43000 + 10 * Var(59)) && (Var(50) & 2**Var(59)) && !(Var(40) & 2**Var(59))
+ID             = 43001 + 10 * Var(59)
+anim           = 6328+Random%2
+pos            = Var(Var(59)),Var(Var(59)+12)
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = -.3-Random%3,-5-Random%3
+accel          = 0,.44
+random         = 0,0
+scale          = Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 2
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 1
+removetime     = 27
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 0
+
+[State ]
+type           = Explod
+trigger1       = NumExplod(43000 + 10 * Var(59)) && (Var(50) & 2**Var(59)) && !(Var(40) & 2**Var(59))
+ID             = 43001 + 10 * Var(59)
+anim           = 6328+Random%2
+pos            = Var(Var(59)),Var(Var(59)+12)
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = .3+Random%3,-5-Random%3
+accel          = 0,.44
+random         = 0,0
+scale          = Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 2
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 1
+removetime     = 27
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 0
+
+[State ]
+type           = Explod
+trigger1       = NumExplod(43000 + 10 * Var(59)) && (Var(50) & 2**Var(59)) && !(Var(40) & 2**Var(59))
+ID             = 43001 + 10 * Var(59)
+anim           = 6328+Random%2
+pos            = Var(Var(59)),Var(Var(59)+12)
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = -.3-Random%3,1+Random%3
+accel          = 0,.44
+random         = 0,0
+scale          = Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 2
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 1
+removetime     = 27
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 0
+
+[State ]
+type           = Explod
+trigger1       = NumExplod(43000 + 10 * Var(59)) && (Var(50) & 2**Var(59)) && !(Var(40) & 2**Var(59))
+trigger1       = Var(40) := (Var(40) | 2**Var(59))
+ID             = 43001 + 10 * Var(59)
+anim           = 6328+Random%2
+pos            = Var(Var(59)),Var(Var(59)+12)
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = .3+Random%3,1+Random%3
+accel          = 0,.44
+random         = 0,0
+scale          = Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 2
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 1
+removetime     = 27
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 0
+
+[State ]
+type                       = Projectile
+trigger1                   = MoveType = A && !(Var(50) & 2**Var(59)) && Root,ProjContactTime(StateNo + 10 * ID + Var(59)) < 0 && NumEnemy
+trigger1                   = 1 || FVar(37) := (EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Pos X-Pos X)*Facing
+trigger1                   = 1 || FVar(38) :=  EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Pos Y-Pos Y+EnemyNear(NumEnemy > 1 && !EnemyNear(0),Alive),Const(Size.Mid.Pos.Y)
+projID                     = StateNo + 10 * ID + Var(59)
+projanim                   = StateNo
+projhitanim                = -1
+projremanim                = -1
+projcancelanim             = -1
+projscale                  = 0,0
+projremove                 = 1
+projremovetime             = 1
+affectteam                 = E
+velocity                   = 0,0
+remvelocity                = 0,0
+accel                      = 0,0
+velmul                     = 0,0
+projhits                   = 1
+projmisstime               = 1
+projpriority               = 5
+projsprpriority            = 2
+projedgebound              = 120
+projstagebound             = 120
+projheightbound            = -2000,1
+offset                     = Var(Var(59)),Var(Var(59)+12)
+postype                    = P1
+projshadow                 = 0,0,0
+attr                       = S, HP
+animtype                   = Hard
+priority                   = 1, Miss
+damage                     = Ceil(Ceil(35000*Root,SysFVar(1)*IfElse(.950**Root,Var(30) > .500,.950**Root,Var(30),.500))*1000./1000000),Ceil(Ceil(35000*Root,SysFVar(1)*.30)*1000./1000000)
+hitflag                    = MAFDP
+guardflag                  = MA
+getpower                   = 0,0
+givepower                  = Ceil(Ceil(35000*Root,SysFVar(1)*.80)*1000./1000000*.650              ),Ceil(Ceil(35000*Root,SysFVar(1)*.80)*1000./1000000*.650*.625              )
+pausetime                  = 0,1
+guard.pausetime            = 0,1
+sparkno                    = s6204
+guard.sparkno              = s6221
+sparkxy                    = 0,Ceil(FVar(38)+40)
+hitsound                   = -1,0
+guardsound                 = -1,0
+ground.type                = High
+ground.slidetime           = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+ground.hittime             = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+ground.velocity            = 0,-1.5
+;air.type                   = Trip
+guard.hittime              = 20+TeamSide
+guard.ctrltime             = 20+TeamSide
+guard.velocity             = -1.5
+;air.type                   = Trip
+air.hittime                = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+air.velocity               = 0,.5
+airguard.ctrltime          = 20+TeamSide
+airguard.velocity          = -1.5,0
+down.velocity              = 0,-1.5
+ground.cornerpush.veloff   = 0
+air.cornerpush.veloff      = 0
+down.cornerpush.veloff     = 0
+guard.cornerpush.veloff    = 0
+airguard.cornerpush.veloff = 0
+yaccel                     = Const(Movement.YAccel)
+sprpriority                = 3
+;p1facing                   = 1
+p1getp2facing              = 0
+p2facing                   = 1
+;p1stateno                  = 
+;p2stateno                  = 5000
+;p2getp1state               = 0
+fall                       = 1
+fall.xvelocity             = 0
+fall.yvelocity             = 0
+fall.recover               = 0
+fall.recovertime           = 1+(45-Root,Var(29))*(Root,Var(29) < 45)
+fall.damage                = 0
+air.fall                   = 1
+ID                         = 431-Root,Var(50)
+chainID                    = -1
+nochainID                  = -1
+hitonce                    = 0
+kill                       = 1
+guard.kill                 = 1
+fall.kill                  = 1
+numhits                    = 1
+guard.dist                 = 0
+ignorehitpause             = 0
+
+[State ]
+type       = AttackDist
+trigger1   = 1
+value      = Ceil(45*Root,Const(Size.XScale)+60+Abs(Root,FVar(15+(Root,SysVar(2) & 1)*10)-Root,FVar(37)))
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = Root,ProjHitTime(StateNo + 10 * ID + Var(59)) = 1
+value          = s3,3
+volume         = 100
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = Root,ProjGuardedTime(StateNo + 10 * ID + Var(59)) = 1
+value          = s150,0
+volume         = 100
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type       = RemoveExplod
+trigger1   = NumExplod(43000 + 10 * Var(59)) && NumExplod(43001 + 10 * Var(59))
+ID         = 43000 + 10 * Var(59)
+ignorehitpause = 1
+
+[State ]
+type       = AppendToClipboard
+trigger1   = 1
+text       = "%d %d %d \n"
+params     = NumExplod(44000), Root,NumProj, Var(59)
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = Var(Var(59)+12) := Var(Var(59)+12)+30 && 0 || (Var(59) := Var(59)+1) < Ceil(Var(58)*1./6) && Var(59) < 12
+value      = StateNo
+ctrl       = 0
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = !NumExplod || Var(58) := Var(58)+1 && Var(59) := 0
+ignorehitpause = 1
+
+
+;===========================================================================
+; ヘルパーアーマー兼システムヘルパーのステート
+;===========================================================================
+[Statedef 10000]
+type            = U
+movetype        = H
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = Vel X,Vel Y
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type        = PosSet
+trigger1    = 1
+x           = Root,Pos X
+y           = Root,Pos Y
+ignorehitpause = 1
+
+[State ]
+type        = Turn
+trigger1    = Root,Facing-Facing
+ignorehitpause = 1
+
+[State ]
+type       = AssertSpecial
+trigger1   = 1
+flag       = Invisible
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = 1
+ignorehitpause = 1
+
+[State ]
+type       = ParentVarSet
+trigger1   = NumHelper(2000) && NumHelper(3000)
+var(3)     = IfElse(Root,Anim < 2000,10,Helper(2000+1000*(Root,Anim < 3000)),SysVar(3))
+ignorehitpause = 1
+
+[State ]
+type       = PlayerPush
+trigger1   = 1
+value      = 0
+ignorehitpause = 1
+
+[State ]
+type       = LifeSet
+trigger1   = 1
+value      = LifeMax
+ignorehitpause = 1
+
+[State ]
+type       = NotHitBy
+trigger1   = 1
+value      = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+time       = -1
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = Facing-Parent,Facing
+ignorehitpause = 1
+
+;[State ]
+;type       = VarSet
+;trigger1   = Root,Var(20) = GameTime
+;sysvar(2)  = 0
+;ignorehitpause = 1
+
+[State ]
+type       = VarSet
+trigger1   = 1
+sysvar(3)  = (SysVar(3)+!(Parent,Anim = 910))*!!(Parent,SysVar(2) & 128)
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = 1
+value      = StateNo+1
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+
+;===========================================================================
+; 
+;===========================================================================
+[Statedef 10001]
+type            = U
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = Vel X,Vel Y
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = Root,Var(20)-GameTime && Root,Alive
+value      = StateNo+1
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = RemoveExplod
+trigger1   = NumExplod(6410) && !(Root,SysVar(2) & 128)
+ID         = 6410
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !NumExplod(6410) && Root,NumExplod(6410)
+ID             = 6410
+anim           = 6410
+pos            = 0,0
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = .25*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,.25*Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 4
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -1
+pausemovetime  = 2147483647
+supermovetime  = 2147483647
+ignorehitpause = 1
+
+[State ]
+type       = ModifyExplod
+trigger1   = NumExplod(6410) || 0 && Var(0) := Root,Anim && Var(1) := Root,AnimElemNo(0)
+ID         = 6410
+scale      = .6*Root,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,.6*Root,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+ignorehitpause = 1
+
+[State ]
+type       = ModifyExplod
+triggerall = Var(2) := (Var(3) := NumExplod(6410))
+trigger1   = Var(0) = 400 && Var(1) = 12
+trigger2   = Var(0) = 410 && Var(1) =  3
+trigger3   = Var(0) = 430 && Var(1) =  8
+;trigger4   = 1
+ID         = 6410
+scale      = (Var(3) := 0),(Var(2) := 0)
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 100
+
+trigger1   = Var(0) =   0
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 016)),-01,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 024)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 032)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 040)),-01,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 048)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 056)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+
+trigger2   = Var(0) =   5
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-06,FVar(0)) || FVar(1) := IfElse(Var(59), 78,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+
+trigger3   = Var(0) =   6
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-11,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 45,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 43,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 45,FVar(1))
+
+trigger4   = Var(0) =  10
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  4,FVar(0)) || FVar(1) := IfElse(Var(59), 72,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 43,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 45,FVar(1))
+
+trigger5   = Var(0) =  11
+trigger5   = FVar(0) := -03 || FVar(1) := 45
+
+trigger6   = Var(0) =  12
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-01,FVar(0)) || FVar(1) := IfElse(Var(59), 61,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  9,FVar(0)) || FVar(1) := IfElse(Var(59), 79,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-01,FVar(0)) || FVar(1) := IfElse(Var(59), 84,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 011)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+
+trigger7   = Var(0) =  20
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 018)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 022)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 036)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 040)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 045)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 049)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 054)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 058)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 063)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 067)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+
+trigger8   = Var(0) =  21
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 018)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 022)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 036)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 040)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 045)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 049)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 054)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 058)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 063)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 067)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger9   = Var(0) =  40 || Var(0) =  48
+trigger9   = FVar(0) := -03 || FVar(1) := 65
+
+trigger10  = Var(0) =  41
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 013)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),110,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 018)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 048)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 053)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+trigger11  = Var(0) =  42
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  5,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 013)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),110,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 018)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 048)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 053)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+trigger12  = Var(0) =  43
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-21,FVar(0)) || FVar(1) := IfElse(Var(59),118,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 013)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),110,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 018)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 048)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 053)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+trigger13  = Var(0) =  47 || Var(0) =  52
+trigger13  = FVar(0) := -03 || FVar(1) := 65
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 195
+
+trigger1   = Var(0) = 100
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 16,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 22,FVar(0)) || FVar(1) := IfElse(Var(59),109,FVar(1))
+
+trigger2   = Var(0) = 102
+trigger2   = FVar(0) := -03 || FVar(1) := 65
+
+trigger3   = Var(0) = 105
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-35,FVar(0)) || FVar(1) := IfElse(Var(59), 26,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 18,FVar(0)) || FVar(1) := IfElse(Var(59), 35,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 36,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 012)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 40,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 016)), 26,FVar(0)) || FVar(1) := IfElse(Var(59), 53,FVar(1))
+
+trigger4   = 0;Var(0) = 107
+
+trigger5   = Var(0) = 120 || Var(0) = 130 || Var(0) = 140
+trigger5   = FVar(0) := -34 || FVar(1) :=  80
+
+trigger6   = Var(0) = 121 || Var(0) = 131 || Var(0) = 141
+trigger6   = FVar(0) := -47 || FVar(1) :=  57
+
+trigger7   = Var(0) = 122 || Var(0) = 132 || Var(0) = 142
+trigger7   = FVar(0) :=   3 || FVar(1) := 124
+
+trigger8   = Var(0) = 150
+trigger8   = FVar(0) := -34 || FVar(1) :=  80
+
+trigger9   = Var(0) = 151
+trigger9   = FVar(0) := -47 || FVar(1) :=  57
+
+trigger10  = Var(0) = 152
+trigger10  = FVar(0) :=   3 || FVar(1) := 124
+
+trigger11  = Var(0) = 160
+trigger11  = FVar(0) := -34 || FVar(1) :=  80
+
+trigger12  = Var(0) = 161
+trigger12  = FVar(0) := -47 || FVar(1) :=  57
+
+trigger13  = Var(0) = 162
+trigger13  = FVar(0) :=   3 || FVar(1) := 124
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 200
+
+trigger1   = Var(0) = 195
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 012)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 015)),-04,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 055)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 059)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 063)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 230
+
+trigger1   = Var(0) = 200
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 16,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 85,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 80,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 017)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 78,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 019)),-01,FVar(0)) || FVar(1) := IfElse(Var(59), 85,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 023)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 025)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger2   = Var(0) = 202
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  4,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 006)), 15,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 012)),  8,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)), 15,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 039)),  4,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 041)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 048)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger3   = Var(0) = 204
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 15,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 32,FVar(0)) || FVar(1) := IfElse(Var(59), 84,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 014)), 10,FVar(0)) || FVar(1) := IfElse(Var(59),108,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 018)), 11,FVar(0)) || FVar(1) := IfElse(Var(59), 70,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 036)), 14,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 043)), 15,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 047)),  4,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 050)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 055)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger4   = Var(0) = 206
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-16,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 12,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)), 20,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 011)), 21,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)), 20,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 017)), 19,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 039)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 63,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 043)), 12,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 046)),  4,FVar(0)) || FVar(1) := IfElse(Var(59), 72,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 048)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 050)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 43,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 052)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger5   = Var(0) = 210
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-13,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-15,FVar(0)) || FVar(1) := IfElse(Var(59), 62,FVar(1))
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-14,FVar(0)) || FVar(1) := IfElse(Var(59), 54,FVar(1))
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 022)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 48,FVar(1))
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 026)),-20,FVar(0)) || FVar(1) := IfElse(Var(59), 48,FVar(1))
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 030)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 50,FVar(1))
+
+trigger6   = Var(0) = 212
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 12,FVar(0)) || FVar(1) := IfElse(Var(59), 78,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)),  7,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 034)),  5,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 038)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 66,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 042)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 50,FVar(1))
+
+trigger7   = Var(0) = 214
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-20,FVar(0)) || FVar(1) := IfElse(Var(59), 53,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-35,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),-23,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),-21,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 011)),-23,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 041)),-21,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 043)),-23,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 045)),-20,FVar(0)) || FVar(1) := IfElse(Var(59), 48,FVar(1))
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 048)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 50,FVar(1))
+
+trigger8   = Var(0) = [220,221]
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 16,FVar(0)) || FVar(1) := IfElse(Var(59),113,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 006)),  7,FVar(0)) || FVar(1) := IfElse(Var(59),108,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 022)), 16,FVar(0)) || FVar(1) := IfElse(Var(59),113,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 025)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+trigger9   = Var(0) = [222,223]
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),110,FVar(1))
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 012)), 35,FVar(0)) || FVar(1) := IfElse(Var(59),103,FVar(1))
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 034)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+trigger10  = Var(0) = 224
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  8,FVar(0)) || FVar(1) := IfElse(Var(59),116,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 014)),  1,FVar(0)) || FVar(1) := IfElse(Var(59),115,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 034)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 037)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+trigger11  = Var(0) = 226
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 15,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 84,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 016)), 14,FVar(0)) || FVar(1) := IfElse(Var(59),108,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 019)), 13,FVar(0)) || FVar(1) := IfElse(Var(59), 66,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 038)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 045)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 049)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 260
+
+trigger1   = Var(0) = 232
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 96,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-11,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 043)), 16,FVar(0)) || FVar(1) := IfElse(Var(59), 69,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 045)), 25,FVar(0)) || FVar(1) := IfElse(Var(59), 80,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 069)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 072)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 075)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 078)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 300
+
+trigger1   = Var(0) = [260,261]
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 37,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)), 25,FVar(0)) || FVar(1) := IfElse(Var(59), 97,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 64,FVar(0)) || FVar(1) := IfElse(Var(59), 92,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 55,FVar(0)) || FVar(1) := IfElse(Var(59), 98,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 31,FVar(0)) || FVar(1) := IfElse(Var(59),110,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 006)),  8,FVar(0)) || FVar(1) := IfElse(Var(59),111,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),-01,FVar(0)) || FVar(1) := IfElse(Var(59), 85,FVar(1))
+
+trigger2   = Var(0) = 262
+trigger2   = FVar(0) := -30 && FVar(1) :=  77
+
+trigger3   = Var(0) = [270,271]
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),  9,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)), 10,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 18,FVar(0)) || FVar(1) := IfElse(Var(59),121,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+trigger4   = Var(0) = 272
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-30,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),110,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 27,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 15,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 006)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),119,FVar(1))
+
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 310
+
+trigger1   = Var(0) = 300
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 84,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  8,FVar(0)) || FVar(1) := IfElse(Var(59), 67,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 029)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 050)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+
+trigger2   = Var(0) = 302
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 84,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  8,FVar(0)) || FVar(1) := IfElse(Var(59), 67,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 034)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 055)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+
+trigger3   = Var(0) = 304
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 84,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  8,FVar(0)) || FVar(1) := IfElse(Var(59), 67,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 039)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 060)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 320
+
+trigger1   = Var(0) = 310
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  9,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 024)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 045)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+
+trigger2   = Var(0) = 312
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 006)),-04,FVar(0)) || FVar(1) := IfElse(Var(59),116,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 025)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+
+trigger3   = Var(0) = 314
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  9,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 029)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 050)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 340
+
+trigger1   = Var(0) = 330
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-04,FVar(0)) || FVar(1) := IfElse(Var(59),116,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+
+trigger2   = Var(0) = 332
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-04,FVar(0)) || FVar(1) := IfElse(Var(59),116,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 028)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+
+trigger3   = Var(0) = 334
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-04,FVar(0)) || FVar(1) := IfElse(Var(59),116,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 029)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 350
+
+trigger1   = Var(0) = 340
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  9,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 025)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 029)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 49,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 69,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 038)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger2   = Var(0) = 342
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  9,FVar(0)) || FVar(1) := IfElse(Var(59), 88,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 025)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 029)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 49,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 69,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 038)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger3   = Var(0) = 344
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)), 17,FVar(0)) || FVar(1) := IfElse(Var(59), 27,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 025)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 029)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 49,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 69,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 038)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 360
+
+trigger1   = Var(0) = 350
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)),  7,FVar(0)) || FVar(1) := IfElse(Var(59), 75,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 010)), 35,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)), 32,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 019)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 036)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 040)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger2   = Var(0) = 352
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)),  7,FVar(0)) || FVar(1) := IfElse(Var(59), 75,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 014)), 35,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 018)), 32,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 024)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 036)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 040)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger3   = Var(0) = 354
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)),  7,FVar(0)) || FVar(1) := IfElse(Var(59), 75,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 017)), 35,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 019)), 32,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 026)),  3,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 036)),-07,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 040)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger4   = Var(0) = 356
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 35,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)), 37,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 010)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 011)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 014)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 015)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 016)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 017)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 019)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 020)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 021)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 022)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 023)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 025)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 026)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 028)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 029)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 032)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 033)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 034)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 035)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 037)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 038)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 033)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 034)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 035)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 037)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 038)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 039)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 040)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 041)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 043)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 044)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 045)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 046)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 047)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 049)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 050)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 051)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 052)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 053)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 055)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 056)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 057)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 058)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 059)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 061)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 062)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 063)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 064)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 065)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 067)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 068)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 069)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 070)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 071)), 31,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 073)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 074)), 33,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 075)), 36,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 076)), 37,FVar(0)) || FVar(1) := IfElse(Var(59), 90,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 077)), 12,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 078)), 14,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 080)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 84,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 081)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 370
+
+trigger1   = Var(0) = 360
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 12,FVar(0)) || FVar(1) := IfElse(Var(59),105,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)), 10,FVar(0)) || FVar(1) := IfElse(Var(59),107,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 006)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 010)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 61,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 011)),-33,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 018)), 21,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 020)), 20,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 023)), 19,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 041)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 63,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 046)),-24,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 050)),-17,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 052)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger2   = Var(0) = 362
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 12,FVar(0)) || FVar(1) := IfElse(Var(59),105,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)), 10,FVar(0)) || FVar(1) := IfElse(Var(59),107,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 010)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 011)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 012)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 014)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 61,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 015)),-33,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 022)), 21,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 024)), 20,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)), 19,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 047)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 63,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 052)),-24,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 056)),-17,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 058)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger3   = Var(0) = 364
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 12,FVar(0)) || FVar(1) := IfElse(Var(59),105,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)), 10,FVar(0)) || FVar(1) := IfElse(Var(59),107,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 014)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 015)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 016)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 017)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 61,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 018)),-33,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 026)), 21,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 028)), 20,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 031)), 19,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 051)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 63,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 056)),-24,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 060)),-17,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 062)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 410
+
+trigger1   = Var(0) = 400
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 10,FVar(0)) || FVar(1) := IfElse(Var(59),107,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 012)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 013)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 014)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 015)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 016)),-19,FVar(0)) || FVar(1) := IfElse(Var(59), 61,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 017)),-33,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 022)), 21,FVar(0)) || FVar(1) := IfElse(Var(59), 60,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 024)), 20,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)), 19,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 050)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 63,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 055)),-24,FVar(0)) || FVar(1) := IfElse(Var(59), 57,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 059)),-17,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 061)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 420
+
+trigger1   = Var(0) = 410
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  5,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 91,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 015)),-03,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 016)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 51,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 019)), 10,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 020)), 16,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 027)),-04,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 035)),  0,FVar(0)) || FVar(1) := IfElse(Var(59),117,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 037)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 49,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 041)),  0,FVar(0)) || FVar(1) := IfElse(Var(59), 69,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 048)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) < 440
+
+trigger1   = Var(0) = 430
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 10,FVar(0)) || FVar(1) := IfElse(Var(59), 74,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 53,FVar(0)) || FVar(1) := IfElse(Var(59), 86,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 014)),-04,FVar(0)) || FVar(1) := IfElse(Var(59), 45,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 089)),-17,FVar(0)) || FVar(1) := IfElse(Var(59), 52,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 093)),-06,FVar(0)) || FVar(1) := IfElse(Var(59), 63,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 097)), 10,FVar(0)) || FVar(1) := IfElse(Var(59), 74,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 101)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 105)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) = 910
+
+;trigger1   = Var(0) = 910
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-04,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 006)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 93,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),-10,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),  2,FVar(0)) || FVar(1) := IfElse(Var(59), 95,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+var(2)     = 0
+triggerall = Var(2) && Var(3)
+triggerall = Var(0) = [5000,5300]
+
+trigger1   = Var(0) = 5000
+trigger1   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-09,FVar(0)) || FVar(1) := IfElse(Var(59), 74,FVar(1))
+
+trigger2   = Var(0) = 5001
+trigger2   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 76,FVar(1))
+
+trigger3   = Var(0) = 5002
+trigger3   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-48,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+
+trigger4   = Var(0) = 5005
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-09,FVar(0)) || FVar(1) := IfElse(Var(59), 74,FVar(1))
+trigger4   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+
+trigger5   = Var(0) = 5006
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 76,FVar(1))
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-09,FVar(0)) || FVar(1) := IfElse(Var(59), 74,FVar(1))
+trigger5   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+
+trigger6   = Var(0) = 5007
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-48,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-54,FVar(0)) || FVar(1) := IfElse(Var(59), 91,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-41,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-09,FVar(0)) || FVar(1) := IfElse(Var(59), 74,FVar(1))
+trigger6   = FVar(0) := IfElse((Var(59) := (Var(1) > 004)),-02,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+
+trigger7   = Var(0) = 5010
+trigger7   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-28,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+
+trigger8   = Var(0) = 5011
+trigger8   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-34,FVar(0)) || FVar(1) := IfElse(Var(59), 91,FVar(1))
+
+trigger9   = Var(0) = 5012
+trigger9   = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+
+trigger10  = Var(0) = 5015
+trigger10  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-28,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+
+trigger11  = Var(0) = 5016
+trigger11  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-34,FVar(0)) || FVar(1) := IfElse(Var(59), 91,FVar(1))
+
+trigger12  = Var(0) = 5017
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-05,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-20,FVar(0)) || FVar(1) := IfElse(Var(59), 76,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 74,FVar(1))
+trigger12  = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-32,FVar(0)) || FVar(1) := IfElse(Var(59), 72,FVar(1))
+
+trigger13  = Var(0) = 5020
+trigger13  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+
+trigger14  = Var(0) = 5021
+trigger14  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-54,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+
+trigger15  = Var(0) = 5022
+trigger15  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-39,FVar(0)) || FVar(1) := IfElse(Var(59), 49,FVar(1))
+
+trigger16  = Var(0) = 5025
+trigger16  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger16  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-22,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+
+trigger17  = Var(0) = 5026
+trigger17  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-54,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+trigger17  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger17  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-22,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+
+trigger18  = Var(0) = 5027
+trigger18  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-39,FVar(0)) || FVar(1) := IfElse(Var(59), 49,FVar(1))
+trigger18  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-31,FVar(0)) || FVar(1) := IfElse(Var(59), 71,FVar(1))
+trigger18  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 59,FVar(1))
+trigger18  = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-22,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+
+trigger19  = Var(0) = 5030
+trigger19  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-11,FVar(0)) || FVar(1) := IfElse(Var(59),113,FVar(1))
+
+trigger20  = Var(0) = 5035
+trigger20  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-08,FVar(0)) || FVar(1) := IfElse(Var(59), 73,FVar(1))
+
+trigger21  = Var(0) = 5040
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  2,FVar(0)) || FVar(1) := IfElse(Var(59),100,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  5,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-04,FVar(0)) || FVar(1) := IfElse(Var(59),108,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 18,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 24,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 006)), 24,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 007)), 24,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 18,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger21  = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),116,FVar(1))
+
+trigger22  = Var(0) = 5050
+trigger22  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-12,FVar(0)) || FVar(1) := IfElse(Var(59),126,FVar(1))
+trigger22  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-12,FVar(0)) || FVar(1) := IfElse(Var(59),113,FVar(1))
+
+trigger23  = Var(0) = 5051
+trigger23  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 20,FVar(0)) || FVar(1) := IfElse(Var(59),133,FVar(1))
+
+trigger24  = Var(0) = 5060
+trigger24  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-12,FVar(0)) || FVar(1) := IfElse(Var(59),113,FVar(1))
+trigger24  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-43,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger24  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-25,FVar(0)) || FVar(1) := IfElse(Var(59), 79,FVar(1))
+
+trigger25  = Var(0) = 5061
+trigger25  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-12,FVar(0)) || FVar(1) := IfElse(Var(59),113,FVar(1))
+trigger25  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-43,FVar(0)) || FVar(1) := IfElse(Var(59), 94,FVar(1))
+trigger25  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-25,FVar(0)) || FVar(1) := IfElse(Var(59), 79,FVar(1))
+trigger25  = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-06,FVar(0)) || FVar(1) := IfElse(Var(59), 77,FVar(1))
+
+trigger26  = Var(0) = 5070
+trigger26  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 23,FVar(0)) || FVar(1) := IfElse(Var(59), 89,FVar(1))
+trigger26  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)), 21,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger26  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-34,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+
+trigger27  = Var(0) = 5080
+trigger27  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 27,FVar(1))
+
+trigger28  = Var(0) = 5090
+trigger28  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-40,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+
+trigger29  = Var(0) = 5100
+trigger29  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 17,FVar(1))
+
+trigger30  = 0;Var(0) = 5101
+
+trigger31  = Var(0) = 5110
+trigger31  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59), 17,FVar(1))
+trigger31  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-40,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+trigger31  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),-30,FVar(0)) || FVar(1) := IfElse(Var(59), 17,FVar(1))
+
+trigger32  = Var(0) = 5120
+trigger32  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger32  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger32  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+
+trigger33  = Var(0) = 5121
+trigger33  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  7,FVar(0)) || FVar(1) := IfElse(Var(59), 41,FVar(1))
+trigger33  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 43,FVar(1))
+trigger33  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  8,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger33  = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 11,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger33  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 13,FVar(0)) || FVar(1) := IfElse(Var(59), 43,FVar(1))
+trigger33  = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 11,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger33  = FVar(0) := IfElse((Var(59) := (Var(1) > 006)),  7,FVar(0)) || FVar(1) := IfElse(Var(59), 41,FVar(1))
+trigger32  = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger32  = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger32  = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+
+trigger34  = Var(0) = 5122
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)), 11,FVar(0)) || FVar(1) := IfElse(Var(59), 41,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)), 12,FVar(0)) || FVar(1) := IfElse(Var(59), 43,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  9,FVar(0)) || FVar(1) := IfElse(Var(59), 65,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 003)), 10,FVar(0)) || FVar(1) := IfElse(Var(59), 58,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 10,FVar(0)) || FVar(1) := IfElse(Var(59), 43,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 10,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 006)), 11,FVar(0)) || FVar(1) := IfElse(Var(59), 41,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 007)),-18,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 008)),-12,FVar(0)) || FVar(1) := IfElse(Var(59), 44,FVar(1))
+trigger34  = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  1,FVar(0)) || FVar(1) := IfElse(Var(59), 83,FVar(1))
+
+trigger35  = Var(0) = 5160
+trigger35  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-40,FVar(0)) || FVar(1) := IfElse(Var(59), 49,FVar(1))
+trigger35  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),-43,FVar(0)) || FVar(1) := IfElse(Var(59), 47,FVar(1))
+
+trigger36  = Var(0) = 5170
+trigger36  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),-29,FVar(0)) || FVar(1) := IfElse(Var(59),-28,FVar(1))
+
+trigger37  = Var(0) = [5200,5210]
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 000)),  2,FVar(0)) || FVar(1) := IfElse(Var(59),100,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 001)),  6,FVar(0)) || FVar(1) := IfElse(Var(59), 87,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 002)),  5,FVar(0)) || FVar(1) := IfElse(Var(59), 82,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 003)),-04,FVar(0)) || FVar(1) := IfElse(Var(59),108,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 004)), 18,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 005)), 24,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 006)), 24,FVar(0)) || FVar(1) := IfElse(Var(59),112,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 007)), 24,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 008)), 18,FVar(0)) || FVar(1) := IfElse(Var(59),114,FVar(1))
+trigger37  = FVar(0) := IfElse((Var(59) := (Var(1) > 009)),  3,FVar(0)) || FVar(1) := IfElse(Var(59),116,FVar(1))
+ignorehitpause = 1
+
+[State ]
+type       = ModifyExplod
+trigger1   = !Var(2) && Var(3)
+ID         = 6410
+pos        = Ceil(FVar(0)*Root,Const(Size.XScale)),Ceil(-FVar(1)*Root,Const(Size.YScale))
+postype    = P1
+trans      = AddAlpha
+alpha      = 196,256
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = TeamSide = 1 && RoundState = 2
+trigger1       = Root,Alive && (Root,Var(59) & 1) && (Root,SysVar(2) & 268435456) && !NumExplod(20000+(Root,Var(59) & 1)*(Root,Var(59) & 7*2)/2) && IfElse((Root,Var(59) & 1),(Root,Var(59) & 7*2),1)
+ID             = 20000+(Root,Var(59) & 7*2)/2
+anim           = 20000+(Root,Var(59) & 7*2)/2
+pos            = 120+50*(P3Name = "UMVC_Hulk"),226
+postype        = Left
+facing         = 1
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = .4,.4
+sprpriority    = 7
+ontop          = 1
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -1
+pausemovetime  = 2147483647
+supermovetime  = 2147483647
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = TeamSide = 2 && RoundState = 2
+trigger1       = Root,Alive && (Root,Var(59) & 1) && (Root,SysVar(2) & 268435456) && !NumExplod(20000+(Root,Var(59) & 1)*(Root,Var(59) & 7*2)/2) && IfElse((Root,Var(59) & 1),(Root,Var(59) & 7*2),1)
+ID             = 20000+(Root,Var(59) & 7*2)/2
+anim           = 20000+(Root,Var(59) & 7*2)/2
+pos            = -120-50*(P3Name = "UMVC_Hulk"),226
+postype        = Right
+facing         = 1
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = .4,.4
+sprpriority    = 7
+ontop          = 1
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -1
+pausemovetime  = 2147483647
+supermovetime  = 2147483647
+ignorehitpause = 1
+
+[State ]
+type       = RemoveExplod
+trigger1   = NumExplod(Var(0) := 20000) && (Root,Var(59) & 1)
+trigger2   = NumExplod(Var(0) := 20001) && !((Root,Var(59) & 1) && (Root,Var(59) & 7*2) = 2)
+trigger3   = NumExplod(Var(0) := 20002) && !((Root,Var(59) & 1) && (Root,Var(59) & 7*2) = 4)
+trigger4   = NumExplod(Var(0) := 20003) && !((Root,Var(59) & 1) && (Root,Var(59) & 7*2) = 6)
+trigger5   = NumExplod(Var(0) := 20004) && !((Root,Var(59) & 1) && (Root,Var(59) & 7*2) = 8)
+trigger6   = NumExplod(Var(0) := 20005) && !((Root,Var(59) & 1) && (Root,Var(59) & 7*2) = 10)
+trigger7   = NumExplod(Var(0) := 20006) && !((Root,Var(59) & 1) && (Root,Var(59) & 7*2) = 12)
+trigger8   = NumExplod(Var(0) := 20007) && !((Root,Var(59) & 1) && (Root,Var(59) & 7*2) = 14)
+ID         = Var(0)
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = 1
+value      = StateNo+1
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+
+;===========================================================================
+; Effect
+;===========================================================================
+[Statedef 10002]
+type            = U
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = Vel X,Vel Y
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+
+
+;---------------------------------------------------------------------------
+[State ]
+type       = Turn
+trigger1   = Var(0) := IfElse(Facing < 0,TeamSide = 1,TeamSide = 2)
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !NumExplod(16000)
+trigger1       = Root,Var(31) && (Root,Var(31) & (268435456 | 536870912))
+ID             = 16000
+anim           = 16000
+pos            = 30,214
+postype        = Back
+facing         = 1-2*(TeamSide = 2)
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = 1-2*(TeamSide = 2),1
+sprpriority    = 4
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 0
+removeongethit = 0
+removetime     = -1
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !NumExplod(16001)
+trigger1       = Root,Var(31) && (Root,Var(31) & (268435456 | 536870912))
+ID             = 16001
+anim           = 16001
+pos            = 30,214
+postype        = Back
+facing         = 1-2*(TeamSide = 2)
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = 1,1
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 0
+removeongethit = 0
+removetime     = -1
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = Var(0)
+ignorehitpause = 1
+
+[State ]
+type       = ModifyExplod
+trigger1   = NumExplod(16001)
+ID         = 16001
+scale      = (600.-(Root,Var(31) & 1023))/600*(1-2*(TeamSide = 2)),1
+ignorehitpause = 1
+
+[State ]
+type       = RemoveExplod
+trigger1   = NumExplod(16000)
+trigger1   = !Root,Var(31)
+ID         = 16000
+ignorehitpause = 1
+
+[State ]
+type       = RemoveExplod
+trigger1   = NumExplod(16001)
+trigger1   = !Root,Var(31)
+ID         = 16001
+ignorehitpause = 1
+
+
+;---------------------------------------------------------------------------
+
+
+;---------------------------------------------------------------------------
+[State ]
+type       = ChangeState
+trigger1   = 1
+value      = StateNo+1
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+
+;===========================================================================
+; Hit / Guarded Spark
+;===========================================================================
+[Statedef 10005]
+type            = U
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = Vel X,Vel Y
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = ChangeState
+trigger1   = Root,Var(20)-GameTime
+value      = StateNo+2
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type        = VarSet
+var(0)      = 1
+triggerall  = Root,Var(3) = 0 && Root,MoveContact = 1 && !Root,MoveReversed || Var(0) := 0 && Var(1) := Root,Anim%1000 && FVar(6) := Root,FVar(6+10*(Root,SysVar(2) & 1))
+trigger1    = 0
+ignorehitpause = 1
+
+[State ]
+type        = VarSet
+var(0)      = 1
+triggerall  = Root,Var(3) = 1 && Root,MoveContact = 1 && !Root,MoveReversed
+trigger1    = 0
+ignorehitpause = 1
+
+[State ]
+type        = VarSet
+var(0)      = 1
+triggerall  = Root,Var(3) = 10 && Root,MoveContact = 1 && !Root,MoveReversed
+trigger1    = Root,HitPauseTime =  7 && Var(1) = 200 || 0 && Var(2) := (01 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            57 && FVar(1) :=           103
+trigger2    = Root,HitPauseTime =  9 && Var(1) = 202 || 0 && Var(2) := (02 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=           119 && FVar(1) :=            99
+trigger3    = Root,HitPauseTime = 11 && Var(1) = 204 || 0 && Var(2) := (03 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            78 && FVar(1) :=            88
+trigger4    = Root,HitPauseTime = 11-6*(Root,AnimElemNo(0) = [10,12]) && Var(1) = 206 || 0 && Var(2) := (03 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            73 && FVar(1) :=            71
+trigger5    = Root,HitPauseTime =  7 && Var(1) = 210 || 0 && Var(2) := (00 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            48 && FVar(1) :=            22
+trigger6    = Root,HitPauseTime =  9 && Var(1) = 212 || 0 && Var(2) := (01 | 00*32 | 0*1024 | 1*2048) && FVar(0) := Root,FVar(37) && FVar(1) :=            63
+trigger7    = Root,HitPauseTime = 11 && Var(1) = 214 || 0 && Var(2) := (04 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            56 && FVar(1) :=            65
+trigger8    = Root,HitPauseTime =  7 && Var(1) = 220 || 0 && Var(2) := (00 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            41 && FVar(1) :=            18
+trigger9    = Root,HitPauseTime =  7 && Var(1) = 221 || 0 && Var(2) := (00 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            41 && FVar(1) :=            18
+trigger10   = Root,HitPauseTime =  9 && Var(1) = 222 || 0 && Var(2) := (02 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            63 && FVar(1) :=            97
+trigger11   = Root,HitPauseTime =  9 && Var(1) = 223 || 0 && Var(2) := (02 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            63 && FVar(1) :=            97
+trigger12   = Root,HitPauseTime = 11 && Var(1) = 224 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger13   = Root,HitPauseTime = 11 && Var(1) = 226 || 0 && Var(2) := (03 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=            53 && FVar(1) :=            81
+trigger14   = Root,HitPauseTime = 11 && Var(1) = 232 || 0 && Var(2) := (02 | 00*32 | 1*1024 | 1*2048) && FVar(0) :=           136 && FVar(1) :=            99
+trigger15   = Root,HitPauseTime =  7 && Var(1) = 300 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger16   = Root,HitPauseTime =  7 && Var(1) = 302 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger17   = Root,HitPauseTime =  7 && Var(1) = 304 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger18   = Root,HitPauseTime =  9 && Var(1) = 310 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger19   = Root,HitPauseTime =  9 && Var(1) = 312 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger20   = Root,HitPauseTime =  9 && Var(1) = 314 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger21   = Root,HitPauseTime =  7 && Var(1) = 330 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) :=      FVar(06) && FVar(1) := Root,FVar(38)-60*Root,Const(Size.YScale)
+trigger22   = Root,HitPauseTime =  7 && Var(1) = 332 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) :=      FVar(06) && FVar(1) := Root,FVar(38)-60*Root,Const(Size.YScale)
+trigger23   = Root,HitPauseTime =  7 && Var(1) = 334 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) :=      FVar(06) && FVar(1) := Root,FVar(38)-60*Root,Const(Size.YScale)
+trigger24   = Root,HitPauseTime =  9 && Var(1) = 340 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger25   = Root,HitPauseTime =  9 && Var(1) = 342 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger26   = Root,HitPauseTime =  9 && Var(1) = 344 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+trigger27   = Root,HitPauseTime =  7 && Var(1) = 410 || 0 && Var(2) := (03 | 00*32 | 0*1024 | 0*2048) && FVar(0) := Root,FVar(37) && FVar(1) := Root,FVar(38)
+ignorehitpause = 1
+
+[State ]
+type        = Null
+trigger1    = Var(0)
+trigger1    = 1 || FVar(0) := IfElse(FVar(0) > Root,FrontEdgeDist,Root,FVar(37),FVar(0))*IfElse((Var(2) & 1024) && FVar(0) <= Root,FrontEdgeDist, Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,1)
+trigger1    = 1 || FVar(1) := FVar(1)*IfElse((Var(2) & 2048),-Parent,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290,1)
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = Var(0)
+trigger1       = Root,MoveHit = 1
+value          = s3,(Var(2) & 31)
+volume         = 0
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = Var(0)
+trigger1       = Root,MoveGuarded = 1
+value          = s150,(Var(2) & 992)/32
+volume         = 0
+channel        = -1
+lowpriority    = 0
+freqmul        = 1.00
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = Var(0)
+trigger1       = Root,MoveHit = 1
+ID             = 6200
+anim           = 6200+((Var(2) & 31) > 1)
+pos            = Ceil(FVar(0)),Ceil(FVar(1))
+postype        = P1
+facing         = 1
+vfacing        = 1-2*(Random%2)
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 5,5
+scale          = (FVar(39) := .75+.20*((Var(1)%10)/2)+.50*(Var(1) >= 300)+.75*(Var(1) >= 400))*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,FVar(39)*Parent,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 0
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = Var(0)
+trigger1       = Root,MoveHit = 1
+ID             = 6200
+anim           = 6201+3*(Var(1) = 206 || Var(1) = 226)
+pos            = Ceil(FVar(0)),Ceil(FVar(1))
+postype        = P1
+facing         = 1
+vfacing        = 1-2*(Random%2 || Var(1) = 226)
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 5,5
+scale          = (FVar(39) := .75+.20*((Var(1)%10)/2)+.50*(Var(1) >= 300)+.75*(Var(1) >= 400))*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,FVar(39)*Parent,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 0
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = Var(0)
+trigger1       = Root,MoveGuarded = 1
+ID             = 6220
+anim           = 6220+(Var(1) > 299)
+pos            = Ceil(FVar(0)),Ceil(FVar(1))
+postype        = P1
+facing         = 1
+vfacing        = 1-2*(Random%2)
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 5,5
+scale          = (FVar(39) := .75+.20*((Var(1)%10)/2)+.50*(Var(1) >= 300)+.75*(Var(1) >= 400))*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,FVar(39)*Parent,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 0
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+
+;===========================================================================
+[State ]
+type           = PlaySnd
+trigger1       = NumEnemy && !NumExplod(6422) && !NumExplod(6423)
+trigger1       = Enemy(0),MoveType = H && Enemy(0),Time = 1
+trigger1       = (Enemy(0),StateNo = 5111 || Enemy(0),StateNo = 5390 || Enemy(0),StateNo = 5392 || Enemy(0),StateNo = 5402 || Enemy(0),StateNo = 5406 || Enemy(0),StateNo = 5412) && !NumExplod(6423)
+value          = s5100,(Enemy(0),StateNo = 5402 || Enemy(0),StateNo = 5406)
+volume         = 0
+channel        = 3
+lowpriority    = 0
+freqmul        = 1.0
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 0
+
+[State ]
+type           = PlaySnd
+trigger1       = NumEnemy > 1 && !NumExplod(6432) && !NumExplod(6433)
+trigger1       = Enemy(1),MoveType = H && Enemy(1),Time = 1
+trigger1       = (Enemy(1),StateNo = 5111 || Enemy(1),StateNo = 5390 || Enemy(1),StateNo = 5392 || Enemy(1),StateNo = 5402 || Enemy(1),StateNo = 5406 || Enemy(1),StateNo = 5412) && !NumExplod(6433)
+value          = s5100,(Enemy(1),StateNo = 5402 || Enemy(1),StateNo = 5406)
+volume         = 0
+channel        = 3
+lowpriority    = 0
+freqmul        = 1.0
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 0
+
+[State ]
+type           = Explod
+trigger1       = NumEnemy
+trigger1       = Enemy(0),MoveType = H && Enemy(0),Time = 1
+trigger1       = (Enemy(0),StateNo = 5111 || Enemy(0),StateNo = 5390 || Enemy(0),StateNo = 5392 || Enemy(0),StateNo = 5402 || Enemy(0),StateNo = 5406 || Enemy(0),StateNo = 5412) && !NumExplod(6423)
+ID             = 6422+(Enemy(0),StateNo = 5402)
+anim           = 6402+(Enemy(0),StateNo = 5402)
+pos            = Ceil(Enemy(0),Pos X-Pos X)*Facing,Ceil(Enemy(0),Pos Y-Pos Y-50*(Enemy(0),StateNo = 5402))
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = .5,.5
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = NumEnemy > 1
+trigger1       = Enemy(1),MoveType = H && Enemy(1),Time = 1
+trigger1       = (Enemy(1),StateNo = 5111 || Enemy(1),StateNo = 5390 || Enemy(1),StateNo = 5392 || Enemy(1),StateNo = 5402 || Enemy(1),StateNo = 5406 || Enemy(1),StateNo = 5412) && !NumExplod(6433)
+ID             = 6432+(Enemy(1),StateNo = 5402)
+anim           = 6402+(Enemy(1),StateNo = 5402)
+pos            = Ceil(Enemy(1),Pos X-Pos X)*Facing,Ceil(Enemy(1),Pos Y-Pos Y-50*(Enemy(1),StateNo = 5402))
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = 1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = .5,.5
+sprpriority    = 5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+trigger1   = 1
+value      = StateNo+2
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+
+;===========================================================================
+[Statedef 10007]
+type            = U
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = Vel X,Vel Y
+poweradd        = 0
+sprpriority     = 3
+hitdefpersist   = 1
+movehitpersist  = 1
+hitcountpersist = 0
+
+[State ]
+type       = RemoveExplod
+trigger1   = NumExplod
+trigger1   = !Root,Alive
+ID         = -1
+ignorehitpause = 1
+
+;[State ]
+;type       = ParentVarSet
+;triggerall = NumEnemy
+;;triggerall = Root,ID = Parent,ID && Enemy(0),Alive && Enemy(0),Life < Enemy(0),LifeMax && Enemy(0),StateNo-5150 && Enemy(0),Anim-5110 && Enemy(0),Anim-5150 || Var(0) := 0
+trigger1   = FVar(23) := Enemy(0),Life && !(SysVar(4) & 1024) && RoundState = 2 && !Anim && !FVar(23)
+;trigger2   = FVar(24) := Enemy(0),Life && !FVar(24) && FVar(23)-FVar(24) && FVar(23) > Enemy(0),Life && !(SysVar(4) & 1024) && !Anim && RoundState = 2
+;trigger3   = FVar(25) := Enemy(0),Life && !FVar(25) && FVar(24)-FVar(25) && FVar(24) > Enemy(0),Life && !(SysVar(4) & 1024) && !Anim && RoundState = 2
+;trigger4   = Var(0) := (2**7) && Ceil(FVar(23)) = Ceil(FVar(24))*2-Ceil(FVar(25)) && FVar(23)-FVar(24) && FVar(23)-FVar(25) && FVar(24)-FVar(25)
+;var(56)    = (Var(56) | Var(0))
+;ignorehitpause = 1
+
+;[State ]
+;type       = ParentVarSet
+;triggerall = NumEnemy > 1
+;triggerall = Root,ID = Parent,ID && Enemy(1),Alive && Enemy(1),Life < Enemy(1),LifeMax && Enemy(1),StateNo-5150 && Enemy(1),Anim-5110 && Enemy(1),Anim-5150 || Var(0) := 0
+;trigger1   = FVar(26) := Enemy(1),Life && !(SysVar(4) & 1024) && RoundState = 2 && !Anim && !FVar(26)
+;trigger2   = FVar(27) := Enemy(1),Life && !FVar(27) && FVar(26)-FVar(27) && FVar(26) > Enemy(1),Life && !(SysVar(4) & 1024) && !Anim && RoundState = 2
+;trigger3   = FVar(28) := Enemy(1),Life && !FVar(28) && FVar(27)-FVar(28) && FVar(27) > Enemy(1),Life && !(SysVar(4) & 1024) && !Anim && RoundState = 2
+;trigger4   = Var(0) := (2**7) && Ceil(FVar(26)) = Ceil(FVar(27))*2-Ceil(FVar(28)) && FVar(26)-FVar(27) && FVar(26)-FVar(28) && FVar(27)-FVar(28)
+;var(56)    = (Var(56) | Var(0))
+;ignorehitpause = 1
+
+[State ]
+type       = DisplayToClipboard
+trigger1   = 0
+text       = "                                     Var(13)=%d Var(14)=%d Var(15)=%d Var(16)=%d Var(18)=%d \n"
+params     =  Var(13), Var(14), Var(15), Var(16), Var(18)
+ignorehitpause = 1
+
+[State ]
+type       = SelfState
+trigger1   = 1
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+
+;===========================================================================
+; 残像
+; AfterImage
+;===========================================================================
+[Statedef 11000]
+type            = A
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = 0,0
+poweradd        = 0
+sprpriority     = -5
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = NotHitBy
+trigger1   = 1
+value      = SCA, NA, SA, HA, NT, ST, HT, NP, SP, HP, AA, AT, AP
+time       = -1
+ignorehitpause = 1
+
+[State ]
+type       = ChangeAnim
+trigger1   = 1
+value      = 10000
+elem       = 1
+ignorehitpause = 1
+
+[State ]
+type       = ChangeAnim
+trigger1   = Root,Var(20) = GameTime && SelfAnimExist(Root,Anim)
+value      = Root,Anim
+elem       = Root,AnimElemNo(0)
+ignorehitpause = 1
+
+[State ]
+type       = BindToRoot
+trigger1   = 1
+time       = 1
+facing     = 1
+pos        = 2*(IsHelper(StateNo+2)-.5*IsHelper(StateNo+3)),4*(IsHelper(StateNo+0)+.25*!IsHelper(StateNo+0))
+ignorehitpause = 1
+
+[State ]
+type       = AngleDraw
+trigger1   = 1
+value      = -60*(Root,Anim = 344 && Root,AnimElemTime(9) > 0 && Root,AnimElemTime(26) < 0)
+;scale      = 1,1
+ignorehitpause = 1
+
+[State ]
+type       = AssertSpecial
+trigger1   = 1
+flag       = NoShadow
+ignorehitpause = 1
+
+[State ]
+type       = PalFX
+trigger1   = 1
+time       = 1
+add        = 255,-128,-128
+mul        = 256,256,256
+sinadd     = 0,0,0,0
+invertall  = 0
+color      = 256
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = !(Root,SysVar(2) & 128) && !Root,NumExplod(6410) || RoundState-2
+ignorehitpause = 1
+
+
+;===========================================================================
+; 学習ステート
+;===========================================================================
+[Statedef 13000]
+type            = S
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = ChangeAnim
+trigger1   = Anim-StateNo != [0,1]
+value      = IsHelper(StateNo+1)+StateNo
+elem       = 1
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = Facing = 1-2*(TeamSide%2)
+ignorehitpause = 1
+
+[State ]
+type           = Projectile
+trigger1       = !AnimElemTime(1) && !Root,NumProjID(StateNo)
+velocity       = 1,0
+projid         = StateNo
+projanim       = StateNo
+offset         = FrontEdgeDist,0
+projstagebound = -16
+projedgebound  = 100000
+projremovetime = -1
+supermovetime  = 2147483647
+pausemovetime  = 2147483647
+guard.dist     = 0
+ignorehitpause = 1
+persistent     = 0
+
+[State ]
+type       = VelSet
+trigger1   = 1
+x          = IfElse(AnimElemTime(1),!!Root,NumProjID(StateNo),FrontEdgeDist+1)
+y          = 0
+ignorehitpause = 1
+
+[State ]
+type       = PosSet
+trigger1   = 1
+y          = 100
+ignorehitpause = 1
+
+[State ]
+type       = VarRangeSet
+trigger1   = !AnimElemTime(1)
+value      = -1
+first      = 0
+last       = 59
+ignorehitpause = 1
+persistent = 0
+
+[State ]
+type       = VarSet
+trigger1   = NumEnemy > Anim%2
+sysvar(0)  = Enemy(Anim%2),Anim
+ignorehitpause = 1
+
+[State ]
+type       = ChangeState
+triggerall = NumEnemy > Anim%2 && FVar(0) < 60
+triggerall = Enemy(Anim%2),MoveHit = 1
+trigger1   = Var(Floor(FVar(0))) = SysVar(0) || Var(Floor(FVar(0))) < 0
+trigger1   = Var(Floor(FVar(1) := FVar(0))) := SysVar(0) || FVar(0) := 60
+trigger2   = FVar(0) := FVar(0)+1
+value      = StateNo
+ctrl       = 0
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+trigger1   = 1
+sysvar(1)  = Abs(Floor(FVar(1))%60)
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = RoundState > 2 || FVar(0) := 0
+ignorehitpause = 1
+
+
+;===========================================================================
+[Statedef 13010]
+type            = S
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = -1
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = ChangeAnim
+trigger1   = Anim-StateNo != [0,1]
+value      = IsHelper(StateNo+1)+StateNo
+elem       = 1
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = Facing = 1-2*(TeamSide%2)
+ignorehitpause = 1
+
+[State ]
+type           = Projectile
+trigger1       = !AnimElemTime(1) && !Root,NumProjID(StateNo)
+velocity       = -1,0
+projid         = StateNo
+projanim       = StateNo
+offset         = -BackEdgeDist,0
+projstagebound = -16
+projedgebound  = 100000
+projremovetime = -1
+supermovetime  = 2147483647
+pausemovetime  = 2147483647
+guard.dist     = 0
+ignorehitpause = 1
+persistent     = 0
+
+[State ]
+type       = VelSet
+trigger1   = 1
+x          = IfElse(AnimElemTime(1),-!!Root,NumProjID(StateNo),-BackEdgeDist-1)
+y          = 0
+ignorehitpause = 1
+
+[State ]
+type       = PosSet
+trigger1   = 1
+y          = 100
+ignorehitpause = 1
+
+[State ]
+type       = VarRangeSet
+trigger1   = !AnimElemTime(1)
+value      = -1
+first      = 0
+last       = 59
+ignorehitpause = 1
+persistent = 0
+
+[State ]
+type       = VarSet
+trigger1   = NumEnemy > Anim%2
+trigger1   = Enemy(Anim%2),MoveHit = 1 && NumHelper(13000+Anim%2)
+v          = Helper(13000+Anim%2),SysVar(1)
+value      = Enemy(Anim%2),StateNo
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = RoundState > 2
+ignorehitpause = 1
+
+
+;===========================================================================
+[Statedef 13020]
+type            = S
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = IsHelper(StateNo+1)+StateNo
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = VarRangeSet
+trigger1   = !AnimElemTime(1)
+value      = 1
+first      = 0
+last       = 59
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+trigger1   = NumEnemy > Anim%2
+trigger1   = Enemy(Anim%2),MoveHit = 1 && NumHelper(13000+Anim%2)
+trigger1   = Var(Helper(13000+Anim%2),SysVar(1)) > Enemy(Anim%2),AnimTime
+v          = Helper(13000+Anim%2),SysVar(1)
+value      = Enemy(Anim%2),AnimTime
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = IfElse(GameTime%2,Facing-Root,Facing,Facing = Root,Facing)
+ignorehitpause = 1
+
+[State ]
+type       = PosSet
+trigger1   = 1
+x          = Root,Pos X-30*Facing*(GameTime%2)
+y          = 100
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = 0;RoundState > 2
+ignorehitpause = 1
+
+
+;===========================================================================
+[Statedef 13030]
+type            = S
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = IsHelper(StateNo+1)+StateNo
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = VarRangeSet
+trigger1   = !AnimElemTime(3)
+value      = -2147483647
+first      = 0
+last       = 59
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+trigger1   = NumEnemy > Anim%2
+trigger1   = Enemy(Anim%2),MoveHit = 1 && NumHelper(13000+Anim%2)
+trigger1   = Var(Helper(13000+Anim%2),SysVar(1)) < Enemy(Anim%2),AnimTime
+v          = Helper(13000+Anim%2),SysVar(1)
+value      = Enemy(Anim%2),AnimTime
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = Root,Facing = Facing
+ignorehitpause = 1
+
+[State ]
+type       = PosSet
+trigger1   = 1
+x          = Root,Pos X
+y          = 100
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = RoundState > 2
+ignorehitpause = 1
+
+
+;===========================================================================
+[Statedef 13040]
+type            = S
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = IsHelper(StateNo+1)+StateNo
+velset          = 0,0
+poweradd        = 0
+sprpriority     = 0
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+persistent = 256
+
+[State ]
+type       = VarRangeSet
+trigger1   = !AnimElemTime(1)
+value      = -2147483647
+first      = 0
+last       = 59
+ignorehitpause = 1
+
+[State ]
+type       = VarSet
+trigger1   = NumEnemy > Anim%2
+trigger1   = Enemy(Anim%2),MoveHit = 1 && NumHelper(13000+Anim%2)
+trigger1   = Var(Helper(13000+Anim%2),SysVar(1)) < Root,GetHitVar(HitTime)
+v          = Helper(13000+Anim%2),SysVar(1)
+value      = Root,GetHitVar(HitTime)
+ignorehitpause = 1
+
+[State ]
+type       = Turn
+trigger1   = Root,Facing = Facing
+ignorehitpause = 1
+
+[State ]
+type       = PosSet
+trigger1   = 1
+x          = Root,Pos X
+y          = 100
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = RoundState > 2
+ignorehitpause = 1
+
+
+;===========================================================================
+; ハイパーコンボ暗転
+;===========================================================================
+[Statedef 15000]
+type            = A
+movetype        = I
+physics         = N
+facep2          = 0
+juggle          = 0
+ctrl            = 0
+anim            = StateNo
+velset          = 0,0
+poweradd        = 0
+sprpriority     = -5
+hitdefpersist   = 0
+movehitpersist  = 0
+hitcountpersist = 0
+
+[State ]
+type       = ChangeState
+trigger1   = !(IsHelper && Name = "UMVC_Hulk" && AuthorName = "Rel")
+value      = 5150
+ctrl       = 0
+ignorehitpause = 1
+
+[State ]
+type       = ChangeAnim
+trigger1   = !AnimElemTime(5)
+value      = Anim
+elem       = 4
+ignorehitpause = 1
+
+[State ]
+type       = Null
+trigger1   = Var(20) :=  6 && Root,Anim = 400
+trigger2   = Var(20) :=  5 && Root,Anim = 410
+trigger3   = Var(20) :=  6 && Root,Anim = 430
+ignorehitpause = 1
+
+[State ]
+type       = ChangeAnim
+triggerall = AnimElemTime(2) < 0
+trigger1   = !Root,AnimElemTime(07) && Root,Anim = 400
+trigger2   = !Root,AnimElemTime(06) && Root,Anim = 410
+trigger3   = !Root,AnimElemTime(07) && Root,Anim = 430
+value      = Anim
+elem       = 2
+ignorehitpause = 1
+
+[State ]
+type       = ChangeAnim
+triggerall = AnimElemTime(5) < 1
+trigger1   = !(Root,Anim = [400,432])
+trigger2   = !Root,AnimElemTime(051) && Root,Anim = 400
+trigger3   = !Root,AnimElemTime(022) && Root,Anim = 410
+value      = Anim
+elem       = 5
+ignorehitpause = 1
+
+[State ]
+type       = AssertSpecial
+trigger1   = AnimElemTime(3) >= 0 && AnimElemTime(5) < 0
+flag       = NoBG
+flag2      = NoFG
+ignorehitpause = 1
+
+[State ]
+type           = PlaySnd
+trigger1       = !AnimElemTime(5)
+value          = s15000,2
+volume         = 255
+channel        = -1
+lowpriority    = 20
+freqmul        = 1.0
+loop           = 0
+pan            = 0
+;abspan         = 0
+ignorehitpause = 0
+
+[State ]
+type           = Explod
+trigger1       = !AnimElemTime(1)
+ID             = StateNo+1
+anim           = 15001
+pos            = Ceil(-RootDist X),Ceil(-RootDist Y-64*Parent,Const(Size.YScale))
+postype        = P1
+facing         = 1
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = 1,1
+sprpriority    = 0
+ontop          = 1
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -1
+pausemovetime  = 0
+supermovetime  = 0
+ignorehitpause = 1
+
+[State ]
+type       = ModifyExplod
+trigger1   = NumExplod(StateNo+1) && AnimElemTime(2) < 0
+ID         = StateNo+1
+pos        = Ceil(-RootDist X),Ceil(-RootDist Y-64*Parent,Const(Size.YScale))
+postype    = P1
+scale      = (1+2.*AnimElemTime(1)/(Var(20)+!Var(20)))*Parent,Const(Size.XScale)/(FrontEdgeDist+BackEdgeDist)*290,(1+2.*AnimElemTime(1)/(Var(20)+!Var(20)))*Parent,Const(Size.YScale)/(FrontEdgeDist+BackEdgeDist)*290
+trans      = AddAlpha
+alpha      = Ceil(256.*AnimElemTime(1)/(Var(20)+!Var(20))),256
+ignorehitpause = 1
+
+[State ]
+type       = RemoveExplod
+trigger1   = NumExplod(StateNo+1)
+trigger1   = AnimElemTime(3) >= 0 || Root,Anim != [400,430]
+ID         = StateNo+1
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !AnimElemTime(2)
+ID             = StateNo+2
+anim           = 15002
+pos            = 0,0
+postype        = Back
+facing         = 1
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = 1,1
+sprpriority    = 5
+ontop          = 1
+shadow         = 0,0,0
+ownpal         = 1
+removeongethit = 0
+removetime     = -2
+pausemovetime  = 2147483647
+supermovetime  = 2147483647
+ignorehitpause = 1
+
+[State ]
+type           = Explod
+trigger1       = !AnimElemTime(3)
+ID             = StateNo+3
+anim           = 15003
+pos            = 0,0
+postype        = Back
+facing         = 1
+vfacing        = 1
+bindtime       = -1
+vel            = 0,0
+accel          = 0,0
+random         = 0,0
+scale          = 2.14,1.16
+sprpriority    = -5
+ontop          = 0
+shadow         = 0,0,0
+ownpal         = 0
+removeongethit = 0
+removetime     = -1
+pausemovetime  = 2147483647
+supermovetime  = 2147483647
+ignorehitpause = 1
+
+[State ]
+type       = ModifyExplod
+trigger1   = NumExplod(StateNo+3)
+trigger1   = 1 || Var(0) :=        (Root,AnimElemTime(08) >= 0 && Root,AnimElemTime(09) < 0 && Root,Anim = 400)
+trigger1   = 1 || Var(0) := Var(0)+(Root,AnimElemTime(07) >= 0 && Root,AnimElemTime(08) < 0 && Root,Anim = 410)
+trigger1   = 1 || Var(0) := Var(0)+(Root,AnimElemTime(08) >= 0 && Root,AnimElemTime(09) < 0 && Root,Anim = 430)
+ID         = StateNo+3
+trans      = AddAlpha
+alpha      = 256,256*!Var(0)
+ignorehitpause = 1
+
+[State ]
+type       = RemoveExplod
+trigger1   = !AnimElemTime(5)
+ID         = StateNo+3
+ignorehitpause = 1
+
+[State ]
+type       = BGPalfx
+trigger1   = AnimElemTime(5) >= 0
+time       = 1
+add        = 256-8*AnimElemTime(5),256-8*AnimElemTime(5),256-8*AnimElemTime(5)
+invertall  = 0
+color      = 256
+ignorehitpause = 1
+
+[State ]
+type       = PalFx
+trigger1   = 1
+time       = 1
+add        = -200,-200,80
+ignorehitpause = 1
+
+[State ]
+type       = PalFx
+trigger1   = Root,AnimElemTime(08) >= 0 && Root,AnimElemTime(09) < 0 && Root,Anim = 400
+trigger2   = Root,AnimElemTime(07) >= 0 && Root,AnimElemTime(08) < 0 && Root,Anim = 410
+trigger3   = Root,AnimElemTime(08) >= 0 && Root,AnimElemTime(09) < 0 && Root,Anim = 430
+time       = 1
+add        = 130,130,390
+ignorehitpause = 1
+
+[State ]
+type       = DestroySelf
+trigger1   = !AnimTime
+ignorehitpause = 1
+
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
