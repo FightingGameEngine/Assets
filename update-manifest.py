@@ -416,7 +416,7 @@ def url_encode_path(path):
 # Character scanner
 # =============================================================================
 
-def scan_characters(chars_dir, source):
+def scan_characters(chars_dir, source, repo_path=None):
     """Scan a chars* source directory for character folders and build
     manifest entries. `source` is the folder NAME (e.g. "chars",
     "charsMARVEL") and is stamped on every entry."""
@@ -485,6 +485,15 @@ def scan_characters(chars_dir, source):
             "cdnBase": cdn_base,
             "files": parsed["files"],
         }
+
+        # Portrait: pre-extracted big portrait PNG @ 256px, stored in the
+        # portraits/ tree (mirrors the source folders: portraits/chars/<id>.png,
+        # portraits/charsMARVEL/<id>.png, ...). Optional — the web frontend
+        # falls back to a letter tile when the field is absent.
+        if repo_path is not None:
+            portrait = Path(repo_path) / "portraits" / source / f"{char_id}.png"
+            if portrait.exists():
+                entry["portrait"] = f"portraits/{source}/{char_id}.png"
 
         characters.append(entry)
         print(f"    -> {entry['displayName']} by {entry['author']} ({size_mb}MB, {len(parsed['files'])} files)")
@@ -699,7 +708,7 @@ def main():
     per_source_counts = {}
     for source in sources:
         print(f"Scanning source '{source}' ({source_label(source)})...")
-        found = scan_characters(repo_path / source, source)
+        found = scan_characters(repo_path / source, source, repo_path=repo_path)
         per_source_counts[source] = len(found)
         characters.extend(found)
         print(f"  Found {len(found)} characters in {source}/")
