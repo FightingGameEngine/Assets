@@ -6,9 +6,14 @@ USAGE:
     python3 update-manifest.py [--repo /path/to/Assets]
 
 WHAT IT DOES:
-    1. Scans chars/ for character folders (each must contain a .def file)
-    2. Parses each .def file to extract:
+    1. Scans EVERY character source folder at the repo root: chars/,
+       charsMARVEL/, charsDC/, ... (any top-level folder named "chars"
+       or starting with "chars"). The classic chars/ folder is the
+       DEFAULT source; every other folder becomes a selectable roster
+       universe in the web frontend.
+    2. For every character folder (each must contain a .def file) parses:
        - id (folder name)
+       - source (the chars* folder it lives in)
        - displayName (from [Info] displayname, or [Info] name)
        - author (from [Info] author)
        - files (ALL files referenced in [Files] section: sprite, anim, sound,
@@ -16,7 +21,8 @@ WHAT IT DOES:
     3. Scans stages/ for .def files (pairs with .sff of same name)
     4. Computes total sizeMB from actual file sizes on disk
     5. Preserves manual overrides (description) from existing manifest.json
-    6. Writes updated manifest.json
+    6. Writes updated manifest.json (version 3 — adds "source" per
+       character and a top-level "sources" array)
     7. Prints a summary of what changed
 
 CASE-AWARE FILE MATCHING:
@@ -36,10 +42,14 @@ FOLDER/.def MISMATCH WARNING:
     .def filename MUST match the folder name. If they don't match, the engine
     can't find the character definition and crashes. This script prints a
     prominent warning when a mismatch is detected, and exits with code 1.
+    (This applies to every chars* source folder — the web layer downloads
+    from charsMARVEL/... etc. but always injects into the engine's chars/
+    namespace.)
 
 WORKFLOW:
     1. Clone Assets to your desktop
-    2. Add/remove character folders in chars/ and stage files in stages/
+    2. Add/remove character folders in chars/, charsMARVEL/, charsDC/, ...
+       and stage files in stages/
     3. Run this script: python3 update-manifest.py
     4. Review changes with: git diff manifest.json
     5. Commit and push: git add manifest.json && git commit -m "update manifest" && git push
@@ -47,10 +57,13 @@ WORKFLOW:
 NOTES:
     - The script PRESERVES existing "description" fields from manifest.json
       so you don't lose manual descriptions. New characters get a generic
-      description you can edit later.
-    - The script PRESERVES the "version" field from existing manifest.
+      description you can edit later. Overrides are keyed by "source/id"
+      so the same folder name in two different chars* folders never
+      cross-contaminates (legacy bare-id overrides still match chars/).
+    - The script writes "version": 3.
     - sizeMB is computed from actual file sizes, rounded to nearest MB.
-    - cdnBase uses jsDelivr with URL-encoding for spaces (%20).
+    - cdnBase uses jsDelivr with URL-encoding for spaces (%20) and the
+      real source folder name (charsMARVEL/... etc).
     - Files that don't exist on disk are skipped (with a warning).
 
 REQUIREMENTS:
@@ -73,6 +86,12 @@ REPO_NAME = "Assets"
 BRANCH = "main"
 CDN_BASE = f"https://cdn.jsdelivr.net/gh/{GITHUB_USER}/{REPO_NAME}@{BRANCH}"
 
+# The default source folder (classic roster). Must always exist first.
+DEFAULT_SOURCE = "chars"
+
+# Manifest version written by this script (3 = multi-source manifest).
+MANIFEST_VERSION = 3
+
 # Files to EXCLUDE from the manifest (not needed by engine)
 EXCLUDE_FILES = {
     "desktop.ini",
@@ -91,6 +110,48 @@ INCLUDE_EXTENSIONS = {
 
 # Track folder/.def mismatches for final summary
 MISMATCH_WARNINGS = []
+
+
+# =============================================================================
+# Source folder discovery
+# =============================================================================
+
+def discover_char_sources(repo_path):
+    """Discover every character source folder at the repo root.
+
+    A source folder is any top-level directory named exactly "chars" or
+    starting with "chars" (charsMARVEL, charsDC, ...). Hidden folders are
+    ignored. The classic "chars" folder is always listed first; the rest
+    follow alphabetically.
+
+    Returns a list of folder NAMES (not paths).
+    """
+    sources = []
+    for entry in sorted(Path(repo_path).iterdir(), key=lambda p: p.name.lower()):
+        if not entry.is_dir():
+            continue
+        if entry.name.startswith("."):
+            continue
+        if entry.name == DEFAULT_SOURCE or entry.name.lower().startswith("chars"):
+            sources.append(entry.name)
+    # Guarantee the default source is present and first
+    if DEFAULT_SOURCE in sources:
+        sources.remove(DEFAULT_SOURCE)
+    sources.insert(0, DEFAULT_SOURCE)
+    return sources
+
+
+def source_label(source):
+    """Human-readable label for a source folder.
+
+    chars        -> "Default"
+    charsMARVEL  -> "MARVEL"
+    charsDC      -> "DC"
+    """
+    if source == DEFAULT_SOURCE:
+        return "Default"
+    suffix = source[len(DEFAULT_SOURCE):] if source.lower().startswith(DEFAULT_SOURCE) else source
+    return suffix.upper() if suffix else source.upper()
 
 
 # =============================================================================
@@ -214,7 +275,11 @@ def parse_def_file(def_path, char_folder):
             elif current_section == "files":
                 # File reference keys: sprite, anim, sound, cmd, cns, stcommon,
                 # st, st1, st2, ..., pal1, pal2, ...
-                # All values are filenames
+                # All values are filenames. Some characters (notably a few
+                # charsMARVEL packs) reference subfolders with Windows
+                # backslashes ("cns\\Foo.cns") — normalize to forward slashes
+                # so case-matching and CDN URLs work on every platform.
+                value = value.replace("\\", "/")
                 if key in ("sprite", "anim", "sound", "cmd", "cns", "stcommon", "st"):
                     if value:
                         result["files"].append(value)
@@ -351,8 +416,10 @@ def url_encode_path(path):
 # Character scanner
 # =============================================================================
 
-def scan_characters(chars_dir):
-    """Scan chars/ directory for character folders and build manifest entries."""
+def scan_characters(chars_dir, source):
+    """Scan a chars* source directory for character folders and build
+    manifest entries. `source` is the folder NAME (e.g. "chars",
+    "charsMARVEL") and is stamped on every entry."""
     characters = []
     chars_path = Path(chars_dir)
 
@@ -392,9 +459,9 @@ def scan_characters(chars_dir):
 
         size_mb = compute_size_mb(char_folder, parsed["files"])
 
-        # Build cdnBase with URL-encoding
+        # Build cdnBase with URL-encoding (includes the source folder)
         encoded_id = url_encode_path(char_id)
-        cdn_base = f"{CDN_BASE}/chars/{encoded_id}/"
+        cdn_base = f"{CDN_BASE}/{source}/{encoded_id}/"
 
         # Check for missing files (shouldn't happen after case-aware matching,
         # but keep as a safety net)
@@ -409,6 +476,7 @@ def scan_characters(chars_dir):
 
         entry = {
             "id": char_id,
+            "source": source,
             "displayName": parsed["displayname"] or char_id,
             "author": parsed["author"] or "Unknown",
             "description": "",  # Preserved from existing manifest
@@ -515,23 +583,41 @@ def scan_stages(stages_dir):
 def load_existing_manifest(manifest_path):
     """Load existing manifest.json to preserve descriptions and version."""
     if not Path(manifest_path).exists():
-        return {"version": 2, "characters": [], "stages": []}
+        return {"version": MANIFEST_VERSION, "characters": [], "stages": []}
     try:
         with open(manifest_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
         print(f"  WARNING: Failed to load existing manifest: {e}")
-        return {"version": 2, "characters": [], "stages": []}
+        return {"version": MANIFEST_VERSION, "characters": [], "stages": []}
+
+
+def override_key(entry):
+    """Identity key used to preserve manual overrides across regenerations.
+
+    New manifests stamp every character with a "source" folder, so the key
+    is "source/id". Legacy manifests (version <= 2) had no source — their
+    entries all belonged to the default chars/ folder, so we fall back to
+    the bare id.
+    """
+    source = entry.get("source") or DEFAULT_SOURCE
+    return f"{source}/{entry.get('id', '')}"
+
+
+def legacy_key(entry):
+    return entry.get("id", "")
 
 
 def preserve_overrides(existing, new_entries, entry_type):
     """Preserve 'description' from existing manifest entries."""
     existing_map = {}
     for e in existing.get(entry_type, []):
-        existing_map[e.get("id", "")] = e
+        existing_map[override_key(e)] = e
+        # Legacy fallback: bare id (old manifest had no source field)
+        existing_map.setdefault(legacy_key(e), e)
 
     for entry in new_entries:
-        old = existing_map.get(entry["id"])
+        old = existing_map.get(override_key(entry)) or existing_map.get(legacy_key(entry))
         if old:
             # Preserve description if it was manually set
             if old.get("description"):
@@ -581,14 +667,24 @@ def main():
     args = parser.parse_args()
 
     repo_path = Path(args.repo).resolve()
-    chars_dir = repo_path / "chars"
     stages_dir = repo_path / "stages"
     manifest_path = repo_path / "manifest.json"
 
     print("=" * 60)
-    print("Assets - Manifest Generator")
+    print("Assets - Manifest Generator (multi-source)")
     print("=" * 60)
     print(f"Repo path: {repo_path}")
+    print()
+
+    # Discover every chars* source folder
+    sources = discover_char_sources(repo_path)
+    print("Character source folders:")
+    for s in sources:
+        print(f"  - {s} ({source_label(s)})")
+    extra = [d.name for d in repo_path.iterdir()
+             if d.is_dir() and not d.name.startswith(".") and d.name not in sources]
+    if extra:
+        print(f"  NOTE: other folders (not scanned as characters): {', '.join(extra)}")
     print()
 
     # Load existing manifest for overrides
@@ -598,11 +694,16 @@ def main():
           f"{len(existing.get('stages', []))} stages")
     print()
 
-    # Scan characters
-    print("Scanning characters...")
-    characters = scan_characters(chars_dir)
-    print(f"  Found {len(characters)} characters")
-    print()
+    # Scan every source folder
+    characters = []
+    per_source_counts = {}
+    for source in sources:
+        print(f"Scanning source '{source}' ({source_label(source)})...")
+        found = scan_characters(repo_path / source, source)
+        per_source_counts[source] = len(found)
+        characters.extend(found)
+        print(f"  Found {len(found)} characters in {source}/")
+        print()
 
     # Scan stages
     print("Scanning stages...")
@@ -614,9 +715,17 @@ def main():
     characters = preserve_overrides(existing, characters, "characters")
     stages = preserve_overrides(existing, stages, "stages")
 
+    # Sources metadata for the frontend (only sources that have characters)
+    sources_meta = [
+        {"id": s, "label": source_label(s)}
+        for s in sources
+        if per_source_counts.get(s, 0) > 0
+    ]
+
     # Build new manifest
     new_manifest = {
-        "version": existing.get("version", 2),
+        "version": MANIFEST_VERSION,
+        "sources": sources_meta,
         "characters": characters,
     }
     if stages:
@@ -641,28 +750,31 @@ def main():
         f.write("\n")  # Trailing newline
 
     # Print summary of changes
-    old_char_ids = {c["id"] for c in existing.get("characters", [])}
-    new_char_ids = {c["id"] for c in characters}
-    added_chars = new_char_ids - old_char_ids
-    removed_chars = old_char_ids - new_char_ids
+    old_char_ids = {override_key(c) for c in existing.get("characters", [])}
+    new_char_ids = {override_key(c) for c in characters}
+    added_chars = sorted(new_char_ids - old_char_ids)
+    removed_chars = sorted(old_char_ids - new_char_ids)
 
     old_stage_ids = {s["id"] for s in existing.get("stages", [])}
     new_stage_ids = {s["id"] for s in stages}
-    added_stages = new_stage_ids - old_stage_ids
-    removed_stages = old_stage_ids - new_stage_ids
+    added_stages = sorted(new_stage_ids - old_stage_ids)
+    removed_stages = sorted(old_stage_ids - new_stage_ids)
 
     print()
     print("=" * 60)
     print("SUMMARY")
     print("=" * 60)
+    for s in sources:
+        print(f"  {s}: {per_source_counts.get(s, 0)} characters")
+    print()
     if added_chars:
-        print(f"  + Added characters: {sorted(added_chars)}")
+        print(f"  + Added characters: {added_chars}")
     if removed_chars:
-        print(f"  - Removed characters: {sorted(removed_chars)}")
+        print(f"  - Removed characters: {removed_chars}")
     if added_stages:
-        print(f"  + Added stages: {sorted(added_stages)}")
+        print(f"  + Added stages: {added_stages}")
     if removed_stages:
-        print(f"  - Removed stages: {sorted(removed_stages)}")
+        print(f"  - Removed stages: {removed_stages}")
     if not (added_chars or removed_chars or added_stages or removed_stages):
         print("  (File contents updated - sizes, files, or metadata changed)")
 
