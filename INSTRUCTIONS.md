@@ -6,11 +6,36 @@ select them in the game.
 
 ## Quick Start
 
-1. Create a folder under `chars/` with your character's name
+1. Create a folder under `chars/` (Default roster), or under another roster
+   folder like `charsMARVEL/` / `charsDC/` for a separate selectable universe
 2. Upload all character files (.def, .cns, .cmd, .air, .sff, .snd, .act)
 3. Run `update-manifest.bat` (Windows) or `./update-manifest.sh` (Mac/Linux)
 4. The script auto-generates manifest.json, commits, and pushes to GitHub
 5. jsDelivr CDN updates within 5-10 minutes
+
+## Roster Sources (multiple chars* folders)
+
+The web frontend groups characters by the folder they live in. The classic
+`chars/` folder is the **Default** roster; every other top-level folder whose
+name starts with `chars` becomes its own selectable roster in the UI
+(`charsMARVEL` -> MARVEL, `charsDC` -> DC, ...). To add a new universe:
+
+1. Create a folder named `chars<Something>` at the repo root (e.g. `charsDC`)
+2. Add character folders inside it (same rules as `chars/`: folder name must
+   match the `.def` file name)
+3. Run `update-manifest.py` — it scans ALL `chars*` folders automatically and
+   stamps each manifest entry with its source folder
+4. The frontend picks the new roster up automatically from the manifest —
+   no web code changes needed
+
+Notes:
+- The engine always loads characters from its own `chars/` namespace, so the
+  web layer downloads from `charsMARVEL/...` but injects into `chars/<id>/`.
+  This is transparent; you never need to care.
+- Character folder names must be unique WITHIN a roster folder. The same name
+  in two different folders is allowed (they stay separate characters).
+- Some characters reference files with Windows backslashes in their `.def`
+  (`cns\Foo.cns`). The updater normalizes these to forward slashes.
 
 ## One-Click Manifest Update
 
