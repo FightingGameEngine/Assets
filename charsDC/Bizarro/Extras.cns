@@ -1,0 +1,1030 @@
+; Extras File
+; ===========
+
+;---------------------------------------------------------------------------
+; Fly Mode
+[Statedef 730]
+type = A
+movetype = I
+physics = N
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 730, 1.2]
+type = Playsnd
+trigger1 = Time = 0 && Var(14) = 0
+value = s1,3
+channel = 0
+
+[State 730, 1.2]
+type = Playsnd
+trigger1 = Time = 0 && Var(14) = 0
+value = s5,6
+channel = 1
+
+[State 730, 2]
+type = Explod
+trigger1 = time = 0
+anim = 743
+pos = 10,0
+sprpriority = 4
+postype = p1
+ownpal = 1
+
+[State 730, 2.1]
+type = VarSet
+trigger1 = Time = 0 && Var(14) = 0
+v = 13
+value = 1
+
+[State 730, 2.2]
+type = VarSet
+trigger1 = Time = 0 && Var(14) = 0
+v = 15
+value = 0
+
+[State 730, 3]
+type = VelSet
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+trigger1 = Var(12) = 0
+x = 0
+y = 0
+
+[State 730, 4]
+type = ChangeAnim
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+trigger1 = Anim != 0
+value = 0
+
+[State 730, 5.1]
+type = VarSet
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+trigger1 = Var(12) != 2
+trigger2 = Var(12) = 2
+trigger2 = Vel Y >= 2
+v = 12
+value = 1
+
+[State 730, 5.2]
+type = VarSet
+trigger1 = Var(12) = 1
+trigger1 = Vel Y <= -2
+v = 12
+value = 2
+
+[State 730, 6]
+type = RemoveExplod
+trigger1 = Time = 0
+ID = 8480
+
+[State 730, 8]
+type = VelSet
+triggerall = Var(12) != 0
+trigger1 = command = "holdfwd"
+trigger2 = command = "holdback"
+trigger3 = command = "holdup"
+trigger4 = command = "holddown"
+y = 0
+
+[State 730, 9]
+type = VarSet
+trigger1 = command = "holdfwd"
+trigger2 = command = "holdback"
+trigger3 = command = "holdup"
+trigger4 = command = "holddown"
+v = 12
+value = 0
+
+[State 730, 10.1]
+type = VelSet
+trigger1 = command = "holdup"
+y = ifelse(Pos Y > -240, -3.7, 0)
+
+[State 730, 10.2]
+type = VelSet
+trigger1 = command = "holdup"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+x = 0
+
+[State 730, 11]
+type = ChangeAnim
+triggerall = Anim != 41
+trigger1 = command = "holdup"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+value = 41
+
+[State 730, 12.1]
+type = VelSet
+trigger1 = command = "holddown"
+y = ifelse(Pos Y < -10, 4.0, 0)
+
+[State 730, 12.2]
+type = VelSet
+trigger1 = command = "holddown"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+x = 0
+
+[State 730, 13]
+type = ChangeAnim
+triggerall = Anim != 44
+trigger1 = command = "holddown"
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+value = 44
+
+[State 730, 14.1]
+type = VelSet
+trigger1 = command = "holdback"
+x = -3.6
+
+[State 730, 14.2]
+type = VelSet
+trigger1 = command = "holdback"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+y = 0
+
+[State 730, 15]
+type = ChangeAnim
+triggerall = Anim != 105
+trigger1 = command = "holdback"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+value = 105
+
+[State 730, 16.1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = 4.1
+
+[State 730, 16.2]
+type = VelSet
+trigger1 = command = "holdfwd"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+y = 0
+
+[State 730, 17]
+type = ChangeAnim
+triggerall = Anim != 20
+trigger1 = command = "holdfwd"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+value = 20
+
+[State 730, 18]
+type = ChangeAnim
+triggerall = Anim != 20
+trigger1 = command = "holdfwd" && command = "holdup"
+trigger2 = command = "holdfwd" && command = "holddown"
+value = 20
+
+[State 730, 19]
+type = ChangeAnim
+triggerall = Anim != 105
+trigger1 = command = "holdback" && command = "holdup"
+trigger2 = command = "holdback" && command = "holddown"
+value = 105
+
+[State 730, 20]
+type = Turn
+trigger1 = P2Dist X < 0
+
+[State 730, 21]
+type = ChangeState
+trigger1 = Time > 0 && Var(14) = 0
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Fly Mega Heat Vision
+[State 730,6]
+triggerall = power >= 1000 ;Level 1
+trigger1 = command = "qcf_2p"
+type = ChangeState
+value = 3100
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Fly Explosive Impact
+[State 730,6]
+triggerall = power >= 1000 ;Level 1
+trigger1 = command = "qcf_2k"
+type = ChangeState
+value = 3300
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; fly Heat Vision
+[State 730, 6]
+trigger1 = (command = "qcf_x") || (command = "qcf_y")
+type = ChangeState
+value = 1400
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Flying Kick
+[State 730, 6]
+trigger1 = (command = "qcf_a") || (command = "qcf_b") || (command = "qcf_c")
+type = ChangeState
+value = 1350
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; fly Impact
+[State 730, 6]
+trigger1 = (command = "qcf_z") || (command = "qcf_c")
+type = ChangeState
+value = 1700
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Fast Wind
+[State 730, 6]
+trigger1 = (command = "qcb_a") || (command = "qcb_b")
+type = ChangeState
+value = 1750
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Heat Vision air (Horizontal)
+[State 730, 6]
+trigger1 = (command = "qcb_x") || (command = "qcb_y") || (command = "qcb_z")
+type = ChangeState
+value = 1800
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; X button
+[State 730, 6]
+trigger1 = command = "x"
+type = ChangeState
+trigger2 = stateno = 99601 && movecontact
+value = 99600
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Y button
+[State 730, 6]
+type = ChangeState
+trigger1 = command = "y"
+trigger2 = ((stateno = 99600) || (stateno = 99601)) && (movecontact = 1)
+value = 99602
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Z button
+[State 730, 6]
+type = ChangeState
+trigger1 = command = "z"
+trigger2 = ((stateno = 99600) || (stateno = 99601) || (stateno = 99602) || (stateno = 99603)) && (movecontact = 1)
+value = 99604
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; A button
+[State 730, 6]
+type = ChangeState
+trigger1 = command = "a"
+trigger2 = (stateno = 99600) && (movecontact = 1)
+value = 99601
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; B button
+[State 730, 6]
+type = ChangeState
+trigger1 = command = "b"
+trigger2 = ((stateno = 99600) || (stateno = 99601) || (stateno = 99602)) && (movecontact = 1)
+value = 99603
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; C button
+[State 730, 6]
+type = ChangeState
+trigger1 = command = "c"
+trigger2 = ((stateno = 99600) || (stateno = 99601) || (stateno = 99602) || (stateno = 99603) || (stateno = 99604)) && (movecontact = 1)
+value = 99605
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;FLY_X
+[Statedef 99600]
+type    = A
+movetype= A
+juggle  = 1
+ctrl = 0
+anim = 600
+velset= 0,0
+poweradd = 20
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,0
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,13
+
+[State 99600, 2]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger2 = AnimElem = 4
+persistent = 0
+attr = A, NA
+damage    = 40,2
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8,8
+sparkno = 1
+guard.sparkno = 3
+sparkxy = -10,-70
+hitsound   = S2,0
+guardsound = s3,0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 11
+ground.velocity = -3
+air.velocity = -2,-3
+
+[State 600, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 730
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;FLY_Y
+[Statedef 99602]
+type    = A
+movetype= A
+juggle  = 1
+ctrl = 0
+anim = 602
+velset= 0,0
+poweradd = 30
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,1
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 8
+value = 0,19
+
+[State 99600, 2]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger2 = AnimElem = 3
+trigger4 = AnimElem = 4
+persistent = 0
+attr = A, NA
+damage    = 40
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 9,9
+sparkno = 2
+guard.sparkno = 3
+sparkxy = -10,-70
+hitsound   = S2,1
+guardsound = s3,0
+ground.type = High
+air.type = Low
+ground.slidetime = 10
+ground.hittime  = 15
+ground.velocity = -4
+air.velocity = -3,-3
+
+[State 99602, 6]
+type = PlaySnd
+trigger1 = Time = 1
+value = 0, 0
+
+[State 99602, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 730
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;FLY_Z
+[Statedef 99604]
+type    = A
+movetype= A
+juggle  = 1
+ctrl = 0
+anim = 604
+velset= 0,0
+poweradd = 50
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,2
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 14
+value = 0,19
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 4
+value = 0,7
+
+[State 99604, 2]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger2 = AnimElem = 3
+trigger4 = AnimElem = 4
+persistent = 0
+attr = A, NA
+damage    = 60
+animtype = Heavy
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 10,10
+sparkno = 2
+guard.sparkno = 3
+sparkxy = -10,-70
+hitsound   = S2,2
+guardsound = s3,0
+ground.type = High
+air.type = Low
+ground.slidetime = 15
+ground.hittime  = 20
+ground.velocity = -5
+air.velocity = -8.5,8
+air.fall = 1
+
+[State 99604, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 730
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;FLY_A
+[Statedef 99601]
+type    = A
+movetype= A
+juggle  = 1
+ctrl = 0
+anim = 601
+velset= 0,0
+poweradd = 20
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,3
+
+[State 99601, 2]
+type = HitDef
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 2
+trigger3 = AnimElem = 3
+persistent = 0
+attr = A, NA
+damage    = 20
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8,8
+sparkno = 1
+guard.sparkno = 3
+sparkxy = -10,-70
+hitsound   = S2,0
+guardsound = s3,0
+ground.type = Low
+air.type = High
+ground.slidetime = 5
+ground.hittime  = 11
+ground.velocity = -3
+air.velocity = -1,-3
+
+[State 99601, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 730
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;FLY_B
+[Statedef 99603]
+type    = A
+movetype= A
+juggle  = 1
+ctrl = 0
+anim = 603
+velset= 0,0
+poweradd = 30
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,3
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,6
+
+[State 99603, 2]
+type = HitDef
+trigger1 = AnimElem = 2
+trigger2 = AnimElem = 3
+persistent = 0
+attr = A, NA
+damage    = 40
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 9,9
+sparkno = 2
+guard.sparkno = 3
+sparkxy = -10,-70
+hitsound   = S2,1
+guardsound = s3,0
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 15
+ground.velocity = -4
+air.velocity = -3,-8
+air.fall = 1
+
+[State 99603, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 730
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;FLY_C
+[Statedef 99605]
+type    = A
+movetype= A
+juggle  = 1
+ctrl = 0
+anim = 605
+velset= 0,0
+poweradd = 50
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,3
+
+[State 405, 6]
+type = PlaySnd
+trigger1 = Time = 0
+value = 0,7
+
+[State 99605, 2]
+type = HitDef
+trigger1 = AnimElem = 1
+trigger2 = AnimElem = 2
+trigger3 = AnimElem = 3
+trigger4 = AnimElem = 4
+trigger5 = AnimElem = 5
+persistent = 0
+attr = A, NA
+damage    = 65
+animtype = Heavy
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 12,12
+sparkno = 2
+guard.sparkno = 3
+sparkxy = -10,-70
+hitsound   = S2,2
+guardsound = s3,0
+ground.type = High
+ground.slidetime = 15
+ground.hittime  = 20
+ground.velocity = -5
+air.type = Low
+air.velocity = -10,8
+air.fall = 1
+
+[State 99605, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 730
+ctrl = 1
+
+;----------------------------------------------------------------
+;charge mode
+[Statedef 740]
+type = S
+physics = S
+ctrl = 0
+sprpriority = 5
+anim = 740
+poweradd = 1
+
+[State 740, CHARGE]
+type = PowerAdd
+triggerall = stateno = 740
+trigger1 = power != const(data.power)
+trigger1 = power <= 1000
+trigger1 = power > 0
+value = 6
+
+[State 740, CHARGE]
+type = PowerAdd
+triggerall = stateno = 740
+trigger1 = power != const(data.power)
+trigger1 = power <= 2000
+trigger1 = power > 1000
+value = 8
+
+[State 740, CHARGE]
+type = PowerAdd
+triggerall = stateno = 740
+trigger1 = power != const(data.power)
+trigger1 = power <= const(data.power)
+trigger1 = power > 2000
+value = 10
+
+[State 740,1]
+type = PalFX
+trigger1 = TimeMod = 2,0
+trigger1 = Time > 0
+time = 1
+add = 80,80,80
+
+[State 740, 2]
+type = Explod
+triggerall = stateno = 740
+trigger1 = power != const(data.power)
+trigger1 = power <= 1000
+trigger1 = power > 0
+trigger1 = TimeMod = 6,0
+anim = 62
+pos = -10,8
+postype = p1
+ownpal = 1
+
+[State 740, 2]
+type = Explod
+triggerall = stateno = 740
+trigger1 = power != const(data.power)
+trigger1 = power <= 2000
+trigger1 = power > 1000
+trigger1 = TimeMod = 6,0
+anim = 62
+pos = -10,8
+postype = p1
+ownpal = 1
+scale = 0.9,1.5
+
+[State 740, 2]
+type = Explod
+triggerall = stateno = 740
+trigger1 = power != const(data.power)
+trigger1 = power <= const(data.power)
+trigger1 = power > 2000
+trigger1 = TimeMod = 6,0
+anim = 62
+pos = -10,8
+postype = p1
+ownpal = 1
+scale = 0.8,2
+
+[State 740, 5]
+type = ChangeState
+trigger1 = command != "hold_x"
+trigger2 = command != "hold_y"
+trigger3 = power = const(data.power)
+value = 0
+ctrl = 1
+
+;--------------------------------------------------------------------------------
+;Push Block Stand
+[Statedef 750]
+type    = S
+movetype= I
+physics = N
+poweradd= 0
+velset = 10,0
+ctrl = 0
+anim = 750
+sprpriority = 2
+
+[State 750, a1]
+type = VelMul
+trigger1 = 1
+x = 0.75
+
+[State 750, a2]
+type = VelSet
+trigger1 = Time = 10
+x = 0
+
+[State 750, a3]
+type = Width
+trigger1 = 1
+value = 10,0
+
+[State 750, a4]
+type = NotHitBy
+trigger1 = Time = 0
+value = SCA
+time = 25
+
+[State 750, a5]
+type = Helper
+trigger1 = Time = 0
+helpertype = Normal
+name = "PushBlock"
+postype = P1
+pos = -50,0
+stateno = 760
+ownpal = 1
+size.height = 200
+size.ground.back = 30
+size.ground.front = 30
+
+[State 750, a6]
+type = Explod
+trigger1 = Time = 0
+anim = 765
+postype = p1
+pos = 73,-80
+ownpal = 1
+vel = 2,0
+ignorehitpause = 1
+sprpriority = 7
+
+[State 750, a7]
+type = PlaySnd
+trigger1 = Time = 0
+value = 3,0
+volume = 200
+channel = 1
+
+[State 750, a8]
+type = PlaySnd
+trigger1 = Time = 0
+value = 1,0
+channel = 0
+
+[State 750, a9]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;--------------------------------------------------------------------------------
+;Push Block Crouch
+[Statedef 751]
+type    = C
+movetype= I
+physics = N
+poweradd= 0
+velset = 10,0
+ctrl = 0
+anim = 751
+sprpriority = 2
+
+[State 751, a1]
+type = VelMul
+trigger1 = 1
+x = 0.75
+
+[State 751, a2]
+type = VelSet
+trigger1 = Time = 10
+x = 0
+
+[State 751, a3]
+type = Width
+trigger1 = 1
+value = 10,0
+
+[State 751, a4]
+type = NotHitBy
+trigger1 = Time = 0
+value = SCA
+time = 25
+
+[State 751, a5]
+type = Helper
+trigger1 = Time = 0
+helpertype = Normal
+name = "PushBlock"
+postype = P1
+pos = -50,0
+stateno = 760
+ownpal = 1
+size.height = 200
+size.ground.back = 30
+size.ground.front = 30
+
+[State 751, a6]
+type = Explod
+trigger1 = Time = 0
+anim = 765
+postype = p1
+pos = 73,-45
+ownpal = 1
+vel = 2,0
+ignorehitpause = 1
+sprpriority = 7
+
+[State 751, a7]
+type = PlaySnd
+trigger1 = Time = 0
+value = 3,0
+volume = 200
+channel = 1
+
+[State 751, a8]
+type = PlaySnd
+trigger1 = Time = 0
+value = 1,0
+channel = 0
+
+[State 751, a9]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;--------------------------------------------------------------------------------
+;Push Block Air
+[Statedef 752]
+type    = S
+movetype= I
+physics = N
+poweradd= 0
+velset = 10,0
+ctrl = 0
+anim = 752
+sprpriority = 2
+
+[State 752, a1]
+type = VelMul
+trigger1 = 1
+x = 0.75
+
+[State 752, a2]
+type = VelSet
+trigger1 = Time = 10
+x = 0
+
+[State 752, a3]
+type = Width
+trigger1 = 1
+value = 10,0
+
+[State 752, a4]
+type = NotHitBy
+trigger1 = Time = 0
+value = SCA
+time = 25
+
+[State 752, a5]
+type = Helper
+trigger1 = Time = 0
+helpertype = Normal
+name = "PushBlock"
+postype = P1
+pos = -50,0
+stateno = 760
+ownpal = 1
+size.height = 200
+size.ground.back = 30
+size.ground.front = 30
+
+[State 752, a6]
+type = Explod
+trigger1 = Time = 0
+anim = 765
+postype = p1
+pos = 73,-55
+ownpal = 1
+vel = 2,0
+ignorehitpause = 1
+sprpriority = 7
+
+[State 752, a7]
+type = PlaySnd
+trigger1 = Time = 0
+value = 3,0
+volume = 200
+channel = 1
+
+[State 752, a8]
+type = PlaySnd
+trigger1 = Time = 0
+value = 1,0
+channel = 0
+
+[State 752, a9]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 51
+ctrl = 1
+
+;-----------------------------------------------------------------
+;guard push helper
+[Statedef 760]
+type    = S
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 760
+sprpriority = -4
+
+[State 760, a1]
+type = PlayerPush
+trigger1 = Time >= 0
+value = 1
+
+[State 760, a2]
+type = VelSet
+trigger1 = Time = [0,10]
+x = 30
+
+[State 760, a3]
+type = VelSet
+trigger1 = Time = [11,13]
+x = 20
+
+[State 760, a4]
+type = VelSet
+trigger1 = Time >= 14
+x = 10
+
+[State 760, a5]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 760, a6]
+type = DestroySelf
+trigger1 = Time >= 18
+
+;---------------------------------------------------------------------------
+;Super Jump opponent locator
+[Statedef 910]
+type    = A
+physics = N
+ctrl = 0
+sprpriority = 2
+
+[State 910, arrow]
+type = ChangeAnim
+trigger1 = IsHelper(0)
+;trigger1 = TeamSide = 2
+value = 910
+
+[State 910, destroyself]
+type = DestroySelf
+triggerall = IsHelper(0)
+trigger1 = RootDist Y > 0
+
+;-----------------------
+; Safe fall (from superjump, or jumping attack)
+[StateDef 948]
+type = A
+movetype = I
+physics = A
+ctrl = 1
+
+; neutral (default)
+[State 948, ChangeAnim]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 48
+

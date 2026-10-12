@@ -1,0 +1,834 @@
+; HELPERS
+; ========
+
+
+;------------------------------
+; Hit by power move (shaking)
+[Statedef 940]
+type    = A
+movetype= H ;Get hit
+physics = N
+
+[State 940, 0]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+y = 0
+z = 0
+
+[State 940, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 940, 2]
+type = PosAdd
+trigger1 = Time = 0
+y = -20
+
+[State 940, 3]
+type = ChangeAnim2
+Trigger1 = Time >= 0
+value = 5050
+
+[State 940, 4]
+type = ChangeState
+trigger1 = HitShakeOver = 1
+value = 941
+
+; Hit by power move (flying)
+[Statedef 941]
+type    = A
+movetype= H ;Get hit
+physics = N
+
+[State 941, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 941, 1]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 5005
+
+[State 941, 2]
+type = VelSet
+trigger1 = Time = 0
+x = -20
+y = -2
+
+[State 941, 5]
+type = ChangeState
+trigger1 = backedgedist <= 5
+value = 942
+
+; Hit by power move (hitting the wall)
+[Statedef 942]
+type    = A
+movetype= H ;Get hit
+physics = N
+
+[State 942, 0]
+type = PlaySnd
+Trigger1 = Time = 0
+value = F5,4
+
+[State 942, 1]
+type = PosAdd
+trigger1 = Time = 0
+y = -20
+
+[State 942, 2]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 5090
+
+[State 942, 3]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+y = 0
+z = 0
+
+[State 942, 4]
+type = EnvShake
+Trigger1 = Time = 0
+time = 15
+ampl = -3
+freq = 90
+phase = 90
+
+[State 942, 5]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 1
+
+[State 942,19]
+type = GameMakeAnim
+trigger1 = Time = 0
+value = 72
+pos = -10, -50
+
+[State 942, 6]
+type = ChangeState
+trigger1 = Time = 10
+value = 943
+
+; Hit by power move (falling to the ground)
+[Statedef 943]
+type    = A
+movetype= H ;Get hit
+physics = N
+
+[State 943, 0]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 5110
+
+[State 943, 1]
+type = Gravity
+trigger1 = Time >= 0
+
+[State 943, 2]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+Time = 35
+
+[State 943, 5]
+type = SelfState
+trigger1 = Pos Y > 10
+trigger1 = Vel Y > 0
+value = 5100
+ctrl = 0
+
+; Sent flying by a powerful blow
+[Statedef 970]
+type    = A
+movetype= H
+physics = N
+velset = 0
+
+[State 970, 0]
+type = VelSet
+trigger1 = HitShakeOver
+trigger1 = Anim != 5000
+x = -7
+y = -15
+
+[State 970, 1]
+type = Gravity
+trigger1 = HitShakeOver
+
+[State 970, 2]
+type = AngleAdd
+trigger1 = HitShakeOver
+trigger1 = Time % 3 = 0
+value = 60
+
+[State 970, 3]
+type = AngleDraw
+trigger1 = HitShakeOver
+
+[State 970, 4]
+type = PosAdd
+trigger1 = HitShakeOver
+trigger1 = Anim != 5000
+y = -80
+
+[State 970, 5]
+type = ChangeAnim2
+trigger1 = HitShakeOver
+trigger1 = Anim != 5000
+value = 970
+
+[State 970, 6]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 5007
+ignorehitpause = 1
+
+[State 970, 10]
+type = SelfState
+trigger1 = Pos Y > -70
+trigger1 = Vel Y > 0
+value = 5100
+ctrl = 0
+
+;Bizarre 1
+;---------------------------------------------------------------------------
+[Statedef 1601] 
+type    = S
+movetype= A
+velset = 0,0                     
+ctrl = 0      
+anim = 1601
+
+[State 1601, Hit]
+type = HitOverride
+trigger1 = Time >= 0
+attr = SCA, NA, SA, HA, NP, SP, HP 
+slot = 6
+stateno = 1604
+time = -1
+
+[State 1601, snd1]
+type = PlaySnd
+trigger1 = animelem = 4 || animelem = 11
+value = s8,1
+
+[State 1601, 1]
+type = velset 
+trigger1 = time = 0
+x = 3
+y = 0
+
+[State 1601, 1]
+type = Velset 
+trigger1 = p2bodydist X = 0
+trigger2 = frontedgedist = 10
+x = 0
+y = 0
+
+[State 1601, 2]
+type = changestate
+trigger1 = Time = 100
+value = 1603
+
+[State 1601, 2]
+type = changestate
+trigger1 = p2bodydist X <= 0
+value = 1602
+
+;Bizarre 2
+;---------------------------------------------------------------------------
+[Statedef 16011] 
+type    = S
+movetype= A
+velset = 0,0                     
+ctrl = 0      
+anim = 1601
+
+[State 16011, Hit]
+type = HitOverride
+trigger1 = Time >= 0
+attr = SCA, NA, SA, HA, NP, SP, HP 
+slot = 6
+stateno = 1604
+time = -1
+
+[State 16011, snd1]
+type = PlaySnd
+trigger1 = animelem = 4 || animelem = 11
+value = s8,1
+
+[State 16011, 1]
+type = velset 
+trigger1 = time = 0
+x = 2
+y = 0
+
+[State 16011, 1]
+type = Velset 
+trigger1 = p2bodydist X = 0
+trigger2 = frontedgedist = 10
+x = 0
+y = 0
+
+[State 16011, 2]
+type = changestate
+trigger1 = Time = 120
+value = 1603
+
+[State 16011, 2]
+type = changestate
+trigger1 = p2bodydist X <= 0
+value = 1602
+
+;Bizarre 3
+;---------------------------------------------------------------------------
+[Statedef 16012] 
+type    = S
+movetype= A
+velset = 0,0                     
+ctrl = 0      
+anim = 1601
+
+[State 16012, Hit]
+type = HitOverride
+trigger1 = Time >= 0
+attr = SCA, NA, SA, HA, NP, SP, HP 
+slot = 6
+stateno = 1604
+time = -1
+
+[State 16012, snd1]
+type = PlaySnd
+trigger1 = animelem = 4 || animelem = 11
+value = s8,1
+
+[State 16012, 1]
+type = velset 
+trigger1 = time = 0
+x = 1.5
+y = 0
+
+[State 16012, 1]
+type = Velset 
+trigger1 = p2bodydist X = 0
+trigger2 = frontedgedist = 10
+x = 0
+y = 0
+
+[State 16012, 2]
+type = changestate
+trigger1 = Time = 200
+value = 1603
+
+[State 16012, 2]
+type = changestate
+trigger1 = p2bodydist X <= 0
+value = 1602
+
+
+; Walk Complete
+;----------------------------------------------------------------------
+[Statedef 1602] 
+type    = S
+movetype= A
+velset = 0,0                     
+ctrl = 0      
+anim = 1602
+sprpriority = -2 
+
+[State 1602, Hit]
+type = HitOverride
+trigger1 = Time >= 0
+attr = SCA, NA, SA, HA, NP, SP, HP 
+slot = 3
+stateno = 1604
+time = -1
+
+[State 1602, 1]
+type = HitDef
+trigger1 = animelem = 1
+trigger2 = animelem = 2
+trigger3 = animelem = 3
+attr = S, SA
+animtype  = Hard
+damage    = 20,10
+guardflag = MA
+pausetime = 6,12
+sparkno = 3
+sparkxy = -10,-65
+hitsound   = s2,2
+guardsound = s3,0
+ground.type = High
+ground.slidetime = 40
+ground.hittime  = 40
+ground.velocity = -3,0
+air.velocity = -5,-7
+
+[State 1602,]
+type = PlaySnd
+trigger1 = animelem = 1
+value = 1,1
+
+[State 1602, 2]
+type = changestate
+trigger1 = animelem = 7
+value = 1603
+
+; Bizarre Falls
+;----------------------------------------------------------------------
+[Statedef 1603]
+type    = A
+movetype= H
+velset = 0,0                     
+ctrl = 0      
+anim = 1603
+
+[State 1603, 1]
+type = NotHitBy
+trigger1 = Time >= 0
+value = SCA
+
+[State 1603, 2]
+type = DestroySelf
+trigger1 = animtime = 0
+
+; Bizarre Dies
+;----------------------------------------------------------------------
+[Statedef 1604]
+type    = A
+movetype= H
+velset = 0,0                     
+ctrl = 0      
+anim = 1604
+
+[State 1604, K.O]
+type = PlaySnd
+trigger1 = animelem = 1
+value = 11,0
+
+[State 1604, 1]
+type = NotHitBy
+trigger1 = Time >= 0
+value = SCA
+
+[State 1604, 2]
+type = DestroySelf
+trigger1 = animtime = 0
+
+;-----------------------------
+; Reverse Flash Win
+[Statedef 1844]
+type = S
+ctrl = 0
+velset = 0 ,0
+sprpriority = 3
+
+[State 1844, changeanim]
+type = changeanim
+trigger1 = !time
+value = 1844
+
+[State 1844, playsnd]
+type = playsnd
+trigger1 = animelem = 10
+value = 6,2
+channel = 0
+
+[State 1844, playsnd]
+type = playsnd
+trigger1 = animelem = 7
+value = 6,5
+channel = 1
+
+[State 1844, Dust]
+type = Explod
+trigger1 = animelem = 1 || animelem = 3 || animelem = 5 || animelem = 7
+anim = 1945
+ID = 1945
+pos = -20,-80
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1844, Dust]
+type = Explod
+trigger1 = animelem = 1 || animelem = 3 || animelem = 5 || animelem = 7
+anim = 1945
+ID = 1945
+pos = -20,-50
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1844, Dust]
+type = Explod
+trigger1 = animelem = 1 || animelem = 3 || animelem = 5 || animelem = 7
+anim = 1945
+ID = 1945
+pos = -20,-30
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1844, Dust]
+type = Explod
+trigger1 = animelem = 1 || animelem = 3 || animelem = 5 || animelem = 7
+anim = 1945
+ID = 1945
+pos = -20,-10
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1844, Run]
+type = velset
+x = 20
+y = 0
+trigger1 = animelem = 1
+
+[State 1844, Ran Away]
+type = velset
+x = 0
+y = 0
+trigger1 = animelem = 8
+
+;-----------------------------
+; Batzarro
+[Statedef 1933]
+type = S
+ctrl = 0
+velset = 0 ,0
+sprpriority = -1
+
+[State 1933, changeanim]
+type = changeanim
+trigger1 = !time
+value = 1933
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 0
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 1
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 2
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 3
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 4
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 5
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 6
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 7
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 8
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 4
+value = 8,0
+channel = 9
+
+[State 1933, playsnd]
+type = playsnd
+trigger1 = animelem = 4
+value = 8,0
+channel = 10
+
+[State 1933, fly off]
+type = velset
+x = 4
+y = -4
+trigger1 = animelem = 4
+
+[State 1933, destroyself]
+type = destroyself
+trigger1 = time = 650
+ignorehitpause = 1
+
+;-----------------------------
+; Reverse Flash
+[Statedef 1944]
+type = S
+ctrl = 0
+velset = 0 ,0
+sprpriority = 3
+
+[State 1944, changeanim]
+type = changeanim
+trigger1 = !time
+value = 1944
+
+[State 1944, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,3 + random%2
+channel = 0
+
+[State 1944, playsnd]
+type = playsnd
+trigger1 = animelem = 16
+value = 6,5
+channel = 1
+
+[State 1944, playsnd]
+type = playsnd
+trigger1 = animelem = 16
+value = 6,5
+channel = 2
+
+[State 1944, Dust]
+type = Explod
+trigger1 = animelem = 16
+anim = 1945
+ID = 1945
+pos = -20,-80
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1944, Dust]
+type = Explod
+trigger1 = animelem = 16
+anim = 1945
+ID = 1945
+pos = -20,-50
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1944, Dust]
+type = Explod
+trigger1 = animelem = 16
+anim = 1945
+ID = 1945
+pos = -20,-30
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1944, Dust]
+type = Explod
+trigger1 = animelem = 16
+anim = 1945
+ID = 1945
+pos = -20,-10
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1944, Ran Away]
+type = velset
+x = -20
+y = 0
+trigger1 = animelem = 16
+
+[State 1944, destroyself]
+type = destroyself
+trigger1 = time = 650
+ignorehitpause = 1
+
+;-----------------------------
+; Batzarro Intro
+[Statedef 1947]
+type = S
+ctrl = 0
+velset = 0 ,0
+sprpriority = -1
+
+[State 1947, changeanim]
+type = changeanim
+trigger1 = !time
+value = 1947
+
+[State 1947, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 0
+
+[State 1947, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 1
+
+[State 1947, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,1
+channel = 2
+
+[State 1947, playsnd]
+type = playsnd
+trigger1 = animelem = 4
+value = 8,0
+channel = 3
+
+[State 1947, fly off]
+type = velset
+x = 4
+y = -4
+trigger1 = animelem = 4
+
+[State 1947, destroyself]
+type = destroyself
+trigger1 = time = 650
+ignorehitpause = 1
+
+;-----------------------------
+; Reverse Flash Intro
+[Statedef 1948]
+type = S
+ctrl = 0
+velset = 0 ,0
+sprpriority = -1
+
+[State 1948, changeanim]
+type = changeanim
+trigger1 = !time
+value = 1948
+
+[State 1948, playsnd]
+type = playsnd
+trigger1 = animelem = 1
+value = 6,2
+channel = 4
+
+[State 1948, playsnd]
+type = playsnd
+trigger1 = animelem = 5
+value = 6,5
+channel = 5
+
+[State 1948, Dust]
+type = Explod
+trigger1 = animelem = 4
+anim = 1945
+ID = 1945
+pos = -20,-80
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1948, Dust]
+type = Explod
+trigger1 = animelem = 4
+anim = 1945
+ID = 1945
+pos = -20,-50
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1948, Dust]
+type = Explod
+trigger1 = animelem = 4
+anim = 1945
+ID = 1945
+pos = -20,-30
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1948, Dust]
+type = Explod
+trigger1 = animelem = 4
+anim = 1945
+ID = 1945
+pos = -20,-10
+postype = p1  ;p2,front,back,left,right
+facing = 1
+velocity = -1,0
+sprpriority = 20
+ownpal = 1
+removeongethit = 1
+
+[State 1948, Ran Away]
+type = velset
+x = -20
+y = 0
+trigger1 = animelem = 5
+
+[State 1948, destroyself]
+type = destroyself
+trigger1 = time = 650
+ignorehitpause = 1
