@@ -89,3 +89,30 @@ the shared `data/common1.cns` (standard MUGEN 1.0). No action needed.
 
 After pushing changes, purge jsDelivr cache:
 `https://purge.jsdelivr.net/gh/FightingGameEngine/Assets@main/manifest.json`
+
+## One-Click Portrait Extraction
+
+| File | Platform | How to Use |
+|------|----------|------------|
+| `extract-portraits.bat` | Windows | Double-click the file in Explorer |
+| `extract-portraits.py` | All (backend) | Called by the .bat, or `python extract-portraits.py` |
+
+The script:
+- Scans every `chars*` roster folder (same discovery rules as the manifest updater)
+- Finds each character's sprite file via the .def's `[Files] sprite=` line
+- Decodes the big portrait straight out of the .sff (SFF v1 **and** v2 —
+  raw/RLE8/RLE5/LZ5/embedded-PNG, linked sprites and palettes included),
+  preferring the largest `9000,1` sprite and falling back to `9000,0`
+- Renders it on a transparent 256x256 canvas (scaled to fill, centered)
+  and writes `portraits/<source>/<character>.png`
+- Skips portraits that already exist (answer `y` at the prompt, or pass
+  `--force`, to re-extract everything)
+
+Useful flags: `--only Batman_Rebirth,Aquaman` (subset), `--force` (redo),
+`--nearest` (crisper pixel scaling instead of bilinear).
+
+Workflow for new characters:
+1. Add the character folder(s) under `chars/` / `charsDC/` / ...
+2. Run `extract-portraits.bat`
+3. Run `update-manifest.bat` (stamps the `"portrait"` fields)
+4. Commit + push — jsDelivr updates in 5-10 minutes
