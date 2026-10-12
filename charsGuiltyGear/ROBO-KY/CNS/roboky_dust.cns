@@ -1,0 +1,427 @@
+;ダストアタック
+[Statedef 850]
+Type    = S
+MoveType= A
+physics = N
+juggle  = 0
+velset = 0,0
+Ctrl = 0
+Anim = 900
+
+[State 240,1]
+Type = PlaySnd
+Trigger1 = AnimElem=1
+value = 3050,0
+
+[State 100,2]
+Type = Velset
+Trigger1 = var(9)>=1
+Trigger1 = !Time
+x = var(10)
+
+[State 100,1]
+Type = Velmul
+Trigger1 = var(9)>=1
+Trigger1 = time>=0
+Trigger1 = Vel X > 0
+x = 0.90
+
+[State 100,2]
+Type = Velset
+Trigger1 = time>=1
+Trigger1 = Vel X<=0.5
+x = 0
+
+[State 200,1]
+Type = varrandom
+Trigger1 = P2StateNo!=5030
+Trigger1 = P2StateNo!=5035
+Trigger1 = P2StateNo!=5050
+Trigger1 = P2StateNo!=5070
+Trigger1 = P2StateNo!=5071
+Trigger1 = P2StateNo!=5100
+Trigger1 = P2StateNo!=5101
+Trigger1 = P2StateNo!=5110
+Trigger1 = P2StateNo!=5150
+Trigger1 = var(17)!=1
+v = 6
+range = 32,39
+
+[State 200,1]
+Type = varrandom
+TriggerAll=var(17)!=1
+Trigger1 = P2StateNo=5030
+Trigger2 = P2StateNo=5035
+Trigger3 = P2StateNo=5050
+Trigger4 = P2StateNo=5070
+Trigger5 = P2StateNo=5071
+v = 6
+range = 26,31
+
+[State 200,1]
+Type = varrandom
+Trigger1 = P2StateNo=5100
+Trigger2 = P2StateNo=5101
+Trigger3 = P2StateNo=5110
+Trigger4 = P2StateNo=5150
+Trigger5 = var(17) = 1
+v = 6
+range = 14,18
+
+[State 850,1] ;攻撃を当たるようにする
+Type = HitDef
+Trigger1 = AnimElem=4
+Attr = S,NA
+Damage = ceil(var(6)*fvar(6)),0
+AnimType = High
+Guardflag = HA
+Hitflag = MAFD
+Down.velocity = -1,-1
+pausetime = 12,14
+SparkNo = 706
+Sparkxy = 0,-72
+Guard.SparkNo = 751
+Hitsound = s200,4
+Guardsound = s150,1
+ground.Type = High
+ground.Hittime  = 12
+ground.velocity = -3,-9
+Guard.pauseTime = 12,14
+Guard.slideTime = 13
+Guard.HitTime = 13
+Guard.velocity = -7
+airGuard.velocity = -1.9,-.8
+air.Type = High
+air.velocity = ifelse(var(17),-6,-3),ifelse(var(17),-1,-9)
+air.Hittime = 12
+fall = 1
+air.fall = 1
+fall.recover = 1
+yaccel = .51
+getpower = 50,30
+p2facing = 1
+
+[State 850,MoveType=I]
+Type = StateTypeSet
+Trigger1 = AnimElem=5
+MoveType = I
+
+[State 750,3]
+Type = helper
+Trigger1 = MoveHit
+igNoreHitpause = 1
+posType = p2
+persistent = 0
+sprpriority = 4
+pos = 0,-70
+ownpal = 1
+stateNo = 6206
+ID = 6206
+
+[State 240,6]
+Type = Helper
+Trigger1 = MoveGuarded
+igNoreHitpause = 1
+persistent = 0
+posType = p2
+sprpriority = 4
+pos = 0,-70
+ownpal = 1
+stateNo = 6160
+ID = 6160
+size.height = -50
+size.ground.front = 30
+size.ground.back = 4
+size.head.pos = 8010,8011
+
+[State 850,2] 
+Type = targetstate
+Trigger1 = p2stateType!=A
+Trigger1 = var(17)!=1
+Trigger1 = MoveHit
+value = 852
+igNoreHitpause = 1
+
+[State 200,6] 
+Type = PlaySnd
+Trigger1 = AnimElem=4
+value = s0,4
+
+[State 200,4];声
+Type = VarRandom
+Trigger1 = !Time
+v = 1
+range = 0,2
+
+[State 200,6] 
+Type = PlaySnd
+Trigger1 = Var(1) = 0
+Trigger1 = AnimElem=1
+value = s900,0
+
+[State 200,6] 
+Type = PlaySnd
+Trigger1 = Var(1) = 1
+Trigger1 = AnimElem=1
+value = s900,1
+
+[State 200,6] 
+Type = PlaySnd
+Trigger1 = Var(1) = 2
+Trigger1 = AnimElem=1
+value = s900,2
+
+[State 1500,0]
+Type = ChangeState
+TriggerAll=P2StateNo=852
+Trigger1 = var(59)<1
+Trigger1 = Command="holdup"
+Trigger2 = var(59)>0||fvar(39)
+value = 851
+
+[State 850,7] ;終了
+Type = ChangeState
+Trigger1 = AnimTime=0
+value = 0
+Ctrl = 1
+
+;---------------------------------------------------------------------------
+[Statedef 851]
+Type = A
+MoveType = A
+physics = N
+Anim = 901
+velset = 0,0
+
+[State 54,0];ジャンプキャンセル可能に
+Type = VarSet
+TriggerAll=var(2)!=4
+TriggerAll=!var(2)
+Trigger1 = var(59)<1
+Trigger1 = Command!="holdup"
+var(2) = 1
+
+[State 50,0];２段ジャンプ
+Type = ChangeState
+TriggerAll=var(2)=1
+TriggerAll=Ctrl
+Trigger1 = var(59)<1
+Trigger1 = Command="holdup"
+value = 45
+Ctrl = 1
+
+[State 3000,00];ダスト時の背景
+Type = helper
+Trigger1 = !Time
+ID = 9012
+posType = left
+igNoreHitpause = 1
+persistent = 0
+pos = 0,0
+priority = 2
+stateNo = 9012
+ownpal = 1
+superMove = 1
+pauseMovetime = 999999
+superMovetime = 999999
+
+[State 851,0]
+Type = Explod
+Trigger1 = !Time
+Trigger1 = Pos Y>=0
+Anim = F800
+posType = p1
+pos = 0,5
+sprpriority = 12
+bindtime = 1
+persistent = 0
+ownpal = 1
+
+[State 851,1]
+Type = AfterImage
+Trigger1 = !Time
+time = 9999
+trans = add1
+timegap = 1
+framegap = 3
+length = 12
+palbright = 0,0,0
+palcontrast = 200,200,200
+palpostbright = 0,0,0
+paladd = 0,0,0
+palmul = 0.7,0.7,0.7
+
+[State 851,0];ダスト中の攻撃スイッチ
+Type = VarSet
+Trigger1 = !Time
+v = 8
+value = 1
+
+[State 851,0];ダスト背景用
+Type = VarSet
+Trigger1 = !Time
+v = 21
+value = 1
+
+[State 851,0];ダッシュ中var初期化
+Type = VarSet
+Trigger1 = !Time
+v = 9
+value = 0
+
+[State 40,0]
+Type = PlaySnd  
+Trigger1 = !Time
+Trigger1 = Pos Y>=0
+value = s40,1
+
+[State 851,3]
+Type = VelSet
+Trigger1 = P2Dist X<=25
+Trigger1 = time>=0
+Trigger1 = time<=40
+x = 1.8
+y = -6.5
+
+[State 851,3]
+Type = VelSet
+Trigger1 = P2Dist X>=26
+Trigger1 = P2Dist X<=50
+Trigger1 = time>=0
+Trigger1 = time<=40
+x = 2.8
+y = -6.5
+
+[State 851,3]
+Type = VelSet
+Trigger1 = P2Dist X>=51
+Trigger1 = P2Dist X<=100
+Trigger1 = time>=0
+Trigger1 = time<=40
+x = 4.3
+y = -6.5
+
+[State 851,3]
+Type = VelSet
+Trigger1 = P2Dist X>=101
+Trigger1 = P2Dist X<=150
+Trigger1 = time>=0
+Trigger1 = time<=40
+x = 5.3
+y = -6.5
+
+[State 851,3]
+Type = VelSet
+Trigger1 = P2Dist X>=151
+Trigger1 = P2Dist X<=200
+Trigger1 = time>=0
+Trigger1 = time<=40
+x = 6.3
+y = -6.5
+
+[State 851,3]
+Type = VelSet
+Trigger1 = P2Dist X>=201
+Trigger1 = !Time
+Trigger1 = time<=40
+x = 6.3
+y = -6.5
+
+[State 851,3]
+Type = VelAdd
+Trigger1 = time>=0
+y = .35
+
+[State 851,2]
+Type = CtrlSet
+Trigger1 = time>1
+value = 1 
+
+[State 851,4]
+Type = ChangeState
+Trigger1 = time>=10
+Trigger1 = Pos Y>=0
+value = 52
+
+;---------------------------------------------------------------------------
+;ダストアタック相手ヒットポーズ中
+[Statedef 852]
+Type    = A
+MoveType= H
+physics = N
+velset = 0,0
+
+[State 852,1]
+Type = ChangeAnim
+Trigger1 = time>=0
+value = ifelse(SelfAnimExist(5052),5052,5050)
+elem = 1
+persistent = 1
+igNoreHitpause = 1
+
+[State 821,2] 
+Type = changestate
+Trigger1 = Hitshakeover
+value = 853
+;-------------------------------------------------------------------------------------------
+;ダストアタック相手
+[Statedef 853]
+Type = A
+MoveType = H
+physics = N
+velset = 0,0
+Ctrl = 0
+
+[State 852,1]
+Type = ChangeAnim
+Trigger1 = !Time
+value = ifelse(SelfAnimExist(5052),5052,5050)
+
+[State 852,1]
+Type = ChangeAnim
+Trigger1 = Time = 40
+value = Anim+10
+
+[State 852,2]
+Type = VelSet
+Trigger1 = time>=0
+Trigger1 = time<=40
+x = -2.5
+y = -7.8
+
+[State 852,3]
+Type = VelAdd
+Trigger1 = time>=0
+y = .40
+
+[State 852,3]
+Type = VelAdd
+Trigger1 = time > 40
+y = .45
+
+[State 1109,4]
+Type = SelfState
+Trigger1 = alive
+Trigger1 = Command="recovery"
+Trigger1 = canrecover
+Trigger1 = time>=38
+Trigger1 = pos y>=-10
+value = 5200
+Ctrl = 0
+
+[State 1109,4]
+Type = SelfState
+Trigger1 = alive
+Trigger1 = Command="recovery"
+Trigger1 = canrecover
+Trigger1 = time>=38
+Trigger1 = pos y < -10
+value = 5210
+Ctrl = 0
+
+[State 852,4]
+Type = SelfState
+Trigger1 = Pos Y > 0
+value = 5100
+
+;--------------------------------------------------------------------------

@@ -1,0 +1,3421 @@
+;っぱっぱ　マイナス２，３
+[statedef -2]
+
+;------------------------------デバッククリップボード--------------------
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,vlx=%f,vly=%f,v=%d\n"
+params =pos x,pos y,vel x,vel y,var(12)
+ignorehitpause = 1
+
+[state -2, displayb];剣幽霊監視
+type = appendtoclipboard
+trigger1 = 0;numhelper(100)
+text = "V39=%d,"
+params = helper(100),var(39)
+ignorehitpause = 1
+
+[state -2, displayb];剣幽霊監視
+type = appendtoclipboard
+trigger1 = 0;numhelper(300)
+text = "V39=%d,V40=%d,V41=%d,"
+params = helper(300),var(39),helper(300),var(40),helper(300),var(41)
+ignorehitpause = 1
+
+[state -2, displayb];剣幽霊監視
+type = appendtoclipboard
+trigger1 = 1
+text = "V26=%d,V27=%d,V34=%d,V35=%d,V5=%d"
+params = var(26),var(27),var(34),var(35),var(20)
+ignorehitpause = 1
+
+[state -2, displayb];ヒット関係
+type = appendtoclipboard
+trigger1 = 0
+text = "EDX=%f,EBDX=%f,EDY=%f,EDBY=%f"
+params = p2dist x,p2bodydist x,p2dist y ,p2bodydist y
+ignorehitpause = 1
+
+
+;----------------デバック用憑依
+;---0無　１剣　２犬　３幽霊　４らおう
+[State 2050,  voice];
+type = varset
+trigger1 = 0
+var(20) = 2
+ignorehitpause = 1
+
+[State 2050,  ];命令がのこってしまうこともあるをクリア？V10 わんこの命令と同時ヒットとか・・
+type = varset
+trigger1 = !numhelper(100) && !numhelper(200) && !numhelper(300) && !numhelper(400) 
+trigger2 = var(20) <= 0
+var(10) = 0
+
+;--------当たった時点での向きが必要になる。
+;---59が1でP1gawa、－１で２P側からとする？
+;--4100ごるふ　4110 鉢植え 4120ばなな
+[state 1200,light];不幸もーどばななど
+type = Helper
+triggerall = numhelper(330)
+trigger1 = helper(330),var(59) = -1
+name = " BANANA LEFT"
+ID = 345
+pos = 0,-145 
+postype = left
+stateno = 4100 + random % 3 * 10
+ownpal = 1
+size.height = -1
+supermovetime = 9999
+
+[state 1200,light];不幸もーどばなななど
+type = Helper
+triggerall = numhelper(330)
+trigger1 = helper(330),var(59) = 1
+name = "BANANA RIGHT"
+ID = 345
+pos = 0,-145 
+postype = right
+stateno = 4100 + random % 3 * 10
+ownpal = 1
+size.height = 1
+supermovetime = 9999
+
+;----------------擬似CTRL　
+;---着地時は2F目からかも
+;----通常技許可	ダッシュ中,挑発敬意R移動  (FDも同タイミング?) 
+[state -3,];
+type = varset
+trigger1 = stateno = 99 || (stateno = 100 && time >= 1)
+trigger2 = (stateno = 102 || stateno = 107) && time >= 6
+trigger3 = stateno = 900 && time >= 61
+trigger4 = stateno = 910 && time >= 17
+trigger5 = stateno = 52 && time > 0
+trigger6 = numtarget(940)
+trigger7 = (stateno = 800 || stateno = 850) && time = 1
+sysvar(3) = 1
+ignorehitpause = 1
+
+;----必殺技許可	ジャンプ予備動作、相殺　着地
+;---解釈？？２ふれ以内限定はジャンプキャンセル受付?すると後だしならリセットされる？有利にならない？ 
+;----いるかさん横縦空ふり着地時はずっといい?
+[state -3,];
+type = varset
+trigger1 = stateno = 40
+trigger2 = stateno = 52 && time > 0
+trigger3 = numtarget(940)
+trigger4 = prevstateno = [1700,1730]
+trigger4 = stateno = 52 
+trigger5 = stateno = 1685 
+sysvar(3) = 2
+ignorehitpause = 1
+
+;----0にする・・
+[state -3,];
+type = varset
+trigger1 = stateno = [0,22]
+trigger2 = stateno = 50 || stateno = 51 || stateno = 55 || stateno = 56
+trigger3 = movetype = H
+trigger4 = stateno = [120,3600] 
+trigger4 = time <= 1
+sysvar(3) = 0
+ignorehitpause = 1
+
+;--------------------実験ステートふぃーど戻し
+[state 5900,v5];
+type = varset
+trigger1 = stateno = [0,20]
+var(5) = 0
+ignorehitpause = 1
+
+;--------------------ゴールドカラーラオウ常時
+[state 5900,GOLD];
+type = varset
+trigger1 = palno = var(42)
+var(20) = 4
+ignorehitpause = 1
+
+;--------------憑依強制解除,受身中もHであるので除外しといて
+;----イントロ時に抽選させない->ブリジット特殊でうまく機能していない
+[state -3,];ラオウ以外
+type = varset
+triggerall = var(20) < 4
+trigger1 = stateno != [150,155]
+trigger1 = stateno != [5201,5210]
+trigger1 = movetype = h
+var(20) = ifelse(random % 3 = 0,-1,0) 
+ignorehitpause = 1
+
+;----これヒットスパークでやってもいいかも
+;----------------------頭上ではなく、チームサイド
+[state 100x,atc efe];よろければがちゃエフェクト6480	これは気絶、自分のほう基本的にないはず
+type = Explod
+triggerall = !numexplod(6485)
+triggerall = movetype = H
+trigger1 = stateno = 5300 
+trigger2 = anim = 5300
+anim = 6480
+ID = 6485
+postype = left
+pos = ifelse(teamside = 2,240,80),80
+sprpriority = 5
+bindtime = -1
+removetime = -1
+ownpal=1
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[state 100x,atc efe];気絶がちゃエフェクト6485
+type = removeExplod
+trigger1 = movetype != H
+trigger2 = anim != 5300
+ID = 6485
+ignorehitpause = 1
+
+[state 100x,atc efe];よろければがちゃエフェクト6480
+type = Explod
+triggerall = numenemy
+triggerall = !numexplod(6480)
+trigger1 = enemynear,stateno = 5800
+trigger1 = enemynear,movetype = H
+trigger1 = enemynear,statetype != A
+anim = 6480
+ID = 6480
+postype = left
+pos = ifelse(teamside = 1,240,80),80
+sprpriority = 5
+bindtime = -1
+removetime = -1
+ownpal=1
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[state 100x,atc efe];よろければがちゃエフェクト4680  けし
+type = removeExplod
+triggerall = numenemy
+trigger1 = enemynear,stateno != [5800,5820]
+trigger2 = enemynear,ctrl 
+ID = 6480
+ignorehitpause = 1
+
+
+;-------振り向き属性は、2JUNP後のフリーでも,airdash,HIGHJ で有効にされる、どこかにまとめたほうがいいかも
+;----受身取った後にできてなくないかい？確認して
+[state 2,];AIR自動振り向き  はしっこではできないと思う sv4
+type = turn
+triggerall = frontedgedist >= 30
+triggerall = p2dist X < -1
+triggerall = time >= 0
+trigger1 = stateno = [50,51]
+trigger1 = var(55);振り向き属性
+trigger2 = stateno = 42
+trigger3 = numhelper(65)
+trigger3 = stateno = 132
+trigger3 = var(12) && var(25) = 2
+ 
+;-------------------Gバランスでバック用テスト
+[state 7000,debu2]
+type =varadd
+triggerall = 0
+trigger1 = command = "holdfwd"
+trigger1 = var(19) > 0
+var(19) = -1
+ignorehitpause = 1
+
+[state 7000,debu2]
+type =varadd
+triggerall = 0
+trigger1 = command = "holdback"
+trigger1 = var(19) < 256
+var(19) = 1
+ignorehitpause = 1
+
+[state 7000,debu2]
+type =varadd
+triggerall = 0
+trigger1 = command = "holdfwd"
+trigger1 = var(18) > 0
+var(18) = -1
+ignorehitpause = 1
+
+[state 7000,debu2]
+type =varadd
+triggerall = 0
+trigger1 = command = "holdback"
+trigger1 = var(18) < 256
+var(18) = 1
+ignorehitpause = 1
+
+;-------------ブラックカラーてんしょんMAX,あと一撃ゲージもへらないようだ
+[state 7000,debu2]
+type =powerset
+triggerall = !var(40)
+trigger1 = palno = var(41)
+value = 2000
+ignorehitpause = 1
+
+[state 7000,debu2];一撃ゲージは100％なので1000でいい20から12にへんこ
+type =varset
+triggerall = var(40) = 1
+trigger1 = palno = var(41)
+fvar(12) = 1000
+ignorehitpause = 1
+
+;----------------------しゃがみ幅ふやし
+[State 10, 2]
+type = width
+triggerall = statetype = C
+trigger1 = stateno != 40 
+player = 1,0
+ignorehitpause = 1
+
+;-------------------------アフターイメージ関連　ハイジャンプ(透明) 一撃準備(赤）GGモード瀕死（黄）
+[State 200,];大、ほーみんぐ残像を消す
+type = AfterImageTime
+trigger1 = stateno = 52
+trigger2 = movetype = H
+time = 0
+ignorehitpause = 1
+
+;---------------STARSHIPのみかもしれないロマキャン、食らいなどでのエフェクトけし　他はへるぱ
+;----メイには～ないかな？
+[state 1100x,]
+type = removeexplod
+trigger1 = movetype != A
+ID = 200
+ignorehitpause = 1
+
+;--------------------------------------特殊ガード関連
+;---------------------------------------------------------------------------------------------
+
+;---------常時でいい？回復になる、正確には
+[state 120x,]
+type = lifeset
+triggerall = stateno = 150 || stateno = 152 || stateno = 154
+trigger1 = var(25) = 2 && power > 0 && !var(40)
+trigger2 = var(25) = 3
+value  = var(21)
+ignorehitpause = 1
+
+[state 120x,];ライフ格納 SBのときも気をつけるS+HSはいっててもね。あとこれじゃだめ、FD状態の確認がない FDかSB以外
+type = varset
+triggerall = 1;
+trigger1 = 1;var(25) != 2 && var(25) != 3
+var(21)  = life
+ignorehitpause = 0
+
+;------------v23----直前ガード30　で8FOK---------受付はHITSTOP中OK,なので早くやりすぎると失敗するわけね--------------------------
+;---------------22-30の間にガードにいければ、成功
+[state 120x,]
+type = varadd
+triggerall = var(23) > 0
+trigger1 = 1
+var(23)  = -1
+ignorehitpause = 1
+
+[state 120x,]
+type = varset
+triggerall = var(23) <= 0
+trigger1 = 1
+var(23)  = 0
+ignorehitpause = 1
+
+;-------------------------------v25を1にする	これ保険。
+[state 120x,]
+type = varset
+triggerall = var(23) <= 22
+trigger1 = var(25) = 1
+var(23)  = 0
+ignorehitpause = 1
+
+;--------------------ここからSB
+;-------------SB起き上がり１０F不能フラグ  fv21  これは5120あたりでやって
+[state 120x,]
+type = varadd
+triggerall = fvar(21) > 0
+trigger1 = 1
+fvar(21)  = -1
+ignorehitpause = 1
+
+[state 120x,]
+type = varset
+triggerall = fvar(21) <= 0
+trigger1 = 1
+fvar(21)  = 0
+ignorehitpause = 1
+
+;------------------------sb	fv22ガード不能時間減少
+[state 120x,]
+type = varadd
+triggerall = fvar(22) > 0
+trigger1 = 1
+fvar(22)  = -1
+ignorehitpause = 0
+
+[state 120x,]
+type = varset
+triggerall = fvar(22) <= 0
+trigger1 = 1
+fvar(22)  = 0
+ignorehitpause = 0
+
+;------------------------sb	FV23受付フレーム増加カウンター
+[state 120x,]
+type = varadd
+triggerall = fvar(23) > 0
+trigger1 = 1
+fvar(23)  = -1
+ignorehitpause = 0
+
+[state 120x,]
+type = varset
+triggerall = fvar(23) <= 0
+trigger1 = 1
+fvar(23)  = 0
+ignorehitpause = 0
+
+;---------------SB,０になったらガードフラグ解除
+[state 120x,]
+type = varset
+triggerall = var(25) = 3
+trigger1 = fvar(22) <= 0
+var(25) = 0
+ignorehitpause = 0
+
+;-----このフラグはレバー後ろでシステムガード不能になる。
+;---手動で（FDなど）直接１３０に送り込み、そこであたるとガードになる。
+;----この間FDも出せないのでそのように設定すればOK
+;---ガードノックバックでの連打の関係でどうしようか
+[State 3660,];SB後遺症　30Fまたは１５Fガード不能になる　－＞FDも？
+type = AssertSpecial
+triggerall = !var(1) || var(1) = 4
+triggerall = fvar(22) > 0
+trigger1 = fvar(23) = 0 && fvar(22) <= 28 
+trigger2 = fvar(23) > 0 && fvar(22) <= 26 
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+ignorehitpause = 1
+
+;---------V25　ガード状態0,1,2か食らい状態-1  st1でもやってる  超必,投げなら-3(バースト封じ)　それ以外-1
+[state 120x,];通常状態
+type = varset
+triggerall = var(25) < 0
+trigger1 = movetype != H
+trigger1 = stateno != [120,155] 
+var(25)  = -1
+ignorehitpause = 1
+
+[state 120x,];普通くらい
+type = varset
+triggerall = numenemy
+triggerall = movetype = H
+triggerall = gethitvar(guarded) = 0
+trigger1 = 1;!HitShakeOver
+trigger1 = enemynear,hitdefattr = sca,na,np,sa,sp
+var(25)  = -2
+ignorehitpause = 1
+
+;----投げを判定できていない。HITDEFATTRは相手のHITDEFが有効でないとだめ、が、他の判断法は・・ない
+;----対応キャラ＆＆CHAIIDでもできる、がnumtarget(*)使う攻撃にはできないね。
+;--本体演出長い技ならだみーHITDEFでもいける
+;---問題はヘルパ攻撃。こればっかりはなかなか
+[state 120x,];バーストダメくらい
+type = varset
+triggerall = numenemy
+triggerall = movetype = H
+triggerall = gethitvar(guarded) = 0
+trigger1 = enemynear,hitdefattr = sca,nt,st,ha,hp,ht
+trigger2 = gethitvar(chainId) = 950 && var(49) = 2
+var(25)  = -3
+ignorehitpause = 1
+
+;-------------------特殊チェンステ　-2部
+[State -1, ded];デッドアングルアタック　ヒットスップ中でもＯＫ終わるまで待機だけどネ
+type = ChangeState
+value = 930
+triggerall = !var(40) && power >= 1000
+triggerall = statetype != A
+triggerall = stateno = 150 || stateno = 152
+triggerall = command = "holdfwd" 
+trigger1 = command = "DAA" || command ="ALL"
+ignorehitpause = 1
+
+[State -1, ded];デッドアングルアタック　ヒットスップ中でもＯＫ終わるまで待機だけどネ
+type = ChangeState
+value = 935
+triggerall = !var(40) && power >= 1000
+triggerall = statetype != A
+triggerall = stateno = 151 || stateno = 153
+triggerall = command = "holdfwd" 
+trigger1 = command = "DAA" || command ="ALL"
+ignorehitpause = 0
+
+;-------------------------------------------------------------イントロ/演出/残像へるぱー
+;------これ保留にする
+[state -2,helper partner];----GGモード瀕死時　黄色い残像 128が32以下でなる 1000なら250  height1なら赤2なら黄色
+type = Helper
+triggerall = !NumHelper(70)
+trigger1 = var(40) = 1 
+trigger2 = var(2) = 1 && life <= 250 
+name = "after image"
+ID = 70
+pos = 0,0
+postype = p1
+stateno = 770
+ownpal = 1
+size.height = 2
+size.xscale = 0.5
+size.yscale = 0.5
+
+;--------------------------ダスト字背景赤くする31Fから
+;--------HITSTOP中も計測している可能性あり、V12じゃだめかも？
+;---50,55はFD
+[state -2,helper partner];----マイナスでやる
+type = Helper
+triggerall = !NumHelper(60)
+trigger1 = var(12) = 30
+name = "Dust Red BG"
+ID = 60
+pos = 0,0
+postype = p1
+stateno = 780
+ownpal = 1
+persistent = 0
+
+
+
+;----------------------------------------ボイス・効果音-2部（ガードとかは-2っぽい
+;--------気絶アニメ指定時セリフ56
+[state -3,flag reset];タイムオーば時はでないよ
+type = varadd
+triggerall = stateno != 170
+trigger1 = anim = 5300
+var(56) = 1
+
+[State -3, recove voice]
+type = PlaySnd
+triggerall = alive 
+trigger1 = var(56) = 1
+trigger1 = anim = 5300
+value = s5300,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+parsistent = 0
+channel = 0
+
+[state -3,flag reset]
+type = varset
+trigger1 = anim != 5300
+var(56) = 0
+
+;--------よろけアニメ指定時セリフ57 が１になったとき1回だけでる
+[state -3,flag reset]
+type = varadd
+trigger1 = anim = 5003
+var(57) = 1
+
+[State -3, recove voice]
+type = PlaySnd
+triggerall = alive 
+trigger1 = var(57) = 1
+trigger1 = anim = 5003
+value = s2550,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+parsistent = 0
+channel = 0
+
+[state -3,flag reset]
+type = varset
+trigger1 = anim != 5003
+var(57) = 0
+
+;--------KO時セリフ58
+[state -3,flag reset]
+type = varadd
+trigger1 = alive = 0
+var(58) = 1
+
+[State -3, recove voice];一撃必殺のときは出ないようにできる？0にすると続けてなぐられたらきえるのでは？
+type = PlaySnd
+triggerall = var(48) != 3
+trigger1 = var(58) = 1
+trigger1 = alive = 0
+value = s5140,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3 + random % 2 * 10
+parsistent = 0
+channel = 10
+
+[state -3,flag reset]
+type = varset
+trigger1 = alive = 1
+var(58) = 0
+
+;----------------ガード animtypeじゃだめ、ガード時とれない,うーん・・ctrltime/?
+;---201系と、151系、攻撃ＬＶ高いと151
+[State -2, g voice];
+type = PlaySnd
+triggerall = stateno = 150 ||stateno = 152 || stateno = 154
+triggerall = random % 3 = 0
+triggerall = alive 
+triggerall = gethitvar(ctrltime) <= 8
+trigger1 = time = 1
+value = s151, ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+ignorehitpause = 1
+
+[State -2, g voice];
+type = PlaySnd
+triggerall = stateno = 150 ||stateno = 152 || stateno = 154
+triggerall = random % 2 != 0
+triggerall = p2bodydist x >= 41
+triggerall = alive 
+triggerall = gethitvar(ctrltime) = [9,12]
+trigger1 = time = 1
+value = s152,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+ignorehitpause = 1
+
+[State -2, g voice];！
+type = PlaySnd
+triggerall = stateno = 150 ||stateno = 152 || stateno = 154
+triggerall = random % 2 = 0
+triggerall = gethitvar(ctrltime) >= 13
+triggerall = alive 
+trigger1 = time = 1
+value = s153,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+ignorehitpause = 1
+
+
+
+;------ダメージ声-----------------------------------------------------------------
+;ダメージ声 
+[State -3,damage w]
+type = PlaySnd
+triggerall = stateno = 5000  || stateno = 5010 || stateno = 5020 || stateno = 5080
+triggerall = gethitvar(animtype) = 0 ;light0,mid1,hard2
+triggerall = random % 3 = 0
+triggerall = alive 
+trigger1 = Time = 1
+value = s5000, ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+parsistent = 0
+channel = 0
+ignorehitpause = 1
+
+;ダメージ声 中
+[State -3, damage m]
+type = PlaySnd
+triggerall = stateno = 5000  || stateno = 5010 || stateno = 5020 || stateno = 5080
+triggerall = gethitvar(animtype) = [1,2] ;back3,up4,diegup5
+triggerall = random % 2 = 0 
+triggerall = alive 
+trigger1 = Time = 1
+value = s5001, ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+parsistent = 0
+channel = 0
+ignorehitpause = 1
+
+;ダメージ声 強
+[State -3, damage s]
+type = PlaySnd
+triggerall = stateno = 5000  || stateno = 5010 || stateno = 5020 || stateno = 5080
+triggerall = gethitvar(animtype) >= 3 ;back3,up4,diegup5
+triggerall = random % 2 = 0
+triggerall = alive 
+trigger1 = Time = 1
+value = s5002, ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+parsistent = 0
+channel = 0
+ignorehitpause = 1
+
+;--------------------------------------------ボイス効果音　
+;---基本的に無、犬時のみ、憑依S,HSはしゃべらない
+;----------------通常攻撃声 弱  3
+;----攻撃200,210,400,410,600,610
+[State -3, atack voice ws];ひゃっ
+type = PlaySnd
+triggerall = random % 2 = 0
+trigger1 = stateno = 200 && animelem = 4
+trigger2 = stateno = 210 && animelem = 5
+trigger3 = stateno = 400 && animelem = 3
+trigger4 = stateno = 410 && animelem = 4
+trigger5 = stateno = 600 && animelem = 4
+trigger6 = stateno = 610 && animelem = 7
+value = s200,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+;----------------------通常攻撃		中
+;---205,220,225,420,440,620,DAA
+[State -3, atack voice ws];うえー
+type = PlaySnd
+triggerall = 1;random % 2 = 0
+trigger1 = stateno = 205 && animelem = 6
+trigger2 = stateno = 220 && animelem = 4 && (var(20) <= 0 || var(20) = 2)
+trigger3 = stateno = 225 && animelem = 6 && (var(20) <= 0 || var(20) = 2)
+trigger4 = stateno = 420 && animelem = 7 && (var(20) <= 0 || var(20) = 2)
+trigger5 = stateno = 440 && animelem = 6
+trigger6 = stateno = 620 && animelem = 5 && (var(20) <= 0 || var(20) = 2)
+trigger7 = stateno = 935 && animelem = 5 
+value = s201,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+;----------------------通常攻撃		強
+;---500,430,240,630
+[State -3, atack voice ws];こないで
+type = PlaySnd
+trigger1 = stateno = 500 && animelem = 7
+trigger2 = stateno = 430 && animelem = 5 && (var(20) <= 0 || var(20) = 2)
+trigger3 = stateno = 630 && animelem = 5 && (var(20) <= 0 || var(20) = 2)
+trigger4 = anim = 850 && animelem = 5
+value = s202,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+
+;-------------------------------------一撃必殺技準備モード時特殊パワー設定
+;-----これ準備モーション中はへらさない?後半から減ってる気がする
+[state 7000,];だんだんぱわーをへらすのだ 食らい中へらさない
+type = varadd
+triggerall = roundstate = 2
+triggerall = 1;stateno != 920
+triggerall = movetype != H && statetype != L 
+trigger1 = var(40) = 1
+trigger1 = gametime % 2 = 0
+trigger1 = fvar(12) > 0
+fvar(12) = -2
+ignroehitpause = 0
+
+;-----食らい中へらさない、ライフに応じて減少速度低下開始。
+[state 7000,];だんだんらいふもけずるのだ -----これ準備モーション中はへらさない
+type = lifeadd
+triggerall = roundstate = 2
+triggerall = stateno != 920
+triggerall = movetype != H && statetype != L 
+triggerall = var(40) = 1
+trigger1 = life > 1
+trigger1 = fvar(12) <= 0
+trigger1 = ifelse(life > 400,1,ifelse(life > 200,gametime % 2 = 1,gametime % 3 = 1))
+value = -1
+kill = 1
+ignroehitpause = 0
+
+[state 7000,];ゲージ、パワーは固定である		演出上標準のゲージには０にしちゃう？
+type = powerset
+triggerall = roundstate = 2
+trigger1 = var(40) = 1 || var(40) = -1
+value = 0
+ignroehitpause = 1
+
+;-------------------各種ゲージは対応キャラのときは消さず？どうする？
+;---勝利時ライフバーけすキャラいるんだよね・判定無理かな
+;---------------------------------一撃ゲージ
+[state 7000,test];空洞枠	7500	一撃演出中はかくすの V21 V22 V23
+type = Explod
+triggerall = numenemy
+triggerall = !numexplod(7500)
+trigger1 = var(40) = 1  
+anim = ifelse(teamside = 1,7500,7510)
+ID = 7500
+pos = ceil(ifelse(teamside = 1,fvar(24),319 - fvar(24))) ,ceil(fvar(25))
+postype = left
+sprpriority = -4
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];一撃拡大縮小ゲージ1		
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7510) = 0
+trigger1 = var(40) = 1  
+anim = ifelse(teamside = 1,7501,7511)
+ID=7510
+pos = ceil(ifelse(teamside = 1,fvar(24),319 - fvar(24))) ,ceil(fvar(25))
+postype = left
+sprpriority = -5
+bindtime = -1
+removetime = -1
+facing = 1
+ownpal = 1
+scale = (fvar(12) * 0.001) / 2,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[State 7000, test];一撃ゲージ縮小
+type = modifyexplod
+trigger1 = 1
+ID = 7510
+scale = (fvar(12) * 0.001) / 2,0.5
+ignorehitpause = 1
+
+[state 7000,test];一撃ゲージを	のをけす
+type = removeExplod
+trigger1 = var(40) <= 0  
+ID = 7500
+
+[state 7000,test];一撃ゲージを	のをけす
+type = removeExplod
+trigger1 = var(40) <= 0  
+ID = 7510
+
+;------------ーバーストゲージ
+[state 7000,];ライフによるゲージ回復量セット3段階らしい
+type = varset
+triggerall = roundstate = 2
+trigger1 = life = [500,1000]
+fvar(11) = 60 
+
+[state 7000,];ライフによるゲージ回復量セット3段階らしい
+type = varset
+triggerall = roundstate = 2
+trigger1 = life = [250,499]
+fvar(11) = 120 
+
+[state 7000,];ライフによるゲージ回復量セット3段階らしい
+type = varset
+triggerall = roundstate = 2
+trigger1 = life = [0,249]
+fvar(11) = 180 
+
+[state 7000,];ラウンド最初でＭＡＸ，使用後0、時間回復（速度はlifeで3段階）ダメージでも増加。
+type = varadd
+triggerall = roundstate = 2
+triggerall = fvar(10) < 15000
+trigger1 = gametime % 60 = 0
+fvar(10) = fvar(11)
+
+;----原作とライフ2倍違うから攻撃数値も違うはず、
+[state 7000,];ラウンド最初でＭＡＸ，使用後0、時間回復（速度はlifeで3段階）ダメージでも増加。
+type = varadd
+triggerall = roundstate = 2
+triggerall = fvar(10) < 15000
+triggerall = movetype = h
+trigger1 = stateno = 5000 || stateno = 5010 || stateno = 5020 || stateno = 5070 || stateno = 5080
+trigger1 = time = 1
+fvar(10) = (gethitvar(damage) * 3 + 100) * (gethitvar(hitcount) * 0.03 + 1)
+ignorehitpause = 1
+
+[state 7000,];行き過ぎリセット
+type = varset
+trigger1 = fvar(10) >= 15000
+fvar(10) = 15000
+ignorehitpause = 1
+
+
+;-------------------理由不明できえるときあり。
+;---暗転命令時、１Ｆ消える、MOVETIMEを時間通り設定するとなる？
+;---消えるのは暗転させ側がバーストした後。相手側もバーストなど消えるという意味不明。
+;---まだ消える、ＳＭＯつけると相手の暗転に消えたまま、なぜか対応キャラのみ。
+;----消さないと縮尺こまる、常時にすると数量限界と空中時ずれる
+;--SMつけると相手のとき消える    消えるのは実行するが表示命令はでないというバグ？
+;---暗転終了時１F消える、SUPREPAUSEのバグかね？
+;----全とっかえ！
+;固定タイプにするとラウンドフェードから出すと、位置ずれる、var設定より先に動くから・・
+[state 7000,test];バースト空洞かフルの枠	modifyでアニメかえれればなー
+type = removeExplod
+trigger1 = fvar(10) < 15000
+ID = 7000
+ignorehitpause = 1
+
+[state 7000,test];バースト空洞枠消去	満タン枠が出る前に消える。 順序的問題、これでOK
+type = removeExplod
+trigger1 = fvar(10) >= 15000
+ID = 7001
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去１	0-	ID7010
+type = removeExplod
+trigger1 = fvar(10) != [0,999]
+ID = 7010
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去2	1000-	ID7011
+type = removeExplod
+trigger1 = fvar(10) != [1000,1999]
+ID = 7011
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去3	2000	ID7012
+type = removeExplod
+trigger1 = fvar(10) != [2000,2999]
+ID = 7012
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去4	3000-	ID7013
+type = removeExplod
+trigger1 = fvar(10) != [3000,3999]
+ID = 7013
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去5	4000-	ID7014
+type = removeExplod
+trigger1 = fvar(10) != [4000,4999]
+ID = 7014
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去6	5000	ID7015
+type = removeExplod
+trigger1 = fvar(10) != [5000,5999]
+ID = 7015
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去7	6000-	ID7016
+type = removeExplod
+trigger1 = fvar(10) != [6000,6999]
+ID = 7016
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去8	7000-	ID7017
+type = removeExplod
+trigger1 = fvar(10) != [7000,7999]
+ID = 7017
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去9	8000	ID7018
+type = removeExplod
+trigger1 = fvar(10) != [8000,8999]
+ID = 7018
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去9	9000	ID7019
+type = removeExplod
+trigger1 = fvar(10) != [9000,9999]
+ID = 7019
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去10	10000	ID7020
+type = removeExplod
+trigger1 = fvar(10) != [10000,10999]
+ID = 7020
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去11	11000	ID7021
+type = removeExplod
+trigger1 = fvar(10) != [11000,11999]
+ID = 7021
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去12	12000	ID7018
+type = removeExplod
+trigger1 = fvar(10) != [12000,12999]
+ID = 7022
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去13	13000	ID7019
+type = removeExplod
+trigger1 = fvar(10) != [13000,13999]
+ID = 7023
+ignorehitpause = 1
+
+[state 7000,test];バースト中身消去14	14000	ID7019
+type = removeExplod
+trigger1 = fvar(10) != [14000,14999]
+ID = 7024
+ignorehitpause = 1
+
+
+[state 7000,test];バースト使用不能時×マーク　被必殺時の禁止
+type = Explod
+triggerall = numenemy
+triggerall = !numexplod(7030)
+trigger1 = var(25) = -3
+anim = 7030 + (teamside = 2) * 50
+ID = 7030 
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) + ((teamside = 1 && ID = 33) || ID = 35) * 10
+postype = left
+sprpriority = -1
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];×マークを	のをけす 食らい時でるほう
+type = removeExplod
+triggerall = roundstate = 2
+trigger1 = movetype != H
+trigger1 = var(25) != -3
+ID = 7030
+ignorehitpause = 1
+
+;-------なげ、こわいよ　ぐらい？
+[state 7000,test];バースト使用不能時×マーク　これ投げのとき自分にもでる
+type = Explod
+triggerall = numenemy
+triggerall = !numexplod(7035)
+trigger1 = roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1))
+trigger2 = roundstate = 3 || !alive
+trigger3 = var(39) >= 1
+trigger4 = stateno = 810 || stateno = 860 || stateno = 3610 
+trigger5 = stateno = 1010 && time = 1
+anim = 7030 + (teamside = 2) * 50
+ID = 7035
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) + ((teamside = 1 && ID = 33) || ID = 35) * 10
+postype = left
+sprpriority = -1
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];×マークを	のをけす 自分攻撃中、イントロ時用
+type = removeExplod
+trigger1 = roundstate = 2
+trigger1 = movetype != A
+trigger2 = anim = 1010 && animelem = 4
+ID = 7035
+ignorehitpause = 1
+
+;-----きりとり--　　　　以下バランスゲージも共通
+[state 7000,test];バーストゲージ満タン枠	
+type = Explod
+triggerall = numenemy 
+triggerall = numexplod(7000) = 0 
+triggerall = fvar(10) >= 15000 
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(fvar(10) >= 15000,7020,7000) + (teamside = 2) * 50
+ID = 7000
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -4
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バーストゲージ空洞枠	
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7001) = 0 
+triggerall = fvar(10) < 15000
+ trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(fvar(10) >= 15000,7020,7000) + (teamside = 2) * 50
+ID = 7001
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29))
+postype = left
+sprpriority = -4
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+
+
+;-------------ここからめんどい、縮尺法使えない協調性ないゲージのせい。REのならいけるけど味気ないしねー
+;--アニメ多いのが難点
+;--AIR7001-7015まである1000ずつ区切ってある 
+[state 7000,test];バースト量によってふえる中身0-999	AIR 1P7001 2P7051
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7010) = 0
+triggerall = fvar(10) = [0,999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7010
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身1000-1999 AIR 1P7002 2P7052
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7011) = 0
+triggerall = fvar(10) = [1000,1999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7011
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身2000-2999	AIR 1P7003 2P7053
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7012) = 0
+triggerall = fvar(10) = [2000,2999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7012
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身3000-3999 AIR 1P7004 2P7054
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7013) = 0
+triggerall = fvar(10) = [3000,3999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7013
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+
+[state 7000,test];バースト量によってふえる中身4000-4999	AIR 1P7005 2P7055
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7014) = 0
+triggerall = fvar(10) = [4000,4999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7014
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身5000-5999 AIR 1P7006 2P7056
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7015) = 0
+triggerall = fvar(10) = [5000,5999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7015
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身6000-6999	AIR 1P7007 2P7057
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7016) = 0
+triggerall = fvar(10) = [6000,6999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7016
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身7000-7999 AIR 1P7008 2P7058
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7017) = 0
+triggerall = fvar(10) = [7000,7999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7017
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29))
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身8000-8999	AIR 1P7009 2P7059
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7018) = 0
+triggerall = fvar(10) = [8000,8999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7018
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身9000-9999 AIR 1P7010 2P7060
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7019) = 0
+triggerall = fvar(10) = [9000,9999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7019
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身10000-10999	AIR 1P7011 2P7061
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7020) = 0
+triggerall = fvar(10) = [10000,10999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7020
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身11000-11999 AIR 1P7012 2P7062
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7021) = 0
+triggerall = fvar(10) = [11000,11999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7021
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身12000-12999	AIR 1P7013 2P7063
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7022) = 0
+triggerall = fvar(10) = [12000,12999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7022
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29))
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身13000-13999 AIR 1P7014 2P7064
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7023) = 0
+triggerall = fvar(10) = [13000,13999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7023
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];バースト量によってふえる中身14000-14999	AIR 1P7056 2P7065
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7024) = 0
+triggerall = fvar(10) = [14000,14999]
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim =  ceil(fvar(10)) / 1000 + 7000 + (teamside = 2) * 50
+ID = 7024
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+;------------------------------------バーストゲージ満タン時実行
+[state 7000,test];バースト満タン時に背景光る	ID7025、変更
+type = Explod
+triggerall = numenemy
+triggerall = !numexplod(7025)
+triggerall = fvar(10) >= 15000
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = 7025 + (teamside = 2) * 50
+ID = 7025
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+postype = left
+sprpriority = -6
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];満タン時に背景光る	のをけす
+type = removeExplod
+trigger1 = fvar(10) < 15000
+ID = 7025
+
+
+;-------------------------ここまでバーストゲージ
+
+
+;----------------------------ガードバランス自然回復部 17字分　１８相手
+;-----同キャラのときはどうするか？自分のを使わないようにする。そのほうが正確　判定はV49が2
+;めんどいけど、ヒットストップ０のときこまるかな？こもんでやる？
+;-----0-255の範囲？ 食らいで減りガード中に増える
+[state 7000,];くらいで減らす
+type = varadd
+triggerall = 0;var(49) != 2
+triggerall = time = 1
+triggerall = var(19) > 0
+trigger1 = stateno = 5000 || stateno = 5010 || stateno = 5020
+trigger2 = stateno = 5080 || stateno = 5070 
+var(19) = -1 * ifelse(gethitvar(animtype) = 0,8,ifelse(gethitvar(animtype) = 1,7,6))
+ignorehitpause = 1
+persistent = 0
+supermovetime = 999
+
+;----------------これも同じくこもんでやるほうがいい？ガードのストップ０はないかな・？
+[state 7000,];自分の方　相手対応キャラでなければ　ガードで増やす  注意：FD(V25=2,3)なら増やさない、他のキャラ判断不能
+type = varadd
+triggerall = 1
+triggerall = var(49) != 2
+triggerall = time = 1
+triggerall = var(19) < 256
+triggerall = var(25) = [0,1] 
+trigger1 = stateno = 150 || stateno = 152 || stateno = 154
+var(19) = ifelse(gethitvar(animtype) = 0,3,ifelse(gethitvar(animtype) = 1,8 + random % 3,14 + random % 5))
+ignorehitpause = 1
+persistent = 0
+supermovetime = 999
+
+[state 7000,];自分の方　いきすぎりせっと
+type = varset
+trigger1 = var(19) > 256
+var(19) = 256
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,];自分の方　いきすぎりせっと
+type = varset
+trigger1 = var(19) < 0
+var(19) = 0
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,];回復バランスがたまってるときに徐々にへる暗転中もへってるようである
+type = varadd
+triggerall = var(49) != 2
+triggerall = time % 5 = 0
+triggerall = var(19) > 128 
+trigger1 = movetype != H
+trigger2 = statetype = L
+var(19) = ifelse(stateno = 5120,-2,-1)
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,];対応キャラの場合はこっちを使用しないが保険でいちおう　これが128＋64以上いかなければカウンタにならないしね
+type = varset
+trigger1 = var(19) <= 128 
+trigger1 = movetype != H
+trigger2 = var(49) = 2
+var(19) = 128
+ignorehitpause = 1
+supermovetime = 999
+
+;--------------------------------相手のガードバランス自然増加減少
+[state 7000,]
+type = varadd
+triggerall= numenemy
+triggerall = time % 5 = 0
+triggerall = var(18) > 128
+trigger1 = enemynear,movetype != H
+trigger2 = enemynear,statetype = L
+var(18) = ifelse(enemynear,stateno = 5120,-2,-1) 
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,];相手の方　いきすぎりせっと
+type = varset
+trigger1 = var(18) > 256
+var(18) = 256
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,];相手の方　いきすぎりせっと
+type = varset
+trigger1 = var(18) < 0
+var(18) = 0
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,]
+type = varset
+triggerall= numenemy
+trigger1 = var(18) <= 128 
+trigger1 = enemynear,movetype != H
+var(18) = 128
+ignorehitpause = 1
+supermovetime = 999
+
+;---------------------------ガードバランス表示部
+;------------これは相手の、であるから対応でもでる
+;---AIR   通常枠 7100　カウンタ時7101
+;--カウンター時は上書き法でちかちかさせる
+;---0か満タンもやらないと・さらに変更サンドイッチ方式
+[state 7000,test];相手がーどばらんすV18	外枠、網あり一番下
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7200) = 0
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 2,7100,7150)
+ID = 7200
+pos = ceil(ifelse(teamside = 2,fvar(26),319 - fvar(26) )),ceil(fvar(27)) 
+postype = left
+sprpriority = -7
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];	相手中身ゲージ	通常オレンジ系
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7201) = 0
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 2,7101,7151)
+ID = 7201
+pos = ceil(ifelse(teamside = 2,fvar(26),319 - fvar(26) )),ceil(fvar(27))  
+postype = left
+sprpriority = -6
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = ifelse(0.004 * var(18) <= 1,0.004 * var(18) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];	相手中身ゲージ	かうんたー白上書き
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7202) = 0
+triggerall = var(18) >= 128 + 64
+triggerall = gametime % 5 = 0
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 2,7102,7152)
+ID = 7202
+pos = ceil(ifelse(teamside = 2,fvar(26),319 - fvar(26) )),ceil(fvar(27)) 
+postype = left
+sprpriority = -5
+bindtime = -1
+removetime = 1
+ownpal = 1
+scale = ifelse(0.004 * var(18) <= 1,0.004 * var(18) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];相手がーどばらんすV18ふたをするがいわく、網なし
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7203) = 0
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 2,7103,7153)
+ID = 7203
+pos = ceil(ifelse(teamside = 2,fvar(26),319 - fvar(26) )),ceil(fvar(27)) 
+postype = left
+sprpriority = -4
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];相手	バランス調節　オレンジ
+type = modifyExplod
+trigger1 = numexplod(7201) 
+ID = 7201
+scale = ifelse(0.004 * var(18) <= 1,0.004 * var(18) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];相手	バランス調節　カウンター
+type = modifyExplod
+trigger1 = numexplod(7202) 
+ID = 7202
+scale = ifelse(0.004 * var(18) <= 1,0.004 * var(18) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+;---自分のガードバランス対応キャラのときは使わない
+;----絵拡大つぶれるので特殊分割 7100-7101(点滅) 7150-7151(点滅
+;---チームサイド逆kになる。V19使用。var(49) != 2 のときのみ。
+;---AIR通常枠7100　カウンタ時7101
+;--カウンター時は上書き法でちかちかさせる
+;-ID7250スター
+[state 7000,test];	自分がーどばらんすV18	外枠、網あり一番下
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7250) = 0 && var(49) != 2
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 1,7100,7150)
+ID = 7250
+pos = ceil(ifelse(teamside = 1,fvar(26),319 - fvar(26) )),ceil(fvar(27))
+postype = left
+sprpriority = -7
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];	相手中身ゲージ	通常オレンジ系
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7251) = 0 && var(49) != 2
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 1,7101,7151)
+ID = 7251
+pos = ceil(ifelse(teamside = 1,fvar(26),319 - fvar(26) )),ceil(fvar(27)) 
+postype = left
+sprpriority = -6
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = ifelse(0.004 * var(19) <= 1,0.004 * var(19) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];	相手中身ゲージ	かうんたー白上書き
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7252) = 0 && var(49) != 2
+triggerall = var(19) >= 128 + 64
+triggerall = gametime % 5 = 0
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 1,7102,7152)
+ID = 7252
+pos = ceil(ifelse(teamside = 1,fvar(26),319 - fvar(26) )),ceil(fvar(27)) 
+postype = left
+sprpriority = -5
+bindtime = -1
+removetime = 1
+ownpal = 1
+scale = ifelse(0.004 * var(19) <= 1,0.004 * var(19) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];相手がーどばらんすV18ふたをするがいわく、網なし
+type = Explod
+triggerall = numenemy
+triggerall = numexplod(7253) = 0 && var(49) != 2
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = ifelse(teamside = 1,7103,7153)
+ID = 7253
+pos = ceil(ifelse(teamside = 1,fvar(26),319 - fvar(26) )),ceil(fvar(27)) 
+postype = left
+sprpriority = -4
+bindtime = -1
+removetime = -1
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];相手	バランス調節　オレンジ
+type = modifyExplod
+trigger1 = numexplod(7251) 
+ID = 7251
+scale = ifelse(0.004 * var(19) <= 1,0.004 * var(19) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+[state 7000,test];相手	バランス調節　カウンター
+type = modifyExplod
+trigger1 = numexplod(7252) 
+ID = 7252
+scale = ifelse(0.004 * var(19) <= 1,0.004 * var(19) ,1) * 0.5,0.5
+ignorehitpause = 1
+supermovetime = 999
+
+;-----------------------------モードなど
+;---------------------------------------------------------------------------------------
+;------------------------var(1) 0OR 1#R 2EX 3SL 4AC    
+;--------------------------------------ゲームモード表示部３種類、＊2
+;------これぐらいは固定にさせて
+;---イントロ中に変更できるからーその間はREMOVE1?
+;-fight瞬間にきえるセレクト中はへるぱにさせる
+[state 7000,test];SL,R,EX　の表示1
+type = removeExplod
+trigger1 = roundstate < 2
+ID = 6000 
+
+[state 7000,test];GG,GGX の表示1
+type = removeExplod
+trigger1 = roundstate < 2
+ID = 6010 
+
+[state 7000,test];SL,R,EX　の表示1	のーまる
+type = Explod
+triggerall = numenemy && !numpartner
+trigger1 = !numexplod(6000)
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1))) 
+anim = 6000 + var(1)
+ID = 6000
+postype = left
+pos = ifelse(teamside = 1,10,310),230 
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 1
+facing = 1
+scale = 0.5,0.5
+[state 7000,test];SL,R,EX　の表示1	SIMUL
+type = Explod
+triggerall = numenemy && numpartner
+trigger1 = !numexplod(6000)
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1))) 
+anim = 6000 + var(1)
+ID = 6000
+postype = left
+pos = ifelse(teamside = 1,10,310),230 + (partner,id < ID) * 10
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 1
+facing = 1
+scale = 0.5,0.5
+
+[state 7000,test];GG,GGX の表示1	のーまる
+type = Explod
+triggerall = numenemy && !numpartner
+trigger1 = !numexplod(6010) 
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = 6010 + var(2)
+ID = 6010
+postype = left
+pos = ifelse(teamside = 1,30,280),230 
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal=1
+facing = 1
+scale = 0.5,0.5
+[state 7000,test];GG,GGX の表示1　SIMUL
+type = Explod
+triggerall = numenemy && numpartner
+trigger1 = !numexplod(6010) 
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = 6010 + var(2)
+ID = 6010
+postype = left
+pos = ifelse(teamside = 1,30,280),230 + (partner,id < ID) * 10 
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal=1
+facing = 1
+scale = 0.5,0.5
+
+;----------------------------これはバーストゲージと連動させます27,28,29
+[state 7000,test];ぶらっく・ごーるどからーの表示1
+type = Explod
+triggerall = numenemy
+triggerall = !numexplod(6020) 
+triggerall = palNO = var(41) || palNO = var(42)
+trigger1 = roundstate >= 2 || (Roundstate <= 1 && (stateno != 5900 || (stateno = 5900 && time >= 1)))
+anim = 6010 + teamside * 10 + (palNO = var(41)) + (palNO = var(42)) * 2
+ID = 6020
+postype = left
+pos = ceil(ifelse(teamside = 1,fvar(28),319 - fvar(28))),ceil(fvar(29)) 
+sprpriority = -4
+bindtime = -1
+removetime = -1
+ownpal=1
+facing = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+
+
+;---------------------攻撃力補正関連------------- -2に移動
+
+;----------------ロマキャンは接触したらその動作中ALL有効34
+;------ヒット時は2、ガード時は1
+;---だいなみっく特殊、3HIT以降はきゃん不可
+[state -3,];ロマキャン
+type = varset
+triggerall = numtarget
+triggerall = !numtarget(940)
+triggerall = MoveContact
+trigger1 = stateno = [200,640]
+trigger2 = stateno = 1010 && animelemtime(6) >= 0
+trigger3 = stateno = 1100 || stateno = 1200 || stateno = 1220 || stateno = 1230 || stateno = 1250
+trigger4 = stateno = 1300 || stateno = 1350
+trigger5 = stateno = 1400 || stateno = 1500 || stateno = 1550
+trigger6 = stateno = 1800
+trigger7 = stateno = [3200,3340]
+trigger8 = stateno = [3400,3490]
+var(34) = ifelse(movehit,2,1)
+ignorehitpause = 1
+
+[state -3,];相殺も一応いれておく contactじゃないかもよ
+type = varset
+triggerall = numtarget
+triggerall = numtarget(940)
+triggerall = MoveContact
+trigger1 = stateno = [200,650]
+trigger2 = stateno = 1010 && animelemtime(6) >= 0
+trigger3 = stateno = 1100 || stateno = 1200 || stateno = 1220 || stateno = 1230 || stateno = 1250
+trigger4 = stateno = 1300 || stateno = 1350
+trigger5 = stateno = 1400 || stateno = 1500 || stateno = 1550
+trigger6 = stateno = [1600,1780]
+trigger7 = stateno = [3200,3340]
+trigger8 = stateno = [3400,3490]
+var(34) = -1
+ignorehitpause = 1
+
+[state -3,];めるぶらとかのシールド
+type = varset
+triggerall = MoveReversed
+triggerall = !numtarget(940)
+trigger1 = stateno = [200,650]
+trigger2 = stateno = 1010 && animelemtime(6) >= 0
+trigger3 = stateno = 1100 || stateno = 1200 || stateno = 1220 || stateno = 1230 || stateno = 1250
+trigger4 = stateno = 1300 || stateno = 1350
+trigger5 = stateno = 1400 || stateno = 1500 || stateno = 1550
+trigger6 = stateno = [1600,1780]
+trigger7 = stateno = [3200,3340]
+trigger8 = stateno = [3400,3490]
+var(34) = -2
+ignorehitpause = 1
+
+
+;---------相殺しても、まだ残ってれば攻撃はあたる。　当たったあとに相殺は？不可にしとく 保留かな・・
+;-----「された」判断不能、ヒットスパークが複雑すぎて対処不能、
+;----対応キャラ以外または対応キャラの１P側のみ
+;------reveはHITDEFと相殺する、冗談としては最悪ＬＶ
+;---地上	ヘルパ系は・・保留
+[State 200, re];相殺	
+type = ReversalDef
+triggerall = var(49) != 2 || (var(49) = 2 && teamside = 1)
+triggerall = !var(34)
+trigger1 = stateno = [200,510]
+trigger2 = stateno = 935 || stateno = 1100
+trigger3 = stateno = [1600,1630]
+trigger4 = stateno = [1400,1430]
+trigger5 = stateno = 1520 
+trigger6 = stateno = [3200,3340]
+trigger7 = stateno = 3420 && time <= 2
+attr = s,sa
+reversal.attr = sca,na,sa,ha
+pausetime = 16,16
+hitsound = s210,11
+ID = 940
+ignorehitpause = 0
+
+
+;---空中通常技は1HITですむ
+;---必殺技は１回転に１つかそれとも常時か？一回転に１でしょうね・
+[State 200, re];相殺
+type = ReversalDef
+triggerall = var(49) != 2 || (var(49) = 2 && teamside = 1)
+triggerall = !var(34)
+trigger1 = stateno = [600,650]
+trigger2 = stateno = 1550
+trigger3 = stateno = 3410
+attr = a,sa
+reversal.attr = sca,na,sa,ha
+pausetime = 16,16
+hitsound = s210,11
+ID = 940
+ignorehitpause = 0
+
+
+;----34-38	はろじゃも同じNO使う、あるていど共通
+;-----------------------自分が攻撃をあてたHITSTOP中のみ増えるVAR
+[state -3,];相殺以外	これはHITTSTOP - 1　の値になります  ヒットかうんとにもつかいます
+type = varadd
+triggerall = numtarget
+triggerall = !numtarget(940)
+trigger1 = target,movetype != A
+trigger1 = hitpausetime
+var(35) = 1
+ignorehitpause = 1
+
+[state -3,];これは　HITSTOPの値になります	相打ち時はコッチだけ有効になる、GETHITが優先されるってことで
+type = varadd
+trigger1 = !hitshakeover
+var(36) = 1
+ignorehitpause = 1
+
+;--------これは対応キャラの相殺「された」も判定できればして 大変になるよ
+[state 7000,];---------------相殺用のカウンと 1HIt=15 リセットタイミングをヒットと同期
+type = varadd
+trigger1 = numtarget(940)
+trigger1 = HITPAUSETIME
+var(37) = 1
+ignorehitpause = 1
+
+[state -3,];両方リセットしてみる KSMH発射、AHMHはtime１でやると不都合そっちでやる
+type = varrangeset
+trigger1 = stateno = [0,52]
+first = 34
+last = 38
+value = 0
+ignorehitpause = 1
+;------------------------------自分カウンタ判定 v49=2の対応キャラ以外
+;------攻撃状態と、ガードバランスV19
+[state 5900,v43];43　攻撃中だったかもしくはガードバランスがたまっている(対応キャラ以外
+type = varset
+triggerall = var(49) < 2
+triggerall = movetype != h
+trigger1 = movetype = A
+trigger2 = var(19) >= 128 + 64
+var(43) = 1
+ignorehitpause = 1
+
+[state 5900,v43];43　HITPAUSE中は変えない。
+type = varset
+triggerall = movetype != H 
+trigger1 = movetype != A
+trigger1 = var(19) < 128 + 64
+trigger2 = statetype = L
+trigger3 = var(49) = 2
+var(43) = 0
+ignorehitpause = 0
+
+;--------------------------------enemynearの状態監視主にHITDEFとよろけなどの判定に
+;----------------------仕様変更にともないmovetype＝A判定ぐらいしかつかわないかも
+[state 5900,v46];44  くらい状態の長さをはかる	復帰不能時間減少に使う10秒ごとに減り始める？600F　
+type = varadd
+triggerall = numenemy
+trigger1 = enemynear,movetype = H
+trigger1 = enemynear,stateno != 150
+trigger1 = enemynear,stateno != 152
+trigger1 = enemynear,stateno != 154
+var(44) = 1
+ignorehitpause = 0
+
+[state 5900,v46];44  くらいい状態の長さリセット　
+type = varset
+triggerall = numenemy
+trigger1 = enemynear,movetype != H
+trigger2 = enemynear,stateno = 150
+trigger3 = enemynear,stateno = 152
+trigger4 = enemynear,stateno = 154
+var(44) = 0
+ignorehitpause = 1
+
+[state 5900,v45];45　しゃがみ状態 HITPAUSE中でも変える  HITDEFで必要
+type = varset
+triggerall = numenemy
+trigger1 = 1
+var(45) = ifelse(enemynear,statetype = C,1,0)
+ignorehitpause = 1
+
+[state 5900,v46];46　ダウン状態	HITPAUSE中でも変えて ダウン時復帰不能時間計算に必要Lなら0
+type = varset
+triggerall = numenemy
+trigger1 = 1
+var(46) = ifelse(enemynear,statetype = L,0,1)
+ignorehitpause = 1
+
+[state 5900,v47];47　カウンター判定、ダウン、、GバランスがたまっていないではカウンタにならないHITPAUSE中は変えない。
+type = varset
+triggerall = numenemy
+trigger1 = !HITPAUSETIME
+trigger1 = var(18) <= 128 + 64
+trigger1 = enemynear,movetype = H
+trigger2 = enemynear,statetype = L
+var(47) = 0
+ignorehitpause = 1
+
+[state 5900,v47];47　カウンター判定、厳密には判定できないので相手が攻撃ステートなら、にする	HITPAUSE中は変えない。
+type = varset
+triggerall = numenemy
+triggerall = enemynear,statetype != L
+trigger1 = enemynear,movetype = A
+trigger2 = var(18) > 128 + 64
+var(47) = 1
+ignorehitpause = 1
+
+[state 3400,];カウンター音とか	HITPAUSEちゅうにでればいいからd、最初に出る必要は無い最初は相手の判断できない
+type = playsnd
+triggerall = var(47)
+triggerall = numtarget
+triggerall = !numtarget(940)
+triggerall = target,stateno != [150,155]
+trigger1 = stateno != 800 && stateno != 850
+trigger1 = HITPAUSETIME
+trigger2 = movetype = H
+trigger2 = target,movetype = H
+trigger2 = var(36)
+value = s60,11
+channel = 11
+ignorehitpause = 1
+
+;-----以下-----------------------------------------
+;----補正関連なのでここに置く
+;---本体のヒットカウントはHITCOUNTで取れる、HITDEFPERSISTを通常状態にもつけること！
+[state -3,];ヒットカウント強制クリア　
+type = hitadd
+triggerall = numenemy
+triggerall = hitcount != 0
+trigger1 = enemynear,movetype = I
+trigger2 = enemynear,movetype = A
+trigger3 = enemynear,stateno = [150,155] 
+value = hitcount * -1 
+ignorehitpause = 0
+
+;-----------------ヘルパーのヒットカウントV33を0クリア
+[state -3,];ヒットカウント強制クリア　
+type = varset
+triggerall = numenemy
+trigger1 = enemynear,movetype = I
+trigger2 = enemynear,movetype = A
+trigger3 = enemynear,stateno = [150,155] 
+var(33) = 0 
+ignorehitpause = 0
+
+;-------ダメージ補正は　1:がーどばらんす	攻撃側で設定可能
+;-------		2:基底			攻撃側で設定可能
+;---------------	3:ダウン追い討ち	攻撃側で設定可能
+;---------------	4:根性値		防御側でやったほうがいいかも
+
+;--------------------fvar(1) 各種基底だめーじ補正
+;--------------対応技でセットする。ここではリセットのみ
+[state -3,fv1];基底ダメージ補正係数リセット　相手が被くらいでなくなったら。
+type = varset
+triggerall = numenemy
+trigger1 = enemynear,movetype != H
+trigger2 = enemynear,stateno = [150,155]
+fvar(1) = 1
+ignorehitpause = 1
+
+;------------------Fv2------------ガードバランス　通常・必殺技用補正-------------
+;----------------------fV3-----ガードバランス　覚醒技用補正--------
+;-------------この数値はSLASHばーじょん、ACではまたちがうようである・・ころころと
+[state -3,fv2re];ガードバランスによる補正 V18で考慮 本来は防御をいじるべきだけど、defencemulでは不可能であろう
+type = varrangeset
+trigger1 = var(18) >= 128 - 16  
+fvalue  = 1
+first = 2
+last = 3
+ignorehitpause = 1
+
+;-----75%より下ダメージが補正減少になる　　通常と覚醒で違う部分
+;---基本通常技の補正分が入ってるので打ち消す計算をする。
+;---覚醒技HITDEF.damege =  var(0) / fvar(2) * fvar(3) * 攻撃値 とやる
+;-----75%以上では常時カウンター扱いで100％くらい
+;--ACではまた変更はいってるようである、めんどい
+;-----こっち通常用
+[state -3,fv2re];-16・・78%
+type = varset
+trigger1 = var(18) = [101,116] 
+fvar(2) = 0.78
+ignorehitpause = 1
+
+[state -3,fv2re];-32・・59%
+type = varset
+trigger1 = var(18) = [84,100] 
+fvar(2) = 0.59
+ignorehitpause = 1
+
+[state -3,fv2re];-48・・44%o
+type = varset
+trigger1 = var(18) = [67,83] 
+fvar(2) = 0.44
+ignorehitpause = 1
+
+[state -3,fv2re];-64・・31% 33%
+type = varset
+trigger1 = var(18) = [50,66] 
+fvar(2) = ifelse(var(1) >= 4,0.33,0.31)
+ignorehitpause = 1
+
+[state -3,fv2re];-80・・18%
+type = varset
+trigger1 = var(18) = [33,49] 
+fvar(2) = 0.18
+ignorehitpause = 1
+
+[state -3,fv2re];-96・・12% 14%?
+type = varset
+trigger1 = var(18) = [50,66] 
+fvar(2) = ifelse(var(1) >= 4,0.14,0.12)
+ignorehitpause = 1
+
+[state -3,fv2re];-112  6% 8%
+type = varset
+trigger1 = var(18) = [16,32] 
+fvar(2) = ifelse(var(1) >= 4,0.08,0.06)
+ignorehitpause = 1
+
+[state -3,fv2re];くらいすぎてると3% 6%
+type = varset
+trigger1 = var(18) = [0,15]  
+fvar(2) = ifelse(var(1) >= 4,0.06,0.03)
+ignorehitpause = 1
+
+;--------------------------相手　覚醒用
+[state -3,fv3re];-16・・69%
+type = varset
+trigger1 = var(18) = [101,116] 
+fvar(3) = 0.69
+ignorehitpause = 1
+
+[state -3,fv3re];-32・・50%
+type = varset
+trigger1 = var(18) = [84,100] 
+fvar(3) = 0.50
+ignorehitpause = 1
+
+[state -3,fv3re];-48・・38%o
+type = varset
+trigger1 = var(18) = [67,83] 
+fvar(3) = 0.38
+ignorehitpause = 1
+
+[state -3,fv3re];-64・・31% 33%
+type = varset
+trigger1 = var(18) = [50,66] 
+fvar(3) =ifelse(var(1) >= 4,0.33,0.31)
+ignorehitpause = 1
+
+[state -3,fv3re];-80・・18%
+type = varset
+trigger1 = var(18) = [33,49] 
+fvar(3) = 0.18
+ignorehitpause = 1
+
+[state -3,fv3re];-96・・12% 17%?
+type = varset
+trigger1 = var(18) = [50,66] 
+fvar(3) = ifelse(var(1) >= 4,0.17,0.12)
+ignorehitpause = 1
+
+[state -3,fv3re];-112  6% 12%
+type = varset
+trigger1 = var(18) = [16,32] 
+fvar(3) = ifelse(var(1) >= 4,0.12,0.06)
+ignorehitpause = 1
+
+[state -3,fv3re];くらいすぎてると3% 10%
+type = varset
+trigger1 = var(18) = [0,15]  
+fvar(3) = ifelse(var(1) >= 4,0.10,0.03)
+ignorehitpause = 1
+
+;-------------fvar(4)	受身不能時間調整
+;-------------------復帰不能時間操作 ここまで長くなることは、まずないんじゃないかなと・・
+;--- 受身不能時間減少 最初の3,6,10%減 9,12,18,で5%  最大60%OFF、14秒で0.6？3秒毎なのに？15秒の誤植？
+[state 5900,fv4];fv4  くらい状態の長さにより復帰不能時間減少 基本乗数1
+type = varset
+triggerall = numenemy
+trigger1 = var(44) < 60 * 3
+trigger2 = enemynear,movetype != H
+trigger3 = enemynear,stateno = [120,155]
+fvar(4) = 1
+ignorehitpause = 0
+
+;--ダウン追い討ちなら0にするため、var(46)=0を乗算して０にする。 　最初の2回10%,あとは2秒ごとに5%なら14秒で0.6にあう
+;----ページによってかいてあることが違うぞ！163P基準にする？
+[state 5900,fv4];fv4 
+type = varadd
+trigger1 = var(44) = 60 * 3	;5%
+trigger2 = var(44) = 60 * 5	;5%
+trigger3 = var(44) = 60 * 7	;10%
+trigger4 = var(44) = 60 * 10	;10%
+trigger5 = var(44) = 60 * 14	;10%
+fvar(4) = ifelse(var(44) <= 60 * 5, -0.05, -0.1)
+ignorehitpause = 0
+
+;------------fvar(5)　ヒットバック補正　最大ヤク2倍らしい
+;---------------1秒以降増加開始、最大8秒
+[state 5900,fv5];fv5  くらい状態の長さでX距離増加 基本乗数1
+type = varset
+triggerall = numenemy
+trigger1 = var(44) < 60 
+trigger2 = enemynear,movetype != H
+trigger3 = enemynear,stateno = [120,155]
+fvar(5) = 1
+ignorehitpause = 0
+
+;--数値不明、最大約2倍であるという。約。約。約って範囲広い
+;----一律10％とすると1.8倍?んー？浮きと同じようなら最初少なくて後でどかんと？
+[state 5900,fv5];fv5 
+type = varadd
+trigger1 = var(44) = 60 * 1	;10%
+trigger2 = var(44) = 60 * 2	;10%
+trigger3 = var(44) = 60 * 3	;10%
+trigger4 = var(44) = 60 * 4	;10%
+trigger5 = var(44) = 60 * 5	;10%
+trigger6 = var(44) = 60 * 6	;10%
+trigger7 = var(44) = 60 * 7	;10%
+trigger8 = var(44) = 60 * 8	;10%
+fvar(5) = 0.1
+ignorehitpause = 0
+
+;------------fvar(6) 浮き補正　	数値不明
+;---------------------------ヒットカウント＋var(33)=ヘルパーのヒットカウント
+;--------浮き補正は6HItから。35HIT以降は減らない、数値不明、これも乗算形式？
+;---6-35の間、6も含むから30? 1%ずつ、最大30%OFFとしてみる?
+;とりがーhitcountは(HITCOUNTPERSIST=0でリセットされると0にされる,表記はつながってるのでまぎらわしい
+[state -3,];相手のヒットカウントを計算して浮き補正
+type = varset
+trigger1 = hitcount + var(33) >= 6
+trigger1 = hitcount + var(33) < 35
+fvar(6) = 1 - (hitcount + var(33) - 5) * 0.01
+ignorehitpause = 1
+
+[state -3,];浮き補正、35HIT以上固定数値  仮：最大0.7倍
+type = varset
+trigger1 = hitcount + var(33) >= 35
+fvar(6) = 0.7  
+ignorehitpause = 1
+
+[state -3,];ヒット途切れまたは５HIT以下のとき乗数１、変化させない
+type = varset
+triggerall = numenemy
+trigger1 = enemynear,movetype != H
+trigger2 = enemynear,stateno = [120,155]
+trigger3 = hitcount + var(33) < 6
+fvar(6) = 1 
+ignorehitpause = 0
+
+;----------fvar(0)に係数集約する。順番的にここ
+;----mug1000,GG420 であれば攻撃設定値は約2.38倍するべき？根性値考慮できないので多すぎるかも
+[state -3,fv0];基本1 * 基底補正2 * Gバランス補正3 *ダウン補正
+type = varset
+trigger1 = 1
+fvar(0) = fvar(1) * fvar(2) * ifelse(!var(46),0.25,1) * 2;1.5
+ignorehitpause = 0
+
+;---------------------防御係数設定用；;----だが1HIT目にかかってくれない？
+;--ACではまた変更はいってるようである、めんどい
+;-----こっち通常用　　非対応キャラのみ fv18
+[state -3,fv2re];ガードバランスによる補正 V18で考慮 本来は防御をいじるべきだけど、defencemulでは不可能であろう
+type = varrangeset
+trigger1 = var(19) >= 128 - 16  
+fvalue  = 1
+first = 18
+last = 19
+ignorehitpause = 1
+
+[state -3,fv2re];-16・・78%
+type = varset
+trigger1 = var(19) = [101,116] 
+fvar(18) = 0.78
+ignorehitpause = 1
+
+[state -3,fv2re];-32・・59%
+type = varset
+trigger1 = var(19) = [84,100] 
+fvar(18) = 0.59
+ignorehitpause = 1
+
+[state -3,fv2re];-48・・44%o
+type = varset
+trigger1 = var(19) = [67,83] 
+fvar(18) = 0.44
+ignorehitpause = 1
+
+[state -3,fv2re];-64・・31% 33%
+type = varset
+trigger1 = var(19) = [50,66] 
+fvar(18) = ifelse(var(1) >= 4,0.33,0.31)
+ignorehitpause = 1
+
+[state -3,fv2re];-80・・18%
+type = varset
+trigger1 = var(19) = [33,49] 
+fvar(18) = 0.18
+ignorehitpause = 1
+
+[state -3,fv2re];-96・・12% 14%?
+type = varset
+trigger1 = var(19) = [50,66] 
+fvar(18) = ifelse(var(1) >= 4,0.14,0.12)
+ignorehitpause = 1
+
+[state -3,fv2re];-112  6% 8%
+type = varset
+trigger1 = var(19) = [16,32] 
+fvar(18) = ifelse(var(1) >= 4,0.08,0.06)
+ignorehitpause = 1
+
+[state -3,fv2re];くらいすぎてると3% 6%
+type = varset
+trigger1 = var(19) = [0,15]  
+fvar(18) = ifelse(var(1) >= 4,0.06,0.03)
+ignorehitpause = 1
+
+;--------------------------非対応時のみ、自分　覚醒用  FV19
+[state -3,fv3re];-16・・69%
+type = varset
+trigger1 = var(19) = [101,116] 
+fvar(19) = 0.69
+ignorehitpause = 1
+
+[state -3,fv3re];-32・・50%
+type = varset
+trigger1 = var(19) = [84,100] 
+fvar(19) = 0.50
+ignorehitpause = 1
+
+[state -3,fv3re];-48・・38%o
+type = varset
+trigger1 = var(19) = [67,83] 
+fvar(19) = 0.38
+ignorehitpause = 1
+
+[state -3,fv3re];-64・・31% 33%
+type = varset
+trigger1 = var(19) = [50,66] 
+fvar(19) =ifelse(var(1) >= 4,0.33,0.31)
+ignorehitpause = 1
+
+[state -3,fv3re];-80・・18%
+type = varset
+trigger1 = var(19) = [33,49] 
+fvar(19) = 0.18
+ignorehitpause = 1
+
+[state -3,fv3re];-96・・12% 17%?
+type = varset
+trigger1 = var(19) = [50,66] 
+fvar(19) = ifelse(var(1) >= 4,0.17,0.12)
+ignorehitpause = 1
+
+[state -3,fv3re];-112  6% 12%
+type = varset
+trigger1 = var(19) = [16,32] 
+fvar(19) = ifelse(var(1) >= 4,0.12,0.06)
+ignorehitpause = 1
+
+[state -3,fv3re];くらいすぎてると3% 10%
+type = varset
+trigger1 = var(19) = [0,15]  
+fvar(19) = ifelse(var(1) >= 4,0.10,0.03)
+ignorehitpause = 1
+
+;-------しょうがないけど一応つけておく
+;----根性値。2  fvar(20)
+[State 1000, 7];50%
+type = varset
+trigger1 = life >= 550
+fvar(20) = 1.00
+ignorehitpause = 1
+
+[State 1000, 7];40%
+type = varset
+trigger1 = life <= 400
+fvar(20) = 0.94
+ignorehitpause = 1
+
+[State 1000, 7]
+type = varset
+trigger1 = life <= 300
+fvar(20) = 1.00
+ignorehitpause = 1
+
+[State 1000, 7]
+type = varset
+trigger1 = life <= 200
+fvar(20) = 0.68
+ignorehitpause = 1
+
+[State 1000, 7]
+type = varset
+trigger1 = life <= 150
+fvar(20) = 0.56
+ignorehitpause = 1
+
+[State 1000, 7]
+type = varset
+trigger1 = life <= 100
+fvar(20) = 0.46
+ignorehitpause = 1
+
+[State 1000, 7]
+type = varset
+trigger1 = life <= 50
+fvar(20) = 0.38
+ignorehitpause = 1
+
+;---------------------常時むるしても、1HIT目にかからない?どこにおいてもだめ
+;-----Gバランスは対応キャラ以外のときのみ適用。
+;---根性値　＊　Gバランス
+[State 1000, 7]
+type = DefenceMulSet
+triggerall = numenemy
+trigger1 = enemynear,hitdefattr = sca,na,np,nt,sa,sp,st
+value = fvar(20) * ifelse(var(49) != 2,fvar(18),1)
+ignorehitpause = 1
+
+[State 1000, 7]
+type = DefenceMulSet
+triggerall = numenemy
+trigger1 = enemynear,hitdefattr = sca,ha,hp,ht
+value = fvar(20)  * ifelse(var(49) != 2,fvar(19),1)
+ignorehitpause = 1
+
+
+
+;-------------------ダスト中じゃなければ・・1.05
+;-----ハイジャンプ中は0.55ですが・これだとまずいかな？
+[state -3,9];各種重力設定9	2JUMPでも通常になる あとがーど？
+type = varset
+triggerall = stateno != 40
+trigger1 = statetype != A
+trigger2 = stateno = 42 || stateno = 102 || stateno = 107
+trigger3 = movetype = H
+trigger4 = stateno = 860 
+fvar(9) = 0.525
+
+;--------------------相打ちでもでる演出
+[State 2050,  voice];敵　跳ねかえり　かべぶつかり  相手の、タイム１ねtarget,timeこれ自分が食らってたらどうなる？mumtaきえ？
+type = PlaySnd
+triggerall = numenemy
+triggerall = enemy,movetype = H
+trigger1 = enemy,stateno = 5710 
+trigger1 = enemy,time = 1
+value = s205,3
+channel = 10
+ignorehitpause = 1
+
+
+
+;---------------------------------------------------------------------------
+[Statedef -3];                   以下-3です
+
+;--------------------ボイスタイプ表示
+;-----IDはいくつがあいてる？6050？;----------これは一定時間できえればいいかな？
+;---イントロ中も発声するので、イントロ中変更はさせない----これ隠しこんふぃぐね
+[state 182,helper partner];----ぼいすセレクトへるぱてすと汎用版
+type = Helper
+triggerall = numenemy
+triggerall = !numhelper(175)
+triggerall = alive && enemy,alive
+trigger1 =  !var(53) && roundstate = 2
+trigger1 = command = "Secode"
+helpertype = normal
+name = "voice select"
+ID = 175
+pos = 40,-180
+postype = back
+stateno = 9010
+keyctrl = 1
+ownpal = 1
+
+[state 7000,test];一度けす？
+type = removeExplod
+triggerall = numhelper(175)
+triggerall = helper(175),stateno = 9015
+triggerall = helper(175),time >= 30
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start" 
+ID = 6050 
+ignorehitpause = 0
+
+[state 7000,test];ボイスタイプ・・表示は画面右上右下、普通スコアがでるところ？これはちむ表示対応いいや・・
+type = Explod
+triggerall = numhelper(175)
+trigger1 = helper(175),stateno = 9020
+trigger1 = !numexplod(6050)
+anim = 7200 + var(54)
+ID = 6050
+postype = left
+pos = ceil(ifelse(teamside = 1,50,255)),10 
+sprpriority = 4
+bindtime = -1
+removetime = 300
+ownpal=1
+facing = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------
+[state 100,soul efe1];霊魂強制８まで
+type = varset
+trigger1 = var(30) >= 8
+var(30) = 8
+ignorehitpause = 1
+
+;----霊魂表示部、基本こっちの攻撃でしか増減しない、-3でいい
+;---出る位置はランダムスタートである、やっかいだね
+;----へるぱ節約のためえくすぷろど：霊魂足りない場合はsale0,0で擬似非表示。
+;----------------1つめ上基準
+[state 100,soul efe1];1
+type = Explod
+triggerall = !numexplod(701)
+trigger1 = 1
+anim = 701
+ID = 701
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];2
+type = Explod
+triggerall = !numexplod(702)
+trigger1 = 1
+anim = 702
+ID = 702
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];3
+type = Explod
+triggerall = !numexplod(703)
+trigger1 = 1
+anim = 703
+ID = 703
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];4
+type = Explod
+triggerall = !numexplod(704)
+trigger1 = 1
+anim = 704
+ID = 704
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];5
+type = Explod
+triggerall = !numexplod(705)
+trigger1 = 1
+anim = 705
+ID = 705
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];6
+type = Explod
+triggerall = !numexplod(706)
+trigger1 = 1
+anim = 706
+ID = 706
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];7
+type = Explod
+triggerall = !numexplod(707)
+trigger1 = 1
+anim = 707
+ID = 707
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];8
+type = Explod
+triggerall = !numexplod(708)
+trigger1 = 1
+anim = 708
+ID = 708
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 1
+ignorehitpause = 1
+scale = 0,0
+
+[state 100,soul efe1];1を非表示
+type = modifyExplod
+triggerall = numexplod(701)
+trigger1 = var(30) = 0
+ID = 701
+scale = 0,0
+[state 100,soul efe1];1を表示
+type = modifyExplod
+triggerall = numexplod(701)
+trigger1 = var(30) >= 1
+ID = 701
+scale = 0.5,0.5
+
+[state 100,soul efe1];2を非表示
+type = modifyExplod
+triggerall = numexplod(702)
+trigger1 = var(30) < 2
+ID = 702
+scale = 0,0
+[state 100,soul efe1];2を表示
+type = modifyExplod
+triggerall = numexplod(702)
+trigger1 = var(30) >= 2
+ID = 702
+scale = 0.5,0.5
+
+[state 100,soul efe1];3を非表示
+type = modifyExplod
+triggerall = numexplod(703)
+trigger1 = var(30) < 3
+ID = 703
+scale = 0,0
+[state 100,soul efe1];3を表示
+type = modifyExplod
+triggerall = numexplod(703)
+trigger1 = var(30) >= 3
+ID = 703
+scale = 0.5,0.5
+
+[state 100,soul efe1];4を非表示
+type = modifyExplod
+triggerall = numexplod(704)
+trigger1 = var(30) < 4
+ID = 704
+scale = 0,0
+[state 100,soul efe1];4を表示
+type = modifyExplod
+triggerall = numexplod(704)
+trigger1 = var(30) >= 4
+ID = 704
+scale = 0.5,0.5
+
+[state 100,soul efe1];5を非表示
+type = modifyExplod
+triggerall = numexplod(705)
+trigger1 = var(30) < 5
+ID = 705
+scale = 0,0
+[state 100,soul efe1];5を表示
+type = modifyExplod
+triggerall = numexplod(705)
+trigger1 = var(30) >= 5
+ID = 705
+scale = 0.5,0.5
+
+[state 100,soul efe1];6を非表示
+type = modifyExplod
+triggerall = numexplod(706)
+trigger1 = var(30) < 6
+ID = 706
+scale = 0,0
+[state 100,soul efe1];6を表示
+type = modifyExplod
+triggerall = numexplod(706)
+trigger1 = var(30) >= 6
+ID = 706
+scale = 0.5,0.5
+
+[state 100,soul efe1];7を非表示
+type = modifyExplod
+triggerall = numexplod(707)
+trigger1 = var(30) < 7
+ID = 707
+scale = 0,0
+[state 100,soul efe1];7を表示
+type = modifyExplod
+triggerall = numexplod(707)
+trigger1 = var(30) >= 7
+ID = 707
+scale = 0.5,0.5
+
+[state 100,soul efe1];8を非表示
+type = modifyExplod
+triggerall = numexplod(708)
+trigger1 = var(30) < 8
+ID = 708
+scale = 0,0
+[state 100,soul efe1];8を表示
+type = modifyExplod
+triggerall = numexplod(708)
+trigger1 = var(30) >= 8
+ID = 708
+scale = 0.5,0.5
+
+
+
+
+
+
+
+;-----システム効果音etc　.
+[State 2050,  snd];地上ダッシュ停止ずさー　commonでやるべきかも？
+type = PlaySnd
+trigger1 = stateno = 99 && time = 1 
+value = s50,8
+channel = 2
+
+[State 2050,  snd];空中ダッシュ　
+type = PlaySnd
+trigger1 = stateno = 102 || stateno = 107
+trigger1 = time = 1
+value = s50,5
+channel = 2
+
+;-------------------攻撃空振り音
+[State 2050,  voice];空振り軽1 200,400,410,600
+type = PlaySnd
+trigger1 = stateno = 200 && animelem = 3
+trigger2 = stateno = 400 && animelem = 3
+trigger3 = stateno = 410 && animelem = 3
+trigger4 = stateno = 600 && animelem = 3
+value = s210,0
+channel = 4
+
+[State 2050,  voice];空振り中 205,210,610
+type = PlaySnd
+trigger1 = stateno = 205 && animelem = 7
+trigger2 = stateno = 210 && animelem = 4
+trigger3 = stateno = 610 && animelem = 4
+value = s210,1
+channel = 4
+
+[State 2050,  voice];空振り中 N時220
+type = PlaySnd
+trigger1 =  var(20) <= 0 || var(20) = 2 
+trigger1 = stateno = 220 && animelem = 7
+value = s210,3
+channel = 4
+
+[State 2050,  voice];空振り強2DAA
+type = PlaySnd
+trigger1 = stateno = 935 && animelem = 4
+value = s210,4
+channel = 4
+
+[State 2050,  voice];空振り強2 Nか犬 225,420,430,620,630.DAA
+type = PlaySnd
+triggerall =  var(20) <= 0 || var(20) = 2 
+trigger1 = stateno = 225 && animelem = 4
+trigger2 = stateno = 420 && animelem = 4 
+trigger3 = stateno = 430 && animelem = 4
+trigger4 = stateno = 620 && animelem = 4 
+trigger5 = stateno = 630 && animelem = 4
+value = s210,4
+channel = 4
+
+[State 2050,  voice];空振り強2 640	CHかえて
+type = PlaySnd
+trigger1 = stateno = 640 && anim = 640 && animelem = 7
+value = s210,11
+channel = 5
+
+[State 2050,  voice];空振り ダストラオウ以外、足払い 
+type = PlaySnd
+trigger1 = var(20) <= 0 || var(20) = 2
+trigger1 = stateno = 240 && animelem = 4
+trigger2 = stateno = 440 && animelem = 4
+value = s210,13
+channel = 4
+
+;-------------憑依特殊
+
+[State -3, ws];ダウン効果音
+type = PlaySnd
+triggerall = time = 1
+trigger1 = stateno = 5100 || stateno = 5110
+trigger2 = stateno = 1160 
+value = s50,6
+channel = 3
+
+;-------------
+
+;----------------------テンションバランス系（仮
+[State 10, 2];前進増加、向かい合ってないとだめ 1秒7.2=144  2.4?
+type = poweradd
+triggerall = !var(40)
+triggerall = power < 2000
+triggerall = p2dist x > 0
+trigger1 = anim = 20 
+value = 1
+ignorehitpause = 0
+
+[State 10, 2];前D増加、向かい合ってないとだめ 1秒15=300 
+type = poweradd
+triggerall = !var(40)
+triggerall = power < 2000
+triggerall = p2dist x > 0
+trigger1 = stateno = 100 || stateno = 102 
+value = 2
+ignorehitpause = 0
+
+[State 10, 2];前J増加、向かい合ってないとだめ 1秒6=120 
+type = poweradd
+triggerall = !var(40)
+triggerall = power < 2000
+triggerall = p2dist x > 0
+triggerall = vel x >= 3.25
+triggerall = stateno != [5000,5050]
+trigger1 = statetype = A
+trigger1 = movetype != H
+value = 1
+ignorehitpause = 0
+
+
+;------------------特殊チェンステ　－3部
+[State -1, sike];サイクバースト　食らい中 青 HITPAUSE中 超必殺以外
+type = ChangeState
+value = 960
+triggerall = (command = "ALL" && command != "holdback" && command !="holdF") || command = "bust" 
+triggerall = fvar(10) >= 15000 && alive 
+triggerall = stateno != [930,965]
+triggerall = var(25) = [-2,2]
+trigger1 = !hitshakeover
+trigger1 = movetype = H 
+ignorehitpause = 1
+
+[State -1, sike];サイクバースト　食らい中 青 HITPAUSE終わってたら・・
+type = ChangeState
+value = 961
+triggerall = (command = "ALL" && command != "holdback" && command !="holdF") || command = "bust" 
+triggerall = fvar(10) >= 15000 && alive 
+triggerall = stateno != [930,965]
+triggerall = var(25) = [-2,2]
+trigger1 = movetype = H 
+ignorehitpause = 0
+
+;-------------------------------- -3部　
+
+
+
+;----------------------------------------------int変数関連
+
+;--------------HJ　ヒットストップしこみはカウント制	相殺時はどうなる？
+;---HIGHJ　はHITSTOP中の下上2F有効、highju は通常でカウント制10F有効・・さあどうする？
+;---ハイジャンプ属性というより、振り向き属性であろうってことで
+;--------HITSTOP中のは振り向き属性をいじる。
+;---基本無、犬、幽霊のみJC可能
+;---へるぱはそっちでいじる
+;---GGでも剣、ラオウはできない。幽霊は普通と同じ
+;--GGALL,500でもいい510だめ
+[State -1, Air Run Fwd];GGmo-do 以外 200,210,220,230,420  GG以外
+type = varset
+triggerall = movecontact
+triggerall = command = "highJ"
+triggreall = stateno != 240
+triggerall = hitpausetime
+trigger1 = var(2) != 1 
+trigger1 = stateno = 200 || stateno = 205 || stateno = 400 
+trigger2 = var(2) != 1 && var(20) != 4
+trigger2 = stateno = 220 || stateno = 430 
+trigger3 = var(2) = 1 && stateno != 220 && stateno != 430
+trigger3 = stateno = [200,500]
+trigger4 = var(2) = 1 && var(20) != 4
+trigger4 = stateno = 220 || stateno = 430 
+var(55) = 2 
+ignorehitpause = 1
+
+[state -3,hIDset];振り向き属性追加 
+type = varset
+triggerall = time >= 0
+trigger1 = stateno = 42 
+trigger2 = stateno = 102 || stateno = 107 
+var(55) = -1
+ignorehitpause = 1
+
+[state 10,];ハイジャンプフラグ　HS仕込みなら2フレーム有効タイマー
+type = varadd
+trigger1 = var(55) > 0
+trigger1 = stateno = [0,20]
+var(55) = -1
+ignorehitpause = 1
+
+[state -3,hIDset];振り向き属性0reset
+type = varset
+trigger1 = stateno = [0,20]
+trigger2 = stateno = 52 && time >=2 
+var(55) = 0
+ignorehitpause = 1
+
+;---------------特殊　ダスト相打ち時にでもでるようにするv4 v12
+;----相手のSYSVAR0　２９Fカウントを代入するためのもの
+;---ダスト用、相打ち時用の保険 普段は使わないはず
+;---空ちゅくらいとかの問題がある、
+[state -3,eIDset];
+type = varset
+triggerall = numenemy
+triggerall = enemynear,stateno = 5850
+trigger1 = !hitshakeover
+trigger1 = movetype = H
+var(4) = enemynear,ID
+ignorehitpause = 1
+
+[state -3,eIDset];  解放０クリア
+type = varset
+trigger1 = movetype = H  
+trigger2 = var(4) 
+trigger2 = playerID(var(4)),movetype != H
+trigger3 = var(4) 
+trigger3 = playerID(var(4)),statetype = L 
+var(4) = 0
+ignorehitpause = 1
+
+;--v6  AIr DASH VEL継続カウント HITPAUSE中は無視
+[state -3,flag 6];
+type = varadd
+triggerall = var(6)
+trigger1 = stateno != [1250,1595]
+var(6) = -1
+ignorehitpause = 0
+
+;-------50,51,600～630なら減速OK 配置
+;-----D、2HSは除外そっちで独自
+[State 200x,];空中ダッシュかうんとがある場合、カウント6が1になったら半減　カウントをL1しといて
+type = Velmul
+triggerall = var(6) = 1
+trigger1 = stateno = [50,51]
+trigger2 = stateno = [600,640]
+x = 0.5
+ignorehitpause = 0
+
+[state -3,flag 6];AIRD、2HS,ローリング、射出など強制解除?
+type = varset
+trigger1 = var(6) <= 0
+trigger2 = movetype = H
+trigger3 = statetype != A
+var(6) = 0
+ignorehitpause = 1
+
+;--v(7)はAIRダッシュ回数とダッシュ属性（振り向きに使う）　0になるのは地上接地、食らい、受身ガードでリセット あとJ属性
+;----ダッシュしたら2ジャンプ不可です
+[state -3,flag 7];
+type = varset
+trigger1 = stateno = [0,20]
+trigger2 = stateno = 52 && time >= 2
+trigger3 = movetype = H
+trigger4 = stateno = 5200 || stateno = 5210
+trigger5 = stateno = 150 || stateno = 152 || stateno = 154
+var(7) = 0
+ignorehitpause = 1
+
+;----地上ダッシュフラグ１　慣性残しはどうやって判断する？
+;-----------これ、2段Jでも残る。
+[state -3,flag 7];地上ダッシュ攻撃にはいったら２にする
+type = varset
+trigger1 = var(8) = 1
+trigger1 = statetype != A && movetype = A
+var(8) = 2
+ignorehitpause = 1
+
+[state -3,flag 7];
+type = varset
+trigger1 = stateno = [0,20]
+trigger2 = stateno = 52 && time >= 2
+trigger3 = movetype = H
+var(8) = 0
+ignorehitpause = 1
+
+;--------------AIRジャンプ用レバー離したかフラグ、ダスト中は別設定　通常Jのみ考慮	HITPAUSE中は・・無視かな？
+[state -3,flag reset]
+type = varset
+trigger1 = stateno = [0,22]
+trigger2 = stateno = 52
+trigger3 = command != "holdup"
+var(9) = 0
+ignorehitpause = 0
+
+
+;----Vダスト　11はほーみんJ許可タイミング　12はほーミンJ持続カウント
+;---相手47Fまでは地上Jスタートはほーみんぐになる が、きりもみに放り込むのは別で29F
+;---------空中CJの場合は29  
+;--一度でもホーミングJ通常中は1、
+[state -3,fag 11];保険、S55でもやる、time=0対策
+type = varset
+trigger1 = stateno = [55,56]
+var(11) = 1
+ignorehitpause = 1
+
+[state -3,fag 11];ダスト中攻撃ヒットしたら2　→S51で重力をかけるかどうかの判断
+type = varset
+triggerall = movehit
+triggerall = var(11) = 1
+trigger1 = stateno = [600,640]
+var(11) = 2
+ignorehitpause = 1
+
+;-----ほーみん　リセットフラグ2・２J,ダッシュ、通常攻撃以外？640,1250,1360,1500-1590?
+[state -3,flag 11];0にしてみる
+type = varset
+trigger1 = !var(4) 
+var(11) = 0
+ignorehitpause = 1
+
+;--------V12 ダストHJ　自分のほうのカウント50Fぐらいを目安に下降に転じる・・
+;----600,640、または55中？ 攻撃のほうtime=0除外 55はそっちで
+;---攻撃するには55必ず通る、そこで必ず１以上になっているはず
+;---Aダッシュ、２Jしたりで効かなくなる・・？
+[State 40, 6];HJのカウント赤くするのにも使う、38Fぐらいから下降かな
+type = varset
+trigger1 = stateno = 42 || stateno = 102 || stateno = 107
+trigger2 = stateno = [1600 ,1690]
+trigger3 = statetype != A
+var(12) = 0
+ignorehitpause = 0
+
+;------------ぱっぱは剣幽霊のストップ分とめないといけない！これのせいだ
+[State 40, 6];HJのカウント赤くするのにも使う、38Fぐらいから下降かな
+type = varadd
+triggerall = !var(32)
+trigger1 = stateno = 55
+trigger1 = time >= 0
+trigger2 = var(12) > 0
+var(12) = 1
+ignorehitpause = 0
+
+;------------------------------------ダスト強制全攻撃ほうりこみまずHITSOTPにね
+;---5850init HITSTOP (ダスト開始の一回のみ）5855 打ち上げ中HITSTOP　5860
+;---5850->5860 または 5855->5860 
+;---このときはヘルパーじゃなく、チーム時他のキャラじゃないこと
+;---相手sysvar参照はDOｓだとおちるがこの方法じゃないとどんどんずれる(相手time=0で動かないの
+;------------ダストスタート空中くらいで5020ni戻したときにまたきてしまう。240でＶar４管理
+[State 2500x, ];きりもみのアレは、29F以内の判断は1スタートなので30
+type = TargetState
+triggerall = numtarget && var(4)
+triggerall = playerID(var(4)),stateno != [5850,5855]
+triggerall = playerID(var(4)),sysvar(0) <= 30
+triggerall = target,ishelper = 0
+triggerall = target,ID = var(4)
+trigger1 = movehit
+trigger1 = HITPAUSETIME
+value = 5855
+ID = -1
+ignorehitpause = 1
+persistent = 15
+
+;------------空中ダストCHJ  これは優先されるから・・ 55
+[state -3,jump cancel];ALLのーまる技  CJのときは29るーる
+type = changestate
+triggerall = var(4) && var(11)
+triggerall = playerID(var(4)),sysvar(0) <= 30 
+triggerall = movehit
+triggerall = command = "holdup"
+trigger1 = stateno = [600,640]
+value = 55
+ignorehitpause = 0
+
+;---------------通常時のハイジャンプフラグ　カウント有効時に上をおすとHJとする 8じゃ短い0じゃ長い？
+;---これ仕込みじゃないほうです
+[state 10,];ハイジャンプフラグ　
+type = varset
+trigger1 = command = "highJu"
+var(13) = 10
+ignorehitpause = 1
+
+[state 10,];ハイジャンプフラグ　
+type = varadd
+triggerall = stateno != 50 && stateno != 40
+trigger1 = var(13) > 0
+var(13) = -1
+ignorehitpause = 1
+
+[state 10,];ハイジャンプフラグ　着地リセット、SS,KSMHも
+type = varset
+trigger1 = stateno = 52 && time >= 2
+var(13) = 0
+ignorehitpause = 1
+
+;-------------------通常J仕込みヒットストップ時
+;---JC Okなのは・・200,210,220,225,400
+;----剣幽霊はあっちでやってるはず
+[state 10,];通常ジャンプ属性　格納	Ｊキャンセルできる技のヒットすとっぷ硬直中仕込み
+type = varset
+triggerall = movecontact
+triggerall = command != "highJ"
+triggerall = command = "holdup"
+triggerall = !var(13)
+triggerall = stateno != 240
+triggerall = hitpausetime
+trigger1 = var(2) != 1 
+trigger1 = stateno = 200 || stateno = 205 || stateno = 400 
+trigger2 = var(2) != 1 && var(20) != 4
+trigger2 = stateno = 220 || stateno = 430 
+trigger3 = var(2) = 1 && stateno != 220 && stateno != 430
+trigger3 = stateno = [200,500]
+trigger4 = var(2) = 1 && var(20) != 4
+trigger4 = stateno = 220 || stateno = 430 
+var(14) = 2
+ignorehitpause = 1
+
+[state 10,];ジャンプフラグ　HS仕込みなら2フレーム有効タイマー
+type = varadd
+triggerall = statetype != A
+trigger1 = var(14) > 0
+trigger1 = stateno = [0,20]
+var(14) = -1
+ignorehitpause = 1
+
+[state 10,];ジャンプフラグ　着地リセット、
+type = varset
+trigger1 = command != "holdup"
+trigger1 = stateno = [0,20]
+trigger2 = stateno = 52 && time >= 2
+var(14) = 0
+
+[state 10,];2ジャンプ回数リセット
+type = varset
+trigger1 = stateno = [0,20]
+trigger2 = stateno = 52 && time >= 2
+trigger3 = stateno = 5200 || stateno = 5210
+trigger4 = stateno = 150 || stateno = 152 || stateno = 154
+var(15) = 0
+ignorehitpause = 1
+
+;--------------------------------16　地上ダッシュ慣性残し
+;------HITPAUSE切れてしばらくするとVEL有効
+[state -3,];
+type = varadd
+triggerall = stateno != 40 && stateno != 42
+triggerall = movecontact
+triggerall = !hitpausetime && !var(32)
+trigger1 = stateno = [200,440]
+var(16) = 1
+ignorehitpause = 1
+
+[state -3,];
+type = varset
+trigger1 = stateno = [200,440]
+trigger1 = hitpausetime || var(32)
+trigger2 = stateno = [0,20]
+trigger3 = stateno = 51 || stateno = 52
+var(16) = 0
+ignorehitpause = 1
+
+;----------------V17------AIRダッシュ有効フラグ　1前　-1後ろ　0してない　SSとかでカウントV6と別扱いで考えたいとき用
+;-----５１になったら解除？
+[state -3,flag 17]
+type = varset
+trigger1 = statetype != A
+trigger2 = stateno = [42,51]
+var(17) = 0
+ignorehitpause = 1
+
+;-^--------------------ろまきゃんー＞バーストが即出しになるのを防ぐ
+[state -3,flag 29]
+type = varadd
+trigger1 = var(29) > 0
+trigger2 = movetype = H
+var(29) = -1
+ignorehitpause = 0
+
+[state -3,flag 29]
+type = varset
+triggerall = movetype != A
+trigger1 = var(29) <= 0
+var(29) = 0
+ignorehitpause = 1
+
+;-------------------------------------------------双子システム対応判断
+[state -2,author];対応キャラ判定 
+type = varset
+triggerall = numenemy
+trigger1 =enemy,authorname = "R-R"
+trigger2 =enemy,authorname = "Rem"
+trigger3 =enemy,authorname = "Y-H"
+trigger4 =enemy,authorname = "EL"
+var(49) = 1
+ignorehitpause = 1
+
+;-----------------------------------ガードバランス:FDによる増加、相殺、など対応判断　2
+[state -2,author];対応キャラ判定 
+type = varset
+triggerall = numenemy
+triggerall = enemy,authorname = "EL" || enemy,authorname = "R-R"
+trigger1 = enemy,name = "BRIDGET"
+trigger2 = enemy,name = "DIZZY"
+trigger3 = enemy,name = "MAY"
+trigger4 = enemy,name = "JAM"
+trigger5 = enemy,name = "Millia Rage"
+trigger6 = enemy,name = "ABA"
+trigger7 = enemy,name = "ZAPPA"
+trigger8 = enemy,name = "TESTAMENT"
+trigger9 = enemy,name = "BAIKEN"
+trigger10 = enemy,name = "I-NO"
+trigger11 = enemy,name = "JOHNNY"
+var(49) = 2
+ignorehitpause = 1
+
+;-------------------------以下固有使用VAR関係
+[state -2,var];幽霊追加入力クリア	26,27
+type = varrangeset
+trigger1 = stateno = [0,20]
+trigger2 = stateno = [40,52]
+trigger3 = movetype = H
+first = 26
+last = 27
+value = 0
+
+
+;----------------------空中ガトリング先行予約入力をいれてみる？
+;----ダストJキャんなど必ず42,55のステート処理をさせてからじゃないと困る？とくにだすと。
+;-----ので予約入力格納？
+;----空中技のほうでもリセットして・t0で。
+[state -3,59];リセット
+type = varset
+trigger1 = movetype = H
+trigger2 = stateno = [0,20]
+trigger3 = stateno = 51
+var(59) = 0
+ignorehitpause = 1
+
+;--基本P=1,K=2,S=3,HS=4,D=5,以下固有 
+;---高度制限ない空中技は？	ぱっぱは憑依を考慮
+;----憑依時さらにへるぱのヒットストップの考慮がいる・・うー
+;----保険に先行できる組み合わせのみ可能にしておく？あれ？
+[state -3,59];ストップ中に↑Dを入力した。
+type = varset
+triggerall = !var(59) && (HITPAUSETIME || var(32)) && (movecontact || var(34))
+triggerall = var(20) != 2
+triggerall = (command = "D" || (var(2) = 2 && command = "S" && command = "HS")) && command = "holdup" 
+trigger1 = stateno = 600 || (var(20) <= 0 && stateno = 620) 
+trigger2 = var(2) = 1
+trigger2 = stateno = 610 || (var(20) <= 0 && stateno = 630) 
+var(59) = 5
+ignorehitpause = 1
+
+[state -3,59];ストップ中に↑Pを入力した。
+type = varset
+triggerall = !var(59) && (HITPAUSETIME || var(32)) && (movecontact || var(34))
+triggerall = command = "P" && command = "holdup" 
+trigger1 = stateno = 600 || ((var(20) <= 0 || var(20) = 2) && stateno = 620)
+trigger2 = var(2) = 1
+trigger2 = stateno = 610 || ((var(20) <= 0 || var(20) = 2) && stateno = 630) 
+var(59) = 1
+ignorehitpause = 1
+
+[state -3,598];ストップ中に↑Kを入力した。
+type = varset
+triggerall = !var(59) && (HITPAUSETIME || var(32)) && (movecontact || var(34))
+triggerall = command = "K" && command = "holdup"
+trigger1 = stateno = 600 || ((var(20) <= 0 || var(20) = 2) && stateno = 620)
+trigger2 = var(2) = 1
+trigger2 = stateno = 610 || ((var(20) <= 0 || var(20) = 2) && stateno = 630) 
+var(59) = 2
+ignorehitpause = 1
+
+[state -3,598];ストップ中に↑Sを入力した。
+type = varset
+triggerall = !var(59) && (HITPAUSETIME || var(32)) && (movecontact || var(34))
+triggerall = command = "S" && command = "holdup"
+trigger1 = stateno = 600 || ((var(20) <= 0 || var(20) = 2) && stateno = 620)
+trigger2 = var(2) = 1
+trigger2 = stateno = 610 || ((var(20) <= 0 || var(20) = 2) && stateno = 630) 
+var(59) = 3
+ignorehitpause = 1
+
+[state -3,59];ストップ中に↑HSを入力した。
+type = varset
+triggerall = !var(59) && (HITPAUSETIME || var(32)) && (movecontact || var(34))
+triggerall = command = "HS" && command = "holdup" 
+trigger1 = stateno = 600 || ((var(20) <= 0 || var(20) = 2) && stateno = 620)
+trigger2 = var(2) = 1
+trigger2 = stateno = 610 || ((var(20) <= 0 || var(20) = 2) && stateno = 630) 
+var(59) = 4
+ignorehitpause = 1
+
+
+;----------------------------------------------あるごりずむ
+;---------------------AIパターン	タイプL-ver0.000
+;-----------------is #30 code:Ikaros-Zappa
+[state 5900,];.RESETAI	停止
+type = varset
+trigger1 = !numhelper(50000)
+trigger2 = !alive || !enemy,alive 
+trigger3 = roundstate != 2
+var(53) = 0
+
+;-------------------------
+;------------------------------------------ダッシュ移動系共通かな
+;----------バーストは上ので統一してある
+[State 240, 7];ロマキャンは・・うーん？
+type = ChangeState
+triggerall = 0;numhelper(50000)
+triggerall = statetype != A && movetype != H
+trigger1 = stateno <= 12 && stateno != 11
+trigger1 = var(39) = 11
+value = 970
+ctrl = 0
+ignorehitpause = 0
+
+[State 240, 7];位置感覚調整	しゃがみ
+type = ChangeState
+triggerall = numhelper(50000)
+triggerall = statetype != A && movetype != H
+trigger1 = stateno <= 12 && stateno != 11
+trigger1 = var(39) = 11
+value = 11
+ctrl = 0
+ignorehitpause = 0
+
+[State 240, 7];位置感覚調整	歩き、20中ならそっちでアニメとか変更される
+type = ChangeState
+triggerall = numhelper(50000)
+triggerall = statetype != A && movetype != H
+trigger1 = stateno <= 12 
+trigger1 = var(39) = [20,21]
+value = var(39)
+ctrl = 0
+ignorehitpause = 0
+
+[State 240, 74];位置感覚調整	地上ダッシュ.停止など？99-105
+type = ChangeState
+triggerall = numhelper(50000)
+triggerall = statetype != A && movetype != H
+trigger1 = stateno <= 20 
+trigger1 = var(39) = [100,105]
+trigger2 = stateno = 100 && var(39) = 99
+value = var(39)
+ctrl = 0
+ignorehitpause = 0
+
+[State 240, 73];位置感覚調整	空中ダッシュ.102,107	回数確認しないと？
+type = ChangeState
+triggerall = numhelper(50000)
+triggerall = var(7) < 2 
+triggerall = statetype = A && movetype != H
+triggerall = stateno = [50,51] 
+trigger1 = var(39) = [102,107]
+value = var(39)
+ctrl = 0
+ignorehitpause = 0
+
+[State 240, 71];位置感覚調整	地上ジャンプ41↑　42前 43後
+type = ChangeState
+triggerall = numhelper(50000)
+triggerall = statetype != A && movetype != H
+triggerall = stateno <= 20 || stateno = 99 ||  stateno = 100 
+trigger1 = var(39) = [41,43]
+value = 40
+ctrl = 0
+ignorehitpause = 0
+
+[State 240, 72];位置感覚調整	空中２ジャンプ41↑　42前 43後	回数制限注意！
+type = ChangeState
+triggerall = numhelper(50000)
+triggerall = statetype != A && movetype != H
+triggerall = !var(15) || (var(14) && var(15) = 1)
+triggerall = var(39) = [41,43]
+trigger1 = stateno = 50 && time >= 1 && ctrl
+trigger2 = stateno = 51 
+value = 42
+ctrl = 0
+ignorehitpause = 0
+
+;------------------------------------------ここからJC可能NOキャラ依存に注意
+[State 240, 7];HomingJへ HITSTOPはだめ
+type = ChangeState
+triggerall = numhelper(50000)
+triggerall = Numtarget(5850)
+triggerall = var(4) && !var(11) && !var(12)
+triggerall = playerID(var(4)),movetype = H
+triggerall = playerID(var(4)),stateno = [5850,5865]
+trigger1 = playerID(var(4)),sysvar(0) <= 47 
+trigger1 = stateno = 240 && movehit
+value = 40
+ctrl = 0
+ignorehitpause = 0
+
+[state -3,jump cancel];ALLのーまる技  CJのときは29るーる
+type = changestate
+triggerall = numhelper(50000)
+triggerall = var(4) && var(11)
+triggerall = playerID(var(4)),sysvar(0) <= 30 
+triggerall = movehit
+trigger1 = stateno = [600,650]
+value = 55
+ignorehitpause = 0
+
+[state 5900,];空中JC	600,610,620
+type = changestate
+triggerall = numhelper(50000)
+triggerall = statetype = A && movetype != H
+triggerall = movecontact
+triggerall = var(39) = [41,43]
+trigger1 = stateno = 620 || stateno = 640
+trigger1 = var(2) != 1
+trigger2 = stateno = [600,640] 
+value = 42
+ignorehitpause = 0
+
+;----------------------------------ここから固有NOステートに注意
+;－－－－－－－－－－－－－－－－攻撃動作
+
+[state 5900,];.GO	げーじわざ・・
+type = changestate
+triggerall = power >= 1000 && !var(40)
+triggerall = statetype != A && movetype != H
+triggerall = stateno <= 20 || stateno = 99 ||  stateno = 100 || movecontact
+trigger1 = var(39) = [3100,3600]
+value = var(39)  
+ignorehitpause = 0
+
+;----------
+[state 5900,];.GO	地上：通常技状態注意・
+type = changestate
+triggerall = statetype != A && movetype != H
+triggerall = stateno <= 20 || stateno = 99 ||  stateno = 100 || movecontact
+trigger1 = var(39) = [200,440]
+trigger2 = var(39) = [1000 ,1220]
+trigger3 = var(39) = [1300 ,2900]
+value = var(39)  
+ignorehitpause = 0
+
+;------------------空中G
+[state 5900,];.GO	空中：通常技状態注意・
+type = changestate
+triggerall = statetype = A && movetype != H
+triggerall = stateno = 50 || stateno = 51 || stateno = 55 || movecontact
+trigger1 = var(39) = [600,650]
+trigger2 = stateno = [1200,1240]
+trigger2 = var(39) = 1250
+value = var(39)  
+ignorehitpause = 0
+
+;---------------------攻撃動作系
+[state 5900,];ctrlがなくなる？？
+type = ctrlset
+triggerall = numhelper(50000)
+triggerall = !ctrl
+trigger1 = stateno = [0,20]
+trigger2 = stateno = [50,51]
+value = 1 
+
+[state 1510,helper partner];----AI管理へるぱ　ID50000 
+type = Helper
+triggerall = 0
+triggerall = !numhelper(50000)
+triggerall = alive && enemy,alive 
+triggerall = roundstate = 2
+trigger1 = command = "AL_1"
+trigger2 = command = "AL_2"
+trigger3 = command = "AL_3"
+trigger4 = command = "AL_4"
+trigger5 = command = "AL_5"
+trigger6 = command = "AL_6"
+trigger7 = command = "AL_7"
+trigger8 = command = "AL_8"
+trigger9 = command = "AL_9"
+trigger10 = command = "AL_10"
+trigger11 = teamside = 1;デバック用
+name = "INT"
+ID = 50000
+pos = 0,0
+keyctrl = 0
+postype = p1
+stateno = 50000
+supermovetime = 999
+
+
+[state 1510,helper partner];----CPU操作判断 
+type = varset
+triggerall= numenemy
+triggerall = alive && enemy,alive 
+triggerall = roundstate = 2
+trigger1 = command = "AL_1"
+trigger2 = command = "AL_2"
+trigger3 = command = "AL_3"
+trigger4 = command = "AL_4"
+trigger5 = command = "AL_5"
+trigger6 = command = "AL_6"
+trigger7 = command = "AL_7"
+trigger8 = command = "AL_8"
+trigger9 = command = "AL_9"
+trigger10 = command = "AL_10"
+var(53) = 1
+
+
+
+

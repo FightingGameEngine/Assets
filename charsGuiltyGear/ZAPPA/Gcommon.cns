@@ -1,0 +1,3481 @@
+;-------------------comonn for GGXX + TWIN "Ikaros"
+; Common state file for M.U.G.E.N beta 2002.04.14
+; System variables usage
+; ----------------------
+; Var name    Type   Purpose
+; --------    ----   -------
+; sysvar(0)   Temp   Set by state 5081 (HITL_SLIDE) to 1 to prevent
+;                    showing ground hit frame in state 5110 (HIT_LIEDOWN).
+;                    Used by guarding states.
+; sysvar(1)   Temp   Used by state 40 (Jump Start) amd 45 (Air Jump Start)
+;                    to keep track of which way to jump.
+;                    Used by state 5100 and 5110 to remember downward
+;                    velocity of player just before hitting the ground.
+;                    Used in state 5080 for storing the anim # to display.
+
+; The following states have special handling within MUGEN, and should be
+; overridden with caution:
+; Jump Start (40): airjumping bookkeeping at time = 0
+; All guard states (120-155): guard handling throughout state
+; Hit_trip, shaking (5070): defence increases at time = 0
+; Hit_bounce (5100): defence increases at time = 0, player becomes
+;                    invincible if within 10 ticks of getting up
+; Hit_liedown (5110): player changes to get-up state (5120) when ready
+; Hit_getup (5120): player's defence is restored to normal at time = 0
+; Hitfall_recover (5200): player's defence is restored at time = 0
+; Hitfall_airrecover (5210): player's defence is restored at time = 0
+;5160,5161は-30AIRでずらす？
+;---------------------------------------------------------------------------
+;----------自動振り向きあり、
+[Statedef 0]
+type = S
+physics = S
+sprpriority = 0
+Hitcountpersist = 1
+
+;独り言 0,100,200;---憑いてるときは控えめに
+;---SLRE8種0-7 AC11種8-18 ALL19
+;------------------ランダムかそうでないかでわけておくかな
+[State -3, voice];固定設定の場合3,5
+type = PlaySnd
+triggerall = var(54) < 6
+triggerall = random % ifelse(!var(20),2,3) = 0
+trigger1 = prevstateno != [10,52]
+trigger1 = animelemtime(1) = 1 
+trigger2 = prevstateno = [10,52]
+trigger2 = animelemtime(1) = 1 && time > 1
+value = s999, ifelse(var(54) >= 3,  (random % 11 + 8) + var(54) * 100 - 300,random % 8 + (var(54) * 100)) 
+channel = 0
+
+[State -3, voice];ランダム設定の場合
+type = PlaySnd
+triggerall = var(54) >= 6 
+triggerall = random % ifelse(!var(20),2,3) = 0
+trigger1 = prevstateno != [10,52]
+trigger1 = animelemtime(1) = 1 
+trigger2 = prevstateno = [10,52]
+trigger2 = animelemtime(1) = 1 && time > 1
+value = s999, ifelse(var(54) = 8, random % 19, ifelse(var(54) = 7,random % 11 + 8,random % 8)) + random % 3 * 100
+channel = 0
+
+;-------------------------ここで各種憑依がおこなわれる
+;---0,11,5200,5210に同じものを---
+;---ブリジット特殊イントロで被弾している、その場合の判定をしたくないイントロとばしはRS2判定になってついてしまう
+[state -3,];強制解除
+type = varset
+triggerall = var(20) = -1 
+trigger1 = !ctrl
+var(20) = 0
+ignorehitpause = 1
+
+;-------------食らい経由共通抽選
+;-------無の確率はそれなりに高い？4分の１ではなさそう
+;---食らいで-1になってたらやる。 0,1,2,3を抽選しさらに0or1で強制無
+[State 2050,  2];らおう時はやらなくていい 
+type = varset
+triggerall = !numhelper(100)
+triggerall = !numhelper(200)
+triggerall = !numhelper(300)
+triggerall = !numhelper(400)
+trigger1 = var(20) = -1 && time = 0
+var(20) =  random % 4  
+persistent = 0
+
+[State 2050,  2];保険、前のがまだいた場合・・もしもういたら消す？
+type = varset
+triggerall = var(20) = -1 && time = 0
+trigger1 = numhelper(100) || numhelper(200)
+trigger2 = numhelper(300) || numhelper(400)
+var(20) =  0 
+persistent = 0
+
+[state 1200,light];でもって0より上になってたら実行憑依
+type = Helper
+triggerall = time = 0
+triggerall = var(20) > 0
+trigger1 = !numhelper(var(20) * 100)
+name = "RANDOM"
+ID = var(20) * 100
+pos = 0,0 
+postype = p1
+stateno = var(20) * 200 + 2000
+ownpal = 1
+size.height = var(20) * 100;ID
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+supermovetime = 9999
+
+
+[State 0, 1];
+type = ChangeAnim
+trigger1 = Anim != 0 && Anim != 5 
+trigger2 = Anim = 5 && AnimTime = 0 ;Turn anim over
+value = 0
+
+[State 0, 2]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 0, 3] ;Stop moving if low velocity or 4 ticks pass
+type = VelSet
+trigger1 = abs(vel x) < 0.5
+trigger2 = Time = 4
+x = 0
+
+[State 0, 4] ;Are you dead?
+type = ChangeState
+trigger1 = !alive
+value = 5050
+
+;---------------------------------------------------------------------------
+; Stand to Crouch　しゃがむと幅が増えますmainusで
+[Statedef 10]
+type    = C
+physics = C
+anim = 10
+Hitcountpersist = 1
+
+[State 10, 1]
+type = VelMul
+trigger1 = Time = 0
+x = .75
+
+[State 10, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 11]
+type    = C
+physics = C
+anim = 11
+sprpriority = 0
+Hitcountpersist = 1
+
+;-------------------------ここで各種憑依がおこなわれる
+;---0,11,5200,5210に同じものを---
+;-------------食らい経由共通抽選
+;-------無の確率はそれなりに高い？4分の１ではなさそう
+;---食らいで-1になってたらやる。 0,1,2,3を抽選しさらに0or1で強制無
+[State 2050,  2];らおう時はやらなくていい
+type = varset
+triggerall = !numhelper(100)
+triggerall = !numhelper(200)
+triggerall = !numhelper(300)
+triggerall = !numhelper(400)
+trigger1 = var(20) = -1 && time = 0
+var(20) =  random % 4 
+persistent = 0
+
+[State 2050,  2];保険、前のがまだいた場合・・もしもういたら消す？
+type = varset
+triggerall = var(20) = -1 && time = 0
+trigger1 = numhelper(100) || numhelper(200)
+trigger2 = numhelper(300) || numhelper(400)
+var(20) =  0 
+persistent = 0
+
+[state 1200,light];でもって0より上になってたら実行憑依
+type = Helper
+triggerall = time = 0
+triggerall = var(20) > 0
+trigger1 = !numhelper(var(20) * 100)
+name = "RANDOM"
+ID = var(20) * 100
+pos = 0,0 
+postype = p1
+stateno = var(20) * 200 + 2000
+ownpal = 1
+size.height = var(20) * 100;ID
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+supermovetime = 9999
+
+[State 11, 1] ;しゃがみ振り向きアニメは自動で行われます
+type = ChangeAnim
+trigger1 = Anim = 6 && AnimTime = 0
+value = 11
+
+;---------------------------------------------------------------------------
+; Crouch to Stand  しゃがみ攻撃後の立ち上がりではリセットしない、
+[Statedef 12]
+type    = S
+physics = S
+anim = 12
+Hitcountpersist = 1
+
+[State 12, 1]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Walk
+[Statedef 20]
+type    = S
+physics = N;S
+sprpriority = 0
+Hitcountpersist = 1
+
+;----------モードによる移動速度など これを２で割った数字
+;----通常			
+;前3.35	後3.25	FD9.6	BD14	AFD14 	ABD14	FJ7.5 FHJ6 BJ5 bhj5
+;----GGモード	20%UP?		
+;前4	後4 	FD11 	BD17 	AFD19 	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----Gカラー			
+;前8	後6	FD24	BD24	AFD17	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----GG+Gカラー			
+;前10	後7	FD30	BD29	AFD20	ABD20 FJ8 FHJ6 BJ8 bhj5
+[State 20, 1];4,Gカラー
+type = VelSet
+triggerall = palno = var(42)
+trigger1 = command = "holdfwd"
+x = ifelse(var(2) = 1, 10,8) * 0.5 
+
+[State 20, 1];4,通常
+type = VelSet
+triggerall = palno != var(42)
+trigger1 = command = "holdfwd"
+x = ifelse(var(2) = 1,4,3.35) * 0.5
+
+[State 20, 2];Gカラー
+type = VelSet
+triggerall = palno = var(42)
+trigger1 = command = "holdback"
+x = ifelse(var(2) = 1,-7,-6) * 0.5
+
+[State 20, 2];通常
+type = VelSet
+triggerall = palno != var(42)
+trigger1 = command = "holdback"
+x = ifelse(var(2) = 1,-4,-3.25) * 0.5
+
+[State 20, 3]
+type = ChangeAnim
+triggerall = vel x > 0
+trigger1 = Anim != 20 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 20
+
+[State 20, 4]
+type = ChangeAnim
+triggerall = vel x < 0
+trigger1 = Anim != 21 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 21
+
+;---------------------------------------------------------------------------
+; Jump Start	0.1.2=３F目にとんでいる,3F目はS50のtime=0であり、そのFはCTRL=0、S50のCTRLはtime=1で
+;---------------投げ無敵必殺技OKしゃがみじょうたい３F
+;---------通常ジャンプ	全:振向き無:地上0-20	地上Jきゃん	3F
+;----------2ジャンプ		全:振向き有:42-50	地上Jきゃん	
+;---------ぷちジャンプ	前:振向き無:地上ダッシュ99.地上通常技HITSTOP後しばらく		3f
+;---------大ジャンプ		前:振向き無:地上ダッシュ100		3F
+;---------ハイジャンプ	全:振向き有:レバー下上		3F
+;--------ホーミングJ		前:振向き無:ダスト			1F
+[Statedef 40]
+type    = c
+physics = c
+anim = 40
+ctrl = 0
+sprpriority = 1
+Hitcountpersist = 1
+
+[State 10, 2];AI強制0戻し・・憑依考慮したくない、共通のでなにかひとつ・・
+type = changestate
+triggerall = numhelper(50000)
+triggerall = var(39) != [41,43]
+trigger1 = time = 0
+value = ifelse(p2dist x < 50 ,240,ifelse(p2dist x < 100,205,225))
+ctrl = 0
+
+[State 10, 2];ふりむく
+type = turn
+trigger1 = p2dist x < 0
+trigger1 = time = 0
+persistent = 0
+
+[state -3,];擬似CTRL 必殺許可
+type = varset
+trigger1 = time = 0
+sysvar(3) = 2
+ignorehitpause = 1
+
+[State 40, mu];投げ無敵
+type = nothitby
+trigger1 = 1
+value = ,nt,st,ht
+time = 1
+ignorehitpause = 1
+
+[State 40, 6s];レバーフリーフラグ
+type = varset
+trigger1 = 1
+var(9) = 1
+ignorehitpause = 1
+
+;------------方向決定
+[State 40, 1];レバーリセットまたは上
+type = VarSet
+trigger1 = Time = 0
+trigger2 = var(39) = 41
+sysvar(1) = 0
+
+[State 40, 2];レバー前上 またはAI強制前とび
+type = VarSet
+trigger1 = command = "holdfwd"
+trigger2 = var(39) = 42
+sysvar(1) = 1
+
+[State 40, 3];レバー後上
+type = VarSet
+trigger1 = command = "holdback"
+trigger2 = var(39) = 43
+sysvar(1) = -1
+
+[State 40, 3];振り向き属性　ハイジャンプであれば。 仕込みは別コマンドでSV4　ここで必殺にいった場合はどうなる？2にしとく？
+type = VarSet
+trigger1 = Time = 0
+trigger1 = var(13)
+var(55) = 2;-1
+
+[State 40, 3];通常J属性	ハイジャンプじゃなければ　HITSTOP仕込みはMINUSで
+type = Varset
+trigger1 = Time = 0
+var(14) = ifelse(var(13),0,2)
+
+[State 40, 3];ハイジャンプ ２J回数へらしておく　14が入ってればHJでもOK ここで必殺にいった場合はどうなる？2にしとく
+type = Varset
+trigger1 = Time = 0
+var(15) = ifelse(var(13),1,0)
+
+;----------モードによる移動速度など これを２で割った数字
+;----通常			
+;前3.35	後3.25	FD9.6	BD14	AFD14 	ABD14	FJ7.5 FHJ6 BJ5 bhj5
+;----GGモード	20%UP?		
+;前4	後4 	FD11 	BD17 	AFD19 	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----Gカラー			
+;前8	後6	FD24	BD24	AFD17	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----GG+Gカラー			
+;前10	後7	FD30	BD29	AFD20	ABD20 FJ8 FHJ6 BJ8 bhj5
+[State 40, 4];地上基本値 x HJ共通じゃない！前J
+type = Varset
+triggerall = !var(13)
+trigger1 = Time = 0 && sysvar(1) = 1
+fvar(7) = ifelse(palNO = var(42), 8,7.5) * 0.5
+[State 40, 4];地上基本値 x HJ共通じゃない！　後ろJ
+type = Varset
+triggerall = !var(13)
+trigger1 = Time = 0 && sysvar(1) = -1
+fvar(7) = ifelse(palNO = var(42), 8,5) * -0.5
+
+[State 40, 4];地上 HJ　前J6,後ろ5
+type = Varset
+triggerall = var(13)
+trigger1 = Time = 0 ;&& sysvar(1) = 1
+fvar(7) = sysvar(1) * ifelse(sysvar(1) = 1,6,5) * 0.5
+
+[State 40, 4];地上 上
+type = Varset
+trigger1 = Time = 0 && !sysvar(1) 
+fvar(7) = 0
+
+[State 40, 4];ぷちJ　ればーNにしたら９９になるはず、地上通常技ダッシュ残し　の場合 16は攻撃中HITSTOP終了後しばらくの・・
+type = Varset
+triggerall = var(8)
+triggerall = Time = 0
+triggerall = sysvar(1) >= 0
+trigger1 = prevstateno = [99,100]
+trigger2 = prevstateno = [200,440]
+trigger2 = var(16) >= 2
+fvar(7) = ifelse(prevstateno = 100,vel x, vel X / 1.5)
+
+[State 40, 4];HJ V13がはいってる場合はHJ NJy20,40滞空 HJy31,49滞空
+type = Varset
+trigger1 = Time = 0
+fvar(8) = ifelse(var(13),-16.0,-10.5)
+
+[State 40, 4];ジャンプ重力違いV13がはいってる場合 y NJ1.05,HJ1.3
+type = Varset
+trigger1 = Time = 0
+fvar(9) = ifelse(var(13),0.65,0.525)
+
+;---------------ストップ中属性追加されても慣性削除らしい？ほりゅう　
+[State 40, 4];ダスト時　慣性残し削除
+type = Varset
+triggerall = var(4) && !var(11) && !var(12)
+triggerall = playerID(var(4)),movetype = H
+triggerall = playerID(var(4)),stateno = [5850,5865]
+trigger1 = playerID(var(4)),sysvar(0) <= 47
+trigger1 = Time = 0
+var(8) = 0
+ignorehitpause = 1
+
+;------ホーミング部 もしかするとtime１スタートか？
+[State 40, 65];ダストジャンプ,F11(D中2段ジャンプするとかで解除)  
+type = ChangeState
+triggerall = var(4) && !var(11) && !var(12)
+triggerall = playerID(var(4)),movetype = H
+triggerall = playerID(var(4)),stateno = [5850,5865]
+trigger1 = playerID(var(4)),sysvar(0) <= 47
+trigger1 = time = 0
+value = 55
+ctrl = 0
+
+[State 40, 6];ダスト以外ジャンプ
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 0
+
+;---------------------AirJump Start空中でのジャンプ　2段ジャンプとか属性は？
+[Statedef 42]
+type    = A
+physics = N
+ctrl = 0
+anim = 41
+hitcountpersist = 1
+
+[State 2050,  snd];通常ジャンプ効果音
+type = PlaySnd
+trigger1 = time = 0
+value = s50,0
+channel = 2
+
+[State 42, 8];AIrダッシュ回数減らす
+type = Varadd
+trigger1 = Time = 0
+var(7) = 1
+ignorehitpause = 1
+
+[State 42, 8];2ジャンプしたフラグ 0通常 1仕込状態V14連動 2実行後or不能行動(AIRDASH
+type = Varset
+trigger1 = Time = 0
+var(15) = 2
+ignorehitpause = 1
+
+[State 42, 8];レバーニュートラルフラグ
+type = Varset
+trigger1 = Time = 0
+var(9) = 1
+ignorehitpause = 1
+
+[State 42, 8];振り向き属性追加・・
+type = Varset
+trigger1 = Time = 0
+var(55) = 1
+ignorehitpause = 1
+
+;---------------------------------------速度決定sv2にしてみる
+[State 42, 1]
+type = VarSet
+trigger1 = Time = 0
+trigger2 = var(39) = 41
+sysvar(2) = 0
+
+[State 42, 2]
+type = VarSet
+triggerall = Time = 0
+trigger1 = command = "holdfwd"
+trigger2 = var(39) = 42
+sysvar(2) = 1
+
+[State 42, 3]
+type = VarSet
+trigger1 = Time = 0
+trigger1 = command = "holdback"
+trigger2 = var(39) = 43
+sysvar(2) = -1
+
+;----------モードによる移動速度など これを２で割った数字
+;----通常			
+;前3.35	後3.25	FD9.6	BD14	AFD14 	ABD14	FJ7.5 FHJ6 BJ5 bhj5
+;----GGモード	20%UP?		
+;前4	後4 	FD11 	BD17 	AFD19 	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----Gカラー			
+;前8	後6	FD24	BD24	AFD17	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----GG+Gカラー			
+;前10	後7	FD30	BD29	AFD20	ABD20 FJ8 FHJ6 BJ8 bhj5
+
+
+[State 40, 4];基本 ダッシュ慣性　のこりじゃない場合 前JNJ
+type = Varset
+triggerall = !var(8) || (var(8) = 2 && var(15) <= 1)
+trigger1 = Time = 0 && sysvar(2) >= 0
+fvar(7) = (sysvar(2) * ifelse(palNO = var(42), 8,7.5) * 0.5)
+
+[State 40, 4];基本 ダッシュ慣性　のこりじゃない場合 後ろJ
+type = Varset
+triggerall = !var(8) || (var(8) = 2 && var(15) <= 1)
+trigger1 = Time = 0 && sysvar(2) = -1
+fvar(7) = (sysvar(2) * ifelse(palNO = var(42), 8,5) * 0.5)
+
+;--------------慣性残る場合の。
+[State 40, 4];プチジャンプ時、すいちょくJ時　0なら0のままだね 慣性残しでもOK
+type = Varset
+triggerall = var(8) = 1 || (var(8) = 2 && var(15) >= 2)
+trigger1 = Time = 0
+trigger1 = sysvar(1) = 0 && sysvar(2) = 0
+fvar(7) = vel x 
+
+[State 40, 4];プチジャンプで前 0なら普通に足されるだけ
+type = Varset
+triggerall = var(8) = 1 || (var(8) = 2 && var(15) >= 2)
+trigger1 = Time = 0
+trigger1 = sysvar(1) = 0 && sysvar(2) = 1
+fvar(7) = vel x + (sysvar(2) * ifelse(palNO = var(42), 8,7.5) * 0.5)
+
+[State 40, 4];プチジャンプで後ろ 0なら普通に足されるだけ
+type = Varset
+triggerall = var(8) = 1 || (var(8) = 2 && var(15) >= 2)
+trigger1 = Time = 0
+trigger1 = sysvar(1) = 0 && sysvar(2) = -1
+fvar(7) = vel x + (sysvar(2) * ifelse(palNO = var(42), 8,5) * 0.5)
+
+;--------------ダッシュ中
+[State 40, 4];前J、NJ
+type = Varset
+triggerall = var(8) = 1 || (var(8) = 2 && var(15) >= 2)
+trigger1 = Time = 0
+trigger1 = sysvar(1) = 1 && sysvar(2) = 0
+fvar(7) = vel x / 2
+
+[State 40, 4];前J、前J
+type = Varset
+triggerall = var(8) = 1 || (var(8) = 2 && var(15) >= 2)
+trigger1 = Time = 0
+trigger1 = sysvar(1) = 1 && sysvar(2) = 1
+fvar(7) = vel x  
+
+[State 40, 4];前J、後ろJ さらにV８で地上ダッシュしてたら
+type = Varset
+triggerall = var(8) = 1 || (var(8) = 2 && var(15) >= 2)
+trigger1 = Time = 0 
+trigger1 = sysvar(1) = 1 && sysvar(2) = -1
+fvar(7) = -1 * ifelse(palNO = var(42), 8,5) * 0.5 
+
+;-------------------Yは共通
+[State 40, 4];10  6.5
+type = varset
+trigger1 = Time = 0
+fvar(8) = -10.5
+
+[State 40, 4];ジャンプ重力NOにもどす？
+type = Varset
+trigger1 = Time = 0
+fvar(9) = 0.525
+
+;---------------ガトリング先行部	ダストにもこぴぺして
+;---地上Jキャンの場合、高度制限ない必殺技可能、さっきまで、帰ってくるな？通る？
+;---空中Jキャンは通常技；ガトリング系のみ
+[State 42, 6];ガトリングなら即行きOK DにいくのはS,HS ,剣幽霊HSからはだめ
+type = ChangeState
+triggerall = Time = 0 && var(59) = 5
+trigger1 = var(20) != 2 && var(20) != 3 && var(20) != 1 
+trigger1 = prevstateno = 630
+trigger2 = prevstateno = 620
+value = 640
+ctrl = 0
+
+[State 42, 6];ガトリングなら即行きOK PにいくのはK らおうならS 憑依でP連打OK
+type = ChangeState
+triggerall = Time = 0 && var(59) = 1
+trigger1 = prevstateno = 610 
+trigger2 = prevstateno = 620 && var(20) = 4 
+trigger3 = prevstateno = 600 && var(20) > 0
+value = 600
+ctrl = 0
+
+[State 42, 6];ガトリングなら即行きOK KにいくのはPS 
+type = ChangeState
+triggerall = Time = 0 && var(59) = 2
+trigger1 =  prevstateno = 600 || prevstateno = 620
+value = 610
+ctrl = 0
+
+[State 42, 6];ガトリングなら即行きOK sにいくのはPK
+type = ChangeState
+triggerall = prevstateno = [600,610]
+trigger1 = Time = 0 && var(59) = 3
+value = 620
+ctrl = 0
+
+[State 42, 6];ガトリングなら即行きOK HsにいくのはPS 
+type = ChangeState
+triggerall = Time = 0 && var(59) = 4
+trigger1 = prevstateno = 600 || prevstateno = 620
+value = 630
+ctrl = 0
+
+;独り言 0,100,200;---憑いてるときは控えめに
+;---SLRE8種0-7 AC11種8-18 ALL19
+;------------------ランダムかそうでないかでわけておくかな
+[State -3, voice];固定設定の場合3,5
+type = PlaySnd
+triggerall = var(54) < 6
+triggerall = random % ifelse(!var(20),2,3) = 0
+trigger1 = time = 0
+value = s999, ifelse(var(54) >= 3,  (random % 11 + 8) + var(54) * 100 - 300,random % 8 + (var(54) * 100)) 
+channel = 0
+
+[State -3, voice];ランダム設定の場合
+type = PlaySnd
+triggerall = var(54) >= 6 
+triggerall = random % ifelse(!var(20),2,3) = 0
+trigger1 = time = 0
+value = s999, ifelse(var(54) = 8, random % 19, ifelse(var(54) = 7,random % 11 + 8,random % 8)) + random % 3 * 100
+channel = 0
+
+[State 42, 6];50のほうでCTRLセット　１F必要なので
+type = ChangeState
+trigger1 = Time = 0
+value = 50
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; AirJump Start		システム空チュジャンプ、未使用
+[Statedef 45]
+type    = A
+physics = N
+ctrl = 0
+velset = 0,0
+Hitcountpersist = 1
+
+[State 45, 1]
+type = ChangeAnim
+trigger1 = SelfAnimExist(44)
+value = 44
+
+[State 45, 2]
+type = ChangeAnim
+trigger1 = !SelfAnimExist(44)
+value = 41
+
+[State 45, 3]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 45, 4]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 45, 5]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 45, 6]
+type = VelSet
+trigger1 = Time = 2
+x = ifelse(sysvar(1)=0, const(velocity.airjump.neu.x), ifelse(sysvar(1)=1, const(velocity.airjump.fwd.x), const(velocity.airjump.back.x)))
+y = const(velocity.airjump.y)
+
+[State 45, 7]
+type = ChangeState
+trigger1 = Time = 2
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Jump Up		ジャンプするとここにくる。40->方向によってアニメをかえる、あと重力、自動着地
+[Statedef 50]
+type    = A
+physics = N
+velset = fvar(7),fvar(8)
+Hitcountpersist = 1
+
+[State 2050,  snd];通常ジャンプ効果音
+type = PlaySnd
+trigger1 = prevstateno = 40
+trigger1 = time = 0 && !var(13)
+value = s50,0
+channel = 2
+
+[State 2050,  snd];Hジャンプ効果音  たまにでてない？？
+type = PlaySnd
+trigger1 = prevstateno = 40
+trigger1 = time = 0 && var(13)
+value = s50,1
+channel = 2
+
+[State 200x,];残像は 大、ほーみんぐ これは50で
+type = Afterimage
+triggerall = prevstateno = 40
+trigger1 = time = 0
+trigger1 = var(13)
+trans = add1
+TimeGap = 2
+FrameGap = 3
+length = 6
+time = 80
+PalBright = 0,0,0
+PalContrast = 125,125,125
+PalAdd = 0,0,0
+
+;-----ずれる、へるぱで確実にやる
+[state 7000,test];JUMPエフェクト　砂埃	ここで必殺に以降するとどうなる？でる？50とかで出すべきかもしれない？
+type = Helper
+triggerall = prevstateno = 40
+trigger1 = time = 0
+name = "jump efe"
+ID = 40
+pos = 0,0
+postype = p1
+stateno = 740
+ownpal = 1
+ignorehitpause = 0
+persistent = 0
+
+;---------------ガトリング先行部	さっきまでとか通るとか各種そのまま
+;---地上Jキャンの場合、高度制限ない必殺技可能、
+;----HITSTOP中に上おされてたことを判断するには？ V足りない　慣性残しのV16 <= 1
+;----またはジャンプ属性仕込みV14>0利用？	またはV13でハイジャンプ
+;----空中Jキャンでハイジャンプは・・
+;--そもそもV14じゃJキャン可能技のレバー上しか判断してないので、PREVSTEは４０でいい？
+;---ジャンプキャンセルで来てればV16加算はとまるはず、これで仮に・・
+[state -1,nuts  ];そのまま　D　RE以外	
+type = changestate
+value = 1740
+triggerall = prevstateno = 40 && var(20) = 3
+triggerall = var(1) != 1
+triggerall = (var(13) || var(14) = 2) && var(16) <= 1
+triggerall = command = "236D" 
+trigger1 = command != "roma"
+trigger1 = Time = 0
+
+[state -1,nuts  ];いたんだよ　P　	EX,OR、
+type = changestate
+value = 1160
+triggerall = prevstateno = 40 && var(20) > 0
+triggerall = !var(1) || var(1) = 2
+triggerall = (var(13) || var(14) = 2) && var(16) <= 1
+triggerall = command = "236P" 
+trigger1 = command != "roma"
+trigger1 = Time = 0
+
+[state -1,nuts  ];そのまま　P　	AC,OR、こまんどちゅうい
+type = changestate
+value = 1700
+triggerall = 0;prevstateno = 40 && var(20) = 3
+triggerall = !var(1) || var(1) = 4
+triggerall = (var(13) || var(14) = 2) && var(16) <= 1
+triggerall = (command = "236P" && var(1) = 4) || (!var(1) && command = "623P") 
+trigger1 = command != "roma"
+trigger1 = Time = 0
+
+[state -1,nuts  ];そのまま　K　	RE以外
+type = changestate
+value = 1710
+triggerall = prevstateno = 40 && var(20) = 3
+triggerall = var(1) != 1
+triggerall = (var(13) || var(14) = 2) && var(16) <= 1
+triggerall = command = "236K" 
+trigger1 = Time = 0
+
+[state -1,nuts  ];そのまま　S　	
+type = changestate
+value = 1720
+triggerall = prevstateno = 40 && var(20) = 3
+triggerall = (var(13) || var(14) = 2) && var(16) <= 1
+triggerall = command = "236S" 
+trigger1 = Time = 0
+
+[state -1,nuts  ];そのまま　HS　	
+type = changestate
+value = 1730
+triggerall = prevstateno = 40 && var(20) = 3
+triggerall = (var(13) || var(14) = 2) && var(16) <= 1
+triggerall = command = "236H" 
+trigger1 = Time = 0
+
+
+[State 50, 1];1F目は硬直
+type = ctrlset
+trigger1 = Time = 1
+value = 1
+ignorehitpuase = 1
+
+[State 50, 1];リセット禁止
+type = VarSet
+trigger1 = 0;Time = 0
+sysvar(1) = 0
+
+;----------------じゃんぷあにめ
+;----ざっぱっぱ1種類
+[State 50, 2];あにちぇん  速度ではなく、レバーでだね・・地上は確実に４０からsv1
+type = ChangeAnim
+trigger1 = Time = 0
+value = 41
+
+[State 50, 3]
+type = ChangeAnim
+trigger1 = Vel y > -2
+trigger1 = SelfAnimExist(anim + 3)
+persistent = 0
+value = Anim + 3
+
+[State 155, 2];ダストじゃないとき
+type = VelAdd
+trigger1 = 1
+y = fvar(9)
+
+[State 50, 3]
+type = Changestate
+trigger1 = vel y > 0 && pos y >= 0
+value = 52
+
+;---------------------------------------------------------------------------
+; Jump Down (empty state for compatibility)	空中技後など任意にこさせる　自由落下　自動着地
+[Statedef 51]
+type    = A
+physics = N
+Hitcountpersist = 1
+
+[state 600];保険など・・
+type = ctrlset
+trigger1 = time = 1
+value = 1
+
+[State 51, 1];降下アニメチェンジ  11
+type = changeanim
+trigger1 = time = 0
+value = 41
+elem = 11
+ignorehitpause = 1
+peristente = 0
+
+;--------------------------重力がかからない条件は・・ダッシュ中かうんと有効時,
+[State 155, 2];ダストじゃないとき
+type = VelAdd
+trigger1 = 1
+y = fvar(9)
+
+;--------------------------airだっしゅ中の処理Y
+[state 600];横滑りさせるダッシュ経由のみ
+type = velset
+trigger1 = var(6) > 1 
+y = 0
+
+[State 50, 3];ふりむきマイナスだとタイム０でやってくれない
+type = turn
+triggerall = p2dist x < 0
+trigger1 = var(12)  
+trigger2 = var(55) 
+persistent = 0
+
+[State 50, 3]
+type = Changestate
+trigger1 = Vel y >= 0 && pos y >= 0
+value = 52
+anim = 47
+
+;---------------------------------------------------------------------------
+;Jump Land	システム着地
+;---2Fまでに技を出すと属性がつく、ということは３F目では消えるということ?
+;--回数もリセットされる？されない？
+[Statedef 52]
+type    = c
+physics = S
+ctrl = 0
+anim = 47
+Hitcountpersist = 1
+
+[State 2050,  snd];システム着地
+type = PlaySnd
+trigger1 = time = 0
+value = s50,9
+channel = 3
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+x = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[state -3,];擬似CTRL いるかさんから振り時
+type = varset
+triggerall = prevstateno = [1700,1730]
+trigger1 = time = 0
+sysvar(3) = 2
+ignorehitpause = 1
+
+[state -3,];属性けし 振り向き(HJ属性)
+type = varset
+trigger1 = time = 2
+var(55) = 0
+ignorehitpause = 1
+
+[state 100x,atc efe];残像ここでもけしてみる
+type = afterimagetime
+trigger1 = time  = 0
+time = 0
+ignorehitpause = 1
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = time % 2 = 0
+anim =6047
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+persistent =0
+scale = 0.5,0.5
+
+[State 52, 4];通常3F ,空中D着地は５、試合終了特殊振り向き発動あり(systemなのでいじれない)
+type = ChangeState
+trigger1 = prevstateno != 640
+trigger1 = AnimTime = 0
+trigger2 = prevstateno = 640
+trigger2 = time >= 5
+trigger3 = (anim = 5 || anim = 6 ) && animtime = 0
+value = 0
+ctrl = 1
+
+;-----地上フロントステップ停止　100－＞レバー離しでくる
+;-----ダッシュ抵抗1.05%
+[Statedef 99]
+type    = S
+movetype = I 
+physics = N
+Anim = 99
+ctrl = 0
+Hitcountpersist = 1
+
+;----------------ダッシュ抵抗
+[State 99,];1.05%?=0.0105 
+type = Velmul
+trigger1 = 1
+x = 1 - 0.0105
+ignorehitpause = 0
+
+[State 100, 4];ぷちジャンプ
+type = ChangeState
+trigger1 = command = "holdup"
+value = 40
+
+[State 99,]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+flag2= NoAutoTurn
+
+[State 52, 4];14ここにいる？?
+type = ChangeState
+trigger1 = time >= 14
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; RUN_FWD		地上ダッシュ　GGでは慣性がかかる	ctrl =0にしておく
+[Statedef 100]
+type    = S
+physics = N
+anim = 100
+sprpriority = 1
+ctrl = 0
+Hitcountpersist = 1
+
+[State 100, 1];ダッシュ属性フラグ　
+type = VarSet
+trigger1 = time = 0
+var(8) = 1
+
+;----------モードによる移動速度など これを２で割った数字
+;----通常			
+;前3.35	後3.25	FD9.6	BD14	AFD14 	ABD14	FJ7.5 FHJ6 BJ5 bhj5
+;----GGモード	20%UP?		
+;前4	後4 	FD11 	BD17 	AFD19 	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----Gカラー			
+;前8	後6	FD24	BD24	AFD17	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----GG+Gカラー			
+;前10	後7	FD30	BD29	AFD20	ABD20 FJ8 FHJ6 BJ8 bhj5
+;前進7 後退5 FD22 BD14  
+[State 100, 1];初速　　Gからー
+type = VelSet
+triggerall = palno = var(42)
+trigger1 = time = 0
+x = ifelse(var(2) = 1,30,24) * 0.5
+
+[State 100, 1];初速 のーまる
+type = VelSet
+triggerall = palno != var(42)
+trigger1 = time = 0
+x = ifelse(var(2) = 1,11,9.6) * 0.5
+
+;------ザッパノーマル最大速度16まで確認
+;------GOLD２８まで確認
+[State 100, 1];速度UP　最大はいくつ？仮に   16
+type = Veladd
+trigger1 = palno != var(42) && vel x <= 8
+trigger2 = palno = var(42) && vel x <= 14
+x = 0.14
+
+[State 100, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 100, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State -3, voice];足音
+type = PlaySnd
+trigger1 = time % 12 = 0
+value = s50,2
+channel = 2
+
+[state 100x,atc efe];ダッシュエフェクト
+type = Explod
+triggerall = numexplod(100) <= 6
+trigger1 = time % 10 = 0
+anim =6100;f801
+ID = 100
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+
+[State 100, 4];ジャンプへ　前だと速度に応じてとんでもなくとぶ・・ADD?
+type = ChangeState
+triggerall = time >= 1
+trigger1 = command = "holdup"
+value = 40
+
+[State 100, 4];2F以降前以外はいると停止へ
+type = ChangeState
+triggerall = time >= 1
+trigger1 = command != "holdfwd"
+value = 99
+
+;----------------------------------AIR　前ダッシュ18F,17.5DOT 6F行動不能バックも
+;------ジャンプ上昇中だったら１枚目のアニメではまだＹかかっている？ SLは２０Ｆ？
+;---[Ｙが０を持続]するのがの間なのが#R18Ｆ，SL20Ｆ?  最初３Ｆは準備時間だよ
+[Statedef 102]
+type    = A
+physics = n
+anim = 102
+sprpriority = 0
+ctrl = 0
+Hitcountpersist = 1
+
+[State 100, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+flag2 = NoAutoTurn
+
+[State 100, 1];ダッシュ回数カウント
+type = Varadd
+trigger1 = time = 0
+var(7) = 1
+
+[State 42, 8];2ジャンプ不能に
+type = Varset
+trigger1 = Time = 0
+var(15) = 2
+ignorehitpause = 1
+
+[State 100, 1];ダッシュフラグ
+type = Varset
+trigger1 = time = 0
+var(17) = 1
+
+;----------モードによる移動速度など これを２で割った数字
+;----通常			
+;前3.35	後3.25	FD9.6	BD14	AFD14 	ABD14	FJ7.5 FHJ6 BJ5 bhj5
+;----GGモード	20%UP?		
+;前4	後4 	FD11 	BD17 	AFD19 	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----Gカラー			
+;前8	後6	FD24	BD24	AFD17	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----GG+Gカラー			
+;前10	後7	FD30	BD29	AFD20	ABD20 FJ8 FHJ6 BJ8 bhj5
+[State 100, 1];Ｘ速度	
+type = Velset
+triggerall = palno = var(42)
+trigger1 = time = 0
+x = ifelse(var(2) = 1,20,17) * 0.5
+
+[State 100, 1];Ｘ速度 NOTGC	
+type = Velset
+triggerall = palno != var(42)
+trigger1 = time = 0
+x = ifelse(var(2) = 1,19,14) * 0.5
+
+[State 100, 1];Y上昇中ならかかる
+type = Veladd
+triggerall = vel y < 0
+trigger1 = animelemtime(3) < 0
+y = fvar(9)
+
+[State 100, 1];・・Y固定にする
+type = Velset
+trigger1 = vel y >= 0
+trigger1 = time = 0
+trigger2 = animelem = 3
+y = 0
+
+[state 100x,atc efe];ダッシュエフェクト
+type = Explod
+trigger1 = time  = 0
+anim =6105
+ID = 100
+postype = p1
+pos = 10,-55
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+persistent  =0
+scale = 0.5,0.5
+
+[state 100x,atc efe];ダッシュエフェクト 粒
+type = Explod
+trigger1 = numexplod(101) <= 15
+trigger1 = time <= 20
+anim =6106
+ID = 101
+postype = p1
+pos = -5,-55
+random = 20,40
+sprpriority = -2
+bindtime = 1
+removetime = 15
+ownpal=1
+scale = 0.1 + (random % 3 * 0.1), 0.1 + (random % 3 * 0.1)
+accel  = -0.2 - (random % 4 * 0.1),0
+
+;------REは20、他は20?
+[State 100, 1];ダッシュ擦継続カウントV6に変更  最初の4Fは除く  減らして1のときにmulするので1ふやす
+type = Varset
+trigger1 = time = 0
+var(6) = 21;ifelse(vaR(1) = 1,21,25)
+
+[State 100, 4];この時点でフリーに V6カウントは2残ってる
+type = Changestate
+trigger1 = time = 20
+value = 51
+anim = 41
+
+;---------------------------------------------------------------------------
+; RUN_BACK	バックステップ無敵7F	14F
+[Statedef 105]
+type    = A
+physics = N
+ctrl = 0
+anim = 105
+sprpriority = 0
+Hitcountpersist = 1
+
+;---------------あぶね
+[State -3, damage s]
+type = PlaySnd
+trigger1 = time = 0
+value = s105, ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+;----------モードによる移動速度など これを２で割った数字
+;----通常			
+;前3.35	後3.25	FD9.6	BD14	AFD14 	ABD14	FJ7.5 FHJ6 BJ5 bhj5
+;----GGモード	20%UP?		
+;前4	後4 	FD11 	BD17 	AFD19 	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----Gカラー			
+;前8	後6	FD24	BD24	AFD17	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----GG+Gカラー			
+;前10	後7	FD30	BD29	AFD20	ABD20 FJ8 FHJ6 BJ8 bhj5
+[State 105, 1]
+type = VelSet
+triggerall = palno = var(42)
+trigger1 = Time = 0
+x = ifelse(var(2) = 1,-29,-24) * 0.5
+
+[State 105, 1]
+type = VelSet
+triggerall = palno != var(42)
+trigger1 = Time = 0
+x = ifelse(var(2) = 1,-17,-14) * 0.5
+
+[State 105, 1]
+type = VelSet
+trigger1 = Time = 0
+y = -1.9;const(velocity.run.back.y)
+
+[State 105, 1];7F無敵
+type = nothitby
+trigger1 = Time = 0
+value = sca
+time = 10
+ignorehitpause = 1
+
+[State 105, 3];13
+type = veladd
+trigger1 = 1
+y = 0.33
+
+[State 105, 3];最後の１Fは１０６で？
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 106
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; RUN_BACK2 (land)  1Fのみ
+[Statedef 106]
+type    = S
+physics = S
+ctrl = 0
+Hitcountpersist = 1
+
+[State 2050,  snd];システム着地
+type = PlaySnd
+trigger1 = time = 0
+value = s50,9
+channel = 3
+
+[State 106, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+x = 0
+
+[State 106, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = 1
+anim =6047
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = 1
+anim =6047
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = 1
+anim =6047
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+
+[State 106, 4]
+type = ChangeState
+trigger1 = Time >= 1
+value = 0
+ctrl = 1
+
+;----------------------------------AIR　後ろダッシュ
+;------ジャンプ上昇中だったら１枚目のアニメではまだＹかかっている？
+[Statedef 107]
+type    = A
+physics = n
+anim = 107
+sprpriority = 0
+ctrl = 0
+Hitcountpersist = 1
+
+[State 100, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+flag2 = NoAutoTurn
+
+[State 100, 1];ダッシュ回数カウント
+type = Varadd
+trigger1 = time = 0
+var(7) = 1
+
+[State 42, 8];2ジャンプ不能に
+type = Varset
+trigger1 = Time = 0
+var(15) = 2
+ignorehitpause = 1
+
+[State 100, 1];ダッシュフラグ
+type = Varset
+trigger1 = time = 0
+var(17) = -1
+
+;----------モードによる移動速度など これを２で割った数字
+;----通常			
+;前3.35	後3.25	FD9.6	BD14	AFD14 	ABD14	FJ7.5 FHJ6 BJ5 bhj5
+;----GGモード	20%UP?		
+;前4	後4 	FD11 	BD17 	AFD19 	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----Gカラー			
+;前8	後6	FD24	BD24	AFD17	ABD16.5	FJ8  FHJ6 BJ8 bhj5
+;----GG+Gカラー			
+;前10	後7	FD30	BD29	AFD20	ABD20 FJ8 FHJ6 BJ8 bhj5
+[State 100, 1];Ｘ速度	
+type = Velset
+triggerall = palno = var(42)
+trigger1 = time = 0
+x = ifelse(var(2) = 1,-20,-16.5) * 0.5
+
+[State 100, 1];Ｘ速度17.5	
+type = Velset
+triggerall = palno != var(42)
+trigger1 = time = 0
+x = ifelse(var(2) = 1,-16.5,-14) * 0.5
+
+[State 100, 1];Y上昇中Y
+type = Veladd
+triggerall = vel y < 0
+trigger1 = animelemtime(3) < 0
+y = fvar(9)
+
+[State 100, 1];3枚目でＹ０固定
+type = Velset
+trigger1 = vel y >= 0
+trigger1 = time = 0
+trigger2 = animelem = 3
+y = 0
+
+[state 100x,atc efe];ダッシュエフェクト
+type = Explod
+trigger1 = time  = 0
+anim =6105
+ID = 100
+postype = p1
+pos = 10,-55
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+persistent  =0
+scale = 0.5,0.5
+
+[state 100x,atc efe];ダッシュエフェクト 粒
+type = Explod
+trigger1 = numexplod(101) <= 15
+trigger1 = time <= 20
+anim =6106
+ID = 101
+postype = p1
+pos = -5,-55
+random = 20,40
+sprpriority = -2
+bindtime = 1
+removetime = 15
+ownpal=1
+scale = 0.1 + (random % 3 * 0.1), 0.1 + (random % 3 * 0.1)
+accel  = -0.2 - (random % 4 * 0.1),0
+
+;-----
+[State 100, 1];ダッシュ摩擦継続カウントV6に変更
+type = Varset
+trigger1 = time = 0
+var(6) = 15
+
+;-----------??REでは10それとも解釈の違い？ 
+;----
+[State 100, 4];ふりーへ 512F横すべりである
+type = Changestate
+trigger1 = time = 14
+value = 51
+anim = 41
+
+;---------------------------------------------------------------------------
+; RUN_UP			未使用
+[Statedef 110]
+type    = S
+physics = N
+
+[State 110, 0]
+type = CtrlSet
+trigger1 = Time = 0
+value = 0
+
+[State 110, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 110
+
+[State 110, 2]
+type = HitBy
+trigger1 = Time = 0
+value = SCA, NT, ST, HT
+time = 30
+
+[State 110, 3]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+z = -7
+
+[State 110, 4]
+type = VelMul
+trigger1 = 1
+z = 0.8
+
+[State 110, 5]
+type = VelSet
+trigger1 = AnimTime = -8
+z = 0
+
+[State 110, 7]
+type = CtrlSet
+trigger1 = AnimTime = 0
+value = 1
+
+[State 110, 8]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; RUN_DOWN
+[Statedef 115]
+type    = S
+physics = N
+
+[State 115, 0]
+type = CtrlSet
+trigger1 = Time = 0
+value = 0
+
+[State 115, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 110
+
+[State 115, 2]
+type = HitBy
+trigger1 = Time = 0
+value = SCA, NT, ST, HT
+time = 30
+
+[State 115, 3]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+z = 7
+
+[State 115, 4]
+type = VelMul
+trigger1 = 1
+z = 0.8
+
+[State 115, 5]
+type = VelSet
+trigger1 = AnimTime = -8
+z = 0
+
+[State 115, 7]
+type = CtrlSet
+trigger1 = AnimTime = 0
+value = 1
+
+[State 115, 8]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+;-------------------------------------------------------------------------WINのみの命令あるため--EFE.cnsに格納
+; GUARD (start)	ガード準備　レバーおしっぱでいれば待機130へ、認識距離外、レバーはなしで140(終了へ）
+;------------------おそらくCTRLがあってレバー後ろ方向をおすとここにくるシステム	自動着地が52いくのと同じように？
+;-------------つまり、かならずここを経由する？ガードすると一瞬でチェんステするけど～
+;------通常ガード	HITTIME-1　これは相手依存でいいと思うが、空中ガードは設定-1
+;------直前ガード	硬直2～4減少(Air6-11)ノックバックが短くなる、のは早く回復してその分下がらないから？受付８、再受付30必要
+;------ＦＤガード	硬直が1～2増加(Air2-4)
+;---------こんなんだれも設定してないよーきっと。commonで設定するべき?、普通攻撃側だよね
+;---------------------------------------------------------------------------
+
+
+
+
+
+;---------------------------------------------------------------------------
+; LOSE (Time over)	時間切れでまけるとここ
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; DRAWGAME (Time over)ドロー、専用のが無ければ170に移動
+[Statedef 175]
+type = S
+ctrl = 0
+velset = 0,0
+
+[State 175, 1] ; If no anim, use go to lose state.
+type = ChangeState
+trigger1 = Time = 0
+trigger1 = !SelfAnimExist(175)
+value = 170
+
+[State 175, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 175
+
+[State 175, 3]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; PREINTRO		イントロダクション。さまざまな演出を。
+;-------------------------
+[Statedef 190]
+type = S
+ctrl = 0
+velset = 0,0
+
+[State 190, 1]
+type = ChangeAnim
+trigger1 = SelfAnimExist(190)
+value = 190
+
+[State 190, 2] ;Go straight to intro.
+type = ChangeState
+trigger1 = Time = 0
+value = 191
+
+;---------------------------------------------------------------------------
+; INTRO (override this state to give character an intro)
+[Statedef 191]
+type = S
+ctrl = 0
+
+[State 191, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 0
+
+;------------------------------------p2stateno使用時の仕方なく使用するステート　すぐに戻すの
+[Statedef 4999]
+type    = U
+movetype= H
+physics = U
+
+[State 5000, 2];対象外強制戻し
+type = selfstate
+triggerall = statetype = L
+trigger1 = Time = 0
+value = 5080
+ignroehitpause = 1
+
+[State 5000, 2];対象外強制戻し
+type = selfstate
+triggerall = statetype = A
+trigger1 = Time = 0
+value = 5020
+ignroehitpause = 1
+
+[State 5000, 2];対象外強制戻し
+type = selfstate
+triggerall = statetype = S || statetype = C
+triggerall = gethitvar(type) = 3
+trigger1 = Time = 0
+value = 5070
+ignroehitpause = 1
+
+[State 5000, 2];対象外強制戻し
+type = selfstate
+triggerall = statetype = C
+trigger1 = Time = 0
+value = 5010
+ignroehitpause = 1
+
+[State 5000, 2];対象外強制戻し
+type = selfstate
+trigger1 = Time = 0
+value = 5000
+ignroehitpause = 1
+
+;------------------------------------以下-食らいシステム
+;-----ぱっぱは悪霊にも青あり、本体が食らいになるが。。、
+;--らおうはいい、本体セットだから。
+;---剣と幽霊は位置がずれる。ゆえに青もずれる、赤もずれる。
+;---へるぱが食らったとき本体連動でうまく本体食らいにできるか？
+;---VARたりない、HITPAUSETIMEうまくいかない。p2statenoの攻撃はあたらない
+;---相手MOVEHITの数値とかどうなるかとか不明？
+;--へるぱのVAR参照とかが一番だけど記述めんどいなー
+;---------------------------------------------------------------------------
+;-----v43に自分カウンタ判定 でヒットストップをのばせばいい。
+; HITG_SHAKE		地上立ちでくらうとここ、硬直	頭くらい5000-　お腹くらい5010-　がある
+[Statedef 5000]
+type    = S
+movetype= H
+physics = N
+velset = 0,0
+
+
+[State 5000, 1] ;Anim for HIT_LIGHT to HIT_HARD　アニメを5000～5002(5010～5012)のどれかにかえる
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = GetHitVar(animtype) != [3,5]
+value = ifelse((GetHitVar(groundtype) = 1),5000,5010) + GetHitVar(animtype)
+
+[State 5000, 2] ;Anim for HIT_BACK		BACK指定のアニメ
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = GetHitVar(animtype) = [3,5]
+value = 5030
+
+[State 5000, 3] ;Anim for HIT_UP/HIT_DIAGUP (only if it exists)　上書きUPとかのアニメ
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = (GetHitVar(animtype) = [4,5]) && (SelfAnimExist(5047 + GetHitVar(animtype)))
+value = 5047 + GetHitVar(animtype) ;5051 - 4 + type
+
+[State 5000, 4] ;Freeze anim	指定アニメで硬直させる
+type = ChangeAnim
+trigger1 = Time > 0
+value = anim
+
+[State 5000, 5] ;State type gets set to aerial if getting hit up 打ち上げだったらA
+type = StateTypeSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(yvel) != 0 || GetHitVar(fall)
+trigger2 = Pos Y != 0
+statetype = a
+
+;-----------------------ガードバランス自前処理：対応キャラ以外のみ
+;--5000立ち5010しゃがみ5020空中5070アシ払い5080ダウンくらい
+[state 7000,];くらいで減らす
+type = varadd
+triggerall = var(49) != 2
+triggerall = var(19) > 0
+trigger1 = time = 0
+var(19) = -1 * ifelse(gethitvar(animtype) = 0,8,ifelse(gethitvar(animtype) = 1,7,6))
+ignorehitpause = 1
+persistent = 0
+
+;---------------------------ここから自前カウンターHITSTOｐ増加
+;----自カウンタ判定43　対応キャラ判定49＝2
+[State 5000, 6];var(43)が１になってたら　増加分とをたして・・ 増加するのはL2から,MID以上にしておく
+type = varset
+triggerall = time = 0 
+triggerall = var(43) = 1 && var(49) != 2
+trigger1 = gethitvar(animtype) = [1,3]
+var(43) = gethitvar(hitshaketime) + gethitvar(animtype) * 3 
+ignorehitpause = 1
+persistent = 15
+
+[State 3400,];カウンタ時の色かえ
+type = PALFX
+triggerall = time = 0 
+trigger1 = var(43) && var(49) != 2
+add = 255,-130, -108
+time = 5
+ignorehitpause = 1
+persistent = 0
+
+[state 3400,];カウンター音とか	HITPAUSEちゅうにでればいいからd、最初に出る必要は無い最初は相手の判断できない
+type = playsnd
+triggerall = time = 0
+trigger1 = var(43) && var(49) != 2
+value = s60,11
+channel = 11
+ignorehitpause = 1
+persistent = 0
+
+[State 5000, 6];var(43)  これのクリップボード表示は前Fので、まにあってないから1で動き出せばあってるはず
+type = varadd
+trigger1 = var(43) > 0 
+var(43) = -1
+ignorehitpause = 1
+
+;--------------でもってV43が０になればOK 0だったらそのまま０だしね
+[State 5000, 6];PAUSETIME終了してY方向が0でFALLでもないと地上ノックバック
+type = ChangeState
+trigger1 = !var(43) && HitShakeOver
+trigger1 = GetHitVar(yvel) = 0 && !GetHitVar(fall)
+value = 5001 ;HITG_SLIDE
+
+[State 5000, 7];上にあてはまってなければ吹き飛び
+type = ChangeState
+trigger1 = !var(43) && HitShakeOver
+value = 5030
+
+[State 5000, FFB Light]
+type = ForceFeedback
+trigger1 = anim = 5000
+trigger2 = anim = 5010
+persistent = 0
+time = 6
+waveform = square
+
+[State 5000, FFB Medium]
+type = ForceFeedback
+trigger1 = anim = 5001
+trigger2 = anim = 5011
+persistent = 0
+time = 8
+waveform = sinesquare
+ampl = 110,-1,-.3
+
+[State 5000, FFB Hard]
+type = ForceFeedback
+trigger1 = anim = 5012
+trigger2 = anim = 5002
+trigger3 = anim = 5030
+persistent = 0
+time = 15
+waveform = sinesquare
+ampl = 140
+
+;---------------------------------------------------------------------------
+; HITG_SLIDE		地上ノックバック
+[Statedef 5001]
+type    = S
+movetype= H
+physics = S
+
+[State 5001, 1];相手のHITDEFのVELを有効に		速度を１にしてるのではなく、真・設定を有効にしろ、という意味？
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 5001, 2];5000～とかがおわったら5005（5015)にする 設定によってはこのアニメ使うまもなく終了するが。
+type = ChangeAnim
+trigger1 = AnimTime = 0
+value = 5005 + GetHitVar(animtype) + (GetHitVar(groundtype)=2)*10
+
+[State 5001, 3] ;Stop sliding back	スライドタイムの間
+type = VelMul
+trigger1 = Time >= GetHitVar(slidetime)
+x = .6
+
+[State 5001, 4]
+type = VelSet
+trigger1 = HitOver
+x = 0
+
+[State 5001, 5]
+type = DefenceMulSet
+trigger1 = HitOver
+value = 1
+
+
+[State 5001, 6]
+type = ChangeState
+trigger1 = HitOver
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; HITC_SHAKE		しゃがみ硬直
+[Statedef 5010]
+type    = C
+movetype= H
+physics = N
+velset = 0,0
+
+
+[State 5000, LL2]; lunatic lyra ver2
+type = Changestate
+trigger1 = ishelper(200)
+value = 1710
+ignorehitpause = 1
+
+[State 5010, 1] ;Anim for HIT_LIGHT to HIT_HARD
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = GetHitVar(animtype) != [3,5]
+value = 5020 + GetHitVar(animtype)
+
+[State 5010, 2] ;Anim for HIT_BACK
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = GetHitVar(animtype) = [3,5]
+value = 5030
+
+[State 5010, 3] ;Anim for HIT_UP/HIT_DIAGUP (only if it exists)
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = (GetHitVar(animtype) = [4,5]) && (SelfAnimExist(5047 + GetHitVar(animtype)))
+value = 5047 + GetHitVar(animtype) ;5051 - 4 + type
+
+[State 5010, 4] ;Freeze anim
+type = ChangeAnim
+trigger1 = Time > 0
+value = anim
+
+[State 5010, 5] ;State type gets set to aerial if getting hit up
+type = StateTypeSet
+triggerall = Time = 0
+trigger1 = GetHitVar(yvel) != 0 || GetHitVar(fall)
+trigger2 = Pos Y != 0
+statetype = a
+
+;-----------------------ガードバランス自前処理：対応キャラ以外のみ
+;--5000立ち5010しゃがみ5020空中5070アシ払い5080ダウンくらい
+[state 7000,];くらいで減らす
+type = varadd
+triggerall = var(49) != 2
+triggerall = var(19) > 0
+trigger1 = time = 0
+var(19) = -1 * ifelse(gethitvar(animtype) = 0,8,ifelse(gethitvar(animtype) = 1,7,6))
+ignorehitpause = 1
+persistent = 0
+
+;---------------------------ここから自前カウンターHITSTOｐ増加
+;----自カウンタ判定43　対応キャラ判定49＝2
+[State 5000, 6];var(43)が１になってたら　増加分とをたして・・ 増加するのはL2から,MID以上にしておく
+type = varset
+triggerall = time = 0 
+triggerall = var(43) = 1 && var(49) != 2
+trigger1 = gethitvar(animtype) = [1,3]
+var(43) = gethitvar(hitshaketime) + gethitvar(animtype) * 3 
+ignorehitpause = 1
+persistent = 15
+
+[State 3400,];カウンタ時の色かえ
+type = PALFX
+triggerall = time = 0 
+trigger1 = var(43) && var(49) != 2
+add = 255,-130, -108
+time = 5
+ignorehitpause = 1
+persistent = 0
+
+[state 3400,];カウンター音とか	HITPAUSEちゅうにでればいいからd、最初に出る必要は無い最初は相手の判断できない
+type = playsnd
+triggerall = time = 0
+trigger1 = var(43) && var(49) != 2
+value = s60,11
+channel = 11
+ignorehitpause = 1
+persistent = 0
+
+[State 5000, 6];var(43)  これのクリップボード表示は前Fので、まにあってないから1で動き出せばあってるはず
+type = varadd
+trigger1 = var(43) > 0 
+var(43) = -1
+ignorehitpause = 1
+
+[State 5010, 6]
+type = ChangeState
+trigger1 = !var(43) && HitShakeOver
+trigger1 = GetHitVar(yvel) = 0 && !GetHitVar(fall)
+value = 5011 ;HITC_SLIDE
+
+[State 5010, 7]
+type = ChangeState
+trigger1 = !var(43) && HitShakeOver
+value = 5030
+
+[State 5010, FFB Light]
+type = ForceFeedback
+trigger1 = anim = 5020
+persistent = 0
+time = 6
+waveform = square
+
+[State 5010, FFB Medium]
+type = ForceFeedback
+trigger1 = anim = 5021
+persistent = 0
+time = 8
+waveform = sinesquare
+ampl = 110,-1,-.3
+
+[State 5010, FFB Hard]
+type = ForceFeedback
+trigger1 = anim = 5022
+persistent = 0
+time = 15
+waveform = sinesquare
+ampl = 140
+
+;---------------------------------------------------------------------------
+; HITC_SLIDE		しゃがみノックバック
+[Statedef 5011]
+type    = C
+movetype= H
+physics = C
+
+[State 5011, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 5011, 2]
+type = ChangeAnim
+trigger1 = AnimTime = 0
+value = 5025 + GetHitVar(animtype)
+
+[State 5011, 3] ;Stop sliding back
+type = VelMul
+trigger1 = Time >= GetHitVar(slidetime)
+x = .6
+
+[State 5011, 4]
+type = VelSet
+trigger1 = HitOver
+x = 0
+
+[State 5011, 5]
+type = DefenceMulSet
+trigger1 = HitOver
+value = 1
+
+[State 5011, 6]
+type = ChangeState
+trigger1 = HitOver
+value = 11
+ctrl = 1
+
+
+;---------------------------------------------------------------------------
+; HITA_SHAKE			空中ヒット硬直
+[Statedef 5020]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+
+[State 5000, LL2]; lunatic lyra ver2
+type = Changestate
+trigger1 = ishelper(200)
+value = 1710
+ignorehitpause = 1
+
+;----------GGだと5030のみしかなくない？
+[State 5020, 1] ;Anim for HIT_LIGHT to HIT_HARD　　AIR.TYPEによる。省略だとGORUND.TYPE？
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 =0; GetHitVar(animtype) != [3,5]
+value = ifelse((GetHitVar(airtype) = 1),5000,5010) + GetHitVar(animtype)
+
+[State 5020, 2] ;Anim for HIT_BACK
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = 1;GetHitVar(animtype) = [3,5]
+value = 5030
+
+[State 5020, 3] ;Anim for HIT_UP/HIT_DIAGUP (only if it exists)
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = (GetHitVar(animtype) = [4,5]) && (SelfAnimExist(5047 + GetHitVar(animtype)))
+value = 5047 + GetHitVar(animtype) ;5051 - 4 + type
+
+[State 5020, 4] ;Freeze anim
+type = ChangeAnim
+trigger1 = Time > 0
+value = anim
+
+;-----------------------ガードバランス自前処理：対応キャラ以外のみ
+;--5000立ち5010しゃがみ5020空中5070アシ払い5080ダウンくらい
+[state 7000,];くらいで減らす
+type = varadd
+triggerall = var(49) != 2
+triggerall = var(19) > 0
+trigger1 = time = 0
+var(19) = -1 * ifelse(gethitvar(animtype) = 0,8,ifelse(gethitvar(animtype) = 1,7,6))
+ignorehitpause = 1
+persistent = 0
+
+;---------------------------ここから自前カウンターHITSTOｐ増加
+;----自カウンタ判定43　対応キャラ判定49＝2
+[State 5000, 6];var(43)が１になってたら　増加分とをたして・・ 増加するのはL2から,MID以上にしておく
+type = varset
+triggerall = time = 0 
+triggerall = var(43) = 1 && var(49) != 2
+trigger1 = gethitvar(animtype) = [1,3]
+var(43) = gethitvar(hitshaketime) + gethitvar(animtype) * 3 
+ignorehitpause = 1
+persistent = 15
+
+[State 3400,];カウンタ時の色かえ
+type = PALFX
+triggerall = time = 0 
+trigger1 = var(43) && var(49) != 2
+add = 255,-130, -108
+time = 5
+ignorehitpause = 1
+persistent = 0
+
+[state 3400,];カウンター音とか	HITPAUSEちゅうにでればいいからd、最初に出る必要は無い最初は相手の判断できない
+type = playsnd
+triggerall = time = 0
+trigger1 = var(43) && var(49) != 2
+value = s60,11
+channel = 11
+ignorehitpause = 1
+persistent = 0
+
+[State 5000, 6];var(43)  これのクリップボード表示は前Fので、まにあってないから1で動き出せばあってるはず
+type = varadd
+trigger1 = var(43) > 0 
+var(43) = -1
+ignorehitpause = 1
+
+[State 5020, 5];当然、無条件で空中吹き飛びになる
+type = ChangeState
+trigger1 = !var(43) && HitShakeOver
+value = 5030
+
+[State 5020, FFB Light]
+type = ForceFeedback
+trigger1 = anim = 5000
+trigger2 = anim = 5010
+persistent = 0
+time = 6
+waveform = square
+
+[State 5020, FFB Medium]
+type = ForceFeedback
+trigger1 = anim = 5001
+trigger2 = anim = 5011
+persistent = 0
+time = 8
+waveform = sinesquare
+ampl = 110,-1,-.3
+
+[State 5020, FFB Hard]
+type = ForceFeedback
+trigger1 = anim = 5012
+trigger2 = anim = 5002
+trigger3 = anim = 5030
+trigger4 = anim = [5051,5059]
+persistent = 0
+time = 15
+waveform = sinesquare
+ampl = 140
+
+;---------------------------------------------------------------------------
+; HITA_UP (initial going up)	吹き飛びステート、重力かかる
+[Statedef 5030]
+type    = A
+movetype= H
+physics = N
+ctrl = 0
+
+[State 5030, 1];HITDEF設定の重力を使用する
+type = VelAdd;Gravity
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 5030, 2];HITDEF設定の速度を　「有効」に。１にするわけではない。
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+[State 5030, 3];FALL=0なら自動復帰になる
+type = ChangeState
+triggerall = !HitFall
+trigger1 = HitOver
+trigger2 = Vel Y > 0    ;Hit ground
+trigger2 = Pos Y >= 10  ;.
+value = 5040 ;HITA_RECOV
+
+[State 5030, 4];FAL=1ならおちる
+type = ChangeState
+triggerall = HitFall
+trigger1 = HitOver
+trigger2 = Vel Y > 0    ;Hit ground
+trigger2 = Pos Y >= 10  ;.
+value = 5050 ;HITA_FALL
+
+[State 5030, 5];５０３０アニメが終わったら・・
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 5035 ;HITA_UP (transition)
+
+;---------------------------------------------------------------------------
+; HITA_UP_T (transition)	一応くるが、たいてい5035アニメを設定されてない。ので5040,505にすぐ移動
+[Statedef 5035]
+type    = A
+movetype= H
+physics = N
+
+[State 5035, 1];5035のアニメがあり、5051～5059でなく5090でもなければチェンジアニメ
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = SelfAnimExist(5035)
+trigger1 = Anim != [5051,5059] ;Not if in hit up anim
+trigger1 = Anim != 5090 ;Not if hit off ground anim
+value = 5035
+
+[State 5035, 2]
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 5035, 3]
+type = ChangeState
+triggerall = !HitFall
+trigger1 = HitOver  ;Hit is over
+trigger2 = AnimTime = 0 ;Animation over
+trigger3 = Vel Y > 0    ;Hit ground
+trigger3 = Pos Y >= 10  ;.
+trigger4 = Time = 0     ;No transition anim
+trigger4 = Anim != 5035 ;.
+value = 5040 ;HITA_RECOV
+
+[State 5035, 4]
+type = ChangeState
+triggerall = HitFall
+trigger1 = HitOver  ;Hit is over
+trigger2 = AnimTime = 0 ;Anim is over
+trigger3 = Vel Y > 0    ;Hit ground
+trigger3 = Pos Y >= 10  ;.
+trigger4 = Time = 0     ;No transition anim
+trigger4 = Anim != 5035 ;.
+value = 5050 ;HITA_FALL
+
+;---------------------------------------------------------------------------
+; HITA_RECOV (recovering in air, not falling)空中自動回復、GGではまずない(全部FALL)SNK,CAP系には良く見られる
+[Statedef 5040]
+type    = A
+movetype= H
+physics = N
+
+[State 5040, 1]
+type = turn
+trigger1 = time = 0
+trigger1 = p2dist x < 0
+
+[State 5040, 1]
+type = ChangeState
+trigger1 = !Alive
+value = 5050
+
+[State 5040, 2]
+type = ChangeAnim
+triggerall = anim != 41
+trigger1 = AnimTime = 0
+trigger1 = Anim != 5040
+trigger2 = Time = 0
+trigger2 = Anim != 5035
+value = 5040
+
+[State 5040, 2];もどし
+type = Changestate
+trigger1 = Anim = 5040
+trigger1 = AnimTime = 0
+value = 51
+anim = 41
+
+[State 5040, 3]
+type = CtrlSet
+trigger1 = HitOver
+value = 1
+
+[State 5040, 4]
+type = StateTypeSet
+trigger1 = HitOver
+movetype = I
+
+[State 5040, 5]
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 5040, 6]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 52 ;JUMPLAND
+
+;---------------------------------------------------------------------------
+; HITA_FALL (knocked up, falling)		落ちる
+[Statedef 5050]
+type    = A
+movetype= H
+physics = N
+
+;-1:アニメが5035終了　2:5035でなく5051-5059,5061-5069,5090でなければ5050にかえる->　5030はOK
+[State 5050, 1] ;Change anim when done with transition
+type = ChangeAnim
+trigger1 = AnimTime = 0
+trigger1 = Anim = 5035
+trigger2 = Time = 0     ;If no transition anim
+trigger2 = Anim != 5035
+trigger2 = (Anim != [5051, 5059]) && (Anim != [5061, 5069])
+trigger2 = Anim != 5090 ;Not if hit off ground anim
+value = 5050
+
+;---5051のが5050より早いタイミングでが5061(5060)にいく上昇中にちぇんあに
+[State 5050, 2] ;Coming down anim5050-5059で頂点すぎるころ、5050ならyが1、それ以外-2で5060になる(5060があれば)
+type = ChangeAnim
+trigger1 = anim = [5050,5059]
+trigger1 = Vel Y >= ifelse(anim = 5050, 1, -2)
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+persistent = 0
+
+[State 5050, 3] ;Gravity
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 5050, 4] ;Recover near ground	地上近くではニュートラル復帰不能
+type = ChangeState
+triggerall = 1;Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+trigger1 = Command = "holdfwd" || command = "holdback"
+value = 5200 ;HITFALL_RECOVER
+
+[State 5050, 5]; Recover in mid air
+type = ChangeState
+triggerall = 1;Vel Y > -1
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State 5050, 6];
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= ifelse((anim = [5051,5059]) || (anim = [5061,5069]), 0, 25)
+value = 5100 ;HIT_BOUNCE
+
+;---------------------------------------------------------------------------
+; HIT_TRIP (shaking)	TRIP設定なら強制ココスタート特殊、GGうつぶせダウンになる5100などの設定をいじるひつようあり
+[Statedef 5070]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+[State 5070, 1]
+type = ChangeAnim 
+trigger1 = 1
+value = 5070
+
+;-----------------------ガードバランス自前処理：対応キャラ以外のみ
+;--5000立ち5010しゃがみ5020空中5070アシ払い5080ダウンくらい
+[state 7000,];くらいで減らす
+type = varadd
+triggerall = var(49) != 2
+triggerall = var(19) > 0
+trigger1 = time = 0
+var(19) = -1 * ifelse(gethitvar(animtype) = 0,8,ifelse(gethitvar(animtype) = 1,7,6))
+ignorehitpause = 1
+persistent = 0
+
+;---------------------------ここから自前カウンターHITSTOｐ増加
+;----自カウンタ判定43　対応キャラ判定49＝2
+[State 5000, 6];var(43)が１になってたら　増加分とをたして・・ 増加するのはL2から,MID以上にしておく
+type = varset
+triggerall = time = 0 
+triggerall = var(43) = 1 && var(49) != 2
+trigger1 = gethitvar(animtype) = [1,3]
+var(43) = gethitvar(hitshaketime) + gethitvar(animtype) * 3 
+ignorehitpause = 1
+persistent = 15
+
+[State 3400,];カウンタ時の色かえ
+type = PALFX
+triggerall = time = 0 
+trigger1 = var(43) && var(49) != 2
+add = 255,-130, -108
+time = 5
+ignorehitpause = 1
+persistent = 0
+
+[state 3400,];カウンター音とか	HITPAUSEちゅうにでればいいからd、最初に出る必要は無い最初は相手の判断できない
+type = playsnd
+triggerall = time = 0
+trigger1 = var(43) && var(49) != 2
+value = s60,11
+channel = 11
+ignorehitpause = 1
+persistent = 0
+
+[State 5000, 6];var(43)  これのクリップボード表示は前Fので、まにあってないから1で動き出せばあってるはず
+type = varadd
+trigger1 = var(43) > 0 
+var(43) = -1
+ignorehitpause = 1
+
+[State 5070, 2]
+type = ChangeState
+trigger1 = !var(43) && HitShakeOver
+value = 5071
+
+[State 5070, 3]
+type = ForceFeedback
+trigger1 = time = 0
+time = 12
+waveform = sinesquare
+ampl = 140
+
+;---------------------------------------------------------------------------
+; HIT_TRIP2 (fall through air)
+[Statedef 5071]
+type    = A
+movetype= H
+physics = N
+
+[State 5071, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+[State 5071, 2] ;Acceleration
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 5071, 3] ;Hit ground	5100をとばして5110にいくようになっているため、跳ねなくなる。
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 15
+type = ChangeState
+value = 5110
+
+;---------------------------------------------------------------------------
+; HITL_SHAKE		ダウン中に攻撃を食らうとここにくるGGでは5030アニメになる5090省略しておけば自動で5030
+;-------------------------5080は上にとばずその場でぺちっとなるアニメのはず
+;----基本的にGGにぺちになる技なし。全て空中に吹き飛ぶ。
+[Statedef 5080]
+type    = L
+movetype= H
+physics = N
+velset = 0,0
+
+[State 5000, LL2]; lunatic lyra ver2
+type = Changestate
+trigger1 = ishelper(200)
+value = 1710
+ignorehitpause = 1
+
+[State 5080, 1] ;Set default anim	上吹き飛びが0なら5080、吹き飛びなら5090 5090がなければ５０３０勝手に使う
+type = VarSet
+trigger1 = time = 0
+sysvar(2) = ifelse (GetHitVar(yvel) = 0, 5080, 5090)
+
+[State 5080, 2];5081-5089,5111-5119 だったらそのアニメの余りを追加代入　でぃじいらない
+type = VarAdd
+trigger1 = 0;time = 0
+trigger1 = (anim = [5081,5089]) || (anim = [5111,5119])
+trigger1 = SelfAnimExist(sysvar(2) + (anim % 10))
+sysvar(2) = anim % 10
+
+[State 5080, 3] ;If 5090 doesn't exist, default to 5030
+type = VarSet
+trigger1 = time = 0
+trigger1 = sysvar(2) = 5090
+trigger1 = 1;!SelfAnimExist(5090)
+sysvar(2) = 5030
+
+[State 5080, 3] ;Freeze
+type = ChangeAnim
+trigger1 = 1
+value = sysvar(2)
+
+;----------------ガードバランス自前処理	対応キャラ以外	ヒットストップ0対策
+;-----5000立ち5010しゃがみ5020空中5070アシ払い5080ダウンくらい
+[state 7000,];くらいで減らす
+type = varadd
+triggerall = var(49) != 2
+triggerall = var(19) > 0
+trigger1 = time = 0
+var(19) = -1 * ifelse(gethitvar(animtype) = 0,8,ifelse(gethitvar(animtype) = 1,7,6))
+ignorehitpause = 1
+persistent = 0
+
+
+[State 5080, 4];YVELが０なら5081
+type = ChangeState
+trigger1 = HitShakeOver
+trigger1 = GetHitVar(yvel) = 0
+value = 5081 ;HITL_SLIDE
+
+[State 5080, 5];それ以外なら空中吹き飛び
+type = ChangeState
+trigger1 = HitShakeOver
+trigger1 = GetHitVar(yvel) != 0
+value = 5030 ;HITA_UP
+
+;---------------------------------------------------------------------------
+; HITL_SLIDE		ダウン中ヒットバック GGの攻撃なら5080->5030にいくはず 
+[Statedef 5081]
+type    = L
+movetype= H
+physics = C
+
+[State 5081, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 5081, 2]
+type = VelSet
+trigger1 = HitOver
+x = 0
+
+[State 5081, 3] ;Don't show hit ground frame
+type = VarSet
+trigger1 = Time = 0
+sysvar(0) = 1
+
+[State 5081, 4]
+type = ChangeState
+trigger1 = HitOver
+value = 5110 ;HIT_LIEDOWN
+
+;---------------------------------------------------------------------------
+; HIT_BOUNCE (hit ground)	基本5050からくるたたきつけ
+;---------地上にたたきつけられる、地上０固定
+[Statedef 5100]
+type    = L
+movetype= H
+physics = N
+
+[State 5100, 1];上に吹き飛ばないときはX速度を1にする?
+type = VelSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+trigger1 = vel x > 1
+x = 1
+
+[State 5100, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 5100, Var] ;Save fall velocity
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = floor(vel y)
+
+;----------------------------アニメ5100か5101、5102系にかえる
+;-------------GGでは5070->5101   でぃじめい特殊、足払いにのみ1枚余分に絵があるが・・5101にしとく？
+;--人によってはでないしー・・基本commonでもでないはずGG系とりこみ足払いではでなくなるし保留??
+;--
+[State 5100, 2] ;Hit  TRIP anim(GGXX,MB)	
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim = 5070
+trigger2 = prevstateno = 5070
+value = 5101
+
+[State 5100, 2] ;Hit ground anim (normal)5100にかえる
+type = ChangeAnim
+triggerall = time = 0
+triggerall = anim != 5070
+triggerall = anim != 5101
+triggerall = prevstateno != 5070
+trigger1 = (anim != [5051,5059]) && (anim != [5061,5069])
+trigger2 = !SelfAnimExist(5100 + (anim % 10))
+value = 5100
+
+[State 5100, 3] ;Hit ground anim (for hit up)5111-5112にかえる
+type = ChangeAnim
+triggerall = anim != 5070
+triggerall = prevstateno != 5070
+trigger1 = time = 0
+trigger1 = (anim = [5051,5059]) || (anim = [5061,5069])
+trigger1 = SelfAnimExist(5100 + (anim % 10))
+value = 5100 + (anim % 10)
+
+[State 5100, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5100, 5]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 5100, 6] ;Reduce speed
+type = VelMul
+trigger1 = Time = 0
+x = 0.75
+
+[State 5100, 7];上に跳ばない設定なら即5110
+type = ChangeState
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+value = 5110 ;HIT_LIEDOWN
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 1
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 14
+
+[State 5100, 9]
+type = HitFallDamage
+trigger1 = Time = 3
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 1
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 5100, 11]
+type = PosFreeze
+trigger1 = 1
+
+;-----------------------5100アニメがおわったら5101に移動、5100はループ不可である
+[State 5100, 12]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 5101
+
+[State 5100, 13]
+type = ForceFeedback
+trigger1 = Time = 0
+waveform = sinesquare
+ampl = 128,-3,-.2,.005
+time = 20
+
+;---------------------------------------------------------------------------
+; HIT_BOUNCE (bounce into air)5160-5161アニメはループアニメ
+;-----はねる
+[Statedef 5101]
+type    = L
+movetype= H
+physics = N
+
+[State 5101, 1] ;Coming hit ground anim (normal)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim != [5101,5109]
+trigger2 = !SelfAnimExist(5160 + (anim % 10))
+value = 5160
+
+[State 5101, 2] ;Coming hit ground anim (for hit up)  
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim = [5101,5109]
+trigger1 = SelfAnimExist(5160 + (anim % 10))
+value = 5160 + (anim % 10)
+
+[State 5101, 3]
+type = HitFallVel
+trigger1 = Time = 0
+
+[State 5101, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 20
+
+[State 5101, 5] ;Acceleration
+type = VelAdd
+trigger1 = 1
+y = .4
+
+[State 5101, 6] ;Hit ground
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 12
+type = ChangeState
+value = 5110
+
+;---------------------------------------------------------------------------
+; HIT_LIEDOWN 5001または5070から、5001ならアニメは5060系スタート　5070なら5070スタートコレが問題
+;--------------これダウン中、・・システム違ううまくいかない
+;------システム起き上がりの時間を無視してチェンジステート？
+[Statedef 5110]
+type    = L
+movetype= H
+physics = N
+
+[State 5110, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 5110, 1] ;For hit up/up-diag type (from state 5081)
+type = ChangeAnim
+persistent = 0
+trigger1 = SelfAnimExist(5110 + (anim % 10))
+trigger1 = anim = [5081,5089]
+value = 5110 + (anim % 10)
+
+[State 5110, 2] ;Hit ground anim (normal)   
+type = ChangeAnim
+triggerall = time = 0
+triggerall = anim != 5070
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim != [5161,5169]
+trigger2 = !SelfAnimExist(5170 + (anim % 10))
+value = 5170
+
+[State 5110, 3] ;Hit ground anim (for hit up)
+type = ChangeAnim
+triggerall = time = 0
+triggerall = anim != 5070
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim = [5161,5169]
+trigger1 = SelfAnimExist(5170 + (anim % 10))
+value = 5170 + (anim % 10)
+
+[State 5110, 3] ;5070からの場合うつぶせ   
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = prevstateno = [5070,5071]
+trigger2 = anim = 5070
+value = 5171
+
+[State 5110, 4]
+type = HitFallDamage
+trigger1 = Time = 0
+
+[State 5110, 5]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, Var] ;Get fall velocity
+type = VarSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) != 0
+sysvar(1) = floor(vel y)
+
+[State 5110, 6]
+type = PlaySnd
+trigger1 = Time = 0
+trigger1 = !SysVar(0)
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 5110, 7];たたきつけの・・これいらないはず
+type = GameMakeAnim
+trigger1 = 0;Time = 0
+trigger1 = !SysVar(0)
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 14
+
+[State 5110, 8]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, 9] ;For hit up type
+type = ChangeAnim
+persistent = 0
+triggerall = anim = [5171,5179]
+triggerall = SelfAnimExist(5110 + (anim % 10))
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground anim
+value = 5110 + (anim % 10)
+
+[State 5110, 10] ;For normal
+type = ChangeAnim
+persistent = 0
+triggerall = Anim != [5111,5119]
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+value = 5110
+
+[State 5110, 11] ;If just died
+type = ChangeState
+triggerall = !alive
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+trigger3 = Anim = [5110,5119]
+value = 5150
+
+[State 5110, 12]
+type = VarSet
+trigger1 = SysVar(0)
+trigger1 = Time = 0
+sysvar(0) = 0
+
+[State 5110, 13] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+;---------------------イントロ用のではいかないように注意？「ダウンアニメが」11Fたったら起き上がる
+[State 5110, 13] ;システムの起き上がりliedown.timeを無視して起き上がりに飛ばす？
+type = changestate
+triggerall = alive
+triggerall = name = "bridget"
+trigger1 = anim = [5110,5111]
+trigger1 = animtime = 0
+value = 5120
+
+[State 5110, 14]
+type = ForceFeedback
+trigger1 = alive
+trigger1 = Time = 0
+time = 8
+ampl = 240
+waveform = sine
+
+[State 5110, 15]
+type = ForceFeedback
+trigger1 = !alive
+trigger1 = Time = 0
+ampl = 200, 7, -.467
+time = 30
+waveform = sine
+
+;---------------------ぶつけイントロ時、　PREVSTATENOを使うための5110別VER　内容同じ
+[Statedef 5115]
+type    = L
+movetype= H
+physics = N
+
+[State 5110, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 5110, 1] ;For hit up/up-diag type (from state 5081)
+type = ChangeAnim
+persistent = 0
+trigger1 = SelfAnimExist(5110 + (anim % 10))
+trigger1 = anim = [5081,5089]
+value = 5110 + (anim % 10)
+
+[State 5110, 2] ;Hit ground anim (normal)
+type = ChangeAnim
+triggerall = time = 0
+triggerall = anim != 5070
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim != [5161,5169]
+trigger2 = !SelfAnimExist(5170 + (anim % 10))
+value = 5170
+
+[State 5110, 3] ;Hit ground anim (for hit up)
+type = ChangeAnim
+triggerall = time = 0
+triggerall = anim != 5070
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim = [5161,5169]
+trigger1 = SelfAnimExist(5170 + (anim % 10))
+value = 5170 + (anim % 10)
+
+[State 5110, 3] ;5070からの場合うつぶせ
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = prevstateno = [5070,5071]
+trigger2 = anim = 5070
+value = 5171
+
+[State 5110, 4]
+type = HitFallDamage
+trigger1 = Time = 0
+
+[State 5110, 5]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, Var] ;Get fall velocity
+type = VarSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) != 0
+sysvar(1) = floor(vel y)
+
+[State 5110, 6]
+type = PlaySnd
+trigger1 = Time = 0
+trigger1 = !SysVar(0)
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 5110, 7];たたきつけの・・これいらないはず
+type = GameMakeAnim
+trigger1 = 0;Time = 0
+trigger1 = !SysVar(0)
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 14
+
+[State 5110, 8]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, 9] ;For hit up type
+type = ChangeAnim
+persistent = 0
+triggerall = anim = [5171,5179]
+triggerall = SelfAnimExist(5110 + (anim % 10))
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground anim
+value = 5110 + (anim % 10)
+
+[State 5110, 10] ;For normal
+type = ChangeAnim
+persistent = 0
+triggerall = Anim != [5111,5119]
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+value = 5110
+
+[State 5110, 11] ;If just died
+type = ChangeState
+triggerall = !alive
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+trigger3 = Anim = [5110,5119]
+value = 5150
+
+[State 5110, 12]
+type = VarSet
+trigger1 = SysVar(0)
+trigger1 = Time = 0
+sysvar(0) = 0
+
+[State 5110, 13] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+;---------------------イントロ用のではいかないように注意？「ダウンアニメが」11Fたったら起き上がる
+[State 5110, 13] ;システムの起き上がりliedown.timeを無視して起き上がりに飛ばす？
+type = changestate
+triggerall = alive
+triggerall = name = "bridget"
+trigger1 = anim = [5110,5111]
+trigger1 = animtime = 0
+value = 5120
+
+[State 5110, 14]
+type = ForceFeedback
+trigger1 = alive
+trigger1 = Time = 0
+time = 8
+ampl = 240
+waveform = sine
+
+[State 5110, 15]
+type = ForceFeedback
+trigger1 = !alive
+trigger1 = Time = 0
+ampl = 200, 7, -.467
+time = 30
+waveform = sine
+
+
+;---------------------------------------------------------------------------
+; HIT_GETUP	おきあがり。にくるまでのタイム、うつぶせとあおむけでタイムが違うが。
+[Statedef 5120]
+type    = L
+movetype= I
+physics = N
+
+[State 5120, 1a] ;Get up anim (normal)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim != [5111,5119]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = 5120
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim = [5111,5119]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = 5120 + (anim % 10)
+
+[State 5120, 2]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 5120, 3]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5120, 4]
+type = HitFallSet
+trigger1 = AnimTime = 0
+value = 1
+
+[State 5120, 5] ;Can't be thrown right after getting up	おきあがったあとの投げ無敵、9フレームに変更
+type = NotHitBy
+trigger1 = AnimTime = 0
+value = , NT,ST,HT
+time = 9;12
+
+[State 5120, 6] ;Can't be hit right after getting up (short time)
+type = NotHitBy
+trigger1 = AnimTime = 0
+value2 = SCA
+time = 3
+
+
+
+[State 5120, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; HIT_LIEDEAD
+; HIT_LIEDEAD  1p state=0 && ctrl = 1 で 2p state 5150(奪い中でも可)でラウンド終了判定される。
+;　　通常ヨーヨーキャッチ時2度はねしないように注意 varかなにかつかったら？
+;----一撃時アニメを変えないように注意5680からくる
+[Statedef 5150]
+type    = L
+movetype= H
+physics = N
+;sprpriority = -3
+
+[state 5900,attack];でふぇんすむるリセットきくかな？
+type = defencemulset
+trigger1 = time =0
+value = 1
+
+[State 5150, 1] ;表示優先度
+type = sprpriority 
+triggerall = prevstateno != 5680
+trigger1 = 1
+value = -3
+
+[State 5150, 1];一撃必殺時　表示優先度
+type = sprpriority 
+triggerall = prevstateno = 5680
+trigger1 = 1
+value = 12
+
+[State 3660,];一撃必殺時　強制音消し
+type = stopsnd
+trigger1 = prevstateno = 5680
+channel = 0
+ignorehitpause = 1
+
+[State 3660,];一撃必殺時　強制音消し
+type = stopsnd
+trigger1 = prevstateno = 5680
+channel = 10
+ignorehitpause = 1
+
+[State 5150, 1] ;Normal anim
+type = ChangeAnim
+triggerall = prevstateno != 5680
+triggerall = Time = 0
+triggerall = SelfAnimExist(5140)
+trigger1 = (anim != [5111,5119]) && (anim != [5171,5179])
+trigger2 = !SelfAnimExist(5140 + (anim % 10))
+value = 5140
+
+[State 5150, 3] ;Hit up type anim
+type = ChangeAnim
+triggerall = prevstateno != 5680
+trigger1 = Time = 0
+trigger1 = (anim = [5111,5119]) || (anim = [5171,5179])
+trigger1 = SelfAnimExist(5140 + (anim % 10))
+value = 5140 + (anim % 10)
+
+[State 5150, 4] ;Match over anim
+type = ChangeAnim
+persistent = 0
+triggerall = prevstateno != 5680
+;trigger1 = Time = 0
+trigger1 = MatchOver = 1
+trigger1 = Anim = [5140,5149]
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+
+[State 5150, 5] ;Switch to 5110 if liedead anim does not exist
+type = ChangeAnim
+triggerall = prevstateno != 5680
+trigger1 = Time = 0
+trigger1 = Anim != [5140,5159]
+trigger1 = Anim != [5110,5119]
+value = 5110
+
+[State 5150, 6] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 5150, 7] ;Friction
+type = VelSet
+trigger1 = Vel x < .05
+persistent = 0
+x = 0
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150, 5] ;ぶつけイントロへ ２どはねしないように注意
+type = Changestate
+triggerall = prevstateno = 5115
+trigger1 = Time = 123
+value = 5155
+
+;-------------------------------ヨーヨーぶつけ勝利イントロ用
+;--LV3扱いにしとく
+;---速度だけ設定して戻す
+[Statedef 5155]
+type    = A
+movetype= H
+physics = N
+sprpriority = 0
+velset = 0,0
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150, 8];擬似ふるえ
+type = posadd
+trigger1 = 1
+x = ifelse(time % 2 = 0,-2 ,2)
+
+[State 5150, 8];アニメフリーズ
+type = changeanim
+trigger1 = 1
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorehitpause = 1
+
+[State 5150, 8]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 5150, 8]
+type = velset
+trigger1 = time >= 13
+x = -8
+y = -2.5
+
+[State 5150, 8]
+type = selfstate
+trigger1 = time >= 13
+value = 5050
+
+;---------------------------------------------------------------------------
+; HIT_FALLRECOVER (still falling)		地上付近復帰
+;----N復帰不能
+[Statedef 5200]
+type    = A
+movetype= H
+physics = N
+
+[State 5200, 1] ;Change anim if done with transition
+type = ChangeAnim
+trigger1 = Anim = 5035
+trigger1 = AnimTime = 0
+value = 5050
+
+[State 5200, 2]
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 40, 1];レバー格納	ニュートラルはありえない、後ろにしとく？
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = -1
+
+[State 40, 2]
+type = VarSet
+trigger1 = Time = 0
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 40, 3]
+type = VarSet
+trigger1 = Time = 0
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 5200, 3];入力してもしばらくしないと・・受身にいかない？
+type = SelfState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 10
+value = 5201
+
+;---------------------------------------------------------------------------
+; HIT_FALLRECOVER (on the ground)
+[Statedef 5201]
+type    = A
+movetype= H
+physics = A
+anim = 5200
+
+;-------------------------ここで各種憑依がおこなわれる
+;---0,11,5200,5210に同じものを---
+;-------------食らい経由共通抽選
+;-------無の確率はそれなりに高い？4分の１ではなさそう
+;---食らいで-1になってたらやる。 0,1,2,3を抽選しさらに0or1で強制無
+[State 2050,  2];らおう時はやらなくていい
+type = varset
+triggerall = !numhelper(100)
+triggerall = !numhelper(200)
+triggerall = !numhelper(300)
+triggerall = !numhelper(400)
+trigger1 = var(20) = -1 && time = 0
+var(20) =  random % 4 * (random % 2) 
+persistent = 0
+
+[State 2050,  2];保険、前のがまだいた場合・・もしもういたら消す？
+type = varset
+triggerall = var(20) = -1 && time = 0
+trigger1 = numhelper(100) || numhelper(200)
+trigger2 = numhelper(300) || numhelper(400)
+var(20) =  0 
+persistent = 0
+
+[state 1200,light];でもって0より上になってたら実行憑依
+type = Helper
+triggerall = time = 0
+triggerall = var(20) > 0
+trigger1 = !numhelper(var(20) * 100)
+name = "RANDOM"
+ID = var(20) * 100
+pos = 0,0 
+postype = p1
+stateno = var(20) * 200 + 2000
+ownpal = 1
+size.height = var(20) * 100;ID
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+supermovetime = 9999
+
+[State -3, ws];受身効果音 これでないときあり　comonにうつして
+type = PlaySnd
+trigger1 = time = 0
+value = s50,7
+channel = 3
+
+;受身声 	しんでまう
+[State -3, recove voice]
+type = PlaySnd
+trigger1 = Time = 0
+value = s5200,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+parsistent = 0
+channel = 0
+
+[state 7000,test];
+type = Explod
+trigger1 = time = 0
+anim = 6600
+ID = 5200
+pos = 0,-60
+postype = p1
+sprpriority = -4
+bindtime = 1
+removetime = -2
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+persistent = 0
+
+[State 5201, 3]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+;X方向加算　前8  N -6, 後ろ-6  N復帰はADDではなくSETみたい
+;---空ちゅとちがう、D追い討ち時前復帰で０になるってことは8である・・はず
+;----後ろ復帰-8が-14
+[State 5210, 1];
+type = VelAdd
+triggerall = sysvar(1)
+trigger1 = time = 0
+x = ifelse(sysvar(1) = 1,8,-6)
+
+;;Y方向 前37  N? 後ろ-10　２F目のね   NはADDで他はSET? 7 が -1になった？ってことは・・？
+;---前復帰2Fめ１９、初速は-20？
+[State 5210, 1];
+type = Velset
+trigger1 = sysvar(1) = 1
+trigger1 = time = 0
+y = -10
+
+[State 5210, 1];後ろ復帰は-9 -10？set?add?
+type = Velset
+trigger1 = sysvar(1) != 1
+trigger1 = time = 0
+y = -5
+
+[State 5210, 3];0-5	6Fは両方無敵
+type = NotHitBy
+trigger1 = time = 0
+value = SCA.na,np,nt,sa,sp,st,ha,hp,gt
+time = 5
+
+[State 5210, 3];それ以降打撃無敵
+type = NotHitBy
+trigger1 = Time = 5
+value = SCA,na,np,sa,sp,ha,hp
+time = 9
+
+[State 5210, 4];7Fから行動OK
+type = CtrlSet
+trigger1 = Time = 6
+value = 1
+
+[State 5201, 4];攻撃判定ありの降下アニメ（空中投げ用?
+type = changestate
+trigger1 = anim = 5200 && animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+[State 5201, 5] ;Blink white	光るのは7F
+type = PalFX
+trigger1 = Time = 0
+time = 7
+add = 128,128,128 ;256,256,256
+
+[State 5201, 6]
+type = GameMakeAnim
+trigger1 = Time = 1
+value = 60
+pos = 0, 0
+under = 1
+
+;---------------------------------------------------------------------------
+; HIT_AIRFALLRECOVER		空中復帰
+;----前X16 Y37?
+[Statedef 5210]
+type    = A
+movetype= I
+physics = N
+anim = 5210
+ctrl = 0
+
+;-------------------------ここで各種憑依がおこなわれる
+;---0,11,5200,5210に同じものを---
+;-------------食らい経由共通抽選
+;-------無の確率はそれなりに高い？4分の１ではなさそう
+;---食らいで-1になってたらやる。 0,1,2,3を抽選しさらに0or1で強制無
+[State 2050,  2];らおう時はやらなくていい
+type = varset
+triggerall = !numhelper(100)
+triggerall = !numhelper(200)
+triggerall = !numhelper(300)
+triggerall = !numhelper(400)
+trigger1 = var(20) = -1 && time = 0
+var(20) =  random % 4 * (random % 2) 
+persistent = 0
+
+[State 2050,  2];保険、前のがまだいた場合・・もしもういたら消す？
+type = varset
+triggerall = var(20) = -1 && time = 0
+trigger1 = numhelper(100) || numhelper(200)
+trigger2 = numhelper(300) || numhelper(400)
+var(20) =  0 
+persistent = 0
+
+[state 1200,light];でもって0より上になってたら実行憑依
+type = Helper
+triggerall = time = 0
+triggerall = var(20) > 0
+trigger1 = !numhelper(var(20) * 100)
+name = "RANDOM"
+ID = var(20) * 100
+pos = 0,0 
+postype = p1
+stateno = var(20) * 200 + 2000
+ownpal = 1
+size.height = var(20) * 100;ID
+size.xscale = 0.5
+size.yscale = 0.5
+persistent = 0
+supermovetime = 9999
+
+
+[State -3, ws];受身効果音 これでないときあり　comonにうつして
+type = PlaySnd
+trigger1 = time = 0
+value = s50,7
+channel = 3
+
+;受身声 しんでしまう
+[State -3, recove voice]
+type = PlaySnd
+trigger1 = Time = 0
+value = s5200,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+parsistent = 0
+channel = 0
+
+
+[state 7000,test];
+type = Explod
+trigger1 = time = 0
+anim = 6600
+ID = 5200
+pos = 0,-60
+postype = p1
+sprpriority = -4
+bindtime = 1
+removetime = -2
+ownpal = 1
+scale = 0.5,0.5
+ignorehitpause = 1
+persistent = 0
+
+;--------------------
+[State 40, 1];レバー格納
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 40, 2]
+type = VarSet
+trigger1 = Time = 0
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 40, 3]
+type = VarSet
+trigger1 = Time = 0
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 5210, 1] ;Blink white 7F
+type = PalFX
+trigger1 = Time = 0
+time = 7
+add = 128,128,128 ;256,256,256
+
+;X方向加算　前8  N -6, 後ろ-6  N復帰はADDではなくSETみたい
+[State 5210, 1];
+type = VelAdd
+triggerall = sysvar(1)
+trigger1 = time = 0
+x = ifelse(sysvar(1) = 1,4,-3)
+
+;;Y方向 前37  N? 後ろ-10　２F目のね   NはADDで他はSET? 7 が -1になった？ってことは・・？
+[State 5210, 1];
+type = VelAdd
+triggerall = !sysvar(1)
+trigger1 = time = 0
+y = -10
+
+[State 5210, 1];
+type = Velset
+triggerall = sysvar(1)
+trigger1 = time = 0
+y = ifelse(sysvar(1) = 1,-10,-10)
+
+[State 5210, 3];0-5	6Fは両方無敵
+type = NotHitBy
+trigger1 = time = 0
+value = SCA.na,np,nt,sa,sp,st,ha,hp,gt
+time = 5
+
+[State 5210, 3];それ以降打撃無敵
+type = NotHitBy
+trigger1 = Time = 5
+value = SCA,na,np,sa,sp,ha,hp
+time = 9
+
+[State 5210, 4];7Fから行動OK
+type = CtrlSet
+trigger1 = Time = 6
+value = 1
+
+[State 5210, 5];フリーにちぇんじ
+type = changestate
+trigger1 = anim = 5210 && animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+[State 5210, 5]
+type = veladd
+trigger1 = 1
+y = 0.525
+ignorehitpause = 0
+
+[State 5210, 5] ;Land on ground
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 52 ;JUMP_LAND
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Continue?
+[Statedef 5500]
+type = S
+ctrl = 0
+anim = 5300
+velset = 0,0
+
+[State 5500, 1] ;Use continue animation if available
+type = ChangeAnim
+trigger1 = time = 0
+trigger1 = SelfAnimExist(5500)
+value = 5500
+
+;---------------------------------------------------------------------------
+; Initialize (at the start of the round)
+[Statedef 5900]
+type = S
+
+[State 5900, 1] ;Clear all int variables
+type = VarRangeSet
+trigger1 = roundsexisted = 0
+value = 0
+
+[State 5900, 2] ;Clear all float variables
+type = VarRangeSet
+trigger1 = roundsexisted = 0
+fvalue = 0
+
+[State 5900, 3] ;Intro for round 1	ラウンド１ならキャラ判定にとぶ
+type = ChangeState
+trigger1 = roundno = 1
+value = 169
+

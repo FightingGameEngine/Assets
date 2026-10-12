@@ -1,0 +1,2909 @@
+;---ぱっぱ　ゲージ技
+;s3000 生まれる　s3100 まりす　s3200かいざー　s3600　こわいよー
+
+;----うまれる
+[statedef 3000];----
+type    = S
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+anim = 3000
+sprpriority = 0
+hitcountpersist = 1
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+;----暗転中5枚目までは動かないはず---VELADDMULをじゃない、移動自体がフリーズのはずposfreeze?
+;---暗転後もまだ慣性のこってる・うごくはず・仕様的にしょうがない？
+[State 99,];1.05%?=0.105
+type = Velmul
+trigger1 = 1
+x = 1 - 0.105
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+;----------------ACのは2連になってしまった。ややこしい
+[state 193,];ボイス	まず抽選0-5のどれかがきまる
+type = varset
+trigger1 = time = 0
+var(51) = ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+
+[State 1100, sound];うまれる
+type = PlaySnd
+trigger1 = time = 0
+value = s3000,var(51) 
+channel = 0
+
+[State 1100, sound];うまれる  AC2連
+type = PlaySnd
+triggerall = var(54) >= 3 && var(54) != 6
+trigger1 = time = 45
+value = s3000,var(51) + 10
+channel = 0
+
+[State 3200, ];無敵1-19	
+type = nothitby
+trigger1 = animelemtime(13) <= 0
+time = 1
+value = sca
+ignorehitpause = 1
+
+[State 3200, ];だげ無敵20-21
+type = nothitby
+trigger1 = animelemtime(13) >= 1
+trigger1 = animelemtime(14) < 0
+time = 1
+value = ,na,np,sa,sp,ha,hp
+ignorehitpause = 1
+
+[State 99,]
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 3660,];GOLD以外強制お祓い
+type = varset
+triggerall = palno !=  var(42)
+trigger1 = time = 0
+var(20) = 0
+superemovetime = 1
+
+[State 3660,];ぎゃーーーー
+type = playsnd
+trigger1 = animelem = 10
+value = s80,7
+channel = 4
+
+;----------------演出手前
+[state 100x,atc efe];1
+type = Explod
+trigger1 = animelem = 3 
+anim = 3050
+ID = 200
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = -1
+removetime = -2
+ownpal = 1
+ignorehitpause = 1
+scale = 0.5,0.5
+supermovetime = 9999
+persistent = 0
+
+[state 100x,atc efe];1演出おく
+type = Explod
+trigger1 = animelem = 3 
+anim = 3060
+ID = 200
+postype = p1
+pos = 0,0
+sprpriority = -2
+bindtime = -1
+removetime = -2
+ownpal = 1
+ignorehitpause = 1
+scale = 0.5,0.5
+supermovetime = 9999
+persistent = 0
+
+[state 3100,cut];SP発動暗転演出 airfront=背景時間　back=持続時間？一応確保  height = エフェクトLV
+type = helper
+trigger1 = time = 0
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+size.air.front = 80
+size.air.back = 80
+ownpal = 1
+size.height = 2
+persistent = 0
+
+[State 3100, Super A];暗転中強制　移動停止ー＞慣性のこるはず、仕様？むりい
+type = posfreeze
+trigger1 = time < 20
+value = 1
+
+[State 3100, Super A];暗転する40	仕様違いでー１だっけ
+type = SuperPause
+trigger1 = time = 0
+postype = p1
+pos = 0, -50
+anim = -1;
+sound = s60, 0
+poweradd = -1000
+persistent = 0
+time = 39
+movetime = 39
+darken = 0
+
+;------------覚醒系ヒット時フラッシュ。テスト。ぴかぴかよくない気もする
+[State 3000,00]
+type = allPalfx
+trigger1 = movehit
+trigger1 = hitpausetime
+trigger1 = var(35) % 6 = 0
+add = 255,255,255
+time = 1
+persistent = 0
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係  対応きゃらならFD以外・・不正確だけどしかたないね
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+trigger1 = hitpausetime
+trigger1 = var(35) % 6 = 0
+var(18) = ifelse(movehit,-6,14)
+ignorehitpause = 1
+
+[state 1540,helper partner];----height=Y位置　Gback=持続時間　2
+type = Helper
+trigger1 = animelem = 11 || animelem = 12 || animelem = 13 || animelem = 14
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = 8020
+ownpal = 1
+ignorehitpause = 0
+size.height = -60;Y軸
+size.ground.front = 50;相殺時X座標
+size.ground.back = 2;持続
+size.head.pos = 8010,8011
+size.proj.doscale = 3
+
+;---STOP７なのでずれてるかも？2DOTか4Aが12から８になった・・??
+[State 200, 1];LV4　4HIT　 X12Y10 AX12y14  GX17?15?
+type = HitDef
+triggerall = 1;!var(34)
+trigger1 = animelem = 11 || animelem = 12 || animelem = 13 || animelem = 14
+attr = S, HA                   
+damage = ceil(40 * fvar(0)),1                
+guardflag = M                  
+hitflag = MAFD                  
+priority = 6,miss           
+animtype = hard 
+ground.type = High         
+pausetime = 7, 7 + var(47) * 8
+guard.pausetime = 7, 7          
+hitsound   = s205, 3
+guardsound = s150, 4            
+ground.slidetime = 17 + var(45)
+ground.hittime  = 17 + var(45)
+guard.hittime  = 16	
+guard.slidetime  = 16
+airguard.ctrltime = 16
+ground.velocity = -5 * fvar(5),-5 * fvar(6)
+air.velocity = -5 * fvar(5), -7 * fvar(6)
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6)            
+guard.velocity = -7.5
+airguard.velocity = -2 ,-4
+yaccel = 0.5           
+fall = 1
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (60 + 60 * var(47) ) * var(46) * fvar(4) ) + 14 + 8 * var(47) + (!var(46)) * 7	
+getpower = 0,0
+palfx.time = var(47) * 5
+palfx.add = var(47) * 255,var(47) * -130, var(47) * -108
+ground.cornerpush.veloff = -15
+air.cornerpush.veloff    = -15
+guard.cornerpush.veloff  = -16
+airguard.cornerpush.veloff= -16
+ignorehitpause = 0
+
+[state 3200,rend]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-------------------------べろうずまりす
+[statedef 3100];----
+type    = S
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+sprpriority = 0
+hitcountpersist = 1
+anim = 3100 + (palno = var(42)) * 10
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Velmul
+trigger1 = 1
+x = 1 - 0.105
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[State 3200, ];完全無敵1-5
+type = nothitby
+trigger1 = time = 0
+time = 5
+value = sca
+ignorehitpause = 1
+persistent = 0
+
+[State 99,]
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 3660,];ぎゃーーーー
+type = playsnd
+trigger1 = animelem = 8
+value = s80,7
+channel = 4
+
+[State 3660,];びりびりびり
+type = playsnd
+trigger1 = animelem = 8
+value = s80,3
+channel = 5
+
+[State -3, voice];消滅しろ
+type = PlaySnd
+trigger1 = time = 0
+value = s3100,ifelse(var(54) < 6, var(54),random % 3 + 3) + (var(54) <= 2) * 3
+parsistent = 0
+channel = 0
+
+
+[State 3200, ];ラオウ移動
+type = varset
+trigger1 = time = 0
+var(10) = 3100
+ignorehitpause = 1
+persistent = 0
+
+[state 3100,cut];SP発動暗転演出 airfront=背景時間　back=持続時間？一応確保  height = エフェクトLV
+type = helper
+trigger1 = time = 4
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+size.air.front = 100
+size.air.back = 100
+ownpal = 1
+size.height = 2
+persistent = 0
+
+[State 3100, Super A];暗転中強制　移動停止ー＞慣性のこるはず、仕様？むりい
+type = posfreeze
+trigger1 = time = [4,24]
+value = 1
+
+[State 3100, Super A];暗転する54?!	仕様違いでー１だっけ
+type = SuperPause
+trigger1 = time = 4
+postype = p1
+pos = 0, -50
+anim = -1;
+sound = s60, 0
+poweradd = -1000
+persistent = 0
+time = 40 - 1
+movetime = 40 -1
+darken = 0
+
+
+
+;-------------------途中から判定OK
+;------どうやるのがかしこい？DOS判定あり、midpos速度
+;---------el4
+[state 1200,light];紫の弾1 4枚目の８からずっとでるが・・1
+type = Helper
+trigger1 = animelemtime(4) = 7
+name = "MARIS"
+ID = 3100
+pos = -70,-50
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = 15
+size.mid.pos = -50,15
+size.proj.doscale = 0
+supermovetime = 999
+[state 1200,light];紫の弾2
+type = Helper
+trigger1 = animelemtime(4) = 8
+name = "MARIS"
+ID = 3100
+pos = -68,-70
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -20
+size.mid.pos = -50,10
+size.proj.doscale = 0
+supermovetime = 999
+
+;---------------------el5
+[state 1200,light];紫の弾3
+type = Helper
+trigger1 = animelemtime(5) = 0
+name = "MARIS"
+ID = 3100
+pos = -65,-80
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -30
+size.mid.pos = -55,-10
+size.proj.doscale = 0
+supermovetime = 999
+[state 1200,light];紫の弾4
+type = Helper
+trigger1 = animelemtime(5) = 1
+name = "MARIS"
+ID = 3100
+pos = -65,-90
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -40
+size.mid.pos = -55,-15
+size.proj.doscale = 0
+supermovetime = 999
+
+;-------------el6		速度があるので前と同軸にみえてしまう
+[state 1200,light];紫の弾5
+type = Helper
+trigger1 = animelemtime(6) = 0
+name = "MARIS"
+ID = 3100
+pos = -100,-120
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -50
+size.mid.pos = -40,-20
+size.proj.doscale = 0
+supermovetime = 999
+
+[state 1200,light];紫の弾6	上とほぼ同じ
+type = Helper
+trigger1 = animelemtime(6) = 1
+name = "MARIS"
+ID = 3100
+pos = -95,-122
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -50
+size.mid.pos = -30,-30
+size.proj.doscale = 0
+supermovetime = 999
+
+;-------------------えｌ7
+[state 1200,light];紫の弾7
+type = Helper
+trigger1 = animelemtime(7) = 0
+name = "MARIS"
+ID = 3100
+pos = -85,-160
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -70
+size.mid.pos = -10,-40
+size.proj.doscale = 0
+supermovetime = 999
+[state 1200,light];紫の弾8 ほぼ90誓い
+type = Helper
+trigger1 = animelemtime(7) = 1
+name = "MARIS"
+ID = 3100
+pos = -70,-190
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -89
+size.mid.pos = -5,-40
+size.proj.doscale = 0
+supermovetime = 999
+
+;-------------el8
+[state 1200,light];紫の弾9 ほぼ右下かたむき
+type = Helper
+trigger1 = animelemtime(8) = 0
+name = "MARIS"
+ID = 3100
+pos = -10,-190
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -100
+size.mid.pos = 5,-50
+size.proj.doscale = 0
+supermovetime = 999
+[state 1200,light];紫の弾10 ほぼ右下かたむき
+type = Helper
+trigger1 = animelemtime(8) = 1
+name = "MARIS"
+ID = 3100
+pos = 40,-200
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -120
+size.mid.pos = 15,-50
+size.proj.doscale = 0
+supermovetime = 999
+[state 1200,light];紫の弾11 
+type = Helper
+trigger1 = animelemtime(8) = 2
+name = "MARIS"
+ID = 3100
+pos = 80,-210
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -150
+size.mid.pos = 20,-50
+size.proj.doscale = 1
+supermovetime = 999
+
+;－－－－－－－－－－－－－－－－－
+[state 1200,light];紫の弾12 そろそろ判定でてもよさげ？？
+type = Helper
+trigger1 = animelemtime(9) = 0
+name = "MARIS"
+ID = 3100
+pos = 120,-190
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -160
+size.mid.pos = 25,-40
+size.proj.doscale = 1
+supermovetime = 999
+
+[state 1200,light];紫の弾13 そろそろ判定でてもよさげ？？
+type = Helper
+trigger1 = animelemtime(9) = 1
+name = "MARIS"
+ID = 3100
+pos = 160,-165
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -170
+size.mid.pos = 30,-40
+size.proj.doscale = 1
+supermovetime = 999
+
+[state 1200,light];紫の弾14 そろそろ判定でてもよさげ？？ほぼ真下
+type = Helper
+trigger1 = animelemtime(9) = 2
+name = "MARIS"
+ID = 3100
+pos = 168,-120
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -180
+size.mid.pos = 45,-35
+size.proj.doscale = 1
+supermovetime = 999
+
+;----------------------EL10 たぶん判定ありでしょう。。
+[state 1200,light];紫の弾15 
+type = Helper
+trigger1 = animelemtime(10) = 0
+name = "MARIS"
+ID = 3100
+pos = 170,-80
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -200
+size.mid.pos = 50,-20
+size.proj.doscale = 1
+supermovetime = 999
+[state 1200,light];紫の弾16 
+type = Helper
+trigger1 = animelemtime(10) = 1
+name = "MARIS"
+ID = 3100
+pos = 180,-35
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -220
+size.mid.pos = 50,-15
+size.proj.doscale = 1
+supermovetime = 999
+[state 1200,light];紫の弾17 	
+type = Helper
+trigger1 = animelemtime(10) = 2
+name = "MARIS"
+ID = 3100
+pos = 155,10
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -220
+size.mid.pos = 50,0
+size.proj.doscale = 1
+supermovetime = 999
+
+;---------------el11	
+[state 1200,light];紫の弾18 
+type = Helper
+trigger1 = animelemtime(11) = 0
+name = "MARIS"
+ID = 3100
+pos = 130,30
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -220
+size.mid.pos = 50,0
+size.proj.doscale = 1
+supermovetime = 999
+
+[state 1200,light];紫の弾19.20 地面滑るかも。
+type = Helper
+trigger1 = animelemtime(11) = 1
+trigger2 = animelemtime(11) = 2
+name = "MARIS"
+ID = 3100
+pos = 130,20
+postype = p1
+stateno = 2100
+ownpal = 1
+size.xscale = 0.5
+size.yscale = 0.5
+size.height = -240
+size.mid.pos = 50,0
+size.proj.doscale = 1
+supermovetime = 999
+
+[state 3200,rend]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;------------------なっくるかいざー
+;-------------
+[statedef 3200]
+type    = S
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+anim = 3200 + (palno = var(42)) * 10
+hitcountpersist = 1
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Velmul
+trigger1 = 1
+x = 1 - 0.105
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.5
+x = 0
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[State 3200, ];完全無敵1-4
+type = nothitby
+trigger1 = time = 0
+time = 4
+value = sca
+ignorehitpause = 1
+persistent = 0
+
+[State 99,]
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State -3, voice];どおら
+type = PlaySnd
+trigger1 = time = 0
+value = s3200,ifelse(var(54) < 6, var(54),random % 3 + 3) + (var(54) <= 2) * 3
+parsistent = 0
+channel = 0
+
+[State 1100, sound];効果音
+type = PlaySnd
+trigger1 = animelem = 8
+value = s210,6
+persistent = 0
+channel = 4
+
+[State 3200, ];ラオウ移動
+type = varset
+trigger1 = time = 4
+var(10) = 3200
+ignorehitpause = 1
+persistent = 0
+
+[state 3100,cut];SP発動暗転演出 airfront=背景時間　back=持続時間？一応確保  height = エフェクトLV
+type = helper
+trigger1 = time = 4
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+size.air.front = 80
+size.air.back = 80
+ownpal = 1
+size.height = 2
+persistent = 0
+
+[State 3100, Super A];暗転中強制　移動停止ー＞慣性のこるはず、仕様？むりい
+type = posfreeze
+trigger1 = time = [4,24]
+value = 1
+
+[State 3100, Super A];暗転する40F動くのも40FでアニメF調整して
+type = SuperPause
+trigger1 = time = 4
+postype = p1
+pos = 0, -50
+anim = -1;
+sound = s60, 0
+poweradd = -1000
+persistent = 0
+time = 40
+movetime = 40
+darken = 0
+
+[state 1540,helper partner];---エフェクト
+type = Helper
+trigger1 = animelem = 11
+name = "sp2"
+ID = 3200 
+pos = 0,0
+postype = p1
+stateno = 700
+ownpal = 1
+persistent = 0
+ignorehitpause = 0
+size.xscale= 1
+size.yscale= 1
+
+
+[state 1540,helper partner];----あたる場所によって違う
+type = Helper
+trigger1 = animelem = 11
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = 8020
+ownpal = 1
+ignorehitpause = 0
+persistent = 0
+size.height = -80;Y座標
+size.ground.front = 90;相殺時X座標
+size.ground.back = 3;持続
+size.head.pos = 8010,8011
+
+;------------X30Y18	AX30Y18	Gx18
+[State 3100, 2s];LV5,	ヒット時壁
+type = HitDef
+triggerall = !var(34)
+trigger1 = animelem = 11 
+attr = S, HA  
+damage = ceil(fvar(0) / fvar(2) * fvar(3) * 140) ,2                
+guardflag = M                  
+hitflag = MAFD                  
+priority = 7,hit           
+animtype = hard 
+ground.type = high
+air.type = low          
+hitsound   = s205, 3
+guardsound = s150, 4         
+pausetime = 15, 15 + var(47) * 12              
+guard.pausetime = 15, 15              
+ground.slidetime = 19 + var(45)
+ground.hittime  = 19 + var(45)
+guard.hittime  = 18	
+guard.slidetime  = 18
+airguard.ctrltime = 19 
+ground.velocity = -15 * fvar(5), -9 * fvar(6)    
+air.velocity = -15 * fvar(5), -9 * fvar(6)  
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6)
+guard.velocity = -9  
+airguard.velocity = -2.5, -4  
+yaccel = 0.5        
+fall = 1
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (60 + 60 * var(47) ) * var(46) * fvar(4) ) + 15 + 12 * var(47) + (!var(46)) * 7
+getpower = 0,0
+palfx.time = 27
+palfx.add = -120 ,0 ,140
+palfx.sinadd = 120,120,120,8
+palfx.invertall = 1
+ground.cornerpush.veloff = -19
+air.cornerpush.veloff    = -19
+guard.cornerpush.veloff  = -20
+airguard.cornerpush.veloff= -20
+ignorehitpause = 0
+p2stateno = 5700
+
+[state 7000,];---------------相手V18ガードバランス関係  対応きゃらならFD以外・・不正確だけどしかたないね
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-6,20)
+persistent = 0
+ignorehitpause = 1
+
+;------------覚醒系ヒット時フラッシュ。テスト。ぴかぴかよくない気もする
+[State 3000,00]
+type = allPalfx
+trigger1 = movehit
+add = 255,255,255
+time = 1
+persistent = 0
+ignorehitpause = 1
+
+[state 3200,rend]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;------------------こわいよー
+[statedef 3600];----
+type    = S
+movetype= A
+physics = n
+ctrl = 0
+anim = 3600
+hitcountpersist = 1
+sprpriority = 0
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Velmul
+trigger1 = 1
+x = 1 - 0.105
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+[State 200x,];一撃ゲージ、通常ゲージともに消失	今後ゲージ使用不可
+type = Varset
+trigger1 = time = 0
+var(40) = -1
+ignorehitpause = 1
+
+[State 200, 7];ちぇんあに
+type = changeanim
+trigger1 = anim = 3600
+trigger1 = time >= 44
+value = 3610
+ignorehitpause = 0
+persistent = 0
+
+[State 200, 7];ちぇんあに 終了時81Fより
+type = changeanim
+triggerall = anim != 3620
+trigger1 = time = 80
+value = 3620
+ignorehitpause = 0
+
+[state 193,];ボイス2連なので固定用
+type = varset
+triggerall = var(54) = 3
+trigger1 = time = 0
+var(51) = random % 3 
+
+[State 2050,  snx];おいでおいで
+type = PlaySnd
+trigger1 = anim = 3610
+value = s3600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+persistent = 0
+
+[state 3600,];だげき無敵、暗転中も動くのであれば・・44まで
+type = nothitby
+trigger1 = var(39) 
+trigger2 = time <= 43
+time = 1
+value = ,na,sa,ha,np,sp,hp
+ignorehitpause = 1
+
+[state 3600,];すりぬけ
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state 3600,cut];sp演出
+type = helper
+trigger1 = time = 3
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+helpertype = normal
+supermovetime = 9999
+ownpal = 1
+keyctrl = 0
+persistent = 0
+ignorehitpause = 1
+size.air.front = 100
+size.air.back = 100
+size.height = 2
+
+[State 3100, Super A];暗転中強制　移動停止ー＞慣性のこるはず、仕様？むりい
+type = posfreeze
+trigger1 = time = [3,23]
+value = 1
+
+[State 3400, Super A]
+type = SuperPause
+trigger1 = time = 3
+postype = p1
+pos = 0, -50
+anim = -1
+sound = s60, 1
+poweradd = 0
+persistent = 0
+time = 39
+movetime = 39
+ignorehitpause = 1
+darken = 0
+
+[State 800, 1];持続３２
+type = HitDef
+triggerall = enemynear,stateno != [5800,5820]
+triggerall = !var(34)
+Trigger1 = time = [46,46 + 32]
+attr = S, HT        
+hitflag = M-         
+priority = 1, Miss    
+sprpriority = -1       
+numhits = 0
+pausetime = 0,0
+p2facing = 1          
+forcestand = 1
+pausetime = 0, 0      
+hitsound = -1
+hitcount = 0
+p1stateno = 3610       
+p2stateno = 5620      
+snap = 40,0
+ID = 950
+
+[State 800, 1];相手がよろけにいってるとき
+type = HitDef
+triggerall = enemynear,stateno = [5800,5820]
+triggerall = !var(34)
+Trigger1 = time = [46,46 + 32]
+Trigger1 = 1
+attr = S, HT        
+hitflag = M         
+priority = 1, Miss    
+sprpriority = -1       
+numhits = 0
+pausetime = 0,0
+p2facing = 1          
+forcestand = 1
+pausetime = 0, 0      
+hitsound = -1
+hitcount = 0
+p1stateno = 3610       
+p2stateno = 5620      
+snap = 40,0
+ID = 950
+
+[state 3600,c];空ふり終わり
+type = changestate
+trigger1 = anim = 3620 && animtime = 0
+value = 0
+ctrl = 1
+
+;-------------------------あたると演出
+[statedef 3610];
+type    = s
+movetype= a
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 3620,];もしへるぱにあたってたら・・
+type = changestate
+triggerall = numtarget
+trigger1 = time = 0
+trigger1 = target,ishelper
+value = 0
+ctrl = 1
+ignorehitpause = 1
+
+[state 3600,];無敵、
+type = nothitby
+trigger1 = 1 
+time = 1
+value = sca
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1)
+trigger1 = time = 0
+var(18) = ifelse(movehit,-6,11)
+persistent = 0
+ignorehitpause = 1
+
+;--------------しばらくしてから柳背景、はじめからぷれいや透明
+[State 3620,];当たった場合2時間停止？ 空中固定時影なしかな
+type = AssertSpecial
+trigger1 = time <= 330
+flag = timerfreeze
+flag2 = globalnoshadow
+flag3 = invisible
+ignorehitpause = 1
+
+;--------------------相手投げ
+[State 3620,];var39,犬封じにも使う
+type = varset
+trigger1 = 1
+var(39) = 1
+ignorehitpause = 1
+
+[State 2092];柳背景をフェード
+type = PalFX
+trigger1 = time >= 33
+trigger1 = time <= 38
+time = 1
+add = -255 + (time - 32) * 5   ,-255 + (time - 32) * 5,-255 + (time - 32) * 5
+ignorehitpause = 1
+
+;----------------柳の背景33前後からフェードできているようである・・めどい
+;---向き固定  右からかな  背景黒ふやしてーもうちょっと上？
+[state 100x,atc efe];1
+type = Explod
+trigger1 = time = 33  
+anim = 3660
+ID = 200
+postype = right
+pos = 0,-10
+sprpriority = 10
+bindtime = -1
+removetime = 300
+ownpal = 0
+ontop = 0
+scale = 0.5,0.5
+
+;-----------P１に１０１から・・
+[state 100x,atc efe];ひいいいいいいいいいいいいぃぃぃ
+type = Explod
+trigger1 = time = 101  
+anim = 3650
+ID = 200
+postype = p1
+pos = 0,0
+sprpriority = 12
+bindtime = -1
+removetime = -2
+ownpal = 1
+ontop = 0
+facing = ifelse(facing = 1,1,-1)
+scale = 0.5,0.5
+
+[state 3670x,];デストロイ表示  ２Ｐで反転する、注意
+type = Explod
+trigger1 = time = 185
+anim = 6470
+ID=6470
+postype = left
+pos = 0,0
+sprpriority = 15
+bindtime = -1
+ontop = 1
+facing = 1
+removetime = -2
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+scale= 0.5,0.5
+
+[state 3670x,];デストロイ表示  枠
+type = Explod
+trigger1 = time = 185
+anim = 6475
+ID=6470
+postype = left
+pos = 0,0
+sprpriority = 15
+bindtime = -1
+ontop = 1
+facing = 1
+removetime = -2
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+scale= 0.5,0.5
+
+[state 3670x,];最後、TVがきえるような灰色演出縮小する
+type = Explod
+trigger1 = time = 330
+anim = 6476
+ID=6476
+postype = left
+pos = 0,120
+sprpriority = 15
+bindtime = -1
+ontop = 1
+facing = 1
+removetime = -2
+ownpal = 1
+persistent = 0
+scale= 0.5,0.5
+
+[state 3670x,];最後、TVがきえるような灰色演出縮小する
+type = modifyExplod
+triggerall = numexplod(6476)
+trigger1 = time > 331
+ID=6476
+scale= 0.5 ,0.5 - (time - 330) * 0.05
+
+[state 3670,];一撃必殺とどめ用の効果音？
+type = playsnd
+trigger1 = time = 190
+value = s60,4
+persistent = 0
+channel = 4
+ignorehitpause = 1
+
+[state 3670,];ですとろーい？VOICE  新追加60-12
+type = playsnd
+trigger1 = var(34) = 2
+trigger1 = animtime = 0
+value = s60,12
+persistent = 0
+channel = 5
+ignorehitpause = 1
+
+[State 2050,  snx];こわいよー
+type = PlaySnd
+trigger1 = time = 185 
+value = s3600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3 + 10
+channel = 0
+
+[State 2050,  voice];ひゅーどろどろどろ
+type = PlaySnd
+trigger1 = time = 50
+value = s80,10
+channel = 4
+
+[State 2050,  voice];ざー砂嵐
+type = PlaySnd
+trigger1 = time = 185
+value = s80,12
+channel = 5
+
+;-------------330前後で画面戻り始め、灰色ー＞線TVけしみたいな
+[State 2050,  ];
+type = targetstate
+trigger1 = time = 330
+value = 5625
+persistent = 0
+
+[state 3600,];----
+type  = changestate
+trigger1 = time >= 380
+value = 0
+ctrl = 1
+
+
+
+;----------------------------すてーとたりな
+;-----------へるぱーがくる共通命令NO１００	V10=100
+;--やっぱりわける
+[statedef 4000];----さっきまでの爆発 犬、剣、幽霊
+type    = A
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+sprpriority = 2
+hitcountpersist = 1
+velset = 0,0 
+anim = 1170
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = noautoturn
+ignorehitpause = 1
+
+[state 8150,2];一応 幽霊は親がやるからいい
+type = parentvarset
+triggerall = time = 0
+trigger1 = ishelper(100)
+trigger2 = ishelper(200)
+var(10) = 0
+
+;-----------3つ後には親だけやらせる？幽霊親監視すてーと2680
+[state 8150,2];憑依クリア	GOLD以外
+type = parentvarset
+triggerall = time = 0
+trigger1 = ishelper(100)
+trigger2 = ishelper(200)
+var(20) = 0
+
+;--------------一応
+[State 8000x, ride];テスト結果:P2stateno無効？すりぬける
+type = HitOverride
+trigger1 = 1 
+attr = sca,na,np,sa,sp,ha,hp,nt,st,ht
+slot = 0
+stateno = -1
+time = 1
+ignorehitpause = 1
+[State 3660,];
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, sound];らおう以外爆発音
+type = PlaySnd
+trigger1 = time = 0
+value = s210,15
+channel = 4
+persistent = 0
+
+;---------------------ヒット後処理らおう以外
+[State 2500x, ];ヒットカウント増加 2HIt目も考慮
+type = parentvaradd
+trigger1 = movehit
+var(33) = 1
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係2HITする
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1)
+trigger1 = movecontact
+var(18) = ifelse(movehit,-6,7)
+ignorehitpause = 1
+persistent = 0
+
+[state 1540,helper partner];----スパーク	
+type = Helper
+trigger1 = movecontact
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+size.height = -50;Y座標
+size.ground.front = 0;相殺時X座標
+size.ground.back = 11;持続
+size.head.pos = 8002,8003
+persistent = 0
+
+[State 2500x, ];接触判定
+type = varset
+trigger1 = movecontact
+var(34) = ifelse(movehit,2,1)
+ignorehitpause = 1
+
+[state 3600,];----
+type  = angledraw
+trigger1 = 1
+value = 0
+scale = 1.8,1.8
+
+[state 120x,atc efe];エフェクト
+type = Explod
+trigger1 = time = 0
+anim = 1170
+ID = 4000
+postype = p1
+pos = -15 + random % 30,-20 + random % 50
+sprpriority = random % 4
+bindtime = -1
+removetime = -2
+ownpal=1
+removeongethit = 1
+scale = 0.8,0.8
+persistent = 0
+
+[state 120x,atc efe];エフェクト
+type = Explod
+trigger1 = time = 0
+anim = 1170
+ID = 4000
+postype = p1
+pos = -10 + random % 20,-30 + random % 50
+sprpriority = random % 4
+bindtime = -1
+removetime = -2
+ownpal=1
+removeongethit = 1
+scale = 0.8,0.8
+persistent = 0
+
+;---------その後さらに基準ずらし
+[state 8150,2];らおう以外？
+type = posadd
+trigger1 = time = 0
+x = fvar(11)
+y = fvar(12)
+persistent = 0
+
+[state 8150,2];
+type = varrangeset
+trigger1 = time = 0
+first = 11
+last = 12
+fvalue = 0
+
+;------------------剣2200-----X-45Y-155
+;------------------わんこ2400----X0Y-60
+;------------------ん幽霊'S 2600-X0Y-170
+[state 3600,];----X0Y-170
+type  = posadd
+triggerall = ishelper(100)
+trigger1 = time = 0
+x = -22.5
+y = -77.5
+
+[state 3600,];----X0Y-170
+type  = posadd
+triggerall = ishelper(200)
+trigger1 = time = 0
+x = 0
+y = -30
+
+[state 3600,];----X0Y-170
+type  = posadd
+trigger1 = const(size.height) = [301,303]
+trigger1 = time = 0
+x = 0
+y = -85
+
+[state 8110,vel];あにむたいむできえ？
+type = destroyself
+trigger1 = animtime = 0
+ignorehitpause = 0
+
+[state 1700,var];ヒットバック逆転防止
+type = varset
+trigger1 = 1
+var(31) = ifelse(root,facing = facing,1,-1)
+ignorehitpause = 1
+
+;--------------よろけ75、Dにあたるかな？犬でたしかめれる？
+;-------らおう以外、らおうは１ずつらしいので大変
+[State 200, 1];LV2 
+type = HitDef
+triggerall = !var(34)
+triggerall = anim = 1170
+trigger1 = animelem = 3
+attr = A, SA                
+damage = ceil(10 * root,fvar(0)),1            
+guardflag = MA                  
+hitflag = MAFD                 
+priority = 4,miss           
+animtype = medium 
+ground.type = high          
+pausetime = 0, 12
+guard.pausetime = 0, 12 + root,var(47) * 2          
+hitsound   = s205,3
+guardsound = s150, 4             
+ground.slidetime = 33
+ground.hittime  = 33
+guard.hittime  = 75
+guard.slidetime  = 75
+airguard.ctrltime = 11 
+ground.velocity = -6 * root,fvar(5) * var(31)          
+air.velocity = -3 * root,fvar(5) * var(31), -7 * root,fvar(6)          
+down.velocity = ifelse(root,var(2) = 2,-3,-8) * root,fvar(5) * var(31),ifelse(root,var(2) = 2,-2,-2.5) * root,fvar(6)
+guard.velocity = -6.5 * var(31) 
+airguard.velocity = -2 * var(31), -4
+yaccel = 0.5
+fall = 0
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (12 + 12 * root,var(47) ) * root,var(46) * root,fvar(4) ) + 12 + 2 * root,var(47) + (!root,var(46)) * 7
+getpower = 0,0
+palfx.time = root,var(47) * 5
+palfx.add = root,var(47) * 255,root,var(47) * -130, root,var(47) * -108
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff    = 0
+guard.cornerpush.veloff  = 0
+airguard.cornerpush.veloff= 0
+ignorehitpause = 0
+p2stateno = 5800
+
+;--------------------ダストほうりこみ  有効中へるぱに当たる可能性は０ではない
+;---チーム時、もう片方に当たる可能性もあるのでは？
+[State 2500x, ];きりもみのアレは、29F以内の判断は1スタートなので30
+type = TargetState
+triggerall = numtarget && root,var(4)
+triggerall = playerID(root,var(4)),stateno != [5850,5855]
+triggerall = playerID(root,var(4)),sysvar(0) <= 30
+triggerall = target,ishelper = 0
+triggerall = target,ID = root,var(4) 
+trigger1 = movehit
+trigger1 = HITPAUSETIME
+value = 5855
+ID = -1
+ignorehitpause = 1
+persistent = 15
+
+;-----------------------------らおうさっきまでいたんだよ？
+;--------------非常に厄介。
+;----だんだん小さくなる判定も。取れないね・・
+;----おぷしょんっぽいの時間的にむ利、保留
+[statedef 4010];----さっきまでの らおう
+type    = A
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+sprpriority = 2
+hitcountpersist = 1
+velset = 0,0 
+anim = 1180
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = noautoturn
+ignorehitpause = 1
+
+[state 8150,2];
+type = parentvarset
+triggerall = root,palno != root,var(42)
+trigger1 = time = 0
+var(10) = 0
+
+;-----------3つ後には親だけやらせる？幽霊親監視すてーと2680
+[state 8150,2];憑依クリア	GOLD以外
+type = parentvarset
+triggerall = root,palno != root,var(42)
+trigger1 = time = 0
+var(20) = 0
+
+
+;--------------一応
+[State 8000x, ride];テスト結果:P2stateno無効？すりぬける
+type = HitOverride
+trigger1 = 1 
+attr = sca,na,np,sa,sp,ha,hp,nt,st,ht
+slot = 0
+stateno = -1
+time = 1
+ignorehitpause = 1
+[State 3660,];
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[State 1100, sound];普通と同じ
+type = PlaySnd
+trigger1 = time = 0
+value = s80,8
+channel = 1
+persistent = 0
+
+[State 3660,];びりびりびり
+type = playsnd
+trigger1 = time = 0
+value = s80,3
+channel = 4
+
+[state 3600,];----X0Y--175
+type  = posadd
+trigger1 = time = 0
+y = -80
+
+[state 1540,helper partner];----羅の字えふぇ１上
+type = Helper
+trigger1 = time = 0
+name = "ra"
+ID = 4010 
+pos = 0,0
+postype = p1
+stateno = 710
+ownpal = 1
+persistent = 0
+size.height = 0
+[state 1540,helper partner];----羅の字えふぇ2下
+type = Helper
+trigger1 = time = 0
+name = "ra"
+ID = 4010
+pos = 0,0
+postype = p1
+stateno = 710
+ownpal = 1
+persistent = 0
+size.height = 1
+
+[state 1540,helper partner];----羅の字えふぇ3右下から左上？
+type = Helper
+trigger1 = time = 0
+name = "ra"
+ID = 4010 
+pos = 45,45
+postype = p1
+stateno = 710
+ownpal = 1
+persistent = 0
+size.height = 2
+[state 1540,helper partner];----羅の字えふぇ4右下にむかう
+type = Helper
+trigger1 = time = 0
+name = "ra"
+ID = 4010
+pos = -45,-45
+postype = p1
+stateno = 710
+ownpal = 1
+persistent = 0
+size.height = 3
+
+[state 1540,helper partner];----羅の字えふぇ5左↓すたーと右ueにむかう
+type = Helper
+trigger1 = time = 0
+name = "ra"
+ID = 4010 
+pos = -45,45
+postype = p1
+stateno = 710
+ownpal = 1
+persistent = 0
+size.height = 4
+[state 1540,helper partner];----羅の字えふぇ6右うえすたーと左したにむかう
+type = Helper
+trigger1 = time = 0
+name = "ra"
+ID = 4010
+pos = 45,-45
+postype = p1
+stateno = 710
+ownpal = 1
+persistent = 0
+size.height = 5
+
+[state 120x,atc efe];仮、えふぇくと
+type = Explod
+trigger1 =0; time = 0
+anim = 1980
+ID = 4010
+postype = p1
+pos = 0,0
+sprpriority = 4
+bindtime = -1
+removetime = 60
+ownpal=1
+scale = 0.5,0.5
+persistent = 0
+
+[state 8110,vel];ヒット時のストップも考慮すると・・
+type = varadd
+trigger1 = 1
+var(39) = 1
+ignorehitpause = 1
+
+[state 8110,vel];あにむたいむできえ？
+type = destroyself
+trigger1 = time >= 80
+trigger2 = var(39) >= 80
+ignorehitpause = 0
+
+[State 2500x, ];拡大縮小	かなりでかい
+type = angledraw
+trigger1 = 1;time <= 18
+scale = 3.5 - time * 0.2 ,3.5 - time * 0.2
+ignorehitpause = 0
+
+[State 2500x, ];拡大縮小
+type = angledraw
+trigger1 = time > 19
+scale = 0,0
+ignorehitpause = 1
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = 1
+trans = addalpha
+alpha = 250,200
+ignorehitpause = 1
+
+
+;---------------------ヒット後処理らおう以外
+[State 2500x, ];ヒットカウント増加 2HIt目も考慮
+type = parentvaradd
+trigger1 = movecontact
+trigger1 = hitpausetime
+trigger1 = var(35) % 5 = 0
+var(33) = 1
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係2HITする
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1)
+trigger1 = movecontact
+trigger1 = hitpausetime
+trigger1 = var(35) % 6 = 0
+var(18) = ifelse(movehit,-6,5)
+ignorehitpause = 1
+
+
+[State 2500x, ];接触判定
+type = varset
+trigger1 = movecontact
+var(34) = ifelse(movehit,2,1)
+ignorehitpause = 1
+
+[State 2500x, ];ヒットストップ中かうんと自分用
+type =varadd
+trigger1 = HITPAUSETIME
+var(35) = 1
+ignorehitpause = 1
+
+;----------------------ラオウ攻撃部	うかせ20STOp6
+;---羅の字の判定もあるかも。ちょとわかんない。保留ね
+;----超若干こっちに引き寄せている。ガード時も。
+;----こっちにもストップある模様。	１１HITだよ？しかも発生２だよ？
+;----ストップ0であるから、IDつけてヒットスパーク管理、スパーク緑線０で！
+[State 200, 1];LV2 
+type = HitDef
+trigger1 = time = [1,11]
+attr = A, SA                
+damage = ceil(10 * root,fvar(0)),1            
+guardflag = M                  
+hitflag = MAFD                 
+priority = 4,miss           
+animtype = medium 
+ground.type = high          
+pausetime = 7, 6 + root,var(47) * 2 
+guard.pausetime = 7, 6          
+hitsound   = s205,3
+guardsound = s150, 4             
+ground.slidetime = 12
+ground.hittime  = 12
+guard.hittime  = 11
+guard.slidetime  = 11
+airguard.ctrltime = 11 
+ground.velocity = 1 * root,fvar(5),-3 * root,fvar(6)           
+air.velocity = 0.5 * root,fvar(5), -3 * root,fvar(6)          
+down.velocity = ifelse(root,var(2) = 2,-3,-8) * root,fvar(5),ifelse(root,var(2) = 2,-2,-2.5) * root,fvar(6)
+guard.velocity = 0.5
+airguard.velocity = 1, -3
+yaccel = 0.5
+fall = 1
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (20 + 20 * root,var(47) ) * root,var(46) * root,fvar(4) ) + 6 + 2 * root,var(47) + (!root,var(46)) * 7
+getpower = 2
+palfx.time = root,var(47) * 5
+palfx.add = root,var(47) * 255,root,var(47) * -130, root,var(47) * -108
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff    = 0
+guard.cornerpush.veloff  = 0
+airguard.cornerpush.veloff= 0
+ignorehitpause = 0
+ID = 3999 + time 
+sprpriority = 2
+
+;--------------------ダストほうりこみ  有効中へるぱに当たる可能性は０ではない
+;---チーム時、もう片方に当たる可能性もあるのでは？
+[State 2500x, ];きりもみのアレは、29F以内の判断は1スタートなので30
+type = TargetState
+triggerall = numtarget && root,var(4)
+triggerall = playerID(root,var(4)),stateno != [5850,5855]
+triggerall = playerID(root,var(4)),sysvar(0) <= 30
+triggerall = target,ishelper = 0
+triggerall = target,ID = root,var(4) 
+trigger1 = movehit
+trigger1 = HITPAUSETIME
+value = 5855
+ID = -1
+ignorehitpause = 1
+persistent = 1
+
+;--IDは4000-4011
+[state 1540,helper partner];----スパーク	1
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4000) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	2
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4001) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	3
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4002) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	4
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4003) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	5
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4004) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	6
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4005) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	7
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4006) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	8
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4007) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	9
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4008) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	10
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4009) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state 1540,helper partner];----スパーク	11
+type = Helper
+triggerall = movecontact
+trigger1 = numtarget(4010) 
+name = "HIT SPARK"
+ID = 4000
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.proj.doscale = 0
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,vlx=%f,vly=%f,hc=%d\n"
+params =pos x,pos y,vel x,vel y,const(size.height)
+ignorehitpause = 1
+
+
+
+
+
+
+
+
+
+
+;----------------------------------------不幸もーど中ばななとか
+;------------------4100ごるふ　4110鉢植え　4120　ばなな
+[statedef 4100];----ごるふ
+type    = A
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+sprpriority = 2
+hitcountpersist = 1
+velset = 0,0 
+anim = 6000
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = noautoturn
+ignorehitpause = 1
+
+;--------------一応
+[State 8000x, ride];テスト結果:P2stateno無効？すりぬける
+type = HitOverride
+trigger1 = 1 
+attr = sca,na,np,sa,sp,ha,hp,nt,st,ht
+slot = 0
+stateno = -1
+time = 1
+ignorehitpause = 1
+[State 3660,];
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+
+[State 2050,  snx];ふぁーのうげ
+type = PlaySnd
+trigger1 = time = 0
+value = s80,9
+channel = 5
+
+[State 2050,  snx];ぼーる
+type = PlaySnd
+trigger1 = time = 30
+value = s210,3
+channel = 6
+
+[State 2050,  snx];たーん
+type = turn
+triggerall = time = 0
+trigeer1 = const(size.height) = -1
+trigger1 = facing = -1
+trigger2 = const(size.height) = 1
+trigger2 = facing = 1
+
+;---------------初速X9Y-5
+[state 7000,];---------------
+type = changeanim
+trigger1 = time = 30
+value = 2720
+persistent = 0
+
+[state 7000,];-----------37から動き？----
+type = velset
+trigger1 = time = 36
+x = 4.5
+y = -2.5
+persistent = 0
+
+[state 7000,];---------------
+type = veladd
+trigger1 = time > 37
+y = 0.5
+
+[state 7000,];---------------跳ね返させるX10Y19
+type = velset
+trigger1 = pos y >= 0 && vel y > 0
+y = -9.5
+
+[state 7000,];---------------当たったら跳ね返る
+type = velset
+trigger1 = movecontact
+x = vel x * -1
+persistent = 0
+
+
+[State 200x,];残像は 
+type = Afterimage
+trigger1 = time = 36
+trans = add
+TimeGap = 1
+FrameGap = 2
+length = 8
+time = 600
+PalBright = 0,0,0
+PalContrast = 125,125,125
+PalAdd = 0,0,0
+
+;--------------------ふぁー
+;---方角は当たった時点での敵前？
+;---はんだんさせるのどうやるの
+[state 100x,atc efe];1
+type = Explod
+triggerall = const(size.height) = -1
+trigger1 = time = 0  
+anim = 2725
+ID = 715
+postype = p1
+pos = 0,-40
+sprpriority = 2
+bindtime = 1
+facing = 1
+removetime = 55
+ownpal = 0
+scale = 0.5,0.5
+
+[state 100x,atc efe];1
+type = Explod
+triggerall = const(size.height) = 1
+trigger1 = time = 0  
+anim = 2726
+ID = 715
+postype = p1
+pos = 0,-40
+sprpriority = 2
+bindtime = 1
+facing = -1
+removetime = 55
+ownpal = 0
+scale = 0.5,0.5
+
+[state 1700,var];ヒットバック逆転防止
+type = varset
+trigger1 = 1
+var(31) = ifelse(root,facing = facing,1,-1)
+ignorehitpause = 1
+
+[state 7000,];---------------
+type = varset
+trigger1 = movecontact
+var(34) = ifelse(movehit,2,1)
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-7,10 * (root,var(1) != 4))
+ignorehitpause = 1
+persistent = 0
+
+[state 1540,helper partner];----あたる場所によって違う
+type = Helper
+trigger1 = movecontact
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,-60
+postype = p2
+stateno = ifelse(movehit,8002,8003)
+ownpal = 1
+ignorehitpause = 1
+size.height = -120;Y座標
+size.ground.front = 90;相殺時X座標
+size.ground.back = 12;持続
+size.head.pos = 8010,8011
+size.proj.doscale = 4
+persistent = 0
+
+;----------当たると跳ね返る、X逆転でいいかな
+;----ごるふぼーる けずりなし
+[State 1800, 1];LV4 X15 AX6,14
+type = HitDef
+triggerall = !var(34)
+triggerall = !movecontact
+trigger1 = time >= 36
+attr = A, SA                   
+damage = ceil(40 * root,fvar(0)),0                             
+guardflag = MA                  
+hitflag = MAFD                  
+priority = 4,miss           
+animtype = hard 
+ground.type = High
+air.type = low
+pausetime = 0, 14 + root,var(47) * 8
+guard.pausetime = 0, 14          
+hitsound   = s205, 1
+guardsound = s150, 1            
+ground.slidetime = 17 + root,var(45)
+ground.hittime  = 17 + root,var(45)
+guard.hittime  = 16	
+guard.slidetime  = 16
+airguard.ctrltime = 16  
+ground.velocity = -7.5 * var(31) * root,fvar(5)        
+air.velocity = -3 * var(31) * root,fvar(5), -7 * root,fvar(6) 
+down.velocity = ifelse(root,var(2) = 2,-3,-8) * var(31) * root,fvar(5),ifelse(root,var(2) = 2,-2,-2.5) * root,fvar(6)          
+guard.velocity = -7.5  * var(31)
+airguard.velocity = -2 * var(31), -3 
+yaccel = 0.5          
+fall = 0
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (16 + 16 * root,var(47) ) * root,var(46) * root,fvar(4) ) + 14 + 8 * root,var(47) + (!root,var(46)) * 7
+getpower = ifelse(root,Var(40),0,24 + (root,var(2) = 1 && root,life <= 250) * 24)
+palfx.time = root,var(47) * 5
+palfx.add = root,var(47) * 255,root,var(47) * -130, root,var(47) * -108
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff    = 0
+guard.cornerpush.veloff  = 0
+airguard.cornerpush.veloff= 0
+ignorehitpause = 0
+
+[state 8110,vel];
+type = destroyself
+triggerall = time >= 30
+trigger1 = vel x > 0
+trigger1 = frontedgedist < 0
+trigger2 = vel x < 0
+trigger2 = backedgedist < 0
+trigger3 = time >= 300
+ignorehitpause = 0
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "f=%d,H=%d\n"
+params = facing,const(size.height)
+ignorehitpause = 1
+
+;-----------------------------鉢植え相手の位置をサーチ
+[statedef 4110];----
+type    = A
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+sprpriority = 2
+hitcountpersist = 1
+velset = 0,10 
+anim = 2730
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = noautoturn
+ignorehitpause = 1
+
+;--------------一応
+[State 8000x, ride];テスト結果:P2stateno無効？すりぬける
+type = HitOverride
+trigger1 = 1 
+attr = sca,na,np,sa,sp,ha,hp,nt,st,ht
+slot = 0
+stateno = -1
+time = 1
+ignorehitpause = 1
+[State 3660,];
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[State 2050,  snx];からふり
+type = PlaySnd
+trigger1 = time = 0
+value = s80,9
+channel = 5
+
+[State 2050,  snx];がしゃん
+type = PlaySnd
+trigger1 = pos y >= 0 && vel y > 0   
+trigger2 = movecontact  
+value = s80,4
+channel = 6
+persistent = 0
+
+[state 8150,2];オチ速度は20
+type = posset
+trigger1 = time = 0
+x = enemynear,pos x 
+y = -43 * 10
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+;--------------------飛び出す草中身
+[state 100x,atc efe];1
+type = Explod
+trigger1 = pos y >= 0 && vel y > 0   
+trigger2 = movecontact   
+anim = 2732
+ID = 700
+postype = p1
+pos = 0,0
+sprpriority = 2
+bindtime = 1
+removetime = -2
+ownpal = 0
+vel = -1,-2
+ignorehitpause = 1
+scale = 0.5,0.5
+persistent = 0
+
+[state 7000,];---------あたったりしたら絵変更
+type = changeanim
+trigger1 = pos y >= 0 && vel y > 0   
+trigger2 = movecontact  
+value = 2731
+ignorehitpause = 1
+persistent = 0
+
+[state 7000,];---------------
+type = velset
+trigger1 = pos y >= 0 && vel y > 0   
+trigger2 = movecontact 
+y = 0
+ignorehitpause = 1
+
+[state 7000,];---------------
+type = posset
+trigger1 = pos y >= 0 && vel y > 0   
+y = 0
+ignorehitpause = 1
+
+[state 1700,var];ヒットバック逆転防止
+type = varset
+trigger1 = 1
+var(31) = ifelse(root,facing = facing,1,-1)
+ignorehitpause = 1
+
+[state 7000,];---------------
+type = varset
+trigger1 = movecontact
+var(34) = ifelse(movehit,2,1)
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-7,5 * (root,var(1) != 4))
+ignorehitpause = 1
+persistent = 0
+
+[state 1540,helper partner];----あたる場所によって違う
+type = Helper
+trigger1 = movecontact
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,-80
+postype = p2
+stateno = ifelse(movehit,8002,8003)
+ownpal = 1
+ignorehitpause = 1
+size.height = -120;Y座標
+size.ground.front = 90;相殺時X座標
+size.ground.back = 12;持続
+size.head.pos = 8010,8011
+size.proj.doscale = 4
+persistent = 0
+
+;--------------鉢植えX10？ AX4,13
+[State 1700, 1];LV 2 すとっぷ６
+type = HitDef
+triggerall = !var(34)
+triggerall = time > 0
+trigger1 = anim = 2730
+attr = A, SA                   
+damage = ceil(25 * root,fvar(0)) ,0                            
+guardflag = MA                  
+hitflag = MAFD                 
+priority = 3,miss           
+animtype = medium 
+ground.type = High
+pausetime = 6, 6 + root,var(47) * 2
+guard.pausetime = 6, 6          
+hitsound   = s205, 1
+guardsound = s150, 1
+ground.slidetime = 12 + root,var(45)
+ground.hittime  = 12 + root,var(45)
+guard.hittime  = 11	
+guard.slidetime  = 11
+airguard.ctrltime = 11 
+ground.velocity = -5 * var(31) * root,fvar(5)             
+air.velocity = -2 * var(31) * root,fvar(5), -6.5 * root,fvar(6)
+down.velocity = ifelse(root,var(2) = 2,-3,-8) * var(31) * root,fvar(5),ifelse(root,var(2) = 2,-2,-2.5) * root,fvar(6)           
+guard.velocity = -6.5 * var(31)  
+airguard.velocity = -4.5 * var(31) , -4.5         
+yaccel = 0.5   
+fall = 0
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (12 + 12 * root,var(47) ) * root,var(46) * root,fvar(4) ) + 12 + 2 * root,var(47) + (!root,var(46)) * 7
+getpower = ifelse(root,Var(40),0,24 + (root,var(2) = 1 && root,life <= 250) * 24)
+palfx.time = root,var(47) * 5
+palfx.add = root,var(47) * 255,root,var(47) * -130, root,var(47) * -108
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff    = 0
+guard.cornerpush.veloff  = 0
+airguard.cornerpush.veloff= 0
+ignorehitpause = 0
+
+[state 8110,vel];鉢植え
+type = destroyself
+trigger1 = anim = 2731
+trigger1 = animtime = 0
+ignorehitpause = 0
+
+;----------------------------------------------
+[statedef 4120];----ばなな
+type    = A
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+sprpriority = 2
+hitcountpersist = 1
+velset = 0,0 
+anim = 2740
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = noautoturn
+ignorehitpause = 1
+
+;--------------一応
+[State 8000x, ride];テスト結果:P2stateno無効？すりぬける
+type = HitOverride
+trigger1 = 1 
+attr = sca,na,np,sa,sp,ha,hp,nt,st,ht
+slot = 0
+stateno = -1
+time = 1
+ignorehitpause = 1
+[State 3660,];
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[State 3660,];点滅きえでいいやもう
+type = AssertSpecial
+trigger1 = anim = 2745
+trigger1 = animelemtime(2) >= 0
+trigger1 = random % 2 = 0
+flag = noshadow
+flag2 = noautoturn
+flag3 = invisible
+ignorehitpause = 1
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+
+[State 2050,  snx];ふぁーのうげ
+type = PlaySnd
+trigger1 = time = 0
+value = s80,8
+channel = 5
+
+[State 2050,  snx];あたったばあいぼよよん　メイのいるかと同じ
+type = PlaySnd
+trigger1 = movecontact
+value = s210,14
+channel = 6
+persistent = 0
+
+[State 2050,  snx];たーん
+type = turn
+triggerall = time = 0
+trigeer1 = const(size.height) = -1
+trigger1 = facing = -1
+trigger2 = const(size.height) = 1
+trigger2 = facing = 1
+
+
+;;;;バナナはランダム速度投げアニメ時のみ
+;---------------初速X9Y-5
+[state 7000,];-----------0
+type = velset
+trigger1 = time = 0
+x = random % 5 + 3
+y = (random % 4 + 3) * -1
+persistent = 0
+
+[state 7000,];---------------
+type = veladd
+triggerall = anim = 2740
+trigger1 = time > 0
+y = 0.5
+ignorehitpause = 0
+
+;---------------------------着地
+[state 7000,];---------------
+type = changeanim
+triggerall = anim != 2745
+trigger1 = pos y >= 0 && vel y > 0
+value = 2745
+persistent = 0
+
+[state 7000,];-----------停止
+type = velset
+trigger1 = anim = 2745
+x = 0
+y = 0
+ignorehitpause = 1
+
+[state 7000,];-----------停止
+type = posset
+trigger1 = anim = 2745
+y = 0
+ignorehitpause = 1
+
+;----------------------------------ヒット後
+[state 7000,];---------------
+type = changeanim
+triggerall = anim != 2750
+trigger1 = movecontact
+value = 2750
+persistent = 0
+ignorehitpause = 1
+
+[state 7000,];---------------
+type = posadd
+triggerall = anim = 2750
+trigger1 = animelem = 2
+trigger2 = animelem = 3
+trigger3 = animelem = 4
+trigger4 = animelem = 5
+trigger5 = animelem = 6
+x = 10
+ignorehitpause = 0
+
+[state 1700,var];ヒットバック逆転防止
+type = varset
+trigger1 = 1
+var(31) = ifelse(root,facing = facing,1,-1)
+ignorehitpause = 1
+
+[state 7000,];---------------
+type = varset
+trigger1 = movecontact
+var(34) = ifelse(movehit,2,1)
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-7,10 * (root,var(1) != 4))
+ignorehitpause = 1
+persistent = 0
+
+[state 1540,helper partner];----あたる場所によって違う
+type = Helper
+trigger1 = movecontact
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = ifelse(movehit,8002,8003)
+ownpal = 1
+ignorehitpause = 1
+size.height = -120;Y座標
+size.ground.front = 90;相殺時X座標
+size.ground.back = 12;持続
+size.head.pos = 8010,8011
+size.proj.doscale = 4
+persistent = 0
+
+;-----------ばなな、特殊前に転ぶX8,8
+[State 1700, 1];LV 2 すとっぷ６
+type = HitDef
+triggerall = !var(34)
+trigger1 = anim = 2745
+attr = A, SA                   
+damage = 0                          
+guardflag = L                  
+hitflag = MA                 
+priority = 3,miss           
+animtype = medium 
+ground.type = trip
+pausetime = 0, 6 + root,var(47) * 2
+guard.pausetime = 0, 6          
+hitsound   = s205, 1
+guardsound = s150, 1
+ground.slidetime = 12 + root,var(45)
+ground.hittime  = 12 + root,var(45)
+guard.hittime  = 11	
+guard.slidetime  = 11
+airguard.ctrltime = 11 
+ground.velocity = 4 * var(31) * root,fvar(5),-4 * root,fvar(6)             
+air.velocity = 4 * var(31) * root,fvar(5), -4 * root,fvar(6)
+down.velocity = ifelse(root,var(2) = 2,-3,-8) * var(31) * root,fvar(5),ifelse(root,var(2) = 2,-2,-2.5) * root,fvar(6)           
+guard.velocity = -5.5 * var(31)  
+airguard.velocity = -4.5 * var(31) , -4.5         
+yaccel = 0.5   
+fall = 1
+air.fall = 1                 
+fall.recover = 0
+fall.recovertime = ceil( (12 + 12 * root,var(47) ) * root,var(46) * root,fvar(4) ) + 12 + 2 * root,var(47) + (!root,var(46)) * 7
+getpower = ifelse(root,Var(40),0,24 + (root,var(2) = 1 && root,life <= 250) * 24)
+palfx.time = root,var(47) * 5
+palfx.add = root,var(47) * 255,root,var(47) * -130, root,var(47) * -108
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff    = 0
+guard.cornerpush.veloff  = 0
+airguard.cornerpush.veloff= 0
+ignorehitpause = 0
+
+[state 8110,vel];
+type = destroyself
+triggerall = animtime = 0
+trigger1 = anim = [2745,2750]
+ignorehitpause = 0
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "f=%d,H=%d\n"
+params = facing,const(size.height)
+ignorehitpause = 1
+
+
+
+
+
+
+
+;---------------------------------inte
+;--------------------------50000
+[statedef 50000];AI命令管理	基本待機
+type = A
+movetype = I
+physics = n
+anim = 6000
+ctrl = 0
+
+[state 3140,];命令感覚
+type = varset
+trigger1 = 1
+var(59) = gametime % 60
+
+;----------------本体と情報同期
+[state 3140,]
+type = posset
+trigger1 = 1
+x = root,pos x
+y = root,pos y
+ignorehitpause = 1
+[state 3140,]
+type = velset
+trigger1 = 1
+x = root,vel x
+y = root,vel y
+[state 3140,]
+type = turn
+trigger1 = root,facing != facing
+
+[state 3140,];本体すてーと
+type = varset
+trigger1 = 1
+var(0) = root,stateno
+
+;--------Var系
+[state 3140,];モード１
+type = varset
+trigger1 = 1
+var(1) = root,var(1)
+[state 3140,];モード2
+type = varset
+trigger1 = 1
+var(2) = root,var(2)
+
+[state 3140,];モード１
+type = varset
+trigger1 = 1
+var(1) = root,var(1)
+[state 3140,];モード2
+type = varset
+trigger1 = 1
+var(2) = root,var(2)
+[state 3140,];本体状態 1立ち 2しゃがみ 3空 4だうん？		V3
+type = varset
+trigger1 = root,statetype = S || root,statetype = C  
+var(3) = ifelse(root,statetype = S,1,2)
+[state 3140,];本体状態 1立ち 2しゃがみ 3空 4だうん？		V3
+type = varset
+trigger1 = root,statetype = A || root,statetype = L  
+var(3) = ifelse(root,statetype = A,3,4)
+
+[state 3140,];手近な相手状態 1立ち 2しゃがみ 3空 4だうん？	V4
+type = varset
+trigger1 = enemynear,statetype = S || enemynear,statetype = C  
+var(4) = ifelse(enemynear,statetype = S,1,2)
+[state 3140,];手近な相手 1立ち 2しゃがみ 3空 4だうん？		V4
+type = varset
+trigger1 = enemynear,statetype = A || enemynear,statetype = L  
+var(4) = ifelse(enemynear,statetype = A,3,4)
+
+[state 3140,];本体状態 0A 1I 　2H	V5
+type = varset
+trigger1 = 1
+var(5) = ifelse(root,movetype = A,0,ifelse(root,movetype = I,1,2))
+
+[state 3140,];手近な相手状態 0A 1I 　2H	V6
+type = varset
+trigger1 = 1
+var(6) = ifelse(enemynear,movetype = A,0,ifelse(enemynear,movetype = I,1,2))
+
+[state 3140,];本体CTLR状態　擬似CTRLは通常OKなら１、ALLOKなら2
+type = varrangeset
+trigger1 = 1
+value = 0
+first = 10
+last = 12
+[state 3140,];本体CTLR状態通常系OK　擬似CTRLは通常OKなら１、ALLOKなら2,判断しにくいねわける
+type = varset
+trigger1 = root,ctrl || root,sysvar(3) = 1
+trigger2 = root,stateno = [0,20]
+trigger3 = root,stateno = [50,51]
+var(10) = 1
+[state 3140,];本体CTLR状態必殺系もOK　擬似CTRLは通常OKなら１、ALLOKなら2,判断しにくいねわける
+type = varset
+trigger1 = root,ctrl || root,sysvar(3)
+trigger2 = root,stateno = [0,20]
+trigger3 = root,stateno = [50,51]
+var(11) = 1
+[state 3140,];本体	movecontact、重要  ヒットなら1、ガードされたら-１,あたってるだけを判断ならvar(12)だけですむ
+type = varset
+trigger1 = root,movecontact
+var(12) = ifelse(root,movehit,1,-1)
+
+[state 3140,];本体MOVEHITなど・・これぱっぱだと・・
+type = varset
+trigger1 = 1
+var(13) = ifelse(root,hitpausetime, 1,0)
+
+[state 3140,];本体HITSHARKなど・・
+type = varset
+trigger1 = 1
+var(14) = ifelse(root,HitShakeOver, 1,0)
+
+
+;----------------------------------ぱっぱ特殊
+;-----------------憑依状態など
+[state 3140,];・
+type = varset
+trigger1 = 1
+var(20) = root,var(20)
+
+;------------------------相手との距離
+;---最低距離は14？。幅の関係？
+;--Xは＋なら対面して前　　Yはマイナスなら相手が上、プラスなら相手が下
+;--BDISTでなければ密着ーにいく・・
+[state 3140,];X距	めくりっぽく、空中戦用？
+type = varset
+trigger1 = p2dist x <= -10
+fvar(0) = -1
+[state 3140,];X距	ちょー至近距離１	地上投げれる範囲
+type = varset
+trigger1 = p2dist x > -10
+trigger1 = p2dist x <= 20
+fvar(0) = 0
+[state 3140,];X距	至近距離１_1	
+type = varset
+trigger1 = p2dist x = 20
+trigger1 = p2dist x <= 45
+fvar(0) = 0.5 
+[state 3140,];X距	至近距離2
+type = varset
+trigger1 = p2dist x > 45
+trigger1 = p2dist x <= 60
+fvar(0) = 1
+[state 3140,];X距	近距離1  
+type = varset
+trigger1 = p2dist x > 61
+trigger1 = p2dist x <= 100
+fvar(0) = 2
+[state 3140,];X距	中距離1	Sがとどくぎりぎり
+type = varset
+trigger1 = p2dist x > 100
+trigger1 = p2dist x <= 170
+fvar(0) = 3 
+[state 3140,];X距	遠距離1
+type = varset
+trigger1 = p2dist x > 170
+trigger1 = p2dist x <= 210
+fvar(0) = 4 
+[state 3140,];X距	遠距離2	
+type = varset
+trigger1 = p2dist x > 210
+fvar(0) = 5 
+;----------------------------------------Yはマイナスなら相手が上、プラスなら相手が下------Y
+[state 3140,];y距	相手上 かなり離れている。2キャラ分ぐらい？ 自分地上で相手ジャンプ？
+type = varset
+trigger1 = p2dist y <= -50
+fvar(1) = -2
+[state 3140,];y距	相手上、1キャラ分ぐらい？	空中同士なら投げれるかも？
+type = varset
+trigger1 = p2dist y < -10
+trigger1 = p2dist y > -50
+fvar(1) = -1
+[state 3140,];Y距	高さほぼ同じ,基準位置？
+type = varset
+trigger1 = p2dist y >= -10 
+trigger1 = p2dist y <= 10 
+fvar(1) = 0 
+[state 3140,];y距	Sがとどくかな？むりかな
+type = varset
+trigger1 = p2dist y > 10
+trigger1 = p2dist y < 50
+fvar(1) = 1
+[state 3140,];y距	高い、じゃんぷ頂点ぐらい？
+type = varset
+trigger1 = p2dist y >= 50
+trigger1 = p2dist y <= 120
+fvar(1) = 2 
+
+[state 3140,];	行動常時りせっと
+type = parentvarset
+trigger1 = 1
+var(52) = 0
+
+[state 3140,];思考ぱたーん、HPに応じて？	
+type = varset
+trigger1 = 1
+var(58) = ifelse(life >= 500,0,ifelse(life >= 250,2,3)) 
+
+;-------------------------移動系は53にしてみる？
+
+
+;----どこらへんがいい間合いでしょうね？というか不自然になるねーやっぱ
+[state 3140,];位置調整	地上前あるき・・	
+type = parentvarset
+triggerall = var(3) <= 2 && fvar(0) >= 4 && !var(57)
+trigger1 = var(6) && root,stateno <= 20 && random % 300 = 0
+var(53) = 20
+
+[state 3140,];位置調整	地上ダッシュ、HP余裕あるとき。	
+type = parentvarset
+triggerall = var(3) <= 2 && fvar(0) >= 2 && !var(58)
+trigger1 = var(6) && root,stateno <= 20 && random % 600 = 0
+var(53) = 100
+
+[state 3140,];位置調整	地上後ろあるき・・,相手がI時？	
+type = parentvarset
+triggerall = var(3) <= 2 && fvar(0) <= 1 && !var(57)
+trigger1 = var(6) = 1 && root,stateno <= 20  && random % 200 = 0
+var(53) = 21
+
+[state 3140,];位置調整	地上バックダッシュ・・近くて相手が攻撃時、とかね	
+type = parentvarset
+triggerall = var(3) <= 2 && fvar(0) <= 1
+trigger1 = !var(6) && root,stateno <= 20  && random % 100 = 0
+var(53) = 105
+
+[state 3140,];位置調整	とびこみ
+type = parentvarset
+triggerall = var(3) <= 2 && fvar(0) <= 2 && fvar(0) >= 1 && !fvar(1) && var(4) <= 2 
+trigger1 = var(0) = [0,20]
+trigger1 = random % 60 = 0
+var(53) = 42
+
+[state 3140,];位置調整	じゃんぷきゃんせ200,210,220,225,400,600,620,640
+type = parentvarset
+triggerall = var(3) <= 2 && fvar(0) <= 2 && fvar(1) <= -1 && var(4) = 3 && var(6) = 2
+trigger1 = var(12) && (var(0) = 225 || var(0) = 210) 
+var(53) = 42
+
+[state 3140,];システム動作系	立ちへs0は１でいく	
+type = parentvarset
+triggerall = var(3) <= 2
+trigger1 = root,var(53) = 20
+trigger1 = fvar(0) <= 1
+trigger2 = root,var(53) = 21
+trigger2 = backedgedist < 10
+var(53) = 1
+
+[state 3140,];システム動作系封鎖	プレイやの判断もかねているためる最低１は保障しないと?んー？-1にする？
+type = parentvarset
+triggerall = var(3) <= 2 
+trigger1 = !root,var(53)
+trigger2 = stateno = [130,131]
+trigger2 = !inguarddist
+trigger3 = root,var(53) = [41,53] 
+trigger3 = var(0) = 52 
+var(53) = 1
+
+[state 3140,];システム動作系封鎖	空中状態
+type = parentvarset
+triggerall = var(3) = 3 
+trigger1 = !root,var(53)
+trigger2 = root,var(53) != [40,53] 
+trigger2 = root,var(53) != [100,107] 
+trigger3 = stateno = 132
+trigger3 = !inguarddist
+var(53) = 2
+
+[state 3140,];一度歩きとかに入ったら・・	あまり連続は変なので
+type = varset
+trigger1 = root,var(53) = [20,21]
+trigger1 = !var(57)
+var(57) = 300
+[state 3140,];	
+type = varadd
+trigger1 = var(57) > 0
+var(57) = -1
+
+;-------------------------ガード特殊本体V25もいじるといい？いらないか
+;-----でぃすとより遠い場合の判断はどうしようか？むり？
+[state 3140,];システム動作系封鎖	立ちへ
+type = parentvarset
+triggerall = fvar(0) <= 3 && !var(6)
+triggerall = inguarddist && random % 240
+trigger1 = root,stateno = [0,20]
+var(53) = ifelse(var(4) = 1,130,131)
+
+;------------------------------ここから攻撃動作命令V52使用
+;---コンボはストップ中のみ抽選する？じゃないと延々とやるよ？
+;-------------------------------------------------------
+;-----------------------------たちすたーと必殺系----
+;---------------げーじがあったらやらせてみよう
+;------------ぱっぱは憑依V20も考慮しないといけない
+[state 7000,];	うまれる
+type = parentvarset
+triggerall = power >= 1000 && !root,var(40)
+trigger1 = !var(59) && fvar(0) < 2 && !fvar(1) && var(4) < 4 
+trigger1 = var(11) && var(3) <= 2
+trigger2 = var(13) && var(12) = 1 && (var(0) = 220 || var(0) = 235 || var(0) = 230 || var(0) = 420)
+var(52) = 3000
+
+;----------必殺技
+[state 7000,];
+type = parentvarset
+triggerall = !root,var(52) && fvar(0) <= 2 && !fvar(1) && var(4) < 4 
+trigger1 = !var(59) && var(11) && var(3) <= 2 && random % 20 = 0
+trigger2 = var(13) && var(12) = 1 && (var(0) = 210 || var(0) = 410 || var(0) = 230)
+var(52) = 1100
+
+
+;----------------通常技、間合いにあわせててきとー
+;------またはコンボ
+;--------------------基本行動足払いD
+[state 7000,];
+type = parentvarset
+triggerall = var(20) != 2
+triggerall = !root,var(52) && fvar(0) <= 1 && !fvar(1) && var(4) < 4 
+trigger1 = !var(59) && var(10) && var(4) = 1 && random % 3 = 0
+trigger2 = var(13) && var(12) = 1 && (var(0) = 230 || var(0) = 410)
+var(52) = 440
+
+
+;--------------
+[state 3140,]
+type = destroyself
+trigger1 = root,alive = 0
+trigger2 = enemy,alive = 0
+trigger3 = roundstate >= 3
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "EDX=%f,EDY=%f,fv0=%f,fv1=%f,V53=%d\n"
+params = p2bodydist x,p2bodydist y,fvar(0),fvar(1),root,var(53)
+
+[state -2, displayb];
+type = appendtoclipboard
+trigger1 = 1
+text = "v10=%d,v11=%d,V12=%d"
+params = var(10),var(11),var(12),
+
+[state -2, displayb];
+type = appendtoclipboard
+trigger1 = 0
+text = "v3=%d,v4=%d,v5=%d,V6=%d,V12=%d"
+params = var(3),var(4),var(5),var(6),var(12)
+
+
