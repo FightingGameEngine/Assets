@@ -1,0 +1,5122 @@
+;-------------------------defence	
+;-----55ダスト
+;--s900挑発 s910敬意 s920一撃準備 s930DAA	 940相殺IDに使用	950黄ばーすと 960青バースト
+;----以下敵P2SPR--5700 壁はねかり 5800よろけ　5850ダスト 5900はシステム使用、使っちゃだめ！
+
+;-------------------------------------------------------------------------WINのみの命令あるため--EFE.cnsに格納
+; GUARD (start)	ガード準備　レバーおしっぱでいれば待機130へ、認識距離外、レバーはなしで140(終了へ）
+;------------------おそらくCTRLがあってレバー後ろ方向をおすとここにくるシステム	自動着地が52いくのと同じように？
+;-------------つまり、かならずここを経由する？ガードすると一瞬でチェんステするけど～
+;------通常ガード0	HITTIME-1　これは相手依存でいいと思うが、空中ガードは設定-1
+;------直前ガード1	硬直2～4減少(Air6-11)ノックバックが短くなる、のは早く回復してその分下がらないから？受付８、再受付30必要
+;------ＦＤガード2	硬直が1～2増加(Air2-4)
+;------Sバック3		硬直が固定数値に(地上2空中4)	一定時間ガードできなくなる
+;----SB>>FD>JD　順番変更、JD最後っぽいFDエフェクトと内部処理は切り離して考えて
+;---------こんなんだれも設定してないよーきっと。commonで設定するべき?、普通攻撃側だよね
+[Statedef 120]
+type = U    ;Leave state type unchanged
+physics = U ;Leave physics unchanged
+
+[State 0, 1];ぽむぽむリセット 保険ね
+type = varset
+trigger1 = var(55) > 10
+var(55) = 0
+ignorehitpause = 1
+
+[State 120, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 130 + (statetype = C) + (statetype = A)*2
+
+[State 120, 2]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = S
+physics = S
+
+[State 120, 3]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = C
+physics = C
+
+[State 120, 4]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = A
+physics = A
+
+[State 120, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 120, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+;--------------特殊FDCダッシュ　GGXのみ
+[State 130, Hi to Lo]
+type = ChangeState
+triggerall = var(2) = 2
+triggerall = var(21)
+triggerall = time = 0
+trigger1 = command = "FF"
+value = 100
+ctrl = 0
+
+[State 120, 5];anim120終了したらガード待機130-3まいめ
+type = ChangeState
+trigger1 = Time = 0
+value = 130 + (statetype = C) + (statetype = A)*2
+
+;------------ここ120-140ループになる、どうすればいい？
+;----1レバーはなし　2FDでなくガード距離以外
+[State 120, Stop Guarding];レバーはなすか　ガード距離じゃなければ終了へ（WINのみ
+type = ChangeState
+triggerall = 1
+trigger1 = command != "holdback"
+trigger2 = var(25) < 2
+trigger2 = !inguarddist
+value = 140
+
+;---------------FD,SBは基本的に130系にとばします　攻撃きたら150系にいきます
+;--130->150->130-140
+;--150->130->140 	のパターンがあるので順番ずれるがかならずくる。
+
+;---------------------------------------------------------------------------
+;---SBだったら規定2or4フレームここで待機させる。当たるとシステムで自動150にいく。
+;-受付終了したら絵は同じで硬直扱いのステートにとばしておく。
+; STAND GUARD (guarding)	地上ガード待機　レバー下でしゃがみガード待機
+[Statedef 130]
+type    = S
+physics = S
+
+[State 0, 1];ぽむぽむリセット 保険ね
+type = varset
+trigger1 = var(55) > 10
+var(55) = 0
+ignorehitpause = 1
+
+;----------------SB AC、ぱたーん7　
+;---SB成功fv23 SBガード不能時間fv22 起上禁止f21
+[state 120x,];SB　ガード状態フラグ	JDだろうとFD経由のときでも強制３	FD中コマンドで再帰でくるのでtime０のときのみ
+type = varset
+triggerall = 1;
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+var(25)  = 3
+ignorehitpause = 0
+
+[state 120x,];SB　ガード不能時間の発動　成功時１５、失敗時３０、FD中コマンドで再帰でくるのでtime０のときのみ
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+fvar(22)  = 30
+ignorehitpause = 0
+
+[state -2,helper partner];----SB発動リング黄色　成功時のはそっちで、代用エフェ
+type = Helper
+triggerall = var(25) = 3
+trigger1 = time = 0
+name = "SB helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 0
+size.height = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = prevstateno != [130,132]
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = -40
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　コントロル不
+type = ctrlset
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = 0
+ignorehitpause = 1
+
+[state 120x,];SB　受付終了普通２、成功後で4放置で失敗待機ステート135へ fv23
+ type = changestate
+triggerall = var(25) = 3
+trigger1 = fvar(23) = 0 && time >= 2 
+trigger2 = fvar(23) > 0 && time >= 4 
+value = 160
+ignorehitpause = 1
+
+;-----------------------待機中のFD固有動作	演出だけは直前でもでる
+;--保険でここでも2セットできるようにする	SB以外
+[state 120x,]
+type = varset
+triggerall = var(25) <= 2
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 0
+var(25)  = 2
+ignorehitpause = 1
+
+[state -2,helper partner];
+type = Helper
+triggerall = var(25) = 2 
+triggerall = !numhelper(50)
+trigger1 = time >= 0
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+[State -1,SB];FDにかかわらず	SBコマンドはいったら強制移動
+type = ChangeState
+value = ifelse(command = "SBS",130,131)
+triggerall = var(25) <= 2
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = (!var(1) || var(1) = 4)
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time >= 0
+ignorehitpause = 0
+
+[State 150, 2];FDやっててパワーが0になったら・・ 通常Gとする
+type = varset
+triggerall = var(25) = 2
+trigger1 = power < 0
+trigger1 = 1
+var(25) = 0
+ignorehitpause = 1
+
+[state 120x,];FDパワー減少　
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;--------------特殊FDCダッシュ　GGXモード、FD入ってるときのみ
+[State 130, Hi to Lo]
+type = ChangeState
+triggerall = var(2) = 2
+triggerall = var(25) = 2
+triggerall = time = [0,1]
+trigger1 = command = "FF"
+value = 100
+ctrl = 0
+
+[State 130, 1];ガード硬直以外から来た場合
+type = ChangeAnim
+triggerall = prevstateno != [150,153]
+trigger1 = Anim != 130
+value = 130
+
+[State 130, 1];ガード硬直からそのまま来た場合（FDしっぱなし)	
+type = ChangeAnim
+trigger1 = prevstateno = [150,153]
+trigger1 = time = 0
+trigger2 = var(25) = 3 && time = 0
+value = 130
+elem = 3
+
+;-----終了条件部、SBの3でも３０Fで0にされるので140に戻ってしまうデバック時ここもつぶして
+
+[State 130, Hi to Lo];SB以外で・・
+type = ChangeState
+triggerall = var(25) < 3
+trigger1 = command = "holddown"
+value = 131
+
+[State 130, Stop Guarding]
+type = ChangeState
+triggerall = var(25) < 3
+trigger1 = command != "holdback"
+trigger2 = var(25) < 2
+trigger2 = !inguarddist
+value = 140
+
+;---------------------------------------------------------------------------
+; CROUCH GUARD (guarding)しゃがみガード待機、れバー真横で立ちガード
+[Statedef 131]
+type    = C
+physics = C
+
+[State 0, 1];ぽむぽむリセット 保険ね これは1でもリセット
+type = varset
+trigger1 = var(55) >= 1
+var(55) = 0
+ignorehitpause = 1
+
+;----------------SB AC、ぱたーん7　
+;----------------SB AC、ぱたーん7　
+;---SB成功fv23 SBガード不能時間fv22 起上禁止f21
+[state 120x,];SB　ガード状態フラグ	JDだろうとFD経由のときでも強制３	FD中コマンドで再帰でくるのでtime０のときのみ
+type = varset
+triggerall = 1;
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+var(25)  = 3
+ignorehitpause = 0
+
+[state 120x,];SB　ガード不能時間の発動　成功時１５、失敗時３０、FD中コマンドで再帰でくるのでtime０のときのみ
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+fvar(22)  = 30
+ignorehitpause = 0
+
+[state -2,helper partner];----SB発動リング黄色　成功時のはそっちで、代用エフェ
+type = Helper
+triggerall = var(25) = 3
+trigger1 = time = 0
+name = "SB helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 0
+size.height = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = prevstateno != [130,132]
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = -40
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　コントロル不
+type = ctrlset
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = 0
+ignorehitpause = 1
+
+[state 120x,];SB　受付終了普通２、成功後で4放置で失敗待機ステート135へ fv23	しゃがみは161！
+ type = changestate
+triggerall = var(25) = 3
+trigger1 = fvar(23) = 0 && time >= 2 
+trigger2 = fvar(23) > 0 && time >= 4 
+value = 161
+ignorehitpause = 1
+
+;-----------------------待機中のFD固有動作	演出だけは直前でもでる
+[state 120x,]
+type = varset
+triggerall = var(25) <= 2
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 0
+var(25)  = 2
+ignorehitpause = 1
+
+[state -2,helper partner];
+type = Helper
+triggerall = var(25) = 2 
+triggerall = !numhelper(50)
+trigger1 = 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+[State -1,SB];FD中じゃなくても　SBコマンドはいったら強制移動	SBのときはいかないように
+type = ChangeState
+value = ifelse(command = "SBS",130,131)
+triggerall = var(25) <= 2
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = (!var(1) || var(1) = 4)
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time >= 0
+ignorehitpause = 0
+
+[State 150, 2];FDやっててパワーが0になったら・・ 通常Gとする
+type = varset
+triggerall = var(25) = 2
+trigger1 = power < 0
+trigger1 = 1
+var(25) = 0
+ignorehitpause = 1
+
+[state 120x,];FDパワー減少　
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;--------------特殊FDCダッシュ　GGXモード、FD入ってるときのみ
+[State 130, Hi to Lo]
+type = ChangeState
+triggerall = var(2) = 2
+triggerall = var(25) = 2
+triggerall = time = [0,1]
+trigger1 = command = "FF"
+value = 100
+ctrl = 0
+
+[State 130, 1];ガード硬直以外から来た場合
+type = ChangeAnim
+triggerall = prevstateno != [150,153]
+trigger1 = Anim != 131
+value = 131
+
+[State 130, 1];ガード硬直からそのまま来た場合（FDしっぱなし)
+type = ChangeAnim
+trigger1 = prevstateno = [150,153]
+trigger1 = time = 0
+trigger2 = var(25) = 3 && time = 0
+value = 131
+elem = 3
+
+[State 131, Lo to Hi]
+type = ChangeState
+triggerall = var(25) < 3
+trigger1 = command != "holddown"
+value = 130
+
+[State 131, Stop Guarding]
+type = ChangeState
+triggerall = var(25) < 3
+trigger1 = command != "holdback"
+trigger2 = var(25) < 2
+trigger2 = !inguarddist
+value = 140
+
+;---------------------------------------------------------------------------
+; AIR GUARD (guarding)空中がーど待機	重力がかかります ダスト時は特殊で・・おもろいかかりかたをする
+;----ダスト中の動きはHoJ55と同じようだ。距離によって？一定時間加速あり
+[Statedef 132]
+type    = A
+physics = N
+
+[State 0, 1];ぽむぽむリセット 保険ね
+type = varset
+trigger1 = var(55) > 10
+var(55) = 0
+ignorehitpause = 1
+
+;----------------SB AC、ぱたーん7　
+;----------------SB AC、ぱたーん7　
+;---SB成功fv23 SBガード不能時間fv22 起上禁止f21
+[state 120x,];SB　ガード状態フラグ	JDだろうとFD経由のときでも強制３	FD中コマンドで再帰でくるのでtime０のときのみ
+type = varset
+triggerall = 1;
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+var(25)  = 3
+ignorehitpause = 0
+
+[state 120x,];SB　ガード不能時間の発動　成功時１５、失敗時３０、FD中コマンドで再帰でくるのでtime０のときのみ
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+fvar(22)  = 30
+ignorehitpause = 0
+
+[state -2,helper partner];----SB発動リング黄色　成功時のはそっちで、代用エフェ
+type = Helper
+triggerall = var(25) = 3
+trigger1 = time = 0
+name = "SB helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 0
+size.height = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = 1;prevstaten != [130,132]
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = -40
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　コントロル不
+type = ctrlset
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = 0
+ignorehitpause = 1
+
+[state 120x,];SB　受付終了普通２、成功後で4放置で失敗待機ステート135へ fv23
+ type = changestate
+triggerall = var(25) = 3
+trigger1 = fvar(23) = 0 && time >= 2 
+trigger2 = fvar(23) > 0 && time >= 4 
+value = 162
+ignorehitpause = 1
+
+;-----------------------待機中のFD固有動作
+[state 120x,]
+type = varset
+triggerall = var(25) <= 2
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 0
+var(25)  = 2
+ignorehitpause = 1
+
+[state -2,helper partner];
+type = Helper
+triggerall = var(25) = 2 
+triggerall = !numhelper(50)
+trigger1 = 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+[State -1,SB];FD	以外でも SBコマンドはいったら強制移動
+type = ChangeState
+value = 132
+triggerall = var(25) <= 2
+triggerall = !var(40) && power >= 20 && statetype = a && fvar(21) = 0
+triggerall = (!var(1) || var(1) = 4)
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time >= 0
+ignorehitpause = 0
+
+[State 150, 2];FDやっててパワーが0になったら・・ 通常Gとする
+type = varset
+triggerall = var(25) = 2
+trigger1 = power < 0
+trigger1 = 1
+var(25) = 0
+ignorehitpause = 1
+
+[state 120x,];FDパワー減少　
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;-----------------------------------------
+[State 132, 2];HOJ経由のときの重力判定
+type = Varset
+triggerall = time = 0
+trigger1 = var(11) = [1,2] 
+var(11) = 3
+
+[State 130, 1];ガード硬直以外から来た場合
+type = ChangeAnim
+triggerall = prevstateno != [150,153]
+trigger1 = Anim != 132
+value = 132
+
+[State 130, 1];ガード硬直からそのまま来た場合（FDしっぱなし)
+type = ChangeAnim
+trigger1 = prevstateno = [150,153]
+trigger1 = time = 0
+trigger2 = var(25) = 3 && time = 0
+value = 132
+elem = 3
+
+[State 155, 2];ダスト振り向き?
+type = turn
+triggerall = p2dist x < 0
+trigger1 = var(12)
+
+[State 155, 2];ダストじゃないときfvar(9)?
+type = VelAdd
+trigger1 = !var(12)
+trigger2 = var(12) >= 30
+y = fvar(9);Const(movement.yaccel)
+
+[State 132, 3];--POSがすでに地上で速度が下にむかってる→着地OK
+type = VarSet
+trigger1 = 1
+sysvar(0) = (pos y >= 0) && (vel y > 0)
+
+[State 132, 4];上のが真になったらになったら停止
+type = VelSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 5]
+type = PosSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 6];レバーいれたまま地上に着地している立ちガード
+type = ChangeState
+trigger1 = sysvar(0)
+trigger1 = command = "holdback"
+value = 130
+
+[State 132, 7];保険的、普通の着地
+type = ChangeState
+trigger1 = sysvar(0)
+value = 52
+
+[State 132, Stop Guarding];レバーはなしなどで終了
+type = ChangeState
+trigger1 = command != "holdback"
+trigger2 = var(25) < 2
+trigger2 = !inguarddist
+value = 140
+
+
+
+;---------------------------------------------------------------------------
+; GUARD (end)	ガード解除	共通	空中なら重力かかってる
+;--------ガード終了アニメはなし、すぐに通常に戻る　保険でてきとーにAir設定はしといて
+;----すぐ戻ると0->120->140->0るーぷして相手攻撃中硬直になるっぽいなんとかして
+;---------------ってかCTRL1だし
+[Statedef 140]
+type = U    ;Leave state type unchanged
+physics = U ;Leave physics unchanged
+ctrl = 1
+
+[State 140, 1]
+type = ChangeAnim
+trigger1 = 0;Time = 0
+value = 140 + (statetype = C) + (statetype = A)*2
+
+[State 140, 2]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = S
+physics = S
+
+[State 140, 3]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = C
+physics = C
+
+[State 140, 4]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = A
+physics = A
+
+[State 140, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 140, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+;[State 140, 5] ;Implemented within engine
+;type = ChangeState
+;trigger1 = AnimTime = 0
+;value = (statetype = C)*11 + (statetype = A)*51
+
+;---------------------------------------------------------------------------
+; SGUARDHIT (shaking)これが立ちガード硬直。しゃがみを押してるとGGXXでは内部的にはしゃがみガードだが絵がかわらないという。
+;--つまり、硬直を無視してしゃがみガードに送れるが、アニメは立ちのまま、ってことでいいはず?
+;-HじゃないとHITSHAKEOVERが考慮されない
+;--直前ならLVに応じて早く通常へ2,3,3,4,4 L2 M3 H4とする。
+;FDなら共通で2ふえるだけだね・
+;---スラッシュバック　やなもの追加、
+
+;-------------地上立ちのHITSTOP PAUSETIME中
+[Statedef 150]
+type    = S
+movetype= h
+physics = N
+velset = 0,0
+
+;-------------------------------------------ガード属性 優先順位SB>FD>JD>D
+[State 150, 2];ガード初期化0以下のときのみ０にしておく　0通常　1JD 2FD 3SB   
+type = varset
+triggerall = var(25) <= 0
+trigger1 = time = 0
+var(25) = 0
+ignorehitpause = 1
+
+;----------------------SB成功時実行部
+;----------v25=3　スラッシュバック成功
+[State -1,SB];130経由せず150にくることもあるので・・コマンド入ってたら３
+type = varset
+var(25) = 3
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = (!var(1) || var(1) = 4)
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+ignorehitpause = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = prevstateno != [120,155]
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = -40
+ignorehitpause = 1
+persistent = 0
+
+[State 150, 2];SB	減らしても成功ゲージ獲得 直前より３％上、そもそも直前はなん％なの？仮５％
+type = poweradd
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = 100
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　ガード不能時間を15に設定しなおし HITPAUSEでへる？へらない？減ると一瞬で不能時間終わる、たぶん減らない
+type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+fvar(22) = 15
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　SB受付フレームのばし成功30Fに	 HITPAUSEでへる？へらない？んー？、たぶん減らない
+ type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+fvar(23) = 30
+ignorehitpause = 1
+persistent = 0
+
+;-------------------------SBガードエフェクトベージュの円形、代用はどれがいい？
+[state -2,helper partner];----エフェクト代用、黄色バーストのを
+type = Helper
+triggerall = var(25) = 3
+trigger1 = time = 0
+name = "SB HIT efect"
+ID = 150
+pos = 0,-55
+postype = p1
+stateno = 756
+ownpal = 1
+ignorehitpause = 1
+size.xscale = 0.5
+size.yscale = 0.75
+persistent = 0
+
+;------------------------------FD	ガード成功時実行
+;-----------------------待機中のFD固有動作
+[state 120x,]
+type = varset
+triggerall = var(25) < 3
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time = 0
+var(25)  = 2
+ignorehitpause = 1
+
+[state -2,helper partner];緑の円
+type = Helper
+triggerall = var(25) = 2 
+triggerall = !numhelper(50)
+trigger1 = 1;time = 0
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+;----------v25=2　FDガード成功
+[state 120x,];FDガードパワー減らし
+type = poweradd
+triggerall = time = 0
+trigger1 = var(25) = 2 && power > 0 && !var(40)
+value  = -25
+ignorehitpause = 1
+persistent = 0
+
+;-------------------------FDガードエフェクト青い稲光みたいなのがあるっぽい
+[state 120x,atc efe];ＦＤで当たったときの
+type = Explod
+triggerall = var(25) = 2 && power > 0 && !var(40)
+trigger1 = time = 0
+anim = 6165
+ID = 760
+postype = p1
+pos = 0,-55
+sprpriority = 4
+bindtime = 1
+facing = ifelse(random % 2 = 0,1,-1)
+vfacing = ifelse(random % 2 = 0,1,-1)
+removetime = -2
+ownpal=1
+removeongethit = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+persistent = 0
+
+;------引き戻しのときの方向に注意。fv20に格納	引き戻しでFDするとより相手に近づいてしまう
+;--hitdefのVELは向きで自動で反転されている、後ろにとぶのはP1ではマイナスp2ではプラスにされているので・・たしかめるには？
+;--posaddは自動で反転してくれる、マイナスでいいが、引き戻しの判定方法は？
+[state 120x,];----FD距離強制のばし、POSADD ちぇんすてふれーむで ２p側だと逆転してる気がする基本値設定して符号を乗算
+type = posadd
+triggerall = var(25) = 2 
+trigger1 = HitShakeOver
+x = -15 * ifelse(gethitvar(xvel) <= 0,1,-1) * facing
+ignorehitpause = 1
+persistent = 0
+
+;--------------本体で引き戻しできる相手いない？確認できない
+[state 120x,];----FD距離強制のばし、画面背のとき	擬似相手押し返し画面はし引き戻しのときはどうなる？相手は？
+type =  width
+triggerall = 0;var(25) = 2 
+triggerall = BackEdgeBodyDist < 35
+trigger1 = HitShakeOver
+player = 35,0
+ignorehitpause = 1
+persistent = 1
+
+;----実験おしかえしへるぱ
+[state -2,helper partner];
+type = Helper
+triggerall = var(25) = 2 
+triggerall = BackEdgeBodyDist < 35
+triggerall = enemynear,moveguarded
+trigger1 = HitShakeOver
+helpertype = normal
+name = "FD ref helper"
+ID = 745
+pos = 20,0
+postype = p2
+stateno = 745
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.height = 240
+ground.back = 120    
+ground.front = 120   
+air.back = 120        
+air.front = 120   
+
+;-------------------FD/SB共通擬似ライフ削り無効
+;---------------------------------------------FD/SBライフ強制戻し -2でやる
+
+
+
+;-----------------------JUSTガード　直前ガード
+;----------v25=1　直前ガード成功	FDでもSBでもなくV23が23以上のとき（8F有効
+;-------------------------直前ガード 専用実行
+[state 120x,]
+type = varset
+triggerall = var(25) <= 1
+trigger1 = var(23) > 22
+trigger1 = time = 0
+var(25) = 1
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];光る
+type = palfx
+triggerall = var(25) = 1
+trigger1 = time = 0
+time = 10
+add = 255,255,255
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];ＪＤ	テンション獲得。2%仮
+type = poweradd
+triggerall = var(25) = 1
+triggerall = !var(40)
+trigger1 = time = 0
+value = 40
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];ＪＤ受付リセット	成功時のみ。
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(23) = 0
+ignorehitpause = 1
+persistent = 0
+
+;--------------------ガードバランス増加；対応キャラ以外ね
+;----なんかすぐたまる。ほとんどのキャラがHARDなのかも
+[state 7000,];自分の方　相手対応キャラでなければ　ガードで増やす  注意：FD(V25=2,3)なら増やさない、他のキャラ判断不能
+type = varadd
+triggerall = 1
+triggerall = var(49) != 2
+triggerall = var(19) < 256
+triggerall = var(25) <= 1 
+trigger1 = time = 0
+var(19) = ifelse(gethitvar(animtype) = 0,6,ifelse(gethitvar(animtype) = 1,8 + random % 3,10 + random % 5))
+ignorehitpause = 1
+persistent = 0
+supermovetime = 1
+
+;-----------------------摩擦調整
+;---原作と離れ方違う、仕方ない。ガードはX０でも普通後ろに下がるはず
+;--ADｄやめ、初速乗算でいいや　Jd,SBなら低く、他なら長くー＞見た目原作の長さになる
+;---JDは空中の顕著にへるが、地上は硬直時間減少で吸収かもしれない摩擦仕様の違いでむりっとやっぱつけとく
+[State 1540, 4];でふぉると	
+type = varset
+trigger1 = time = 0
+fvar(13) = ifelse(var(25) = 1 || var(25) = 3 ,0.9,1.2)
+ignorehitpause = 1
+persistent = 0
+
+;-----------------------------------------
+;-----------------------ガードこうちょく計算部　ひとつですませられるかな？
+[State 150, 2];がード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5	保険として必ずだいにゅー
+type = varset
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime)
+ignorehitpause = 1
+
+;----以下は、システムの違いでずれはあるでしょうが、しょうがないよ？
+[State 150, 2];JUSTガード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5	2,3,3,4,4減る
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime) - ifelse(GetHitVar(animtype) = 0,2,ifelse(GetHitVar(animtype) = 1,3,4))
+ignorehitpause = 1
+
+[State 150, 2];FDガード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5 2,3,3,4,5増
+type = varset
+triggerall = var(25) = 2
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime) + ifelse(GetHitVar(animtype) = 0,2,ifelse(GetHitVar(animtype) = 1,3,4))
+ignorehitpause = 1
+
+[State 150, 2];SBガード硬直数値格納 地上２固定　空中4固定
+type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+var(24) = ifelse(statetype = A,4,2)
+ignorehitpause = 1
+
+[State 1540, 4];計算すんだら　ＪＤ受付フラグリセット	成功時のみ。
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(25) = 0
+ignorehitpause = 1
+persistent = 0
+
+;----------------------------------------------------------------
+
+[State 150, 2];硬直が終わるとノックバックへ下おしならしゃがみガードに
+type = ChangeState
+trigger1 = HitShakeOver
+value = 151 + 2*(command = "holddown")
+
+;-----------------------------------ここから下はいじらない
+[State 150, 1];絵的にはここをどうにかする
+type = ChangeAnim
+trigger1 = 1
+value = 130;150
+elem = 3
+
+[State 150, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 150, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+[State 150, 3]
+type = ForceFeedback
+trigger1 = time = 0
+waveform = square
+time = 3
+
+;---------------------------------------------------------------------------
+; SGUARDHIT2 (knocked back)	硬直がおわってノックバック
+;-----FD、通常ガードの時間変更はここでなんとかして。ctrltimeをいじる、設定する
+;---ここでSB入力すると有効になるけど130に移動させちゃうとやっかいになるよ
+[Statedef 151]
+type    = S
+movetype= H
+physics = S
+;anim = 150
+
+;----------------------GG特殊、ガード切り替えでも硬直終了まで絵的にかわらない
+[State 151, 1];
+type = changeanim
+triggerall = prevstateno != 152
+trigger1 = Time = 0
+value = 150
+
+
+[State 151, 1];HTIDEF　X設定有効に
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 151, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 151, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = s
+
+[State 151, 1];ガード数値調整　
+type = Velset
+trigger1 = time = 0
+x = vel x * fvar(13)
+persistent = 0
+
+;---しくみ
+;---SB連打可能であり、従来どおりFDも発動可能である、3ボタン同時ならSBの３にセットさせる
+;---フラグを使わないのであれば、SBを後において上書き法でやる？
+;--こSBは一度押したらそのフレームだけ判定継続不可。コマンドのたびに３セットと不能フラグリセット
+;--FDはおしっぱ判定可能なので、おしたままガードにいけばそっちで判別されるはず、コマンドでエフェクト、パワー減らしだけ発生
+;---------------SB
+;----ここでは失敗モーションにいかないので連打できるわけで。たまにCPUがすごいぴかぴかするのはこれであると
+;--不能ふれ30に設定しなおすことでガード可能にもどし、この間ガードでSB発動になる
+[state 120x,];SB　ガード状態フラグ
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+var(25)  = 3
+ignorehitpause = 1
+
+[state 120x,];SB　ガード不能時間の発動　成功時１５、失敗時３０、基本30にセットしてガードしたら15に変更
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+fvar(22)  = 30
+ignorehitpause = 1
+
+[state -2,helper partner];----SB発動リング黄色　成功時のはそっちで、代用エフェ
+type = Helper
+triggerall = numhelper(55) < 10
+triggerall = !numhelper(55) || (numhelper(55) && random % 3 = 0)
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+name = "SB helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 1
+size.height = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ここでガードすると2回減るかも、
+type = poweradd
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+value = -40
+ignorehitpause = 0
+
+;------------FD実行部
+;--ここでもFDにいけるようにはする？var判断ではなくコマンド判断？
+;---パワーへらしていくため、
+[state -2,helper partner];みどりりんぐえふぇ
+type = Helper
+triggerall = !numhelper(50)
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+
+[state 120x,];FD/パワー減少
+type = poweradd
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = 1
+value  = -4
+ignorehitpause = 0
+
+;--------------------V25=0通常　1JD -2FD---3SB
+;---スライド停止はさすがにmugenに従っとく？いやしかし・・
+;--基本ctrltime=slidetimeであるはず
+[State 151, 2];デフォルトの設定	完全にそっくりには無理
+type = VelSet
+trigger1 = Time >= GetHitVar(slidetime)
+trigger1 = Time >= var(24)
+trigger2 = HitOver
+trigger2 = Time >= var(24)
+x = 0
+
+[State 151, 3];FD2,SB3はここでも再入力できるのでこの条件はまずい
+type = CtrlSet
+trigger1 = Time >= var(24)
+value = 1
+
+[State 151, 4];設定時間終了、SBなら通常	これここで入力追加あるから、３じゃだめかも13？
+type = ChangeState
+trigger1 = Time >= var(24)
+value = 130
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; CGUARDHIT (shaking)	シャがみガード硬直
+;－－－－hittoPAUSE中
+[Statedef 152]
+type    = C
+movetype= H
+physics = N
+velset = 0,0
+
+;-------------------------------------------ガード属性 優先順位SB>JD>FD>D
+[State 150, 2];ガード初期化0以下のときのみ０にしておく　0通常　1JD 2FD 3SB   
+type = varset
+triggerall = var(25) <= 0
+trigger1 = time = 0
+var(25) = 0
+ignorehitpause = 1
+
+
+[State -1,SB];130経由せず150にくることもあるので・・コマンド入ってたら３
+type = varset
+var(25) = 3
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = (!var(1) || var(1) = 4)
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+ignorehitpause = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = prevstateno != [120,155]
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = -40
+ignorehitpause = 1
+persistent = 0
+
+[State 150, 2];SB	減らしても成功ゲージ獲得
+type = poweradd
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = 100
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　ガード不能時間を15に設定しなおし HITPAUSEでへる？へらない？減ると一瞬で不能時間終わる、たぶん減らない
+type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+fvar(22) = 15
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　SB受付フレームのばし成功30Fに	 HITPAUSEでへる？へらない？んー？、たぶん減らない
+ type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+fvar(23) = 30
+ignorehitpause = 1
+persistent = 0
+
+;-------------------------SBガードエフェクトベージュの円形、代用はどれがいい？
+[state -2,helper partner];----エフェクト代用、黄色バーストのを
+type = Helper
+triggerall = var(25) = 3
+trigger1 = time = 0
+name = "SB HIT efect"
+ID = 150
+pos = 0,-55
+postype = p1
+stateno = 756
+ownpal = 1
+ignorehitpause = 1
+size.xscale = 0.5
+size.yscale = 0.75
+persistent = 0
+
+;------------------------------FD	ガード成功時実行
+;-----------------------待機中のFD固有動作
+[state 120x,]
+type = varset
+triggerall = var(25) < 3
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time = 0
+var(25)  = 2
+ignorehitpause = 1
+
+[state -2,helper partner];緑の円
+type = Helper
+triggerall = var(25) = 2 
+triggerall = !numhelper(50)
+trigger1 = 1;time = 0
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+;----------v25=2　FDガード成功
+[state 120x,];FDガードパワー減らし
+type = poweradd
+triggerall = time = 0
+trigger1 = var(25) = 2 && power > 0 && !var(40)
+value  = -25
+ignorehitpause = 1
+persistent = 0
+
+;-------------------------FDガードエフェクト青い稲光みたいなのがあるっぽい
+[state 120x,atc efe];ＦＤで当たったときの
+type = Explod
+triggerall = var(25) = 2 && power > 0 && !var(40)
+trigger1 = time = 0
+anim = 6165
+ID = 760
+postype = p1
+pos = 0,-55
+sprpriority = 4
+bindtime = 1
+facing = ifelse(random % 2 = 0,1,-1)
+vfacing = ifelse(random % 2 = 0,1,-1)
+removetime = -2
+ownpal=1
+removeongethit = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+persistent = 0
+
+;------引き戻しのときの方向に注意。fv20に格納	引き戻しでFDするとより相手に近づいてしまう
+;--hitdefのVELは向きで自動で反転されている、後ろにとぶのはP1ではマイナスp2ではプラスにされているので・・たしかめるには？
+;--posaddは自動で反転してくれる、マイナスでいいが、引き戻しの判定方法は？
+[state 120x,];----FD距離強制のばし、POSADD ちぇんすてふれーむで ２p側だと逆転してる気がする基本値設定して符号を乗算
+type = posadd
+triggerall = var(25) = 2 
+trigger1 = HitShakeOver
+x = -15 * ifelse(gethitvar(xvel) <= 0,1,-1) * facing
+ignorehitpause = 1
+persistent = 0
+
+;--------------本体で引き戻しできる相手いない？確認できない
+[state 120x,];----FD距離強制のばし、画面背のとき	擬似相手押し返し画面はし引き戻しのときはどうなる？相手は？
+type =  width
+triggerall = var(25) = 2 
+triggerall = 0;BackEdgeBodyDist < 35
+trigger1 = HitShakeOver
+player = 35,0
+ignorehitpause = 1
+persistent = 1
+
+;----実験おしかえしへるぱ
+;----相手本体の攻撃のときのみにしたい。ヘルパーの攻撃を判定？ってゆうか無理？
+[state -2,helper partner];
+type = Helper
+triggerall = var(25) = 2 
+triggerall = BackEdgeBodyDist < 35
+triggerall = enemynear,moveguarded
+trigger1 = HitShakeOver
+helpertype = normal
+name = "FD ref helper"
+ID = 745
+pos = 20,0
+postype = p2
+stateno = 745
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.height = 240
+ground.back = 120    
+ground.front = 120   
+air.back = 120        
+air.front = 120   
+
+;-------------------FD/SB共通擬似ライフ削り無効
+;---------------------------------------------FD/SBライフ強制戻し
+;----------------------SB成功時実行部
+
+;-----------------------JUSTガード　直前ガード
+;----------v25=1　直前ガード成功	FDでもSBでもなくV23が23以上のとき（8F有効
+;-------------------------直前ガード 専用実行
+[state 120x,]
+type = varset
+triggerall = var(25) <= 1
+trigger1 = var(23) > 22
+trigger1 = time = 0
+var(25) = 1
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];光る
+type = palfx
+triggerall = var(25) = 1
+trigger1 = time = 0
+time = 10
+add = 255,255,255
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];ＪＤ	テンション獲得。
+type = poweradd
+triggerall = var(25) = 1
+triggerall = !var(40)
+trigger1 = time = 0
+value = 40
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];ＪＤ受付リセット	成功時のみ。
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(23) = 0
+ignorehitpause = 1
+persistent = 0
+
+;--------------------ガードバランス増加；対応キャラ以外ね
+[state 7000,];自分の方　相手対応キャラでなければ　ガードで増やす  注意：FD(V25=2,3)なら増やさない、他のキャラ判断不能
+type = varadd
+triggerall = 1
+triggerall = var(49) != 2
+triggerall = var(19) < 256
+triggerall = var(25) <= 1 
+trigger1 = time = 0
+var(19) = ifelse(gethitvar(animtype) = 0,6,ifelse(gethitvar(animtype) = 1,8 + random % 3,10 + random % 5))
+ignorehitpause = 1
+persistent = 0
+supermovetime = 1
+
+;-----------------------摩擦調整
+;---原作と離れ方違う、仕方ない。ガードはX０でも普通後ろに下がるはず
+;--ADｄやめ、初速乗算でいいや　Jd,SBなら低く、他なら長くー＞見た目原作の長さになる
+[State 1540, 4];でふぉると	
+type = varset
+trigger1 = time = 0
+fvar(13) = ifelse(var(25) = 1 || var(25) =3 ,0.9,1.2)
+ignorehitpause = 1
+persistent = 0
+
+;-----------------------ガードこうちょく計算部　ひとつですませられるかな？
+[State 150, 2];がード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5	これは保険として必ず代入
+type = varset
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime)
+ignorehitpause = 1
+
+[State 150, 2];JUSTガード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5	2,3,3,4,4減る
+type = varset
+triggerall = !hitshakeover
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime) - ifelse(GetHitVar(animtype) = 0,2,ifelse(GetHitVar(animtype) = 1,3,4))
+ignorehitpause = 1
+
+[State 150, 2];FDガード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5 2,3,3,4,5増
+type = varset
+triggerall = var(25) = 2
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime) + ifelse(GetHitVar(animtype) = 0,2,ifelse(GetHitVar(animtype) = 1,3,4))
+ignorehitpause = 1
+
+[State 150, 2];SBガード硬直数値格納 地上２固定　空中4固定
+type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+var(24) = ifelse(statetype = A,4,2)
+ignorehitpause = 1
+
+[State 1540, 4];計算すんだら　ＪＤ受付フラグリセット	成功時のみ。
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(25) = 0
+ignorehitpause = 1
+persistent = 0
+
+[State 152, 1]
+type = ChangeAnim
+trigger1 = 1
+value = 131;151
+elem = 3
+
+[State 152, 3]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 151 + 2*(command = "holddown")
+
+[State 152, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 152, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+[State 152, 4]
+type = ForceFeedback
+trigger1 = time = 0
+waveform = square
+time = 4
+
+;---------------------------------------------------------------------------
+; CGUARDHIT2 (knocked back)	っしゃがみガードのっくばっく
+[Statedef 153]
+type    = C
+movetype= H
+physics = C
+;anim = 151
+
+;----------------------GG特殊、ガード切り替えでも硬直終了まで絵的にかわらない
+[State 151, 1];
+type = changeanim
+triggerall = prevstateno != 150
+trigger1 = Time = 0
+value = 151
+
+[State 153, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 153, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 153, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+;----ガード調整
+[State 151, 1];
+type = Velset
+trigger1 = time = 0
+x = vel x * fvar(13)
+persistent = 0
+
+;---------------SB
+;----ここでは失敗モーションにいかないので連打できるわけで。たまにCPUがすごいぴかぴかするのはこれであると
+;--不能ふれ30に設定しなおすことでガード可能にもどし、この間ガードでSB発動になる
+[state 120x,];SB　ガード状態フラグ
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+var(25)  = 3
+ignorehitpause = 1
+
+[state 120x,];SB　ガード不能時間の発動　成功時１５、失敗時３０、基本30にセットしてガードしたら15に変更
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+fvar(22)  = 30
+ignorehitpause = 1
+
+[state -2,helper partner];----SB発動リング黄色　成功時のはそっちで、代用エフェ
+type = Helper
+triggerall = numhelper(55) < 10
+triggerall = !numhelper(55) || (numhelper(55) && random % 3 = 0)
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+name = "SB helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 1
+size.height = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+value = -40
+ignorehitpause = 1
+
+;------------FD実行部
+;---パワーへらしていくため、
+[state -2,helper partner];みどりりんぐえふぇ
+type = Helper
+triggerall = var(25) = 2;
+triggerall = !numhelper(50)
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+
+[state 120x,];FD/パワー減少
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;--------------------V25=0通常　1JD -1FD
+;---スライド停止はさすがにmugenに従っとく？いやしかし・・
+;--基本ctrltime=slidetimeであるはず
+[State 151, 2];デフォルトの設定	完全にそっくりには無理
+type = VelSet
+trigger1 = Time >= GetHitVar(slidetime)
+trigger1 = Time >= var(24)
+trigger2 = HitOver
+trigger2 = Time >= var(24)
+x = 0
+
+[State 151, 3];
+type = CtrlSet
+trigger1 = Time >= var(24)
+value = 1
+
+[State 151, 4];設定時間終了、131とかにもどすとややこしくなる
+type = ChangeState
+trigger1 = Time >= var(24)
+value = 131
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; AGUARDHIT (shaking)空中ガード硬直	重力停止速度停止
+;-----------硬直増減は地上と違う
+[Statedef 154]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+;--------------------空中J,ダッシュりせっと
+[State 99,]
+type = Varset
+trigger1 = time= 0
+var(7) = 0
+ignorehitpause = 1
+[State 99,]
+type = Varset
+trigger1 = time= 0
+var(15) = 0
+ignorehitpause = 1
+
+;-------------------------------------------ガード属性 優先順位SB>JD>FD>D
+[State 150, 2];ガード初期化0以下のときのみ０にしておく　0通常　1JD 2FD 3SB   
+type = varset
+triggerall = var(25) <= 0
+trigger1 = time = 0
+var(25) = 0
+ignorehitpause = 1
+
+[State -1,SB];130経由せず150にくることもあるので・・コマンド入ってたら３
+type = varset
+var(25) = 3
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = (!var(1) || var(1) = 4)
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time = 0
+ignorehitpause = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = prevstateno != [120,155]
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = -40
+ignorehitpause = 1
+persistent = 0
+
+[State 150, 2];SB	減らしても成功ゲージ獲得
+type = poweradd
+triggerall = var(25) = 3
+trigger1 = time = 0
+value = 100
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　ガード不能時間を15に設定しなおし HITPAUSEでへる？へらない？減ると一瞬で不能時間終わる、たぶん減らない
+type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+fvar(22) = 15
+ignorehitpause = 1
+persistent = 0
+
+[state 120x,];SB　SB受付フレームのばし成功30Fに	 HITPAUSEでへる？へらない？んー？、たぶん減らない
+ type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+fvar(23) = 30
+ignorehitpause = 1
+persistent = 0
+
+;-------------------------SBガードエフェクトベージュの円形、代用はどれがいい？
+[state -2,helper partner];----エフェクト代用、黄色バーストのを
+type = Helper
+triggerall = var(25) = 3
+trigger1 = time = 0
+name = "SB HIT efect"
+ID = 150
+pos = 0,-55
+postype = p1
+stateno = 756
+ownpal = 1
+ignorehitpause = 1
+size.xscale = 0.5
+size.yscale = 0.75
+persistent = 0
+
+;------------------------------FD	ガード成功時実行
+;-----------------------待機中のFD固有動作
+[state 120x,]
+type = varset
+triggerall = var(25) < 3
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time = 0
+var(25)  = 2
+ignorehitpause = 1
+
+[state -2,helper partner];緑の円
+type = Helper
+triggerall = var(25) = 2 
+triggerall = !numhelper(50)
+trigger1 = 1;time = 0
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+;----------v25=2　FDガード成功
+[state 120x,];FDガードパワー減らし
+type = poweradd
+triggerall = time = 0
+trigger1 = var(25) = 2 && power > 0 && !var(40)
+value  = -25
+ignorehitpause = 1
+persistent = 0
+
+;-------------------------FDガードエフェクト青い稲光みたいなのがあるっぽい
+[state 120x,atc efe];ＦＤで当たったときの
+type = Explod
+triggerall = var(25) = 2 && power > 0 && !var(40)
+trigger1 = time = 0
+anim = 6165
+ID = 760
+postype = p1
+pos = 0,-55
+sprpriority = 4
+bindtime = 1
+facing = ifelse(random % 2 = 0,1,-1)
+vfacing = ifelse(random % 2 = 0,1,-1)
+removetime = -2
+ownpal=1
+removeongethit = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+persistent = 0
+
+;------引き戻しのときの方向に注意。fv20に格納	引き戻しでFDするとより相手に近づいてしまう
+;--hitdefのVELは向きで自動で反転されている、後ろにとぶのはP1ではマイナスp2ではプラスにされているので・・たしかめるには？
+;--posaddは自動で反転してくれる、マイナスでいいが、引き戻しの判定方法は？
+[state 120x,];----FD距離強制のばし、POSADD ちぇんすてふれーむで ２p側だと逆転してる気がする基本値設定して符号を乗算
+type = posadd
+triggerall = var(25) = 2 
+trigger1 = HitShakeOver
+x = -20 * ifelse(gethitvar(xvel) <= 0,1,-1) * facing
+ignorehitpause = 1
+persistent = 0
+
+
+;--------------本体で引き戻しできる相手いない？確認できない
+[state 120x,];----FD距離強制のばし、画面背のとき	擬似相手押し返し画面はし引き戻しのときはどうなる？相手は？
+type =  width
+triggerall = var(25) = 2 
+triggerall = 0;BackEdgeBodyDist < 35
+trigger1 = HitShakeOver
+player = 35,0
+ignorehitpause = 1
+persistent = 1
+
+;----実験おしかえしへるぱ
+[state -2,helper partner];
+type = Helper
+triggerall = var(25) = 2 
+triggerall = BackEdgeBodyDist < 35
+triggerall = enemynear,moveguarded
+trigger1 = HitShakeOver
+helpertype = normal
+name = "FD ref helper"
+ID = 745
+pos = 20,0
+postype = p2
+stateno = 745
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.height = 240
+ground.back = 120    
+ground.front = 120   
+air.back = 120        
+air.front = 120   
+
+;-------------------FD/SB共通擬似ライフ削り無効
+
+
+;-----------------------JUSTガード　直前ガード
+;----------v25=1　直前ガード成功	FDでもSBでもなくV23が23以上のとき（8F有効
+;-------------------------直前ガード 専用実行
+[state 120x,]
+type = varset
+triggerall = var(25) <= 1
+trigger1 = var(23) > 22
+trigger1 = time = 0
+var(25) = 1
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];光る
+type = palfx
+triggerall = var(25) = 1
+trigger1 = time = 0
+time = 10
+add = 255,255,255
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];ＪＤ	テンション獲得。
+type = poweradd
+triggerall = var(25) = 1
+triggerall = !var(40)
+trigger1 = time = 0
+value = 40
+ignorehitpause = 1
+persistent = 0
+
+[State 1540, 4];ＪＤ受付リセット	成功時のみ。
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(23) = 0
+ignorehitpause = 1
+persistent = 0
+
+;--------------------ガードバランス増加；対応キャラ以外ね
+[state 7000,];自分の方　相手対応キャラでなければ　ガードで増やす  注意：FD(V25=2,3)なら増やさない、他のキャラ判断不能
+type = varadd
+triggerall = 1
+triggerall = var(49) != 2
+triggerall = var(19) < 256
+triggerall = var(25) <= 1 
+trigger1 = time = 0
+var(19) = ifelse(gethitvar(animtype) = 0,6,ifelse(gethitvar(animtype) = 1,8 + random % 3,10 + random % 5))
+ignorehitpause = 1
+persistent = 0
+supermovetime = 1
+
+;-----------------------摩擦調整
+;---原作と離れ方違う、仕方ない。ガードはX０でも普通後ろに下がるはず
+;--ADｄやめ、初速乗算でいいや　Jd,SBなら低く、他なら長くー＞見た目原作の長さになる
+[State 1540, 4];でふぉると	
+type = varset
+trigger1 = time = 0
+fvar(13) = ifelse(var(25) = 1 || var(25) = 3 ,0.5,1.1)
+ignorehitpause = 1
+persistent = 0
+
+;-----------------------ガードこうちょく計算部　ひとつですませられるかな？
+[State 150, 2];がード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5	
+type = varset
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime)
+ignorehitpause = 1
+
+[State 150, 2];JUSTガード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5	6,6,6,7,8減る
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime) - ifelse(GetHitVar(animtype) = 0,6,ifelse(GetHitVar(animtype) = 1,7,8))
+ignorehitpause = 1
+
+[State 150, 2];FDガード硬直数値格納 (animtype)L0 M1 H2 B3 U4 D5 2,3,3,4,5増
+type = varset
+triggerall = var(25) = 2
+trigger1 = time = 0
+var(24) = GetHitVar(ctrltime) + ifelse(GetHitVar(animtype) = 0,2,ifelse(GetHitVar(animtype) = 1,3,4))
+ignorehitpause = 1
+
+[State 150, 2];SBガード硬直数値格納 地上２固定　空中4固定
+type = varset
+triggerall = var(25) = 3
+trigger1 = time = 0
+var(24) = ifelse(statetype = A,4,2)
+ignorehitpause = 1
+
+[State 1540, 4];計算すんだら　ＪＤ受付フラグリセット	成功時のみ。
+type = varset
+triggerall = var(25) = 1
+trigger1 = time = 0
+var(25) = 0
+ignorehitpause = 1
+persistent = 0
+
+[State 154, 1]
+type = ChangeAnim
+trigger1 = 1
+value = 132;152
+elem = 3
+
+[State 154, 2]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 155 ;AGUARDHIT2
+
+[State 154, 3]
+type = ForceFeedback
+trigger1 = time = 0
+waveform = square
+time = 4
+
+;---------------------------------------------------------------------------
+; AGUARDHIT2 (knocked away)	空チュがーどノックバック　重力あり
+;－－－－ここでのJD摩擦関連はよく確認して・・基本摩擦かかってないから
+[Statedef 155]
+type    = A
+movetype= H
+physics = N
+anim = 152
+
+[State 155, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+;----調整
+[State 151, 1];
+type = Velset
+trigger1 = time = 0
+x = vel x * fvar(13)
+persistent = 0
+
+;---------------SB
+;----ここでは失敗モーションにいかないので連打できるわけで。たまにCPUがすごいぴかぴかするのはこれであると
+;--不能ふれ30に設定しなおすことでガード可能にもどし、この間ガードでSB発動になる
+[state 120x,];SB　ガード状態フラグ
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+var(25)  = 3
+ignorehitpause = 1
+
+[state 120x,];SB　ガード不能時間の発動　成功時１５、失敗時３０、基本30にセットしてガードしたら15に変更
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+fvar(22)  = 30
+ignorehitpause = 1
+
+[state -2,helper partner];----SB発動リング黄色　成功時のはそっちで、代用エフェ
+type = Helper
+triggerall = numhelper(55) < 10
+triggerall = !numhelper(55) || (numhelper(55) && random % 3 = 0)
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+name = "SB helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 1
+size.height = 1
+
+[State 150, 2];SB	ゲージ減らし2％	ガード硬直（成功）ではprevstateno有効にしておく？
+type = poweradd
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = 1
+value = -40
+ignorehitpause = 1
+
+;------------FD実行部
+;---パワーへらしていくため、
+[state -2,helper partner];みどりりんぐえふぇ
+type = Helper
+triggerall = var(25) = 2;
+triggerall = !numhelper(50)
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+
+[state 120x,];FD/パワー減少
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;--------------
+[State 155, 2]
+type = VelAdd
+trigger1 = 1
+y = Const(movement.yaccel)
+
+[State 151, 3];
+type = CtrlSet
+trigger1 = Time >= var(24)
+value = 1
+
+[State 155, 4]
+type = VarSet
+trigger1 = 1
+sysvar(0) = (pos y >= 0) && (vel y > 0)
+
+[State 155, 5]
+type = VelSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 155, 6]
+type = PosSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 155, 6];がーどのまま着地
+type = ChangeState
+triggerall = sysvar(0)
+trigger1 = command = "holdback"
+trigger1 = inguarddist
+value = 130
+
+[State 155, 7];普通
+type = ChangeState
+trigger1 = sysvar(0)
+value = 52
+
+
+;-----------------------GGX,SB用新規ガード関係160
+;------------------------SB失敗の　ガードモーション　絵はガードだけど硬直部。一定時間で通常に戻す
+;--最初２F FDCできる、ってことはその２Fはガードできるってことにならない？
+;--擬似FDとしてここでエフェクト変更と待機時間変更
+;--さらに一定時間以後はSBにいけるように・・っややこし
+[Statedef 160]
+type    = S
+movetype = I
+physics = S
+ctrl = 0
+velest = 0,0
+
+;---ガードフラグ3にする必要なし
+;-------------------------再びSBへ、fvが25以下で擬似FDのとき。つまり擬似FD最低１Fやってからいけるようにする。
+[State -1,SB];SB地上	ここでは３にしない。移動のみさせる	さらに擬似FDになってから、だからこれは上にお
+type = ChangeState
+value = ifelse(command = "SBS",130,131)
+triggerall = fvar(22) <= 25 && var(25) = 2
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+triggerall = 1;command = "start"
+trigger1 = 1
+ignorehitpause = 0
+
+;----擬似FD,２F以降　
+[state 120x,];ガード不能時間切れてもまだFDコマンドなら２にする最初から２でもよさげ。
+type = varset
+triggerall = var(25) = 2 || var(25) = 3
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 1 
+var(25) = 2
+ignorehitpause = 1
+
+;-----------ここに来た時点でfv22の数は28か26?
+;------失敗時にしかこないので30スタートであろう、
+;----2F以降の演出だけは出す
+[state -2,helper partner];
+type = Helper
+triggerall = !numhelper(50)
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+
+;--------GGXのみ足払いOK  GGX/XXの判断ははV2,間違えないで
+;---失敗2F[から]なので擬似FDここでもいけるかも
+[State -1, FD];擬似	SB/FD失敗 しゃがみへ	保険ループするのでタイム制限
+type = ChangeState
+value = 161
+triggerall = var(25) = 2
+triggerall = time >= 1
+triggerall = command = "holdback" 
+trigger1 = command = "holddown"
+trigger1 = fvar(22) > 0
+
+;---擬似FD:ガード不能フラグが0になってまだ入ってたらそのままガードかのなFDへ継続
+[state 120x,]
+type = changestate
+triggerall = var(25) = 2
+trigger1 = fvar(22) <= 0
+value  = ifelse(command = "holddown",131,130)
+ctrl = 1
+ignorehitpause = 1
+
+[state 120x,];FDパワー減少　これはちぇんステしないときのみ実行、むこうでやるからね
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;25以下でもしFDはいってなければ
+[state 120x,];SB　硬直終了。前の130～と結構早く終わる
+type = changestate
+triggerall = fvar(22) <= 25
+trigger1 = var(22) = 0 
+trigger2 = power <= 0  
+trigger3 = command != "holdback" 
+trigger4 = var(40)  
+trigger5 = fvar(22) <= 0
+value = 0
+ctrl = 1
+ignorehitpause = 0
+
+;-----------------------------SB失敗モーションしゃがみ
+[Statedef 161]
+type    = C
+physics = C
+movetype = I
+ctrl = 0
+velest = 0,0
+
+;---ガードフラグ3にする必要なし
+;-------------------------再びSBへ、fvが25以下で擬似FDのとき。つまり擬似FD最低１Fやってからいけるようにする。
+[State -1,SB];SB地上	ここでは３にしない。移動のみさせる	さらに擬似FDになってから、だからこれは上にお
+type = ChangeState
+value = ifelse(command = "SBS",130,131)
+triggerall = fvar(22) <= 25 && var(25) = 2
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+triggerall = 1;command = "start"
+trigger1 = 1
+ignorehitpause = 0
+
+;----擬似FD,２F以降　
+[state 120x,];ガード不能時間切れてもまだFDコマンドなら２にする最初から２でもよさげ。
+type = varset
+triggerall = var(25) = 2 || var(25) = 3
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 1 
+var(25) = 2
+ignorehitpause = 1
+
+;-----------ここに来た時点でfv22の数は28か26?
+;------失敗時にしかこないので30スタートであろう、
+;----2F以降の演出だけは出す
+[state -2,helper partner];
+type = Helper
+triggerall = !numhelper(50)
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+
+;--------GGXのみ足払いOK  GGX/XXの判断ははV2,間違えないで
+;---失敗2F[から]なので擬似FDここでもいけるかも
+[State -1, FD];擬似	SB/FD失敗 たちへ タイム制限しないとループエラー？
+type = ChangeState
+value = 160
+triggerall = var(25) = 2
+triggerall = time >= 1
+triggerall = command = "holdback" 
+trigger1 = command = "holddown"
+trigger1 = fvar(22) > 0
+
+;---擬似FD:ガード不能フラグが0になってまだ入ってたらそのままガードかのなFDへ継続
+[state 120x,]
+type = changestate
+triggerall = var(25) = 2
+trigger1 = fvar(22) <= 0
+value  = ifelse(command = "holddown",131,130)
+ctrl = 1
+ignorehitpause = 1
+
+[state 120x,];FDパワー減少　これはちぇんステしないときのみ実行、むこうでやるからね
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;25以下でもしFDはいってなければ
+[state 120x,];SB　硬直終了。前の130～と結構早く終わる
+type = changestate
+triggerall = fvar(22) <= 25
+trigger1 = var(22) = 0 
+trigger2 = power <= 0  
+trigger3 = command != "holdback" 
+trigger4 = var(40)  
+trigger5 = fvar(22) <= 0
+value = ifelse(command = "holddown",11,0)
+ctrl = 1
+ignorehitpause = 0
+
+;-----------------------------SB失敗モーション空中
+[Statedef 162]
+type    = A
+movetype = I
+physics = N
+ctrl = 0
+
+;---ガードフラグ3にする必要なし
+;-------------------------再びSBへ、fvが25以下で擬似FDのとき。つまり擬似FD最低１Fやってからいけるようにする。
+[State -1,SB];SB地上	ここでは３にしない。移動のみさせる	さらに擬似FDになってから、だからこれは上にお
+type = ChangeState
+value = 132
+triggerall = fvar(22) <= 25 && var(25) = 2
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+triggerall = 1;command = "start"
+trigger1 = 1
+ignorehitpause = 0
+
+;----擬似FD,２F以降　
+[state 120x,];ガード不能時間切れてもまだFDコマンドなら２にする最初から２でもよさげ。
+type = varset
+triggerall = var(25) = 2 || var(25) = 3
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 1 
+var(25) = 2
+ignorehitpause = 1
+
+;-----------ここに来た時点でfv22の数は28か26?
+;------失敗時にしかこないので30スタートであろう、
+;----2F以降の演出だけは出す
+[state -2,helper partner];
+type = Helper
+triggerall = !numhelper(50)
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time >= 1
+helpertype = normal
+name = "FD helper"
+ID = 50
+pos = 0,0
+postype = p1
+stateno = 750
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+
+;--------GGXのみ足払いOK  GGX/XXの判断ははV2,間違えないで
+;---失敗2F[から]なので擬似FDここでもいけるかも
+
+;---擬似FD:ガード不能フラグが0になってまだ入ってたらそのままガードかのなFDへ継続
+[state 120x,]
+type = changestate
+triggerall = var(25) = 2
+trigger1 = fvar(22) <= 0
+value  = 132
+ctrl = 1
+ignorehitpause = 1
+
+[state 120x,];FDパワー減少　これはちぇんステしないときのみ実行、むこうでやるからね
+type = poweradd
+triggerall = power > 0 && !var(40) 
+trigger1 = var(25) = 2
+value  = -4
+ignorehitpause = 0
+
+;25以下でもしFDはいってなければ
+[state 120x,];SB　硬直終了。前の130～と結構早く終わる
+type = changestate
+triggerall = fvar(22) <= 25
+trigger1 = var(22) = 0 
+trigger2 = power <= 0  
+trigger3 = command != "holdback" 
+trigger4 = var(40)  
+trigger5 = fvar(22) <= 0
+value = 51
+ctrl = 1
+ignorehitpause = 0
+
+;----------------ダスと用重力
+[State 40, 6];遠すぎる場合加速、dist-30あたりを基準、いかないように？最高-19確認
+type = veladd
+triggerall = var(12)
+triggerall = var(12) < 30
+triggerall = vel y >= -9.5
+triggerall = p2dist y > 0
+trigger1 = time > 1
+y = -0.2625
+ignorehtipause = 0
+
+;----------------ダスと用重力
+[State 40, 6];重力　なんもしなければ９０F滞空
+type = veladd
+trigger1 = var(12) >= 30
+trigger1 = var(12) <= 45
+y = 0.1
+ignorehtipause = 0
+
+[State 40, 6];重力　なんもしなければ９０F滞空
+type = veladd
+trigger1 = var(12) > 45
+y = 0.44
+ignorehtipause = 0
+
+[State 155, 2];ダストじゃないときfvar(9)?
+type = VelAdd
+trigger1 = !var(12)
+y = fvar(9);Const(movement.yaccel)
+
+[State 132, 3];--POSがすでに地上で速度が下にむかってる→着地OK
+type = VarSet
+trigger1 = 1
+sysvar(0) = (pos y >= 0) && (vel y > 0)
+
+[State 132, 4];上のが真になったらになったら停止
+type = VelSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 5]
+type = PosSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 7];もしFDままだったらFDへ着地
+type = ChangeState
+triggerall = sysvar(0)
+triggerall = var(25) = 2
+trigger1 = command = "holdback" 
+value = ifelse(command = "holddown",131,130)
+
+[State 132, 7];保険的、普通の着地
+type = ChangeState
+trigger1 = sysvar(0)
+value = 52
+
+
+
+;--------------------------------がーどここまで
+
+
+
+
+
+;----------------------------------ロマンキャンセル
+;------------------------HITPOUSE中にもこれるけど、HITPAUSEがおわるまで硬直である。
+[statedef 970];地上ロマンキャンセル
+type    = s
+movetype= u
+physics = s
+ctrl = 0
+sprpriority = 0
+poweradd = -1000
+velset = 0,0
+hitcountpersist = 1
+
+;----------------各種攻撃時のエフェクト消去
+;---------------STARSHIPのみかも　他はへるぱだし
+[state 1100x,]
+type = removeexplod
+trigger1 = HitPauseTime
+ID = 200
+ignorehitpause = 1
+
+[state -3,flag 29];---コマンドALLだけでなく3つ押しで出したときも他の技暴発になる。仕様正しい故の暴発
+type = varset
+triggerall = command = "ALL"
+trigger1 = time = 0 
+var(29) = 8
+ignorehitpause = 1
+persistent = 0
+
+[State 0, 1];ぽむぽむ　隠れにする
+type = varset
+trigger1 = var(55) = 2 
+var(55) = 1
+ignorehitpause = 1
+
+[State -3, 4]
+type = posset
+trigger1 = 1
+y = 0
+ignorehitpause = 1
+
+;-------------------これはーうまく中心できないのであわせたアニメ１こ回転にしたほうがいいかも
+[state -2,helper partner];----RCエフェクトヘルパー片方 hightにあにめNO
+type = Helper
+trigger1 = time = 0
+trigger1 = 1;HitPauseTime
+name = "RC helper red"
+ID = 950
+pos = 0,-50
+postype = p1
+stateno = 760
+ownpal = 1
+persistent = 16
+sprpriority = 1
+size.height = 6400 + random % 3
+ignorehitpause = 1
+
+[State 3000,00]
+type = Palfx
+trigger1 = HitPauseTime
+add = 255,255,255
+sinadd = 0, 0, 0
+time = 8
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 16
+
+[State 2050,  voice];効果音～ろまんてーっく
+type = PlaySnd
+trigger1 = HitPauseTime
+value = s60,10
+channel = 6
+ignorehitpause = 1
+persistent = 16
+
+[state 2100,];これHITPAUSE硬直おわるかどうか  hitshakeoverがきくかどうか？
+type = changestate
+trigger1 = !HitPauseTime
+value = 0
+ctrl = 1
+ignorehitpause = 1
+
+;---------------------------------
+[statedef 972];地上ロマンキャンセルHITSTOP中じゃなければ
+type    = s
+movetype= i
+physics = s
+ctrl = 0
+sprpriority = 0
+poweradd = -1000
+velset = 0,0
+hitcountpersist = 1
+
+;----------------各種攻撃時のエフェクト消去
+;---------------STARSHIPのみかも　他はへるぱだし
+[state 1100x,]
+type = removeexplod
+trigger1 = HitPauseTime
+ID = 200
+ignorehitpause = 1
+
+[state -3,flag 29];---コマンドALLだけでなく3つ押しで出したときも他の技暴発になる。仕様正しい故の暴発
+type = varset
+triggerall = command = "ALL"
+trigger1 = time = 0 
+var(29) = 8
+ignorehitpause = 1
+persistent = 0
+
+[State 0, 1];ぽむぽむ　隠れにする
+type = varset
+trigger1 = var(55) = 2 
+var(55) = 1
+ignorehitpause = 1
+
+[state -2,helper partner];----RCエフェクトヘルパー片方 hightにあにめNO
+type = Helper
+trigger1 = time = 0
+name = "RC helper red"
+ID = 950
+pos = 0,-50
+postype = p1
+stateno = 760
+sprpriority = 1
+ownpal = 1
+persistent = 16
+size.height = 6400 + random % 3 
+ignorehitpause = 1
+
+[State -3, 4]
+type = posset
+trigger1 = time = 0
+y = 0
+ignorehitpause = 1
+
+[State 3000,00]
+type = Palfx
+trigger1 = time = 0
+add = 255,255,255
+sinadd = 0, 0, 0
+time = 8
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 0
+
+[State 2050,  voice];効果音～ろまんてーっく
+type = PlaySnd
+trigger1 = time = 0
+value = s60,10
+channel = 6
+ignorehitpause = 1
+persistent = 0
+
+[state 2100,];これHITPAUSE硬直おわるかどうか  hitshakeoverがきくかどうか？
+type = changestate
+trigger1 = time = 0
+value = 0
+ctrl = 1
+ignorehitpause = 0
+
+;---------------------------------フォース-ロマンキャンセル地上
+;---足払い、SSのHITSTOP じゃっくろじゃ
+;---仕様限界：HITSTOP中は通常の赤ロマ、ジャストタイミングで当てた状態で青ロマになるが、=HITDEF有効
+;---muではHITDEF無効になってしまう、しょうがないのでHITSTOP1,2Fも有効にして、HITSTOPさせないで通常にもどす
+[statedef 975];青ロマンキャンセル
+type    = s
+movetype= i
+physics = s
+ctrl = 0
+sprpriority = 0
+poweradd = -500
+hitcountpersist = 1
+velset = 0,0
+
+;----------------各種攻撃時のエフェクト消去
+;---------------STARSHIPのみかも　他はへるぱだし
+[State -3, 4]
+type = posset
+trigger1 = 1
+y = 0
+ignorehitpause = 1
+
+[state -3,flag 29];---コマンドALLだけでなく3つ押しで出したときも他の技暴発になる。仕様正しい故の暴発
+type = varset
+triggerall = command = "ALL"
+trigger1 = time = 0 
+var(29) = 8
+ignorehitpause = 1
+persistent = 0
+
+[state -2,helper partner];----RCエフェクトヘルパー片方 hightにあにめNO
+type = Helper
+trigger1 = time = 0
+name = "RC helper red"
+ID = 950
+pos = 0,-50
+postype = p1
+stateno = 760
+ownpal = 1
+persistent = 16
+size.height = 6450 + random % 3
+ignorehitpause = 1
+
+[State 3000,00]
+type = Palfx
+trigger1 = time = 0
+add = 255,255,255
+sinadd = 0, 0, 0
+time = 8
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 0
+
+[State 2050,  voice];効果音～ろまんてーっく
+type = PlaySnd
+trigger1 = time = 0
+value = s60,10
+channel = 6
+ignorehitpause = 1
+persistent = 0
+
+[state 2100,];すぐに戻す 
+type = changestate
+trigger1 = time = 0
+value = 0
+ctrl = 1
+ignorehitpause = 1
+
+;--------------------------------ロマキャン後は普通ダッシュとかできない
+;----------------------属性しこんであればできる
+;空中ロマンキャンセル通常	重力はどうなる？--------HITSTOP中
+[statedef 980];
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+sprpriority = 0
+hitcountpersist = 1
+poweradd = -1000
+
+;----------------各種攻撃時のエフェクト消去
+;---------------STARSHIPのみかも　他はへるぱだし
+[state 1100x,]
+type = removeexplod
+trigger1 = HitPauseTime
+trigger1 = 1
+ID = 200
+ignorehitpause = 1
+
+[state 2000,];---コマンドALLだけでなく3つ押しで出したときも他の技暴発になる。仕様正しい故の暴発
+type = varset
+triggerall = command = "ALL"
+trigger1 = 1 
+var(29) = 10
+ignorehitpause = 1
+persistent = 0
+
+[state 2000,];
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state -2,helper partner];----RCエフェクトヘルパー片方 hightにあにめNO
+type = Helper
+trigger1 = time = 0
+trigger1 = HitPauseTime
+name = "RC helper red"
+ID = 950
+pos = 0,-50
+postype = p1
+stateno = 760
+ownpal = 1
+persistent = 16
+size.height = 6400 + random % 3
+ignorehitpause = 1
+persistent = 16
+
+[State 3000,00]
+type = Palfx
+trigger1 = time = 0
+trigger1 = HitPauseTime
+add = 255,255,255
+sinadd = 0, 0, 0
+time = 8
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 16
+
+[State 2050,  voice];効果音～ろまんてーっく
+type = PlaySnd
+trigger1 = time = 0
+trigger1 = HitPauseTime
+value = s60,10
+channel = 6
+ignorehitpause = 1
+persistent = 16
+
+[state 2120,];
+type = poweradd
+trigger1 = 0;time = 0
+trigger1 = HitPauseTime
+value = -1000
+ignorehitpause = 1
+persistent = 30
+
+
+[state 2120,];フリーに戻す
+type = changestate
+trigger1 = !HitPauseTime;HITshakeOVER
+value = 51
+ctrl = 1
+anim = 41
+ignorehitpause = 1
+
+;------------------------------------
+;-------------------ちょー特殊　地上投げむぎゅ専用
+[statedef 981];空中ロマンキャンセル	地上投げ専用やってみる
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+sprpriority = 0
+poweradd = -1000
+hitcountpersist = 1
+
+[state -3,flag 29];---コマンドALLだけでなく3つ押しで出したときも他の技暴発になる。仕様正しい故の暴発
+type = varset
+triggerall = command = "ALL"
+trigger1 = time = 0 
+var(29) = 10
+ignorehitpause = 1
+persistent = 0
+
+[state 2000,];
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state -2,helper partner];----RCエフェクトヘルパー片方 hightにあにめNO
+type = Helper
+trigger1 = time = 0
+trigger1 = HitPauseTime
+name = "RC helper red"
+ID = 950
+pos = 0,-50
+postype = p1
+stateno = 760
+ownpal = 1
+persistent = 16
+size.height = 6400 + random % 3
+ignorehitpause = 1
+persistent = 16
+
+[State 3000,00]
+type = Palfx
+trigger1 = time = 0
+trigger1 = HitPauseTime
+add = 255,255,255
+sinadd = 0, 0, 0
+time = 8
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 16
+
+[State 2050,  voice];効果音～ろまんてーっく
+type = PlaySnd
+trigger1 = time = 0
+trigger1 = HitPauseTime
+value = s60,10
+channel = 6
+ignorehitpause = 1
+persistent = 16
+
+[state 2000,];フリーアニメ
+type = changeanim
+trigger1 = !HitPauseTime;HITshakeOVER
+value = 41
+elem  = 8
+ignorehitpause = 1
+
+[state 2000,];１Fしかないけどねー
+type = ctrlset
+trigger1 = anim = 41
+value = 1
+ignorehitpause = 1
+
+[state 2120,];１Fあにめ表示後に着地なので・・
+type = changestate
+trigger1 = time >= HitPauseTime + 1;HITshakeOVER + 1
+value = 52
+ctrl = 0
+anim = 47
+ignorehitpause = 1
+
+;-----------------------------------空中ロマンキャンセル
+[statedef 982];空中ロマンキャンセルHITSTOP以外
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+sprpriority = 0
+poweradd = -1000
+hitcountpersist = 1
+
+;----------------各種攻撃時のエフェクト消去
+;---------------STARSHIPのみかも　他はへるぱだし
+[state 1100x,]
+type = removeexplod
+trigger1 = 1
+ID = 200
+ignorehitpause = 1
+
+[state -3,flag 29];---コマンドALLだけでなく3つ押しで出したときも他の技暴発になる。仕様正しい故の暴発time０判定不可っぽい
+type = varset
+triggerall = command = "ALL"
+trigger1 = time = 0 
+var(29) = 10
+ignorehitpause = 1
+persistent = 0
+
+[state 2000,];
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state -2,helper partner];----RCエフェクトヘルパー片方 hightにあにめNO
+type = Helper
+trigger1 = time = 0
+name = "RC helper red"
+ID = 950
+pos = 0,-50
+postype = p1
+stateno = 760
+ownpal = 1
+persistent = 16
+size.height = 6400 + random % 3
+ignorehitpause = 1
+
+[State 3000,00]
+type = Palfx
+trigger1 = time = 0
+add = 255,255,255
+sinadd = 0, 0, 0
+time = 8
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 0
+
+[State 2050,  voice];効果音～ろまんてーっく
+type = PlaySnd
+trigger1 = time = 0
+value = s60,10
+channel = 6
+ignorehitpause = 1
+persistent = 0
+
+[state 2000,];フリーアニメ
+type = changeanim
+trigger1 = time = 0
+value = 41
+elem  = 8
+ignorehitpause = 0
+
+[state 2120,];フリーに戻す
+type = changestate
+trigger1 = time = 0
+value = 51
+ctrl = 1
+anim = 41
+ignorehitpause = 0
+
+;----------------------------青ロマキャン空中版
+;-----ロジャゲットぐらいしかない
+[statedef 985];空中ふぉーすロマンキャンセル通常	重力はどうなる？ホーミングする？
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+sprpriority = 0
+poweradd = -500
+hitcountpersist = 1
+
+[state -3,flag 29];---コマンドALLだけでなく3つ押しで出したときも他の技暴発になる。仕様正しい故の暴発
+type = varset
+triggerall = command = "ALL"
+trigger1 = time = 0 
+var(29) = 10
+ignorehitpause = 1
+persistent = 0
+
+[state 2000,];
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 2050,  voice];効果音～ろまんてーっく
+type = PlaySnd
+trigger1 = time = 0
+value = s60,10
+channel = 6
+ignorehitpause = 1
+
+[State 3000,00]
+type = Palfx
+trigger1 = time = 0
+add = 255,255,255
+sinadd = 0, 0, 0
+time = 5
+invertall = 0
+color = 0
+ignorehitpause = 1
+persistent = 0
+
+[state -2,helper partner];----RCエフェクトヘルパー片方 hightにあにめNO
+type = Helper
+trigger1 = time = 0
+name = "RC helper red"
+ID = 950
+pos = 0,-50
+postype = p1
+stateno = 760
+ownpal = 1
+persistent = 16
+size.height = 6450 + random % 3
+ignorehitpause = 1
+
+[state 2120,];フリーに戻す
+type = changestate
+trigger1 = time = 0
+value = 51
+ctrl = 1
+anim = 41
+
+;-------------------------------------------------------------------------------------以下敵の動作
+;--------------------------------気絶		ればがちゃはそのうち
+[Statedef 5300];気絶  5310からくる
+type    = S
+movetype= H
+physics = s
+ctrl = 0
+
+[State 1293, 1];アニメは5300必須だよね？
+type = ChangeAnim
+trigger1 = time = 0
+value = ifelse(authorname = "R-R",5300 + var(0),5300)
+ignorehitpause = 1
+
+[State 5070, 2];終了
+type = selfstate
+trigger1 = time >= 120
+value = 0
+ctrl = 1
+
+[Statedef 5310];気絶HITSTOPスタート
+type    = U
+movetype= H
+physics = U
+ctrl = 0
+
+[State 1293, 1];ダウンくらい、へるぱーだったらもどす
+type = selfstate
+triggerall = time = 0
+trigger1 = statetype = L || statetype = A
+trigger2 = ishelper
+value = ifelse(statetype = L,5080,5020)
+ignorehitpause = 1
+
+[State 1293, 1];S　にする
+type = statetypeset
+trigger1 = time = 0
+type = S
+physics = S
+ignorehitpause = 1
+
+[State 1293, 1];アニメは5000
+type = ChangeAnim
+trigger1 = 1
+value = ifelse(authorname = "R-R",5000 + var(0),5000)
+ignorehitpause = 1
+
+[State 5070, 2];終了
+type = changestate
+Trigger1 = HITshakeover
+value = 5300
+ignorehitpause = 1
+
+;------------------------------------------------ここから固有
+;---------------------------------------------2pspr使用
+;---------------地上投げ相手
+[Statedef 5600];
+type    = s
+movetype= H
+physics = N
+velset = 0,0
+ctrl = 0
+sprpriority = 0
+
+;-----------相手がＡＣモードかＯＲのときね1Fかなりシビア、ねらってはむり
+[State 5070, 2];投げぬけ　ぼたんはどうなる？ これ引き込み中はこっちのコマンドみてくれるよう。ＨＳで大丈夫
+type = changestate
+triggerall =  enemynear,var(1) = 0 || enemynear,var(1) = 4  
+trigger1 = time <= 1
+trigger1 = command = "HS"
+value = 5750
+
+[State 1293, 1];アニメは5600	で設定したほうがいいかも
+type = ChangeAnim2
+trigger1 = time = 0
+value = ifelse(authorname = "R-R",5600 + var(0),5600)
+
+[State 5070, 2];後ろ向く11F
+type = turn
+trigger1 = time = 10
+
+[State 5070, 2];無敵に・
+type = nothitby
+trigger1 = 1
+value = sca
+
+;------------------対応キャラのみ・・
+;-----キケンかもしんないね・・一応でないはずだから×マーク表示させるためのもの。
+[State 5070, 2];特殊・バースト封じ
+type = varset
+triggerall = TeamMode = Single && enemy,teammode = single;win 
+trigger1 = enemynear,var(49) = 2
+var(25) = -3
+
+[State 5070, 2];保険
+type = selfstate
+trigger1 = time >= 600
+value = 5001
+
+
+
+;---------------------------------------地上なげ相手地面待機
+;------enemy state-----------------------------------------------------------use p2spr  
+[Statedef 5605];Lにするとしりもち当たったときにYがずれてやだ(仕様っぽい
+type = c
+movetype= H
+physics = N
+velset = 0,0
+sprpriority = -1
+
+[State 5070, 2];無敵にするとしりもちあたらなくなる、でもよよとかくらう？あとで・
+type = nothitby
+trigger1 = 0
+value = sca
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 0
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 14
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 0
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 820, 1];
+type = posset
+trigger1 = time = 0   ;
+y = 0
+ignorehitpause = 1
+
+[State 820, 1];たたきつけアニメ5100？
+type = ChangeAnim
+triggerall = 1   ;
+Trigger1 = Time = 0
+value = ifelse(authorname = "R-R",5100 + var(0),5100)
+
+[State 820, 1];上にふきとび5160？ 7Fから
+type = ChangeAnim
+triggerall = 1   ;
+Trigger1 = Time = 6
+value = ifelse(authorname = "R-R",5160 + var(0),5160)
+
+[State 820, 1];地面で5170？ 13Fから
+type = ChangeAnim
+triggerall = 1   ;
+Trigger1 = Time = 12
+value = ifelse(authorname = "R-R",5170 + var(0),5170)
+
+[State 820, 1];地面で5110？ 21Fから
+type = ChangeAnim
+triggerall = 1   ;
+Trigger1 = Time >= 21
+value = ifelse(authorname = "R-R",5110 + var(0),5110)
+
+[State 840,];保険
+type = selfState
+trigger1 = time > 100
+value = 5110
+
+;-----------------------------あたってふきとぶ
+;---L状態にしてみる？
+;----見た目とPOSYが違うなー
+[Statedef 5610]
+type = L
+movetype= H
+physics = N
+velset = 0,0
+sprpriority = -1
+
+[State 5070, 2];無敵に・
+type = nothitby
+trigger1 = 0
+value = sca
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 0
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 14
+ignorehitpause = 1
+persistent = 1
+
+[State 820, 1];POS
+type = posset
+triggerall = 1
+Trigger1 = time >= 0
+y = 0
+ignorehitpause = 1
+
+[State 820, 1];たたきつけアニメ5100？
+type = ChangeAnim
+triggerall = 1   ;
+Trigger1 = 1
+value = ifelse(authorname = "R-R",5100 + var(0),5100)
+ignorehitpause = 1
+
+[State 820, 1];おわったら
+type = changestate
+triggerall = 1   ;
+Trigger1 = HITshakeover
+value = 5615
+ignorehitpause = 0
+
+;--------------------擬似5101　POSSET＋20がうざいのでしかたなく
+[Statedef 5615]
+type = L
+movetype= H
+physics = N
+;velset = 0,-3
+sprpriority = 0
+
+[State 5070, 2];速度を
+type = hitvelset
+trigger1 = time = 0
+x = 1
+y = 1
+
+[State 820, 1];POS
+type = posset
+triggerall = 1
+Trigger1 = time = 0
+y = 0
+ignorehitpause = 1
+
+[State 5101, 1] ;Coming hit ground anim (normal)5160
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim != [5101,5109]
+trigger2 = !SelfAnimExist(5160 + (anim % 10))
+value = ifelse(authorname = "R-R",5160 + var(0),5160)
+
+[State 5101, 2] ;Coming hit ground anim (for hit up)  専用なのでまず使わない？
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim = [5101,5109]
+trigger1 = SelfAnimExist(5160 + (anim % 10))
+value = ifelse(authorname = "R-R",5160 + var(0),5160) + (anim % 10)
+
+[State 5101, 5] ;Acceleration
+type = VelAdd
+trigger1 = 1
+y = 0.4
+
+[State 5101, 6] ;Hit ground
+type = selfstate
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 12
+value = 5110
+
+;---------------------空中投げられ
+[Statedef 5620]
+type = A
+movetype= H
+physics = N
+velset = 0,0
+sprpriority = 0
+
+;-----------相手がＡＣモードかＯＲのときね1Fかなりシビア、ねらってはむり
+[State 5070, 2];投げぬけ　ぼたんはどうなる？ これ引き込み中はこっちのコマンドみてくれるよう。ＨＳで大丈夫
+type = changestate
+triggerall =  enemynear,var(1) = 0 || enemynear,var(1) = 4  
+trigger1 = time <= 1
+trigger1 = command = "HS"
+value = 5760
+
+[State 5070, 2];無敵に・
+type = nothitby
+trigger1 = 1
+value = sca
+
+[State 820, 1];－－－－
+type = posfreeze
+trigger1 = 1   ;debug
+value = 1
+Ignorehitpause = 1
+
+[State 820, 1];－－－－5015？6F
+type = ChangeAnim
+triggerall = 1   ;debug
+Trigger1 = Time < 6
+value = ifelse(authorname = "R-R",5015 + var(0),5015)
+
+[State 820, 1];5010?
+type = ChangeAnim
+triggerall = 1   ;debug
+Trigger1 = Time >= 6
+Trigger1 = Time < 11
+value = ifelse(authorname = "R-R",5010 + var(0),5010)
+
+[State 820, 1];5060?  これだけCA２で
+type = ChangeAnim2
+triggerall = 1   ;debug
+Trigger1 = Time = 12
+value = ifelse(authorname = "R-R",5620 + var(0),5620)
+
+[State 820, 1];5030にして・・
+type = ChangeAnim
+triggerall = 1   ;debug
+Trigger1 = Time = 15
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+
+[State 820, 1];5050にして解放
+type = ChangeAnim
+triggerall = 1   ;debug
+Trigger1 = Time = 18
+value = ifelse(authorname = "R-R",5050 + var(0),5050)
+
+[State 840,];おちへ
+type = selfState
+Trigger1 = Time = 18
+value = 5050;5625
+
+;------------------対応キャラのみ・・
+;-----キケンかもしんないね・・一応でないはずだから×マーク表示させるためのもの。
+[State 5070, 2];特殊・バースト封じ
+type = varset
+triggerall = TeamMode = Single && enemy,teammode = single;win 
+trigger1 = enemynear,var(49) = 2
+var(25) = -3
+
+[State 840,];保険など
+type = selfState
+trigger1 = time >= 30
+value = 5050
+
+;-------起き上がるまでバースト不能なんだけど、うまくいってないぞ？
+[statedef 5625]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+
+[State 5070, 2];無敵に・
+type = nothitby
+trigger1 = 1
+value = sca
+
+[State 5070, 2]
+type = veladd
+trigger1 = 1
+y = 0.35
+
+[State 875, 1];首をつかむが相手によって
+type = ChangeAnim
+triggerall = 0   ;debug
+Trigger1 = time = 0
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+
+[State 875,]
+type = selfState
+trigger1 = pos y >= 0 && vel y > 0
+value = 5100
+
+;-----------------------------------めんて喜劇　相手の吹き飛び　UP絵、なければ・・？
+;--------ここでバーストを封じたいが・・aa本体にHITDEF
+;----同時ヒットしたら困るねーVAｒたりないしさー？無敵にするわけにもいかない？前半だけ無敵にしておこう
+[statedef 5630]
+type = A
+movetype =H
+physics = N
+ctrl = 0
+velset = 0,-70 * 0.035
+
+[state 3350,]
+type = veladd
+trigger1 = 1 
+y = 0.035
+
+[state 3310,];他の攻撃あたらないように保険
+type = nothitby
+trigger1 = Vel Y < -1
+value = sca
+ignorehitpause = 1
+
+[state 3310,];強制でこれにしよう
+type = changeanim2
+triggerall = name = "BRIDGET" = 0 
+trigger1 = Vel Y < -1
+value = ifelse(authorname = "R-R",5620 + var(0),5620)
+ignorehitpause = 1
+persistent = 1
+
+[state 3310,]
+type = changeanim2
+triggerall = name = "BRIDGET" = 0 
+trigger1 = Vel Y >= -1
+value = ifelse(authorname = "R-R",5630 + var(0),5630)
+ignorehitpause = 1
+persistent = 0
+
+[state 3310,]
+type = changeanim
+triggerall = name = "BRIDGET"  
+trigger1 = vel y < -1
+value = ifelse(authorname = "R-R",5051 + var(0),5051)
+ignorehitpause = 1
+
+[state 3310,]
+type = changeanim
+triggerall = name = "BRIDGET"  
+trigger1 = Vel Y >= -1
+value = ifelse(authorname = "R-R",5061 + var(0),5061)
+ignorehitpause = 1
+persistent = 0
+
+[state 3310,]
+type = changeanim
+triggerall = 0;selfanimexist(5061)
+trigger1 =Vel Y >= 0;ifelse(anim = (5050 + var(0)), 1, -2)
+value = ifelse(authorname = "R-R",5061 + var(0),5061)
+ignorehitpause = 1
+persistent = 0
+
+[state 3360,]
+type = selfstate
+trigger1 = pos y >= -20
+trigger1 = vel y > 0
+value = 5100
+ignorehitpause = 1
+
+;----------------------------------------------むーん　敵ささり>5650
+;-----ヘルパーだったら解放しないといけないぞー
+;-------まずヒットストップ  こっちがわでBGMストップとかする？
+[statedef 5650];----
+type    = A
+movetype= H
+physics = n
+ctrl = 0
+sprpriority = 0
+velset = 0,0
+
+[State 1293, 1];ダウンくらいヘルパーだったら戻す　ダウンあたりしないけど一応ね
+type = selfstate
+triggerall = time = 0
+trigger1 = statetype = L
+trigger2 = ishelper
+value = ifelse(statetype = L,5080,5020)
+
+;------------------対応キャラのみ・・
+;-----キケンかもしんないね・・一応でないはずだから×マーク表示させるためのもの。
+[State 5070, 2];特殊・バースト封じ
+type = varset
+triggerall = TeamMode = Single && enemy,teammode = single;win 
+trigger1 = enemynear,var(49) = 2
+var(25) = -3
+
+[State 3700, 3]
+type = ScreenBound
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[state 3700,]
+type  =playerpush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[state 3700,]
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[state 3800,];吹き飛び  おなか中心  使うしかない？
+type = changeanim
+trigger1 = 1
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+;value = ifelse(authorname = "R-R",5650 + var(0),5650)
+ignorehitpause = 1
+
+[state 3700,];保険
+type = selfstate
+trigger1 = time >= 400
+value = 5050
+ignorehitpause = 1
+
+[state 3700,];HITSTOP終了
+type = changestate
+trigger1 = HitShakeOver
+value = 5660
+ignorehitpause = 1
+
+;-------------------------月ささりヒットストップおわったあと
+[statedef 5660];----本体側で制御してるからなにもすることはない
+type    = A
+movetype= H
+physics = n
+poweradd= 0
+ctrl = 0
+velset = 0,0
+sprpriority = 0
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = nokosnd
+ignorehitpause = 1
+
+[state 3700,]
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[State 3650, 3]
+type = ScreenBound
+trigger1= 1
+value = 0
+
+[state 3700,];保険
+type = selfstate
+trigger1 = time >= 400
+value = 5050
+ignorehitpause = 1
+
+
+;---
+;画面外から下降する、このとき位置を固定させてしまう？
+;---うまく２２０の位置に投下するには？scposは変動する。posyはステージで違う、おまけに勝手に動いて浮上される。15~20,自動であがる
+;----自動でPOSY０より下だと、浮上して強制的にうごいてしまう。
+;-----EXPLODでやっちゃえ  本体は表示優先マイナスでもOK、
+;-----explodだめ、
+[statedef 5670];----
+type    = A
+movetype= H
+physics = N
+poweradd= 0
+ctrl = 0
+sprpriority = 0;12
+velset = 0,0
+
+[State 3650, 3]
+type = ScreenBound
+trigger1= 1
+value = 0
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = nokosnd
+flag2 = globalnoshadow
+flag3 = noFG
+ignorehitpause = 1
+
+[state 3700,]
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[state 3700,]
+type  =playerpush
+trigger1 = 1
+value = 0
+persistent = 1
+ignorehitpause = 1
+
+[state 3700,]
+type  = sprpriority 
+trigger1 = time >= 100
+value = 12
+ignorehitpause = 1
+
+[state 3700,];位置決定 
+type  = posset
+trigger1 = time = 0
+x = 0
+y = 0 
+persistent = 0
+ignorehitpause = 1
+
+[state 3700,];位置決定　ずらす
+type  = posadd
+trigger1 = time = 0
+y = -25 * 20 + (220 - screenpos y) 
+persistent = 0
+ignorehitpause = 1
+
+[state 3700,];移動開始
+type  = posadd
+trigger1 = time = [100,119]
+y = 25
+ignorehitpause = 1
+
+;----------------------原作50dotづつ下降、mugen=25dot
+;-------------対応キャラ用、AIR5119、ALL3Fずつのアニメ。  刺さり位置backでspos X0Y220
+;------------Ｔ100から下降　スタート位置160、-250 + (time - 100) * 25
+;trigger1 = time = [100,119];[40,59]
+;pos = 160,-250 + (time - 100) * 25
+;trigger1 = time = 119
+;pos = 160,220
+
+[state 3800,];対応アニメ、アニメしないでおとす 119移行は勝手に動く
+type = changeanim
+trigger1 = time = [100,119]
+trigger1 = SelfAnimExist(5119) 
+value = ifelse(authorname = "R-R",5119 + var(0),5119)
+elem = 1
+ignorehitpause = 1
+
+[state 3800,];がないとき 頭中心
+type = changeanim2
+trigger1 = time = [100,119]
+trigger1 = !SelfAnimExist(5119) 
+value = ifelse(authorname = "R-R",5660 + var(0),5660)
+elem = 1
+ignorehitpause = 1
+
+;----ステージによってＰＯＳＹがずれるのでＳＣＲＥＮＮＰＯＳを使うべきかも
+;----scposy自体が不確定、タイムにしてもずれる、
+[state 3670,]
+type = changestate
+trigger1 = time >= 150
+value = 5680
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,vlx=%f,vly=%f,spy=%f\n"
+params =pos x,pos y,vel x,vel y,screenpos y
+ignorehitpause = 1
+
+;-----------------------ささってとまる
+;-----ささってからKOまで時間差あり
+[statedef 5680];----
+type    = A
+movetype= H
+physics = n
+poweradd= 0
+ctrl = 0
+velset = 0,0
+sprpriority = 12
+
+[State 3660,];あさーとできかない場合０を強制消ししてみる
+type = stopsnd
+trigger1 = 1
+channel = 0
+ignorehitpause = 1
+
+[State 3660,];あさーとできかない場合０を強制消ししてみる
+type = stopsnd
+trigger1 = 1
+channel = 1
+ignorehitpause = 1
+
+[State 3660,];一撃必殺時　強制音消し	ひすこは５だった
+type = stopsnd
+trigger1 = 1
+channel = 5
+ignorehitpause = 1
+
+[State 3660,];一撃必殺時　強制音消し
+type = stopsnd
+trigger1 = 1
+channel = 10
+ignorehitpause = 1
+
+[state 3700,]
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[state 3700,]
+type  =playerpush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = nokosnd
+flag2 = globalnoshadow
+flag3 = noFG
+ignorehitpause = 1
+
+[State 3660,];スローモーション停止
+type = AssertSpecial
+trigger1 = 1
+flag = nokoslow
+ignorehitpause = 1
+
+;-------------対応キャラ用、AIR5119、ALL3Fずつのアニメ。
+;----------対応アニメありキャラ5119
+;rigger1 = time = [30,100]
+;pos = 160,220
+[state 3800,];対応アニメ、アニメ停止 100移行は勝手に動く
+type = changeanim
+trigger1 = time = [30,80]
+trigger1 = SelfAnimExist(5119) 
+value = ifelse(authorname = "R-R",5119 + var(0),5119)
+elem = 1
+ignorehitpause = 1
+
+[state 3800,];がないとき 頭中心
+type = changeanim2
+trigger1 = time = [30,80]
+trigger1 = !SelfAnimExist(5119) 
+value = ifelse(authorname = "R-R",5660 + var(0),5660)
+elem = 1
+ignorehitpause = 1
+
+[state 3800,];30だとシステムＫＯ表示とかぶるね。ずらしてみる
+type = lifeset
+trigger1 = time = 150
+value = 0
+ignorehitpause = 1
+
+[state 3800,];
+type = changestate;
+trigger1 = time = 160
+value = 5150
+ignorehitpause = 1
+
+[statedef 5690];----相打ち時即解放させたい・
+type    = A
+movetype= H
+physics = n
+poweradd= 0
+ctrl = 0
+velset = -5,-6.5
+
+[state 3800,];
+type = changeanim
+trigger1 = time =0
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorehitpause = 1
+
+[state 3750,]
+type = selfstate
+trigger1 = time = 0
+value = 5050
+ignorehitpause = 1
+
+;------------------------壁はねかえり、床はねかえり、
+;-----------------------------------------------壁跳ね返り
+;-------6S　A投げDAA
+;------------------------------------------まずHITPAUSE
+;---------------カウンターのときにくる場合あり。
+[Statedef 5700]
+type    = U
+movetype= H
+physics = N
+velset = 0,0
+ctrl = 0
+sprpriority = 0
+
+[State 1293, 1];ダウンくらい、へるぱーだったらもどす
+type = selfstate
+triggerall = time = 0
+trigger1 = statetype = L
+trigger2 = ishelper
+value = ifelse(statetype = L,5080,5020)
+ignorehitpause = 1
+
+[State 1293, 1];S　にする
+type = statetypeset
+trigger1 = time = 0
+statetype = A
+ignorehitpause = 1
+
+[State 3360, 1]
+type = ChangeAnim
+triggerall = 1   ;debug
+Trigger1 = 1
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorethiapuse = 1
+
+[State 840, 6]
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 3360,]
+type = changeState
+trigger1 =  hitshakeover
+value = 5705
+ignorehitpause = 1
+
+;------enemy state2	ふきとび-----------------------------------------use p2spr  
+;------ここでも受身をとれるようにしないと！
+[Statedef 5705]
+type = A
+movetype= H
+physics = n
+
+[State 840, 6]
+type = hitvelset
+trigger1 = time = 0
+x = 1
+y = 1 
+ignorehitpause = 1
+
+[State 840, 6]
+type = veladd
+trigger1 = 1
+y = 0.5
+ignorehitpause = 0
+
+[State 840, 6]
+type = changeanim
+trigger1 = time = 0
+value =  ifelse(authorname = "R-R",5050 + var(0),5050)
+ignorehitpause = 1
+
+[State 840, 6]
+type = changeanim
+triggerall = selfanimexist(5060)
+trigger1 = vel y > -2
+value =  ifelse(authorname = "R-R",5060 + var(0),5060)
+ignorehitpause = 1
+persistent = 0
+
+
+[State 840, 6];かべ
+type = changeState
+trigger1 = backedgedist < 10
+trigger1 = Pos Y <= -10
+value = 5710
+
+[State 840, 6]
+type = selfState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= -10
+value = 5100
+
+;---------------------------------------かべにあたった場合はねかえる
+[Statedef 5710]
+type = A
+movetype= H
+physics = n
+
+[State 840, 6]
+type = changeanim
+trigger1 = time <= 5
+value =  ifelse(authorname = "R-R",5010 + var(0),5010)
+ignorehitpause = 1
+
+[State 840, 6];TRIPアニメで
+type = changeanim
+trigger1 = time > 6
+value =  ifelse(authorname = "R-R",5070 + var(0),5070)
+ignorehitpause = 1
+persistent = 0
+
+[State 840, 6]
+type = posfreeze
+trigger1 = time < 6
+value = 1
+ignorehitpause = 1
+
+[State 840, 6];半分ぐらいになる
+type = velset
+trigger1 = time = 6
+x = vel x * -0.5;-3
+y = gethitvar(yvel) * 0.5;-7
+ignorehitpause = 0
+
+[State 840, 6]
+type = veladd
+trigger1 = time > 6
+y = 0.5
+ignorehitpause = 0
+
+;-----------受身、
+[State 5050, 4];Recover near ground	地上近くではニュートラル復帰不能
+type = selfState
+triggerall = 1;Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+trigger1 = Command = "holdfwd" || command = "holdback"
+value = 5200 ;HITFALL_RECOVER
+
+[State 5050, 5]; Recover in mid air
+type = selfstate
+triggerall = 1;Vel Y > -1
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State 840, 6]
+type = selfState
+trigger1 = time > 6
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= -20
+value = 5100
+
+;---------------------------------------床たたきつけシリーズ
+[Statedef 5720]
+type = A
+movetype= H
+physics = n
+
+[State 840, 6]
+type = changeanim
+trigger1 = 1
+value =  ifelse(authorname = "R-R",5100 + var(0),5100)
+ignorehitpause = 1
+
+[State 840, 6]
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 840, 6]
+type = changestate
+trigger1 =  hitshakeover
+value = 5725
+ignorehitpause = 1
+
+;----------------しゃがみHSカウンター床バウンド  x4 y 18(19)?
+[Statedef 5725]
+type = A
+movetype= H
+physics = n
+velset = -1,-11
+
+[State 820, 1];5030-5050-5060
+type = ChangeAnim
+triggerall = 1
+trigger1 = time = 0
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+
+[State 5050, 6];
+type = veladd
+trigger1 = 0
+y = 0.44
+
+[State 5050, 6];
+type = selfstate
+trigger1 = time = 0
+trigger1 = 1;Pos Y >= ifelse((anim = [5051,5059]) || (anim = [5061,5069]), 0, 25)
+value = 5050 
+
+;---------------------------ACでの・・横滑りとか？
+;[Statedef 5730]
+
+
+;---------------------------AC-投げぬけ	つかんでから、の相手空中放り投げVER
+;---つかまれてから、のほうということで空中に変更する。これ共通にしてもいいんじゃない？
+[Statedef 5750];
+type    = A
+movetype= H
+physics = N
+;velset = -3,-7
+ctrl = 0
+
+[State 1293, 1];ガードアニメにしとく？
+type = turn
+trigger1 = enemynear,facing = facing
+trigger1 = time = 0
+
+[State 1293, 1];ガードアニメにしとく？
+type = velset
+trigger1 = time = 0
+x = -3
+y = -7
+
+[State 1293, 1];ガードアニメにしとく？
+type = ChangeAnim
+trigger1 = 1
+value = ifelse(authorname = "R-R",152 + var(0),152)
+
+[State 5070, 2];無敵らしい
+type = nothitby
+trigger1 = 1
+value = sca
+ignorehitpause = 1
+
+[state 810,tstate];
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 5070, 2];重力
+type = veladd
+trigger1 = 1
+y = 0.525
+ignorehitpause = 0
+
+[State 5070, 2];保険
+type = selfstate
+trigger1 = pos y >= 0 && vel y > 0
+value = 52
+ctrl = 0
+
+;---つかまれてから、のほうということで空中に変更する。これ共通にしてもいいんじゃない？
+;-----空中のほう
+[Statedef 5760];
+type    = A
+movetype= H
+physics = N
+;velset = -4,-5
+ctrl = 0
+
+[State 1293, 1];ガードアニメにしとく？
+type = turn
+trigger1 = enemynear,facing = facing
+trigger1 = time = 0
+
+[State 1293, 1];ガードアニメにしとく？
+type = velset
+trigger1 = time = 0
+x = -4
+y = -5
+
+[State 1293, 1];ガードアニメにしとく？
+type = ChangeAnim
+trigger1 = 1
+value = ifelse(authorname = "R-R",152 + var(0),152)
+
+[State 5070, 2];無敵らしい
+type = nothitby
+trigger1 = time < 15
+value = sca
+ignorehitpause = 1
+
+[state 810,tstate];
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 5070, 2];重力
+type = veladd
+trigger1 = 1
+y = const(movement.yaccel)
+ignorehitpause = 0
+
+[State 5070, 2];	これどうしよ？相手によってアニメちがうし・？ガード硬直にほうりこんでみるかな
+type = ctrlset
+trigger1 = time >= 15
+value = 1
+
+[State 5070, 2];保険やっぱ51？
+type = selfstate
+trigger1 = time >= 15
+value = 51
+ctrl = 1
+
+[State 5070, 2];保険
+type = selfstate
+trigger1 = pos y >= 0 && vel y > 0
+value = 52
+ctrl = 0
+
+;-----------------GG共通TRIPの足払いのはね	いわば擬似５０７０でいいと思う
+;-------------------戦闘中 相打ち考慮して、p2stateno使用すると・・SELFSTATE必須
+[Statedef 5770];足払いHIT中硬直
+type    = U
+movetype= H
+physics = N
+ctrl = 0
+sprpriority = 0
+velset = 0,0
+
+[State 1293, 1];へるぱ、空中、ダウンだったら強制チェンジ　
+type = selfstate
+triggerall = time = 0
+trigger1 = ishelper
+trigger2 = statetype = A || statetype = L
+value = ifelse(statetype = L,5080,5070)
+ignorehitpause = 1
+
+[State 1293, 1];ステートタイプをセット
+type = statetypeset
+trigger1 = time = 0
+statetype = A
+ignorehitpause = 1
+
+[State 1293, 1];アニメは5070
+type = ChangeAnim
+trigger1 = 1
+value = ifelse(authorname = "R-R",5070 + var(0),5070)
+ignorehitpause = 1
+
+[State 5070, 2]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 5771
+ignorehitpause = 1
+
+[State 5070, 3]
+type = ForceFeedback
+trigger1 = time = 0
+time = 12
+waveform = sinesquare
+ampl = 140
+
+;--------------------------------足払いふきとび-------------擬似5071
+; HIT_TRIP2 (fall through air)
+[statedef 5771]
+type    = A
+movetype= H
+physics = n
+ctrl = 0    
+
+[State 5071, 1];x3y9の半分
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+ignorehitpause = 1
+
+[State 5071, 2] ;Acceleration
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+ignorehitpause = 0
+
+[State 5071, 3] ;Hit ground5110を独自に
+type = changestate
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 15
+value = 5772
+
+;----------------------------擬似5100、5772
+[Statedef 5772]
+type    = L
+movetype= H
+physics = N
+
+[State 5100, 1];上に吹き飛ばないときはX速度を1にする?
+type = VelSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+trigger1 = vel x > 1
+x = 1
+ignorehitpause = 1
+
+[State 5100, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 5100, Var] ;Save fall velocity
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = floor(vel y)
+
+;----------------------------アニメ5100か5101、5102系にかえる
+;----強制ほおりこみだから前でかならず必須AIｒ5070である
+;-------------GGでは5070->5101
+[State 5100, 2] ;Hit  TRIP anim(GGXX,MB)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = SelfAnimExist(5101)
+value = ifelse(authorname = "R-R",5101 + var(0),5101)
+ignorehitpause = 1
+persistent = 0
+
+[State 5100, 2] ;Hit ground anim (normal)5100にかえる
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = !SelfAnimExist(5101)
+value = ifelse(authorname = "R-R",5100 + var(0),5100)
+ignorehitpause = 1
+persistent = 0
+
+[State 5100, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5100, 5]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 5100, 6] ;Reduce speed
+type = VelMul
+trigger1 = Time = 0
+x = 0.75
+
+[State 5100, 7];上に跳ばない設定なら即5110
+type = selfState
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+value = 5110 ;HIT_LIEDOWN
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 1
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 14
+
+[State 5100, 9]
+type = HitFallDamage
+trigger1 = Time = 3
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 1
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 5100, 11]
+type = PosFreeze
+trigger1 = 1
+value = 1
+
+;-----------------------5100アニメがおわったら5101に移動、5100はループ不可である
+[State 5100, 12];イントロ中の場合は待機へほうりこむ
+type = changeState
+trigger1 = roundstate < 2
+trigger1 = AnimTime = 0
+value = 5773
+
+[State 5100, 12]
+type = selfState
+trigger1 = roundstate >= 2
+trigger1 = AnimTime = 0
+value = 5101
+
+[State 5100, 13]
+type = ForceFeedback
+trigger1 = Time = 0
+waveform = sinesquare
+ampl = 128,-3,-.2,.005
+time = 20
+
+;--------------------------------擬似5101　5773　イントロふみふみのときにつかいます。
+;---------------------------Lにしないのは追い討ちでYがずれるため
+[Statedef 5773]
+type    = A
+movetype= H
+physics = N
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 5101, 1] ;Coming hit ground anim (normal)
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+triggerall = time = 0
+trigger1 = anim != [5101,5109]
+trigger2 = !SelfAnimExist(5160 + (anim % 10))
+value = ifelse(authorname = "R-R",5160 + var(0),5160)
+
+[State 5101, 1] ;Coming hit ground anim (normal)	双子ばん
+type = ChangeAnim
+triggerall = authorname = "R-R"
+triggerall = time = 0
+trigger1 = anim != [5101 + var(0),5109 + var(0)]
+trigger2 = !SelfAnimExist(5160 + (anim % 10))
+value = ifelse(authorname = "R-R",5160 + var(0),5160)
+
+[State 5101, 2] ;Coming hit ground anim (for hit up)
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+triggerall = time = 0
+trigger1 = anim = [5101,5109]
+trigger1 = SelfAnimExist(5160 + (anim % 10))
+value = ifelse(authorname = "R-R",5160 + var(0),5160) + (anim % 10)
+
+[State 5101, 2] ;Coming hit ground anim (for hit up)双子ばん
+type = ChangeAnim
+triggerall = authorname = "R-R"
+triggerall = time = 0
+trigger1 = anim = [5101 + var(0),5109 +var(0)]
+trigger1 = SelfAnimExist(5160 + (anim % 10))
+value = ifelse(authorname = "R-R",5160 + var(0),5160) + (anim % 10)
+
+[State 5101, 3]
+type = HitFallVel
+trigger1 = Time = 0
+
+[State 5101, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 20
+
+[State 5101, 5] ;Acceleration
+type = VelAdd
+trigger1 = 1
+y = .4
+
+[State 5101, 6] ;Hit ground
+type = changestate
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 12
+type = ChangeState
+value = 5780
+
+;----------------------------------------------イントロ専用、TRIPふきとび待機
+[statedef 5780];Lにすると追い討ち時Y位置がずれるので・・
+type    = c
+movetype= H
+physics = n
+ctrl = 0    
+velset = 0,0
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 5071, 3] 
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 6050,];アニメ
+type = changeanim 
+triggerall = selfanimexist(5111)
+trigger1 = 1;time = 0
+value = ifelse(authorname = "R-R",5111 + var(0),5111)
+ignorehitpause = 1
+
+[state 6050,];アニメ
+type = changeanim 
+triggerall = !selfanimexist(5111)
+trigger1 = 1;time = 0
+value = ifelse(authorname = "R-R",5110 + var(0),5110)
+ignorehitpause = 1
+
+[State 5071, 3] ;保険でおきあがらせる
+type = selfState
+trigger1 = time >= 250
+trigger2 = roundstate >= 2
+value = 5120
+
+[State 5071, 3] ;とばされたとき
+type = selfState
+trigger1 = roundstate >= 2
+value = 0
+
+;-------------------踏みイントロ 踏みp2	足払いステートの後で来るはず
+[statedef 5785]
+type = A
+movetype = H
+physics = n
+ctrl = 0
+velset = 0,0
+sprpriority = -3
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 6050,];アニメ
+type = changeanim 
+trigger1 = 1
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorehitpause = 1
+
+[state 6050,];
+type = posset 
+trigger1 = 1
+y = 0
+
+[state 6050,];HITSTOP終了
+type = changestate 
+Trigger1 = HITshakeover
+value = 5786
+
+;--------------------------HITSTOP
+[statedef 5786]
+type = A
+movetype = H
+physics = n
+ctrl = 0
+velset = 0,0
+sprpriority = -3
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+ignorehitpause = 1
+
+[state 6050,];
+type = changeanim 
+trigger1 = 1
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorehitpause = 1
+
+[state 6050,]
+type = posset
+trigger1 = time = 0
+y = 0
+ignorehitpause = 1
+
+[state 6050,];
+type = changestate
+Trigger1 = HITshakeover
+value = 5787
+ignorehitpause = 0
+
+;---------------------------上に吹き飛ぶ
+[statedef 5787]
+type = A
+movetype = H
+physics = n
+ctrl = 0
+velset = 0,-5
+sprpriority = -3
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 6050,]
+type = veladd
+trigger1 = 1
+y = 0.525
+
+[state 6050,];
+type = changeanim 
+trigger1 = time = 0
+value = ifelse(authorname = "R-R",5050 + var(0),5050)
+
+[state 6050,];
+type = changeanim 
+triggerall = selfanimexist(5060)
+trigger1 = vel y > 0
+value = ifelse(authorname = "R-R",5060 + var(0),5060)
+persistent = 0
+
+[State 1000, 3]
+type = EnvShake
+trigger1 = pos y >= 0 && vel y > 0
+time = 10
+ampl = 5
+
+[state 6050,];ダウンしせりふおわるまでてしばらく放置
+type = changestate 
+trigger1 = pos y >= 0 && vel y > 0
+value = 5788
+
+[state 6050,];保険
+type = selfstate
+trigger1 = roundstate = 2
+trigger2 = pos y >= 50 && vel y > 0
+value = 0
+
+;-------だうんしたまんま	これあいてもつかう
+[statedef 5788]
+type = L
+movetype = H
+physics = n
+ctrl = 0
+velset = 0,0
+sprpriority = 0
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 6052,]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 1
+;value = 61
+;pos = 0, 0
+;under = 1
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 10
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 1
+;value = F7, 0 ;Hit ground
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[state 6055,];地面ダウンアニメ
+type = changeanim
+trigger1 = 1
+value = ifelse(authorname = "R-R",5110 + var(0),5110)
+
+[state 6050,];メイ専用　おきあがりへ
+type = selfstate
+triggerall = time >= 90
+trigger1 = enemy,authorname = "MEKA"
+trigger1 = P2name = "may"
+trigger2 = enemy,authorname = "EL"
+trigger2 = P2name = "MAY"
+value = 194
+
+[state 6050,];おきあがりへ  これもこっちにかく=5120
+type = changestate 
+trigger1 = time >= 250
+value = 5790
+
+[state 6050,];保険
+type = selfstate 
+trigger1 = roundstate >= 2
+value = 0
+
+;----------めいしかえし　ぶりじっとせんよー
+[statedef 5789]
+type = L
+movetype = H
+physics = n
+ctrl = 0
+velset = 0,0
+sprpriority = 0
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 6052,]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 1
+;value = 61
+;pos = 0, 0
+;under = 1
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 10
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 1
+;value = F7, 0 ;Hit ground
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[state 6055,];地面ダウンアニメ
+type = changeanim
+trigger1 = 1
+value = ifelse(authorname = "R-R",5111 + var(0),5111)
+
+[State -3, damage s];しゃれがつうじない なんか消される
+type = PlaySnd
+trigger1 = Time = 80
+value = s5200, ifelse(var(54) <= 2 || var(54) = 6,2,5)
+channel = 0
+ignorehitpause = 1
+
+[state 6050,];おきあがりへ  これもこっちにかく=5120
+type = changestate 
+trigger1 = time >= 100
+value = 5790
+
+[state 6050,];保険
+type = changestate 
+trigger1 = roundstate >= 2
+value = 0
+
+;--------------------------------5120と同じ
+[Statedef 5790]
+type    = L
+movetype= H
+physics = N
+
+[State 5120, 1a] ;Get up anim (normal)
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+triggerall = time = 0
+trigger1 = anim != [5111,5119]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120)
+
+[State 5120, 1a] ;Get up anim (normal)双子
+type = ChangeAnim
+triggerall = authorname = "R-R" 
+triggerall = time = 0
+trigger1 = anim != [5111 + var(0),5119 + var(0)]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120)
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+triggerall = time = 0
+trigger1 = anim = [5111,5119]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120) + (anim % 10)
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = authorname = "R-R"
+triggerall = time = 0
+trigger1 = anim = [5111 + var(0),5119 + var(0)]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120) + (anim % 10)
+
+[State 5120, 2]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 5120, 3]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5120, 7]
+type = selfstate
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 0
+
+[state 6050,];保険
+type = selfstate 
+trigger1 = roundstate >= 2
+value = 0
+
+;-------------------------------------------GGXX特殊よろけ
+;-----------------------------------対応キャラは5003,5008にアニメがアル  HISTOP この間にステート判断してセルフステ
+;-----------相打ち時にいかなくなる対策、HITDEFにp2statenoをつけるよ
+;----たおしたとき立往生になってる、みてダメージはいるタイミングによるので。うまくいってない
+[statedef 5800]
+type    = U
+movetype= H
+physics = n
+ctrl = 0    
+
+[State 1293, 1];空中またはダウンくらい、へるぱーだったらもどす
+type = selfstate
+triggerall = time = 0
+trigger1 = statetype = A || statetype = L
+trigger2 = ishelper
+value = ifelse(statetype = L,5080,5020)
+ignorehitpause = 1
+
+[State 1293, 1];しんでたら
+type = selfstate
+trigger1 = !alive
+value = ifelse(statetype = L,5080,5020)
+ignorehitpause = 1
+
+[State 1293, 1];S　にする
+type = statetypeset
+trigger1 = time = 0
+statetype = s
+ignorehitpause = 1
+
+[State 1293, 1];なければアニメは5000-5010くりかえしにしますか
+type = ChangeAnim
+trigger1 = selfanimexist(5003)
+trigger1 = 1
+value = ifelse(authorname = "R-R",5003 + var(0),5003)
+ignorehitpause = 1
+
+[State 1293, 1];アニメは
+type = ChangeAnim
+trigger1 = !selfanimexist(5003)
+trigger1 = 1
+value = ifelse(authorname = "R-R",5011 + var(0),5011)
+ignorehitpause = 1
+
+[State 5070, 2];
+type = posset
+trigger1 = time = 0
+y = 0
+ignorehitpause = 1
+
+[State 5070, 2];
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 5070, 2]
+type = ChangeState
+trigger1 = HitShakeOver
+value = ifelse(alive,5810,5030)
+ignorehitpause = 1
+
+[State 5070, 2];保険
+type = selfstate
+trigger1 = time >= 100
+value = 5001
+ignorehitpause = 1
+
+;--------------------------------れヴぁがちゃ実験
+[State 5070, 2];
+type = varset
+trigger1 = time = 0
+sysvar(2) = gethitvar(hittime)
+ignorehitpause = 1
+
+[state 5800,]; 
+type = varadd
+trigger1 = command = "holddown" && command = "holdback"
+trigger1 =sysvar(1) != 1
+trigger2 = command = "holddown" && command != "holdfwd" && command != "holdback"
+trigger2 =sysvar(1) != 2
+trigger3 = command = "holddown" && command = "holdfwd" 
+trigger3 =sysvar(1) != 3
+trigger4 = command = "holdback" && command != "holddown" && command != "holdup"
+trigger4 =sysvar(1) != 4
+trigger5 = command != "holddown" && command = "holdfwd" && command != "holdup"
+trigger5 = sysvar(1) != 6
+trigger6 = command = "holdback" &&  command = "holdup" 
+trigger6 =sysvar(1) != 7
+trigger7 = command != "holdback" &&  command = "holdup" && command != "holdfwd" 
+trigger7 =sysvar(1) != 8
+trigger8 = command = "holdup" && command = "holdfwd" 
+trigger8 =sysvar(1) != 9
+sysvar(0) = 1
+ignorehitpause = 1
+
+[state 5800,];ニュートラル 
+type = varset
+trigger1 = command != "holddown" && command != "holdback" && command != "holdup" && command != "holdfwd" 
+sysvar(1) = 0
+ignorehitpause = 1
+
+[state 5800,];斜め後ろ 
+type = varset
+trigger1 = command = "holddown" && command = "holdback"
+sysvar(1) = 1
+ignorehitpause = 1
+
+[state 5800,];下 はない
+type = varset
+trigger1 = 0;command = "holddown" && command != "holdfwd" && command != "holdback"
+sysvar(1) = 2
+ignorehitpause = 1
+
+[state 5800,];斜め前 
+type = varset
+trigger1 = command = "holddown" && command = "holdfwd" 
+sysvar(1) = 3
+ignorehitpause = 1
+
+[state 5800,];後ろ 
+type = varset
+trigger1 = command = "holdback" && command != "holddown" && command != "holdup"
+sysvar(1) = 4
+ignorehitpause = 1
+
+[state 5800,];前 
+type = varset
+trigger1 = command != "holddown" && command = "holdfwd" && command != "holdup"
+sysvar(1) = 6
+ignorehitpause = 1
+
+[state 5800,];後ろ斜め上 もない
+type = varset
+trigger1 = 0;command = "holdback" &&  command = "holdup" 
+sysvar(1) = 7
+ignorehitpause = 1
+
+[state 5800,];上 
+type = varset
+trigger1 = command != "holdback" &&  command = "holdup" && command != "holdfwd" 
+sysvar(1)= 8
+ignorehitpause = 1
+
+[state 5800,];前斜め上 
+type = varset
+trigger1 = command = "holdup" && command = "holdfwd" 
+sysvar(1) = 9
+ignorehitpause = 1
+
+;-------------------------よろけヒットバックだいたい33-39F
+[statedef 5810]
+type    = S
+movetype= h
+physics = s
+ctrl = 0   
+
+[State 1293, 1];無い場合のアニメ交互くりかえし
+type = ChangeAnim
+trigger1 = !selfanimexist(5003)
+trigger1 = time % 5 = 0
+trigger1 = time % 10 != 0
+value = ifelse(authorname = "R-R",5001 + var(0),5001)
+
+[State 1293, 1];アニメは
+type = ChangeAnim
+trigger1 = !selfanimexist(5003)
+trigger1 = time % 5 = 0
+trigger1 = time % 10 = 0
+value = ifelse(authorname = "R-R",5011 + var(0),5011)
+
+[State 5071, 1];HITDEFのを有効にする
+type = HitVelSet
+trigger1 = time = 0
+x = 1
+
+[State 5001, 3] ;Stop sliding back
+type = VelMul
+trigger1 = Time >= GetHitVar(slidetime)
+x = .6
+
+[State 5001, 5];指定時間終了でとまる？
+type = DefenceMulSet
+trigger1 = HitOver
+value = 1
+
+[State 5070, 2]
+type = ChangeState
+trigger1 = HItover
+trigger1 = time >= sysvar(2) - sysvar(1) / 10
+value = 5820
+
+[State 5070, 2];保険
+type = selfstate
+trigger1 = time >= 60
+value = 5001
+
+;---------------------------------5008アニメ、ここでVEL=0CTRL戻し？
+[statedef 5820]
+type    = S
+movetype= H
+physics = s
+ctrl = 0  
+velset = 0,0
+
+[State 5001, 2]
+type = ChangeAnim
+triggerall = selfanimexist(5008)
+trigger1 = time = 0
+value = ifelse(authorname = "R-R",5008 + var(0),5008)
+persistent = 0
+
+[State 5001, 2]
+type = ChangeAnim
+triggerall = !selfanimexist(5008)
+trigger1 = time = 0
+value = ifelse(authorname = "R-R",5011 + var(0),5011)
+persistent = 0
+
+[State 5001, 6];4Fであってる
+type = selfstate
+trigger1 = time >= 4
+value = 0
+ctrl = 1
+
+;----------------------------------------------5850
+;------------------------------------------------ダスト、打ち上げられた敵、usep2spr
+;-------------------init　一回のみ
+;---ダストは特殊、よよとか他攻撃同時あたってもダスト放物線維持させる必要あり
+;-----------------超特殊措置、１Ｆは確実に実行させるため無敵にしてみる
+[Statedef 5850];test  now 14:-0.3(35f	まずHITSTOP
+type    = U                      
+movetype= H                      
+physics = n
+ctrl = 0 
+velset = -2.5,-7         
+
+[State 1293, 1];空中またはダウンくらい、
+type = selfstate
+triggerall = time = 0
+trigger1 = statetype = A || statetype = L
+trigger2 = ishelper
+value = ifelse(statetype = L,5080,5020)
+ignorehitpause = 1
+
+[State 1293, 1];実行確実のため１Ｆだけ無敵にする
+type = nothitby
+trigger1 = time = 0
+value = sca
+time = 1
+ignorehitpause = 1
+
+[State 1293, 1];実行確実のため１Ｆだけ無敵にする
+type = playerpush
+trigger1 = time = 0
+value = 1
+ignorehitpause = 1
+
+[State 1293, 1];S　にする
+type = statetypeset
+trigger1 = time = 0
+statetype = A
+ignorehitpause = 1
+
+[state 3800,];  ふきとび	kirimomiあれば
+type = changeanim
+trigger1 = 1
+trigger1 = selfanimexist(5052)
+value = ifelse(authorname = "R-R",5052 + var(0),5052)
+ignorehitpause = 1
+
+[state 3800,];  ふきとび固定は5030にしてみる
+type = changeanim
+triggerall = 1
+trigger1 = !selfanimexist(5052)
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorehitpause = 1
+
+;--------0.44で77Fに調節。　x2.25;y16.8 
+;こまどり-相手1F目 x5-4 y14-14-14-?-14-14  きりもみ中はYVEL固定なのかも？
+;---速度は即設定しておいて・・ふりーずさせてみる
+[State 5070, 2];29＋48　一部51でつく？重力？キャラごとでは対処不能だよ
+type = velset
+trigger1 = time >= 0;HitShakeOver
+x = -2.5;-2.25
+y = -7;-16.8
+ignorehitpause = 1
+
+[State 5070, 2];HITSTOP中は動かさない
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+;--------------------------かうんとを1スタート設定
+[State 5070, 2]
+type = varset
+trigger1 = 1
+sysvar(0) = 1
+ignorehitpause = 1
+
+[State 5070, 2]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 5860
+ignorehitpause = 1
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,vlx=%f,vly=%f,sv(0)=%d\n"
+params =pos x,pos y,vel x,vel y,sysvar(0)
+ignorehitpause = 1
+
+;------------------------------------打ち上げ中に追加でくらうとHITSTOP
+;---分岐、"29F"以内であれば5860ｍでなければ5865
+[Statedef 5855];test  now 14:-0.3(35f	まずHITSTOP
+type    = A                      
+movetype= H                      
+physics = n
+ctrl = 0 
+velset = vel x,vel y
+
+[state 3800,]; もしへるぱーなら 
+type = selfstate
+trigger1 = ishelper
+value = 5050
+ignorehitpause = 1  
+                        
+[state 3800,]; 錐揉み絵、自然なら内部的に45F間そうなるが攻撃した場合は29Fルールであろう
+type = changeanim
+trigger1 = sysvar(0) <= 30
+trigger1 = selfanimexist(5052)
+value = ifelse(authorname = "R-R",5052 + var(0),5052)
+ignorehitpause = 1
+
+[state 3800,];錐揉み無いとき、または２９Fルール終了後  空中ふきとび固定は5030にしてみる
+type = changeanim
+trigger1 = !selfanimexist(5052)
+trigger2 = sysvar(0) >= 31
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorehitpause = 1
+
+[State 5070, 2];29＋48　一部51でつく？重力？キャラごとでは対処不能だよ
+type = posfreeze
+trigger1 = 1
+velue = 1
+ignorehitpause = 1
+
+[State 5070, 2];分岐あり、29F終了後の攻撃くらいなら5865へ
+type = ChangeState
+trigger1 = HitShakeOver
+value = ifelse(sysvar(0) <= 30, 5860,5865)
+ignorehitpause = 1
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,vlx=%f,vly=%f,sv(0)=%d\n"
+params =pos x,pos y,vel x,vel y, sysvar(0)
+ignorehitpause = 1
+
+;-----------------------------------有効中なぐると最後はここに
+;29Fまでダスト放り込みOKで、頂点になるのは44F付近
+;--1~29F重力なしなので注意---最速受身は49F目、29F以下のときはココに放り込むのでTIME=49でやればいい、
+;---30以降は擬似5020,5050である5865にいくように
+[Statedef 5860];test  now 14:-0.3(35f	
+type    = A                      
+movetype= H                      
+physics = n
+ctrl = 0 
+velset = vel x,vel y
+
+[state 3800,];1スタートなのでtime０なら2になるはず
+type = varadd
+trigger1 =  time >= 0
+sysvar(0) = 1
+ignorehitpause = 0
+
+[state 3800,];5052が無い場合 5030と5050-1どっちがいいかな？
+type = changeanim
+triggerall = !selfanimexist(5052)
+trigger1 = sysvar(0) <= 45
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+ignorehitpause = 1
+
+[state 3800,];きりもみ絵は44F持続
+type = changeanim
+triggerall = sysvar(0) > 45
+triggerall = !selfanimexist(5062)
+trigger1 = 1
+value = ifelse(authorname = "R-R",5050 + var(0),5050)
+ignorehitpause = 1
+persistent = 0
+
+[state 3800,];きりもみ絵は44F持続
+type = changeanim
+triggerall = sysvar(0) > 45
+triggerall = !selfanimexist(5062)
+trigger1 = selfanimexist(5060)
+trigger1 = vel y > 0
+value = ifelse(authorname = "R-R",5060 + var(0),5060)
+ignorehitpause = 1
+persistent = 0
+
+[state 3800,];きりもみ絵は44F持続
+type = changeanim
+triggerall = sysvar(0) > 45
+triggerall = !selfanimexist(5062)
+trigger1 = selfanimexist(5060)
+value = ifelse(authorname = "R-R",5060 + var(0),5060)
+ignorehitpause = 1
+persistent = 0
+
+[state 3800,];きりもみ絵は44F持続
+type = changeanim
+triggerall = sysvar(0) > 45
+triggerall = selfanimexist(5062)
+trigger1 = 1
+value = ifelse(authorname = "R-R",5062 + var(0),5062)
+ignorehitpause = 1
+persistent = 0
+
+;-----------29F間はY固定みたい
+;---最初は1dotoずつだかそのうち２Fに１F2dotさがり
+[state 3800,];相手の重力依存？重力でなく係数、とすればあわせるのはむずい77Fでおちるように調節
+type = veladd
+trigger1 = sysvar(0) > 33
+y = 0.5
+ignorehitpause = 0
+
+;-----最速受身は49F目 time=48が49F	29過ぎてたらここにはこないのでOK
+;---29F以内受身不能48もこれでOK DEFはいじらないでいい
+[State 5050, 4] ;Recover near ground２９F以降？
+type = selfState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+triggerall = time >= 48 
+trigger1 = Command = "recovery"
+value = 5200 ;HITFALL_RECOVER
+
+[State 5050, 5]; Recover in mid air
+type = selfState
+triggerall = Vel Y > -1
+triggerall = alive
+triggerall = time >= 48
+trigger1 = Command = "recovery"
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State 5050, 5]; Recover in mid air
+type = selfState
+trigger1 = Vel Y > 0 && pos y >= 0
+value = 5100
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,vlx=%f,vly=%f,sv(0)=%d\n"
+params =pos x,pos y,vel x,vel y, sysvar(0)
+ignorehitpause = 1
+
+
+;------ダスト放物線後半部-擬似5030-5050
+;----5865(5030,5050)mix
+;---------------------------------------------------------------------------
+; ------------------------	29ルール後半　通常吹き飛び通常重力
+[Statedef 5865]
+type    = A
+movetype= H
+physics = N
+ctrl = 0
+
+[state 3800,];計測用 ほーみんぐJに使うか？いらないかな
+type = varadd
+trigger1 =  time >= 0
+sysvar(0) = 1
+ignorehitpause = 0
+
+[State 5030, 1];HITDEF設定の重力を使用する
+type = VelAdd;Gravity
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 5030, 2];HITDEF設定の速度を　「有効」に。１にするわけではない。
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+;-1:アニメが5035終了　2:5035でなく5051-5059,5061-5069,5090でなければ5050にかえる->　5030はOK
+[State 5050, 1] ;Change anim when done with transition
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+trigger1 = AnimTime = 0
+trigger1 = Anim = 5035
+trigger2 = Time = 0     ;If no transition anim
+trigger2 = Anim != 5035
+trigger2 = (Anim != [5051, 5059]) && (Anim != [5061, 5069])
+trigger2 = Anim != 5090 ;Not if hit off ground anim
+value = ifelse(authorname = "R-R",5050 + var(0),5050);5050
+
+;-------
+[State 5050, 1] ;双子用
+type = ChangeAnim
+triggerall = authorname = "R-R"
+trigger1 = AnimTime = 0
+trigger1 = Anim = 5035 + var(0)
+trigger2 = Time = 0     ;If no transition anim
+trigger2 = Anim != 5035 + var(0)
+trigger2 = (Anim != [5051 + var(0) , 5059 + var(0)]) && (Anim != [5061 + var(0) , 5069 + var(0)])
+trigger2 = Anim != 5090 + var(0);Not if hit off ground anim
+value = ifelse(authorname = "R-R",5050 + var(0),5050);5050
+
+;---5051のが5050より早いタイミングでが5061(5060)にいく上昇中にちぇんあに
+[State 5050, 2] ;Coming down anim5050-5059で頂点すぎるころ、5050ならyが1、それ以外-2で5060になる(5060があれば)
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+trigger1 = anim = [5050,5059]
+trigger1 = Vel Y >= ifelse(anim = 5050, 1, -2)
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+persistent = 0
+
+[State 5050, 2] ;双子用
+type = ChangeAnim
+triggerall = authorname = "R-R"
+trigger1 = anim = [5050 + var(0),5059 + var(0)]
+trigger1 = Vel Y >= ifelse(anim = 5050 + var(0), 1, -2)
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+persistent = 0
+
+[State 5050, 4] ;Recover near ground	地上近くではニュートラル復帰不能
+type = ChangeState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+trigger1 = Command = "holdfwd" || command = "holdback"
+value = 5200 ;HITFALL_RECOVER
+
+[State 5050, 5]; Recover in mid air
+type = ChangeState
+triggerall = Vel Y > -1
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State 5050, 6];
+triggerall = authorname = "R-R" = 0
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= ifelse((anim = [5051,5059]) || (anim = [5061,5069]), 0, 25)
+value = 5100 ;HIT_BOUNCE
+
+[State 5050, 6];双子用
+triggerall = authorname = "R-R"
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= ifelse((anim = [5051 + var(0),5059 + var(0)]) || (anim = [5061 + var(0),5069 + var(0)]), 0, 25)
+value = 5100 ;HIT_BOUNCE
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,vlx=%f,vly=%f,sv(0)=%d\n"
+params =pos x,pos y,vel x,vel y, sysvar(0)
+ignorehitpause = 1
+

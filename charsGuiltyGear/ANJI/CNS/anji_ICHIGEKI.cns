@@ -1,0 +1,3567 @@
+;絶
+[Statedef 3500]
+type    = S
+movetype= A
+physics = N
+anim = 3500
+ctrl = 0
+sprpriority = 55
+velset = 0,0
+poweradd = 0
+
+[State 900, 1] 
+type = varset
+trigger1 = time = 0
+v = 24
+value = 2
+
+[State 100, 2]
+type = Velset
+trigger1 = var(9) >= 1
+trigger1 = time = 0
+x = var(10)
+
+[State 100, 1]
+type = Velmul
+trigger1 = var(9) >= 1
+trigger1 = time >= 0
+trigger1 = Vel X > 0
+x = 0.90
+
+[State 100, 2]
+type = Velset
+trigger1 = time >= 1
+trigger1 = Vel X <= 0.5
+x = 0
+
+[State 3000, 0]
+type = assertspecial
+trigger1 = NumExplod(1010) = 1
+trigger2 = Numexplod(1011) = 1
+flag = nofg
+ignorehitpause = 1
+
+[State 3000, 00];暗転
+type = helper
+trigger1 = time = 23
+trigger1 = NumExplod(1010) = 1
+ID = 6050
+postype = left
+ignorehitpause = 1
+persistent = 0
+pos = 0,0
+priority = 2
+stateno = 6050
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 750, 3];青い回転エフェクト前
+type = helper
+trigger1 = time = 22
+stateno = 4060
+ID = 4060
+postype = p1
+pos = -10,-65
+priority = 10
+persistent = 0
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+
+[State 750, 3];青い回転エフェクト後ろ
+type = helper
+trigger1 = time = 22
+stateno = 4061
+ID = 4061
+postype = p1
+pos = -10,-65
+priority = 10
+persistent = 0
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+
+[State 3000, 0]
+type = NotHitBy
+trigger1 = time >= 21
+value = SCA
+time = 1
+
+[State 3001,4];覚醒時間停止
+type = SuperPause
+trigger1 = time = 22
+time = var(14)
+movetime = var(14)
+pos = 0, 999
+anim = 9999
+ctrl = 0
+darken = 0
+unhittable = 0
+ignorehitpause = 1
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist <= 25
+v = 14
+value = 33
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 25
+trigger1 = BackEdgeBodyDist <= 50
+v = 14
+value = 35
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 50
+trigger1 = BackEdgeBodyDist <= 75
+v = 14
+value = 37
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 75
+trigger1 = BackEdgeBodyDist <= 100
+v = 14
+value = 39
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 100
+trigger1 = BackEdgeBodyDist <= 125
+v = 14
+value = 41
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 125
+trigger1 = BackEdgeBodyDist <= 150
+v = 14
+value = 43
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 150
+trigger1 = BackEdgeBodyDist <= 175
+v = 14
+value = 45
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 175
+trigger1 = BackEdgeBodyDist <= 200
+v = 14
+value = 47
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 200
+trigger1 = BackEdgeBodyDist <= 225
+v = 14
+value = 49
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 225
+trigger1 = BackEdgeBodyDist <= 250
+v = 14
+value = 51
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 250
+trigger1 = BackEdgeBodyDist <= 275
+v = 14
+value = 53
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 275
+trigger1 = BackEdgeBodyDist <= 300
+v = 14
+value = 55
+
+[State 900, 1] 
+type = varset
+trigger1 = BackEdgeBodyDist > 300
+v = 14
+value = 57
+
+[State 3000 , 0];覚醒時の背景
+type = Explod
+trigger1 = time >= 22
+trigger1 = var(59) >= 1
+anim = 10000
+id = 1010
+postype = left
+pos = 0,0
+sprpriority = -2
+supermove = 1
+bindtime = -1
+persistent = 0
+ownpal = 1
+ontop = 0
+scale = 0.7,0.7
+
+[State 3000 , 0];覚醒時の背景
+type = Explod
+trigger1 = time >= 22
+trigger1 = var(59) >= 1
+anim = 10001
+postype = left
+pos = 0,0
+sprpriority = -2
+supermove = 1
+bindtime = -1
+persistent = 0
+ownpal = 1
+ontop = 0
+scale = 0.5,0.5
+
+[State 3000 , 0];覚醒時の背景
+type = Explod
+trigger1 = time >= 22
+trigger1 = var(59) = 0
+anim = 12200
+id = 12200
+postype = left
+pos = 0,0
+sprpriority = -2
+supermove = 1
+bindtime = -1
+persistent = 0
+ownpal = 1
+ontop = 0
+
+[State 3000 , 0];オーラ
+type = Explod
+trigger1 = time >= 22
+anim = 9920
+postype = p1
+pos = 10,-50
+sprpriority = 999
+supermove = 1
+bindtime = -1
+persistent = 0
+ownpal = 1
+ontop = 0
+
+[State 3000, 3];覚醒開始光の斜め線　上方向
+type = Explod
+trigger1 = time = 22
+pos = 0, -50
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 950
+[State 3000, 3];覚醒開始光の斜め線　上方向
+type = Explod
+trigger1 = time = 22
+pos = 240, -290
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 950
+
+[State 3000, 3];覚醒開始光の斜め線　下方向
+type = Explod
+trigger1 = time = 22
+pos = -240, 190
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 951
+
+[State 3000, 3];覚醒開始光の斜め線　下方向
+type = Explod
+trigger1 = time = 22
+pos = -480, 430
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 951
+
+[State 3000, 3];覚醒開始 光の粒　上
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 0, -200
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 0,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　下
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 0, 100
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 0,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　前
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 150, -50
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,0
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　後
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = -150, -50
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,0
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　右上
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 150, -200
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　左上
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = -150, -200
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　右下
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 150, 100
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　左下
+type = Explod
+trigger1 = time >= 22
+trigger1 = time <= 52
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = -150, 100
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 4]
+type = PlaySnd
+trigger1 = Time = 22
+value = 6000, 3
+
+[State 210, 3] 
+type = VarRandom
+trigger1 = Time = 0
+v = 1
+range = 0,1
+[State 210, 5] 
+type = PlaySnd
+trigger1 = Var(1) = 0
+trigger1 = Time = 22
+value = 3500, 3
+[State 210, 5] 
+type = PlaySnd
+trigger1 = Var(1) = 1
+trigger1 = Time = 22
+value = 3500, 4
+
+[State 3000, 4]
+type = velset
+trigger1 = time >= 34
+x = -12
+
+[State 1210 , 1]
+type = screenbound
+trigger1 = time >= 22
+value = 0
+movecamera = 0,0
+
+[State 875, enemy_pushoff]
+type = Playerpush
+trigger1 = time >= 22
+value = 0
+
+[State 40, 6]
+type = ChangeState
+trigger1 = time >= 37+var(14)
+value = 3501
+ctrl = 0
+
+;-------------------------------------------------------------------------------------------
+[Statedef 3501]
+type    = A
+movetype = A
+physics = N
+anim = 3501
+ctrl = 0
+sprpriority = 55
+velset = 0,0
+poweradd = 0
+
+[State 3000, 4]
+type = posadd
+trigger1 = time = 0
+x = -200
+
+[State 3000, 4]
+type = posadd
+trigger1 = time = 0
+y = -107
+
+[State 1210 , 1]
+type = screenbound
+trigger1 = time >= 0
+value = 0
+movecamera = 0,0
+
+[State 875, enemy_pushoff]
+type = Playerpush
+trigger1 = time >= 0
+value = 0
+
+[State 3000, 4]
+type = velset
+trigger1 = time >= 0
+x = 13
+
+[State 200, 1] ;攻撃を当たるようにする
+type = hitDef
+trigger1 = AnimElem = 1
+attr = A, HA
+damage = 9999999, 0
+animtype = back
+guardflag = MA
+hitflag = MAF
+priority = 7, Hit
+pausetime = 15, 15
+sparkxy = 2, 27
+sparkno = -1
+guard.sparkno = -1
+hitsound   = s9999,0
+guardsound = s150,2
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 15
+ground.velocity = -2,-7.5
+airguard.velocity = -2,-5
+air.type = High
+air.velocity = -2,-7.5
+air.hittime = 12
+fall.recover = 0
+fall = 1
+air.fall = 1
+yaccel = .51
+getpower = 0, 0
+guard.dist = 320
+airguard.dist = 320
+
+[State guard, 1];ガードエフェクト
+type = Explod
+trigger1 = moveguarded
+anim = 9620
+pos = 2, -83
+Postype = p2
+facing = -1
+sprpriority = 9
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State Help, 1]
+type = Helper
+Trigger1 = movehit
+helpertype = normal
+name = "Destroyed"
+ID = 11010
+Stateno = ifelse(var(59),11010,11011)
+pos = 0,0
+postype = p1
+supermoveTime = 9999
+pausemoveTime = 9999
+facing = 1
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+[State 1000, 3];必殺ヒットエフェクトマーク
+type = helper
+trigger1 = movehit
+ID = 4000
+postype = p2
+ignorehitpause = 1
+persistent = 0
+pos = 2,-83
+priority = 2
+stateno = 4000
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 3001,4]
+type = SuperPause
+trigger1 = movehit
+time = 100
+movetime = 0
+pos = 0, 999
+anim = 9999
+ctrl = 0
+darken = 0
+unhittable = 0
+ignorehitpause = 1
+persistent = 0
+
+[State 40, 6]
+type = ChangeState
+trigger1 = FrontEdgeBodyDist <= -400
+value = 3502
+ctrl = 0
+
+;-------------------------------------------------------------------------------------------
+[Statedef 3502]
+type    = S
+physics = N
+anim = 100
+ctrl = 0
+sprpriority = 2
+velset = 0,0
+poweradd = 0
+
+[State 900, 1] 
+type = varset
+trigger1 = time = 0
+v = 14
+value = 0
+
+[State 3000, 4]
+type = posadd
+trigger1 = time = 0
+y = 107
+[State 3000, 4]
+type = posadd
+trigger1 = time = 1
+x = 100
+
+[State 3000, 4]
+type = turn
+trigger1 = time = 0
+
+[State 1210 , 1]
+type = screenbound
+trigger1 = time >= 0
+value = 0
+movecamera = 0,0
+
+[State 875, enemy_pushoff]
+type = Playerpush
+trigger1 = time >= 0
+value = 1
+
+[State 3000, 4]
+type = velset
+trigger1 = time >= 0
+x = 6.5
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = Animelemtime(3) = 1
+trigger2 = Animelemtime(7) = 1
+value = s100, 1
+
+[State 40, 6]
+type = ChangeState
+trigger1 = BackEdgeBodyDist >= 20
+value = 3503
+ctrl = 0
+
+;-------------------------------------------------------------------------------------------
+[Statedef 3503]
+type = S
+ctrl = 0
+anim = 3503
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 200, 6] 
+type = PlaySnd
+trigger1 = animelem = 5
+value = s200, 0
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------
+;死蝶浮月
+[Statedef 3600]
+type    = S
+movetype = A
+physics = N
+anim = 3600
+ctrl = 0
+sprpriority = 55
+velset = 0,0
+poweradd = 0
+
+[State 200, 0];コンボ数加算
+type = Varadd
+trigger1 = movehit
+trigger1 = hitcount = 1
+v = 22
+value = 1
+ignorehitpause = 1
+persistent = 0
+[State 200, 0];コンボ数加算
+type = Varadd
+trigger1 = movehit
+trigger1 = hitcount = 2
+v = 22
+value = 1
+ignorehitpause = 1
+persistent = 0
+[State 200, 0];コンボ数加算
+type = Varadd
+trigger1 = movehit
+trigger1 = hitcount = 3
+v = 22
+value = 1
+ignorehitpause = 1
+persistent = 0
+[State 200, 0];コンボ数加算
+type = Varadd
+trigger1 = movehit
+trigger1 = hitcount = 4
+v = 22
+value = 1
+ignorehitpause = 1
+persistent = 0
+
+[State 3000, 0]
+type = assertspecial
+trigger1 = NumExplod(1010) = 1
+trigger2 = Numexplod(1011) = 1
+flag = nofg
+ignorehitpause = 1
+
+[State 3000, 0]
+type = sprpriority
+triggerall = time >= 1
+trigger1 = NumExplod(1010) = 0
+trigger2 = Numexplod(1011) = 1
+value = 2
+
+[State 3000, 00];暗転
+type = helper
+trigger1 = time = 2
+trigger1 = NumExplod(1010) = 1
+ID = 6050
+postype = left
+ignorehitpause = 1
+persistent = 0
+pos = 0,0
+priority = 2
+stateno = 6050
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 750, 3];青い回転エフェクト前
+type = helper
+trigger1 = time = 1
+stateno = 4060
+ID = 4060
+postype = p1
+pos = -10,-65
+priority = 10
+persistent = 0
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+
+[State 750, 3];青い回転エフェクト後ろ
+type = helper
+trigger1 = time = 1
+stateno = 4061
+ID = 4061
+postype = p1
+pos = -10,-65
+priority = 10
+persistent = 0
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+ownpal = 1
+ignorehitpause = 1
+
+[State 3000 , 0];オーラ
+type = Explod
+trigger1 = time >= 11
+anim = 9920
+id = 9920
+postype = p1
+pos = 10,-50
+sprpriority = 999
+supermove = 1
+bindtime = -1
+persistent = 0
+ownpal = 1
+ontop = 0
+
+[State 1540, 1]
+type = ModifyExplod
+trigger1 = 1
+ID = 9920
+scale = var(32)*0.004,var(32)*0.004
+supermove = 1
+
+[State 1540, 1]
+type = varset
+trigger1 = time = 0
+var(32) = 100
+supermove = 1
+
+[State 1540, 1]
+type = varadd
+trigger1 = time >= 10
+var(32) = 5
+supermove = 1
+
+[State 3000, 0]
+type = NotHitBy
+trigger1 = time >= 0
+trigger1 = time <= 86
+value = SCA
+time = 1
+
+[State 3000,1]
+type = poweradd
+trigger1 = time = 1
+value = -1000
+
+[State 3001,4];覚醒時間停止
+type = SuperPause
+trigger1 = time = 1
+time = 45
+movetime = 45
+pos = 0, 999
+anim = 9999
+ctrl = 0
+darken = 0
+unhittable = 0
+ignorehitpause = 1
+
+[State 3000 , 0];覚醒時の背景
+type = Explod
+trigger1 = time >= 9
+anim = 10007
+id = 1010
+postype = left
+pos = 0,0
+sprpriority = -2
+supermove = 1
+bindtime = -1
+persistent = 0
+ownpal = 1
+ontop = 0
+scale = 0.5,0.5
+
+[State 3000 , 0];覚醒時の背景
+type = Explod
+trigger1 = time >= 9
+anim = 10006
+postype = left
+pos = 0,0
+sprpriority = -2
+supermove = 1
+bindtime = -1
+persistent = 0
+ownpal = 1
+ontop = 0
+scale = 0.5,0.5
+
+[State 3000, 3];覚醒開始光の斜め線　上方向
+type = Explod
+trigger1 = time = 1
+pos = 0, -50
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 950
+[State 3000, 3];覚醒開始光の斜め線　上方向
+type = Explod
+trigger1 = time = 1
+pos = 240, -290
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 950
+
+[State 3000, 3];覚醒開始光の斜め線　下方向
+type = Explod
+trigger1 = time = 1
+pos = -240, 190
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 951
+
+[State 3000, 3];覚醒開始光の斜め線　下方向
+type = Explod
+trigger1 = time = 1
+pos = -480, 430
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9902
+ID = 951
+
+[State 3000, 3];覚醒開始 光の粒　上
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 0, -200
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 0,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　下
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 0, 100
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 0,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　前
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 150, -50
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,0
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　後
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = -150, -50
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,0
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　右上
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 150, -200
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　左上
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = -150, -200
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　右下
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = 150, 100
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+[State 3000, 3];覚醒開始 光の粒　左下
+type = Explod
+trigger1 = time >= 1
+trigger1 = time <= 31
+trigger1 = timemod =6, 0
+trigger1 = NumExplod(952) <= 15
+pos = -150, 100
+;persistent = 0
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 9913
+ID = 952
+
+
+
+
+
+
+
+
+
+[State 3000, 3];覚醒開始光の斜め線　上方向
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = 0, -50
+persistent = 3
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+anim = 3610+random%4
+ID = 950
+scale = 0.5,0.5
+
+[State 3000, 3];覚醒開始光の斜め線　上方向
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = 240, -290
+persistent = 4
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 950
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始光の斜め線　下方向
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = -240, 190
+persistent = 7
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 951
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始光の斜め線　下方向
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = -480, 430
+persistent = 6
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 951
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　上
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = 0, -200
+persistent = 5
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 0,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　下
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = 0, 100
+persistent = 8
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 0,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　前
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = 150, -50
+persistent = 11
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,0
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　後
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = -150, -50
+persistent = 12
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,0
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　右上
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = 150, -200
+persistent = 9
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　左上
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = -150, -200
+persistent = 14
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　右下
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = 150, 100
+persistent = 2
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = -10,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 3000, 3];覚醒開始 光の粒　左下
+type = Explod
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(19) < 0
+trigger1 = movehit
+pos = -150, 100
+persistent = 10
+ignorehitpause = 1
+sprpriority = 9999
+ownpal = 1
+ontop = 1
+Removetime = 13
+Random = 50,50
+Vel = 10,-10
+pausemovetime = 99999999999999
+supermovetime = 99999999999999
+supermove = 1
+bindtime = 1
+anim = 3610+random%4
+ID = 952
+scale = 0.5,0.5
+facing = -1+(random%2)*2
+vfacing = -1+(random%2)*2
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 3000, 4]
+type = Pause
+trigger1 = AnimElemTime(15) >= 0 && AnimElemTime(20) < 0
+trigger1 = time%2 = 0
+trigger1 = movehit
+time = 5
+
+[State 3000, 4]
+type = Pause
+trigger1 = AnimElemTime(11) >= 0 && AnimElemTime(14) < 0
+trigger1 = time%2 = 0
+trigger1 = movehit
+time = 3
+
+[State 3000, 4]
+type = Pause
+trigger1 = AnimElemTime(6) >= 0 && AnimElemTime(10) < 0
+trigger1 = time%2 = 0
+trigger1 = movehit
+time = 2
+
+[State 3000, 4]
+type = PlaySnd
+trigger1 = Time = 1
+value = 6000, 3
+
+[State 3000, 4]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 1100, 2
+
+[State 3000, 4]
+type = PlaySnd
+trigger1 = animelem = 10
+value = 1100, 2
+
+[State 3000, 4]
+type = PlaySnd
+trigger1 = animelem = 14
+value = 1100, 2
+
+[State 3000, 4]
+type = PlaySnd
+trigger1 = animelem = 20
+value = 1100, 2
+
+[State 3000, 4]
+type = PlaySnd
+trigger1 = time>50
+trigger1 = AnimElemTime(20) < 0
+value = 1900,0
+persistent = 18
+
+[State 1000, 1] 
+type = PlaySnd
+trigger1 = animelem = 17
+trigger1 = movehit
+value = 3600, 0
+channel = 1
+
+[State 3000, 4]
+type = velset
+trigger1 = Time = 46
+x = 2
+
+[State 3000, 4]
+type = velset
+trigger1 = animelem = 5
+x = 0
+
+[State 3000, 4]
+type = velset
+trigger1 = animelem = 6
+x = 2
+
+[State 3000, 4]
+type = velset
+trigger1 = animelem = 10
+x = 0
+
+[State 3000, 4]
+type = velset
+trigger1 = animelem = 11
+x = 2
+
+[State 3000, 4]
+type = velset
+trigger1 = animelem = 20
+x = 0
+
+[State 3000, 4]
+type = varset
+trigger1 = time = 0
+var(1) = 256
+
+[State 3000, 4]
+type = varadd
+trigger1 = time > 50
+trigger1 = var(1) <= 256
+var(1) = -2
+
+[State 3000, 4]
+type = PalFX
+trigger1 = AnimElemTime(20) < 0
+time = 1
+invertall = 0
+color = var(1)
+ignorehitpause = 1
+
+[State 200, 1]
+type = varrandom
+trigger1 = P2StateNo != 5030
+trigger1 = P2StateNo != 5035
+trigger1 = P2StateNo != 5050
+trigger1 = P2StateNo != 5070
+trigger1 = P2StateNo != 5071
+trigger1 = P2StateNo != 5100
+trigger1 = P2StateNo != 5101
+trigger1 = P2StateNo != 5110
+trigger1 = P2StateNo != 5150
+trigger1 = var(17) != 1
+v = 6
+range = 85,95
+
+[State 200, 1]
+type = varrandom
+triggerall = var(17) != 1
+trigger1 = P2StateNo = 5030
+trigger2 = P2StateNo = 5035
+trigger3 = P2StateNo = 5050
+trigger4 = P2StateNo = 5070
+trigger5 = P2StateNo = 5071
+v = 6
+range = 78,85
+
+[State 200, 1]
+type = varrandom
+trigger1 = P2StateNo = 5100
+trigger2 = P2StateNo = 5101
+trigger3 = P2StateNo = 5110
+trigger4 = P2StateNo = 5150
+trigger5 = var(17) = 1
+v = 6
+range = 34,38
+
+[State 1000, 3] ;攻撃予約
+type = HitDef
+trigger1 = AnimElem = 5
+attr = S, SA
+animtype  = Hard
+damage    = 99, 14
+hitflag = MAF
+guardflag = MA
+hitonce = 1
+pausetime = 15,15
+sparkno = -1
+guard.sparkno = -1
+sparkxy = 1,-79
+hitsound   = s200,2
+guardsound = s150,2
+ground.type = low
+ground.slidetime = 18
+ground.hittime  = 20
+ground.velocity = -5.5
+air.velocity = -2,-5
+fall.recover = 0
+air.fall = 0
+yaccel = .51
+getpower = 0, 0
+id = 3200
+p2facing = 1
+kill = 0
+
+[State 40, 6]
+type = ChangeState
+trigger1 = Numtarget(3200) = 0
+trigger1 = AnimElem = 6
+value = 3200
+ctrl = 0
+
+[State 1000, 3] 
+type = HitDef
+trigger1 = AnimElem = 10
+trigger1 = Numtarget(3200) = 1
+attr = S, SA
+animtype  = Hard
+damage    = 99, 14
+hitflag = MAF
+;guardflag = MA
+hitonce = 1
+pausetime = 15,15
+sparkno = -1
+guard.sparkno = -1
+sparkxy = 1,-69
+hitsound   = s200,2
+guardsound = s150,2
+ground.type = low
+ground.slidetime = 18
+ground.hittime  = 20
+ground.velocity = -5.5
+air.velocity = -2,-5
+fall.recover = 0
+air.fall = 0
+yaccel = .51
+getpower = 0, 0
+id = 3201
+p2facing = 1
+kill = 0
+
+[State 1000, 3] ;攻撃予約
+type = HitDef
+trigger1 = AnimElem = 14
+trigger1 = Numtarget(3201)
+attr = S, SA
+animtype  = Hard
+damage    = 99, 14
+hitflag = MAF
+;guardflag = MA
+hitonce = 1
+pausetime = 15,15
+sparkno = -1
+guard.sparkno = -1
+sparkxy = 1,-82
+hitsound   = s200,2
+guardsound = s150,2
+ground.type = low
+ground.slidetime = 18
+ground.hittime  = 20
+ground.velocity = -5.5
+air.velocity = -2,-5
+fall.recover = 0
+air.fall = 0
+yaccel = .51
+getpower = 0, 0
+id = 3202
+p2facing = 1
+kill = 0
+
+[State 1000, 3] ;攻撃予約
+type = HitDef
+trigger1 = AnimElem = 20
+trigger1 = Numtarget(3202)
+attr = S, HA
+animtype  = back
+damage    = 9999999, 14
+hitflag = MAFD
+down.velocity = -1, -1
+;guardflag = MA
+hitonce = 1
+pausetime = 15,15
+sparkno = -1
+guard.sparkno = -1
+sparkxy = 1,-59
+hitsound   = s200,2
+guardsound = s150,2
+ground.type = low
+ground.slidetime = 18
+ground.hittime  = 20
+ground.velocity = -5*fvar(14),-9*fvar(15)
+air.velocity = -5*fvar(14),-8.2*fvar(15)
+fall.recover = 0
+air.fall = 0
+fall = 1
+yaccel = .51
+getpower = 0, 0
+p2facing = 1
+id = 3203
+kill = 0
+
+[State 3100, 0];相手地上ヒット時
+type = TargetState
+trigger1 = Numtarget(3200) = 1
+trigger1 = movehit
+trigger1 = p2statetype != A
+trigger1 = p2statetype != L
+value = 3210
+id = 3200
+ignorehitpause = 1
+persistent = 0
+
+[State 3100, 0];相手地上ヒット時
+type = TargetState
+trigger1 = Numtarget(3201) = 1
+trigger1 = movehit
+trigger1 = p2statetype != A
+trigger1 = p2statetype != L
+value = 3210
+id = 3201
+ignorehitpause = 1
+persistent = 0
+
+[State 3100, 0];相手地上ヒット時
+type = TargetState
+trigger1 = Numtarget(3202) = 1
+trigger1 = movehit
+trigger1 = p2statetype != A
+trigger1 = p2statetype != L
+value = 3210
+id = 3202
+ignorehitpause = 1
+persistent = 0
+
+[State guard, 1];ガードエフェクト
+type = Explod
+trigger1 = moveguarded
+trigger1 = Numtarget(3200) = 1
+trigger1 = P2MoveType = H
+anim = 9620
+ID = 9620
+pos = 1, -79
+Postype = p2
+facing = -1
+sprpriority = 9
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State guard, 1];ガードエフェクト
+type = Explod
+trigger1 = moveguarded
+trigger1 = Numtarget(3201) = 1
+trigger1 = P2MoveType = H
+anim = 9620
+ID = 9620
+pos = 5,-69
+Postype = p2
+facing = -1
+sprpriority = 9
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State guard, 1];ガードエフェクト
+type = Explod
+trigger1 = moveguarded
+trigger1 = Numtarget(3202) = 1
+trigger1 = P2MoveType = H
+anim = 9620
+ID = 9620
+pos = 4,-86
+Postype = p2
+facing = -1
+sprpriority = 9
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State guard, 1];ガードエフェクト
+type = Explod
+trigger1 = moveguarded
+trigger1 = Numtarget(3203) = 1
+trigger1 = P2MoveType = H
+anim = 9620
+ID = 9620
+pos = 3,-59
+Postype = p2
+facing = -1
+sprpriority = 9
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State 1000, 3];必殺ヒットエフェクトマーク
+type = helper
+trigger1 = Numtarget(3200) = 1
+trigger1 = moveguarded = 0
+trigger1 = P2MoveType = H
+ID = 4000
+postype = p2
+ignorehitpause = 1
+persistent = 0
+pos = 8,-79
+priority = 2
+stateno = 4000
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 1000, 3];必殺ヒットエフェクトマーク
+type = helper
+trigger1 = Numtarget(3201) = 1
+trigger1 = moveguarded = 0
+trigger1 = P2MoveType = H
+ID = 4000
+postype = p2
+ignorehitpause = 1
+persistent = 0
+pos = 5,-69
+priority = 2
+stateno = 4000
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 1000, 3];必殺ヒットエフェクトマーク
+type = helper
+trigger1 = Numtarget(3202) = 1
+trigger1 = moveguarded = 0
+trigger1 = P2MoveType = H
+ID = 4000
+postype = p2
+ignorehitpause = 1
+persistent = 0
+pos = 4,-86
+priority = 2
+stateno = 4000
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State 1000, 3];必殺ヒットエフェクトマーク
+type = helper
+trigger1 = Numtarget(3203) = 1
+trigger1 = moveguarded = 0
+trigger1 = P2MoveType = H
+ID = 4000
+postype = p2
+ignorehitpause = 1
+persistent = 0
+pos = 3,-59
+priority = 2
+stateno = 4000
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+
+[State byoubu];屏風
+type = null;Explod
+trigger1 = Numtarget(3203) = 1
+trigger1 = moveguarded = 0
+trigger1 = P2MoveType = H
+anim = 9901
+pos = 15, 0
+Postype = p1
+facing = -1
+sprpriority = 0
+ownpal = 1
+bindtime = 1
+persistent = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State kaze];風
+type = Explod
+trigger1 = Numtarget(3203) = 1
+trigger1 = moveguarded = 0
+trigger1 = P2MoveType = H
+anim = 9900
+pos = 15, -100
+Postype = p1
+facing = -1
+sprpriority = 1
+ownpal = 1
+bindtime = 1
+persistent = 0
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State 3000, Flash];ヒットフラッシュ
+type = Explod
+trigger1 = Numtarget(3203) = 1
+trigger1 = moveguarded = 0
+trigger1 = P2MoveType = H
+pos = 0, 0
+postype = left
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999999
+ownpal = 1
+ontop = 1
+removetime = 1
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+bindtime = -1
+scale = 1000,1000
+anim = 8000
+
+[State 3000, Flash];ヒットフラッシュ
+type = Explod
+trigger1 = Numtarget(3200) = 1
+pos = 0, 0
+postype = left
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999999
+ownpal = 1
+ontop = 1
+removetime = 1
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+bindtime = -1
+scale = 1000,1000
+anim = 8000
+
+[State hikari];光
+type = Explod
+trigger1 = Animelem = 11
+trigger1 = movehit
+anim = 1902
+pos = 8, -50
+Postype = p1
+facing = -1
+sprpriority = 0
+ownpal = 1
+bindtime = -1
+persistent = 0
+ignorehitpause = 1
+scale = 1.5,1.5
+
+[State 3000, Flash];ヒットフラッシュ
+type = Explod
+trigger1 = Numtarget(3201) = 1
+pos = 0, 0
+postype = left
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999999
+ownpal = 1
+ontop = 1
+removetime = 1
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+bindtime = -1
+scale = 1000,1000
+anim = 8000
+
+[State 3000, Flash];ヒットフラッシュ
+type = Explod
+trigger1 = Numtarget(3202) = 1
+pos = 0, 0
+postype = left
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999999
+ownpal = 1
+ontop = 1
+removetime = 1
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+bindtime = -1
+scale = 1000,1000
+anim = 8000
+
+[State 3000, Flash];ヒットフラッシュ
+type = Explod
+trigger1 = Numtarget(3203) = 1
+pos = 0, 0
+postype = left
+persistent = 0
+ignorehitpause = 1
+sprpriority = 9999999
+ownpal = 1
+ontop = 1
+removetime = 1
+pausemovetime = 999999
+supermovetime = 999999
+supermove = 1
+bindtime = -1
+scale = 1000,1000
+anim = 8000
+
+[State 1000, 3];蝶
+type = helper
+trigger1 = AnimElemTime(2) >= 0 && AnimElemTime(19) < 0
+ID = 3601
+postype = p1
+ignorehitpause = 1
+persistent = 11
+pos = 0,-79
+priority = 2
+stateno = 3601
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+Size.XScale = .19
+Size.YScale = .19
+
+[State 1000, 3];蝶
+type = helper
+trigger1 = AnimElemTime(2) >= 0 && AnimElemTime(19) < 0
+ID = 3602
+postype = p1
+ignorehitpause = 1
+persistent = 10
+pos = 0,-79
+priority = 2
+stateno = 3601
+ownpal = 1
+supermove = 1
+pausemovetime = 999999
+supermovetime = 999999
+Size.XScale = .19
+Size.YScale = .19
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3620
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3621
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3622
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3623
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3624
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3625
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3626
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3627
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3628
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3629
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3633
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3634
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3635
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+[State 0]
+type		= Helper
+trigger1	= Animelem = 11
+trigger1	= movehit
+name		= "lazer5"
+Id		= 3636
+pos		= 0,-63
+postype	= p1
+facing		= 1
+Stateno	= 3602
+ownpal		= 1
+size.xscale	= 0.5
+size.yscale	= 0.5
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 1051, 0];扇
+type = helper
+trigger1 = AnimElemTime(20) = 0
+trigger1 = movehit
+ID = 3630
+helpertype = normal
+postype = p1
+ignorehitpause = 1
+persistent = 0
+pos = 6,-60
+stateno = 3630
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State 1051, 0];扇
+type = helper
+trigger1 = AnimElemTime(20) = 11
+trigger1 = movehit
+ID = 3631
+helpertype = normal
+postype = p1
+ignorehitpause = 1
+persistent = 0
+pos = 6,-60
+stateno = 3631
+ownpal = 1
+size.xscale = 1
+size.yscale = 1
+supermove	= 1
+pausemovetime	= 999999
+supermovetime	= 999999
+
+[State Help, 1]
+type = Helper
+trigger1 = AnimElemTime(21) >= 0
+trigger1 = movehit
+helpertype = normal
+name = "Destroyed"
+ID = 11010
+Stateno = ifelse(var(59),11010,11011)
+pos = 0,0
+postype = p1
+supermoveTime = 9999
+pausemoveTime = 9999
+facing = 1
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+
+[State 3001,4]
+type = null;SuperPause
+trigger1 = AnimElemTime(21) >= 0
+trigger1 = movehit
+time = 100
+movetime = 9999
+pos = 0, 999
+anim = 9999
+ctrl = 0
+darken = 0
+unhittable = 1
+ignorehitpause = 1
+persistent = 0
+
+[State 3001,4]
+type = Pause
+trigger1 = AnimElemTime(21) = 0
+trigger1 = movehit
+time = 100
+movetime = 100
+
+[State 40, 6]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;-----------------------------------------------------------------------------
+[Statedef 3602,レーザー]
+movetype	= I
+anim		= 3615
+sprpriority	= 0
+
+[State 3000, 4]
+type = PalFX
+trigger1 = AnimElemTime(20) < 0
+time = 1
+invertall = 0
+color = var(1)
+ignorehitpause = 1
+
+[State 0]
+type		= AssertSpecial
+trigger1	= 1
+flag		= Noshadow
+
+[State 0]
+type		= trans
+trigger1	= 1
+trans		= add
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3620)
+value 		= 0
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3621)
+value 		= 20
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3622)
+value 		= 40
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3623)
+value 		= 60
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3624)
+value 		= 80
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3625)
+value 		= 100
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3626)
+value 		= 120
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3627)
+value 		= 140
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3628)
+value 		= 160
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3629)
+value 		= 180
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3633)
+value 		= 200
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3634)
+value 		= 220
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3635)
+value 		= 340
+
+[State 0]
+type 		= angleset
+trigger1 	= time = 0
+trigger1 	= ishelper(3636)
+value 		= 320
+[State 0]
+type		= angledraw
+trigger1 	= 1
+scale		= fvar(2),fvar(1)
+ignorehitpause = 1
+
+[State 0]
+type		= VarAdd
+trigger1	= time <= 10
+fvar(2)	= 0.1
+
+[State 0]
+type		= VarAdd
+trigger1	= time <= 10
+fvar(1)	= 0.01
+
+[State 0]
+type		= VarAdd
+trigger1	= parent,AnimElemTime(19) = 8
+trigger1	= fvar(1) > 0 
+fvar(1)	= 0.8
+ignorehitpause = 0
+
+[State 0]
+type		= Varset
+trigger1	= fvar(1) <= 0 
+fvar(1)	= 0
+
+[State 0]
+type = BindToParent
+trigger1 = 1
+time = 1
+pos = 0,-60
+
+[State 0]
+type		= null;Destroyself
+trigger1	= root,movetype = H
+trigger2	= root,stateno != 3600
+trigger3	= Animtime = 0
+;-------------------------------------
+;死蝶
+[Statedef 3601]
+MoveType = I
+Physics  = N
+Anim     = 3601+random%4
+SprPriority = 4
+
+[State -2]
+Type = VarSet
+Trigger1 = Time = 0
+fvar(1) = 0.5+random%40*0.1
+
+[State -2]
+Type = VarSet
+Trigger1 = Time = 0
+fvar(2) = 0.5+random%40*0.1
+
+[State -2]
+Type = VarSet
+Trigger1 = Time = 0
+;Trigger1 = IsHelper(2008) || IsHelper(2108)
+fvar(3) = 30*(Pi/180.0)
+
+[State 2007, 変数増減]
+Type = null;VarAdd
+Trigger1 = fvar(3) < 10
+fvar(3) = .3*time*(Pi/180.0)
+
+[State 7000, VarSet]
+type = Varadd
+trigger1 = IsHelper(3601)
+ignorehitpause = 1
+fvar(3) = (1+random%100*0.05)*(Pi/180.0)
+
+[State 7000, VarSet]
+type = Varadd
+trigger1 = IsHelper(3602)
+ignorehitpause = 1
+fvar(3) = -(1+random%100*0.05)*(Pi/180.0)
+;------------------------
+[State 2]
+Type = VelSet
+Trigger1 = 1
+X = fvar(1)*Cos(fvar(3))+((ifelse(Facing=1,(enemynear,pos x-Pos x),(Pos X-enemynear,pos x))-10)/(30+random%70))
+Y = -fvar(2)*Sin(fvar(3))+(((enemynear,pos y-Pos y)-40)/(50+random%60))
+
+[State 2]
+Type = VelSet
+Trigger1 = parent,AnimElem = 21
+X = (-10+random%20)*60
+Y = (-10+random%20)*60
+
+;-------------------------
+[state 3601]
+type = angleset
+Trigger1 = (vel x != 0)
+Value = atan(Vel Y/Vel X)*(-180.0/pi)+((Vel X<0)*180)
+
+[state 3601]
+Type = AngleSet
+Trigger1=(vel x=0)
+Value = ifelse(vel y<0,90,-90)
+
+[state 3601]
+Type = AngleDraw
+trigger1 = 1
+
+[state 3601]
+type = SprPriority
+trigger1 = random<10
+value = 0
+
+[state 3601]
+type = SprPriority
+trigger1 = random<10
+value = 4
+;------------------------
+[State 2]
+Type = trans
+Trigger1 = 1
+Trans = Add
+
+[State -1, AfterImage]
+type = Afterimage
+trigger1 = time= 0
+trans = add
+length = 60
+TimeGap = 4
+FrameGap =4
+time = 1
+;PalBright = 250,40,0
+PalContrast = 120,120,120
+PalAdd = 10,10,10
+;PalMul = 60,60,60
+
+[state 1000]
+type = AfterImagetime
+trigger1 = 1
+time = 20
+
+[State 3]
+Type = AssertSpecial
+Trigger1 = 1
+flag = Noshadow
+ignoreHitpause = 1
+
+;-------------------------------------------------------------------------
+;扇
+[Statedef 3630]
+type    = A
+movetype = I
+physics = N
+juggle = 5
+poweradd = 0
+anim = 3630
+ctrl = 0
+
+[State 0]
+type		= AssertSpecial
+trigger1	= 1
+flag		= Noshadow
+
+[State 200, 0]
+type = BindToParent
+trigger1 = time <= 150
+time = 1
+pos = -2,0
+
+[State 200, 0]
+trigger1 = 1
+type = sprpriority 
+value = -3
+
+[State 1000, 1] 
+type = PlaySnd
+trigger1 = time = 0
+value = 0, 7
+
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0.19,0
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projheightbound = -999,999
+projmisstime = 2
+projscale = 0.5,0.5
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+supermovetime = 9999
+pausemovetime = 9999
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0.17,0.05
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projheightbound = -999,999
+projmisstime = 2
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0.13,0.1
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0.07,0.15
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0,0.17
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = -0.07,0.15
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = -0.13,0.1
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = -0.17,0.05
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = -0.19,0
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = -0.17,-0.05
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = -0.13,-0.1
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = -0.07,-0.15
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0,-0.17
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0.07,-0.15
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0.13,-0.1
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State Shot, 1];青球
+type = Projectile
+trigger1 = Time%30 = 6
+trigger1 = Time <= 100
+projID = 3430
+projanim = 3430
+postype = p1
+offset = 0,-90
+;velocity = 
+accel = 0.17,-0.05
+projsprpriority = 8
+projremovetime = -1
+projhitanim = 3431
+projmisstime = 2
+projheightbound = -999,999
+projscale = 0.5,0.5
+supermovetime = 9999
+pausemovetime = 9999
+Attr              = A, NP
+Damage            = 60, 5			;ダメージ
+HitFlag           = MAFD		;ヒット時の相手の移動 地上				;ヒットする状態
+GuardFlag         = MA				;ガードできる状態
+animtype          = light
+Priority          = 8, Hit			;攻撃の優先度
+PauseTime         = 5, 5			;ヒット時の硬直時間
+SparkNo           = -1				;ヒットエフェクト
+Guard.SparkNo     = -1				;ガードエフェクト
+Sparkxy           = 0, -50			;エフェクト表示位置
+Ground.Type       = High			;どこに当たるか 地上
+Air.Type          = High			;どこに当たるか 空中
+Ground.SlideTime  = 20				;相手がすべる時間
+Ground.HitTime    = 25				;コンボが繋がる時間 地上
+Air.HitTime       = 25				;コンボが繋がる時間 空中
+Ground.Velocity   = -3,-6			;ヒット時の相手の移動 地上
+Air.Velocity      = -3,-5			;ヒット時の相手の移動 空中
+AirGuard.Velocity = -2,-2			;ヒット時の相手の移動 空中ガード
+Guard.Kill        = 1				;この攻撃をガードで殺せるか
+Fall              = 1				;地面に叩き付けられるか
+Air.Fall          = 1				;地面に叩き付けられるか
+Fall.Recover      = 1				;リカバーできるか
+GetPower          = 0				;ヒット時のパワー増減
+Persistent        = 1
+hitsound          = s200,2
+guardsound        = s150,1
+ID = 3430
+nochainID = 3430
+
+[State 1000, 3];必殺ヒットエフェクトマーク
+type = helper
+trigger1 = root,ProjHitTime(3430) = 1
+trigger1 = Numhelper(4000) = 0
+;trigger1 = hitcount = 1
+ID = 4000
+postype = p2
+ignorehitpause = 1
+persistent = 10
+pos = 0,-77
+priority = 2
+stateno = 4000
+ownpal = 1
+supermove = 1 
+pausemovetime = 999999
+supermovetime = 999999
+[State guard, 1];ガードエフェクト
+type = Explod
+trigger1 = root,projguardedtime(3430) = 1
+anim = 9620
+pos = 1, -50
+Postype = p2
+facing = -1
+sprpriority = 9
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 1
+ignorehitpause = 1
+scale = 0.5,0.5
+
+
+;扇2
+[Statedef 3631]
+type    = A
+movetype = I
+physics = N
+juggle = 5
+poweradd = 0
+anim = 3631
+ctrl = 0
+
+[State 200, 0]
+trigger1 = 1
+type = sprpriority 
+value = -3
+
+[State 200, 0]
+type = BindToParent
+trigger1 = time <= 150
+time = 1
+pos = -2,0
+
+[State 3410 ]
+type = PalFX
+trigger1 = var(1)
+time = 1
+add = var(1),var(1),var(1)
+
+[State 3410,1]
+type = varadd
+trigger1 = time%50 <= 5
+var(1) = 25
+
+[State 3410,1]
+type = varadd
+trigger1 = time%50 = [6,11]
+var(1) = -25
+
+[State exp, 1]
+type = Explod
+trigger1 = root,ProjHitTime(3460) = 1
+trigger1 = Numexplod(9410) = 0
+anim = 9410
+ID = 9410
+pos = -2, -63
+Postype = p2
+facing = -1
+sprpriority = 19
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 10
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State guard, 1];ガードエフェクト
+type = Explod
+trigger1 = root,projguardedtime(3460) = 1
+trigger1 = Numexplod(9610) = 0
+anim = 9610
+ID = 9610
+pos = 1, -63
+Postype = p2
+facing = -1
+sprpriority = 9
+random = 5, 15
+ownpal = 1
+ontop = 1
+pausemovetime = 99999
+supermovetime = 99999
+supermove = 1
+bindtime = 1
+persistent = 1
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[State 0]
+type		= AssertSpecial
+trigger1	= 1
+flag		= Noshadow
+
+[State 3000, 00]
+type = null;destroyself
+;trigger1 = animtime = 0
+trigger1 = time >= 270

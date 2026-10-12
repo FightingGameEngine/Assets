@@ -1,0 +1,3085 @@
+;-----------------GGエフェクト,ガード
+;DOSで使えないもの多用の関係で全てまとめる？　
+;trance,inguraddist,moverever
+;--固有----700YOYO火花--710糸 720ハグ 
+;-共通OK--750FDｴﾌｪ 760ろまCｴﾌｪ 770-赤黄色残像ヘルパ 780-ダスト赤背景--790 SPリング背景ｴﾌｪ
+;--共通--8000ヒットスパーク関連（HEるぱ
+
+
+
+;-------------------------------ヨーヨ戻し時の火花
+[statedef 700];
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 4
+anim = 6000
+
+[state 2090,]
+type = bindtoparent
+trigger1 = numhelper(100)
+time = 1
+pos  = 0,-52
+ignorehitpause = 1
+
+[state 2090,]
+type = angleadd
+trigger1 = anim = 1650
+value = 10
+
+[state 2090,];これやると半透明無効
+type = angledraw
+trigger1 = anim = 1650
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = anim = 1650
+trans = add
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+;----火花はぜったいでるっぽい
+[state 2090,];タメ版のときの小さい火花、これないから作って？
+type = Explod
+triggerall = !numexplod(115)
+triggerall = numhelper(100)
+triggerall = root,var(1) = 0 || root,var(1) = 3 || root,var(1) = 4
+trigger1 = parent,anim = 1610 || parent,anim = 1620
+trigger1 = parent,animelemtime(2) < 0
+trigger2 = parent,stateno = 1620
+anim = 1640
+ID = 115
+pos = 0,0
+postype = p1
+sprpriority = 3
+bindtime = -1
+removetime = -1;114
+ownpal=1
+scale = 0.5,0.5
+ignorehitpause = 1
+
+[state 2090,];タメ版のときの小さい火花、動き始め、またはろじゃ技も含むようになってしまったくらいでけすのは発射してから！
+type = removeExplod
+triggerall = numhelper(100)
+trigger1 = parent,anim = 1610 || parent,anim = 1620
+trigger1 = parent,animelemtime(2) >= 0
+trigger2 = parent,anim = 1605 || parent,anim = 1630
+trigger3 = parent,stateno = [1700,2199]
+trigger4 = parent,stateno = 1650
+trigger5 = parent,stateno = 1640
+trigger5 = root,movetype = H
+ID=115
+ignorehitpause = 0
+
+[state 2090,];タメ版のときの小さい火花、消えたら
+type = removeExplod
+trigger1 = !numhelper(100)
+ID=115
+ignorehitpause = 0
+
+[state 2090,];大きい火花、攻撃時parentoあにめによって・・
+type = changeanim
+triggerall = numhelper(100)
+triggerall = anim != 1650
+trigger1 = parent,anim = 1610 || parent,anim = 1620
+trigger1 = parent,animelemtime(4) >= 0
+value = 1650
+
+[state 2090,];大きい火花消す、くらい、タメなおしで	ろじゃとかいってもけす
+type = changeanim
+triggerall = numhelper(100)
+triggerall = anim != 6000
+triggerall = anim = 1650
+trigger1 = root,movetype = h
+trigger2 = parent,anim != 1610 && parent,anim != 1620 && parent,anim != 1630
+trigger3 = parent,stateno = [1700,2199]
+value = 6000
+
+[state 2090,];大きい火花消す、くらい、タメなおしで	ろじゃとかいってもけす
+type = changeanim
+trigger1 = !numhelper(100)
+value = 6000
+
+[state 2090,];消える
+type = destroyself
+trigger1 = !numhelper(100)
+
+;-------------------------------------ヨーヨーの糸--------------------710
+;-ブリジットとヨーヨーの間。手の位置あたり。pos y - 45ぐらい？
+;呼び出しは、本体からの方がいいかな？minusで
+;--長距離の場合、短いのが2.3本、流れるようにアニメする。糸は全体に貼ってあるわけでない。
+;ブリジットの手にはつねにあるように見える？？いや見えない。
+;軸線上のどこかに短いのがランダムででてるよう・・動きにはついてこない。定期的に貼りなおしてる感じ。
+;複数だすと・・angleの関係で複数常時ヘルパーになってしまうので却下。
+;X2+y2 =Z2 で糸自体の距離、使えない？ tanθ=y/x θは任意角、であれば。dist y /dist x ？？
+;---上のほうにあると角度が変になる
+;-----アングルを使わないとやってられないので、常時ヘルパー・・・・・
+[statedef 709];
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 4
+anim = 6000
+
+[State 3000, 2];透明にしておく 
+type = AssertSpecial
+trigger1 =1
+time = 1
+flag = noautoturn
+flag2 = noshadow
+flag3  = invisible
+ignorehitpause = 1
+
+[state 8310,];ちょっと時間稼ぎ、そのうち検討
+type = changestate
+trigger1 = time >= 30
+value = 710
+
+;------------------------------本体からだしてみる？
+;----本体から出す場合はよーよーを目標地点とした角度、速度設定、必殺ヒットスパークと通じるものがある？
+[Statedef 710]
+type = A
+movetype = I
+physics = N
+velset = 0,0
+sprpriority = 1
+ctrl = 0
+anim = 1660;旧VER1580
+
+[State 3000, 2];透明にしておく 
+type = AssertSpecial
+trigger1 =1
+time = 1
+flag = noautoturn
+flag2 = noshadow
+flag3  = invisible
+ignorehitpause = 1
+
+;--------z2軸上にランダムに貼りつけ。短いのを定期的にずらして貼る
+[state 8300,];YY基準で、velでずらす
+type = posset
+triggerall = numhelper(100)
+trigger1 = time = 0
+x = parent,pos x
+y = parent,pos y
+ignorehitpause = 1
+
+[state 8310,];角度調整部へ
+type = changestate
+trigger1 = animtime = 0
+value = 715
+
+;-------------新新移動00基準 el.ver2	よよ応用編孤独な糸
+;---これは時差ありなので、速度設定は一度きりでいい、はず
+;----------rootdist x が負なら、本体向きより前にある。正なら後ろにある。
+;----------rootdist y が負なら、本体より下にある。正なら上.本体地上(posy0)通常配置でdisty=90
+[state 8150,2]
+type = varset
+triggerall = numhelper(100)
+triggerall = ABS(helper(100),rootdist y) != 0
+triggerall = ABS(helper(100),rootdist x) != 0
+trigger1 = time = 0
+fvar(13) = ifelse(ABS(helper(100),rootdist x) > ABS(helper(100),rootdist y),helper(100),rootdist x / 20,helper(100),rootdist y / 20)
+ignorehitpause = 1
+
+;distが０、もしくはdist x=dist y
+[state 8150,2]
+type = varset
+triggerall = numhelper(100)
+triggerall = time = 0
+trigger1 = helper(100),rootdist y = 0
+trigger2 = helper(100),rootdist x = 0
+trigger3 = helper(100),rootdist x = helper(100),rootdist y
+fvar(13) = 0
+ignorehitpause = 1
+
+[state 8150,2];X Y　いったん０
+type = varrangeset
+trigger1 = time = 0
+fvalue = 0
+first = 14
+last = 15
+ignorehitpause = 1
+
+[state 8150,2];X 	X優位なら1、出なければ比率
+type = varset
+triggerall = abs(rootdist x != 0)
+trigger1 = time = 0
+fvar(14) = ifelse(abs(rootdist x) >= ABS(rootdist y), 1,ABS(rootdist y) / ABS(rootdist x))
+ignorehitpause = 1
+
+[state 8150,2];Y	Y優位なら1、出なければ比率
+type = varset
+triggerall = abs(rootdist y != 0)
+trigger1 = time = 0
+fvar(15) = ifelse(abs(rootdist y) >= ABS(rootdist x),1,ABS(rootdist x) / ABS(rootdist y))
+ignorehitpause = 1
+
+[state 8150,2];移動速度
+type = varset
+trigger1 = time = 0
+fvar(16) = abs(ifelse(abs(rootdist x) >= ABS(rootdist y),rootdist x / 15,rootdist y / 15))
+ignorehitpause = 1
+
+;----------------------基本移動量＝
+;--まとめるとどうしても０除算になる、なんでだろうね
+[state 8150,5];-YX	一度0に設定して真横真縦に対応
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+ignorehitpause = 1
+
+[state 8150,5];-X	0じゃなければ改めて設定
+type = velset
+trigger1 = time = 0
+trigger1 = fvar(14) != 0
+x = fvar(16) / fvar(14) * ifelse(rootdist x < 0,-1,1) 
+ignorehitpause = 1
+
+[state 8150,5];-Y	0じゃなければ改めて設定
+type = velset
+trigger1 = time = 0
+trigger1 = fvar(15) != 0
+y = fvar(16) / fvar(15) * ifelse(rootdist y > 0,1,-1)
+ignorehitpause = 1
+;-----------new移動ここまで
+
+[state 8150,];角度用に格納しておく
+type = varset
+trigger1 = time = 0
+fvar(4) = vel x
+ignorehtipause = 1
+
+[state 8150,];角度用に格納しておく
+type = varset
+trigger1 = time = 0
+fvar(5) = vel y
+ignorehtipause = 1
+
+[state 8150,];本体とおりすぎたらとめないといけないが・・本体もうごくしなー
+type = velset
+trigger1 = time > 2
+trigger1 = random % 4 = 0
+trigger2 = animtime = 0
+trigger3 = rootdist x = [-20,20]
+trigger3 = rootdist y = [-20,20]
+x = 0
+y = 0
+
+[state 8300,];特殊でまできえてる
+type = destroyself
+trigger1 = !numhelper(100)
+trigger2 = numhelper(100)
+trigger2 = helper(100),stateno = [1700,2190]
+trigger3 = numhelper(100)
+trigger3 = helper(100),stateno = [1640,1650]
+
+;-------------debug クリップボード
+[state 8100x, clip];基本編
+type = displaytoclipboard
+trigger1 = numhelper(100)
+text = "PdiX=%f PdiY=%f,YYdiX=%f,YYdiY=%f,f=%d\n"
+params =parentDist X,parentdist y,helper(100),rootdist x,helper(100),rootdist y,var(28)
+
+[state 8100x, clip];基本編
+type = appendtoclipboard
+trigger1 = numhelper(100)
+text = "rdiX=%f rdiY=%f"
+params = rootDist X,rootdist y
+
+;------一ここでは710;8300で決めた角度でangledrowのみ。定期的に8300＜－＞8310　LOOP
+[Statedef 715]
+type = A
+movetype = I
+physics = N
+velset = 0,0
+anim = 1660
+sprpriority = 1  
+
+;----範囲判定は本体とにしたほうがいいかも
+[State 3000, 2] ;範囲外だったら
+type = AssertSpecial
+triggerall = numhelper(100)
+trigger1 = rootdist x != [-40,40]
+trigger1 = rootdist y != [-30,30]
+trigger1 = parentdist x != [-50,50]
+trigger1 = parentdist y != [-40,40]
+time = 1
+flag = noautoturn
+flag2 = noshadow
+ignorehitpause = 1
+
+;---------空中N配置とか、近すぎた場合にうまくいってない
+;-----とおりすぎたときもやばいんだけど
+[State 3000, 2] ;範囲内だったら透明も追加
+type = AssertSpecial
+triggerall = numhelper(100)
+trigger1 = rootdist x = [-40,40]
+trigger1 = rootdist y = [-40,40]
+trigger2 = parentdist x = [-50,50]
+trigger2 = parentdist y = [-40,40]
+time = 1
+flag = noautoturn
+flag2 = noshadow
+flag3 = invisible
+ignorehitpause = 1
+
+[State 3000, 2] ;透明も追加
+type = AssertSpecial
+triggerall = !numhelper(100)
+trigger1 = 1
+time = 1
+flag = noautoturn
+flag2 = noshadow
+flag3 = invisible
+ignorehitpause = 1
+
+[state 8150,2]
+type = varset
+triggerall = 0;numhelper(100)
+triggerall = ABS(helper(100),rootdist y) != 0
+triggerall = ABS(helper(100),rootdist x) != 0
+trigger1 = time = 0
+fvar(13) = ifelse(ABS(helper(100),rootdist x) > ABS(helper(100),rootdist y),helper(100),rootdist x / 20,helper(100),rootdist y / 20)
+ignorehitpause = 1
+
+;distが０、もしくはdist x=dist y
+[state 8150,2]
+type = varset
+triggerall = 0;numhelper(100)
+triggerall = time = 0
+trigger1 = helper(100),rootdist y = 0
+trigger2 = helper(100),rootdist x = 0
+trigger3 = helper(100),rootdist x = helper(100),rootdist y
+fvar(13) = 0
+ignorehitpause = 1
+
+;----distは、相手と関係して向きが変更かかる？
+;--YYが前で-後ろなら+　０除算に注意
+;+180なら左に下がる？
+;---YYが上のほうーとか縦に距離あると変になってる
+;---縦横どちが長いか判断で1Fおかしくなってる？YYに近いほどおきる。あにめがおかしい、なんでたてがまざってるの？
+;--0Fでない、0除算注意fv4は速度X
+[State angle];らぢあん。tan=y/x
+type = AngleSet
+triggerall = numhelper(100)
+triggerall = fvar(13) != 0
+triggerall = fvar(4) != 0
+trigger1 = time = 0
+value = atan(fvar(5) / fvar(4)) * (-180.0 / pi) ;+ (ABS(helper(100),rootdist x) * 2 < ABS(helper(100),rootdist y)) * 180
+;value=atan(fvar(5) / fvar(4)) * (-180.0 / pi); + (var(28) = -1) * 180
+
+[State angle];らぢあん。tan=y/x	速度Yが０	横にしか動いてない。真横
+type = AngleSet
+triggerall = numhelper(100)
+triggerall = fvar(5) = 0
+trigger1 = time = 0
+value = 0
+
+[State angle];らぢあん。tan=y/x 速度xが０　縦にしか動いてない、真縦
+type = AngleSet
+triggerall = numhelper(100)
+triggerall = fvar(4) = 0
+trigger1 = time = 0
+value = 90
+
+[State angle]
+type = AngleDraw
+triggerall = 1;numhelper(100)
+trigger1 = time >= 0
+
+[state 8300,]
+type = destroyself
+triggerall = 1
+trigger1 = !numhelper(100)
+trigger2 = numhelper(100)
+trigger2 = helper(100),stateno = [1700,2190]
+trigger3 = numhelper(100)
+trigger3 = helper(100),stateno = [1640,1650]
+
+[state 8310,]
+type = changestate
+triggerall = 1
+trigger1 = animtime = 0
+value = 710
+
+;-------------debug クリップボード
+[state 8100x, clip];基本編
+type = displaytoclipboard
+trigger1 = numhelper(100)
+text = "PdiX=%f PdiY=%f,YYdiX=%f,YYdiY=%f,f=%d\n"
+params =parentDist X,parentdist y,helper(100),rootdist x,helper(100),rootdist y,var(28)
+
+[state 8100x, clip];基本編
+type = appendtoclipboard
+trigger1 = numhelper(100)
+text = "rdiX=%f rdiY=%f"
+params = rootDist X,rootdist y
+
+;一旦透明にして定期的に消える＆位置がえ演出
+;---旧8300ここで角度を格納、旧8310でdrow
+[Statedef 710]
+type = A
+movetype = I
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 1660;旧VER1580
+
+;---1580 真中、1581右 1582もっと右
+[state 8300,]
+type = turn
+trigger1 = root,facing != facing
+ignorehitpause = 1
+
+[State 3000, 2];透明にしておく 
+type = AssertSpecial
+trigger1 =1
+time = 1
+flag = noautoturn
+flag2 = noshadow
+flag3  = invisible
+ignorehitpause = 1
+
+;--------z2軸上にランダムに貼りつけ。短いのを定期的にずらして貼る
+[state 8300,];YY基準で、velでずらす
+type = posset
+triggerall = numhelper(100)
+trigger1 = time = 0
+x = helper(100),pos x 
+y = helper(100),pos y; - 8 - 45;真中あたりに
+ignorehitpause = 1
+
+[state 8310,]
+type = changestate
+trigger1 = animtime = 0
+value = 715
+
+;------------distでやるなら。Ｒ移動とある程度同じ。
+;acos(X / (X*X+Y*Y))   -> /pi*180
+;----ＹＹより↑でー（-50？）下で＋　（-50）　+YY貼りつけでずらす5
+[State var]
+type = varset
+triggerall = numhelper(100)
+trigger1 =  time = 0
+fvar(4) = helper(100),rootdist x
+
+[State var]
+type = varset
+triggerall = numhelper(100)
+trigger1 =  time = 0
+fvar(5) = helper(100),rootdist y 
+
+;^-----新
+;符号無視：大きい方が何Fでつくか計算、代入　基本量（スピード）=7、EX：X77y50>77/7で11f,移動量X=7(11F),Y移動量7/11f(11F)
+;distが０以外のとき、０除算注意のため
+[state 8150,2]
+type = varset
+triggerall = ABS(rootdist y) != 0
+triggerall = ABS(rootdist x) != 0
+trigger1 = time = 0
+fvar(22) = ifelse(ABS(rootdist x) > ABS(rootdist y),rootdist x / 20,rootdist y / 20)
+ignorehitpause = 1
+
+;distが０、もしくはdist x=dist y
+[state 8150,2]
+type = varset
+triggerall = time = 0
+trigger1 = rootdist y = 0
+trigger2 = rootdist x = 0
+trigger3 = rootdist x = rootdist y
+fvar(22) = 0
+ignorehitpause = 1
+
+;----------------------基本移動量＝?
+[state 8150,5];-217,90 
+type = velset
+triggerall = fvar(22);0でないなら比計算されてるはず
+trigger1 = time = 0
+x = ABS(rootdist x / 20) * ifelse(rootdist x < 0,-1,1)
+y = ABS(rootdist y / 20) * ifelse(rootdist y < 0,-1,1)
+ignorehitpause = 1
+
+[state 8150,5];
+type = velset
+triggerall = !fvar(22);0の時は特殊
+triggerall = time = 0
+trigger1 = rootdist y = 0
+trigger2 = rootdist x = 0
+x = ifelse(rootdist x = 0,0,rootdist x / 20) * ifelse(rootdist x < 0,-1,1)
+y = ifelse(rootdist y = 0,0,rootdist y / 20) * ifelse(rootdist y < 0,-1,1)
+ignorehitpause = 1
+
+[state 8150,5];同じ値で90.90　ともに0じゃない時（0除算　
+type = velset
+triggerall = !fvar(22);0の時は特殊
+triggerall = time = 0
+trigger1 = rootdist x = rootdist y
+trigger1 = rootdist x != 0 && rootdist y != 0
+x = ABS(rootdist x / 20) * ifelse(rootdist x < 0,-1,1);
+y = ABS(rootdist y / 20) * ifelse(rootdist y < 0,-1,1)
+ignorehitpause = 1
+
+[state 8150,5];
+type = velset
+triggerall = !fvar(22);0の時は特殊
+triggerall = time = 0
+trigger1 = rootdist x = rootdist y
+trigger1 = rootdist x = 0 && rootdist y = 0
+x = 0
+y = 0
+ignorehitpause = 1
+
+[state 8150,5];強制停止
+type = velset
+trigger1 = time >= 5
+trigger1 = random % 4 = 1 
+x = 0
+y = 0
+ignorehitpause = 1
+
+[state 8300,]
+type = destroyself
+trigger1 = !numhelper(100)
+trigger2 = numhelper(100)
+trigger2 = helper(100),stateno = [1640,2190]
+
+;-------------debug クリップボード
+[state 8100x, clip];基本編
+type = displaytoclipboard
+trigger1 = numhelper(0)
+text = "RdiX=%f RdiY=%f,YYdiX=%f,YYdiY=%f,f=%d\n"
+params =rootDist X,rootdist y,helper(0),rootdist x,helper(0),rootdist y,var(0)
+
+[State 8100x,];追加
+type = AppendToClipboard
+trigger1 =1
+text = "pdisx=%f,pdisy=%f,atA=%f,atan%f"
+params = parentdist x,parentdist y,fvar(5),fvar(4),;atan( fvar(5)/fvar(4) ) ;* ( 180.0 / pi) 
+;params = fvar(4),fvar(5),fvar(5),fvar(4),;atan( fvar(5)/fvar(4) ) ;* ( 180.0 / pi) 
+
+
+;------一ここでは710;8300で決めた角度でangledrowのみ。定期的に8300＜－＞8310　LOOP
+[Statedef 715]
+type = A
+movetype = I
+physics = N
+anim = 1660;旧VER1592;真ん中
+velset = 0,0
+sprpriority = 1  
+
+[state 8300,]
+type = turn
+trigger1 = 0;root,facing != facing
+ignorehitpause = 1
+
+[State 3000, 2] ;範囲外だったら
+type = AssertSpecial
+triggerall = numhelper(100)
+trigger1 = helper(100),rootdist x != [-80,80]
+trigger1 = helper(100),rootdist y != [-95,95]
+time = 1
+flag = noautoturn
+flag2 = noshadow
+ignorehitpause = 1
+
+[State 3000, 2] ;範囲内だったら透明も追加
+type = AssertSpecial
+triggerall = numhelper(100)
+trigger1 = helper(100),rootdist x = [-80,80]
+trigger1 = helper(100),rootdist y = [-95,95]
+trigger2 = root,facing != facing
+time = 1
+flag = noautoturn
+flag2 = noshadow
+flag3 = invisible
+ignorehitpause = 1
+
+[State 3000, 2] ;透明も追加
+type = AssertSpecial
+triggerall = !numhelper(100)
+trigger1 =1
+time = 1
+flag = noautoturn
+flag2 = noshadow
+flag3 = invisible
+ignorehitpause = 1
+
+;----distは、相手と関係して向きが変更かかる？
+;--YYが前で-後ろなら+　０除算に注意
+;+180なら左に下がる？
+[State angle];らぢあん。tan=y/x
+type = AngleSet
+triggerall = fvar(4) != 0
+triggerall = rootdist y != 0
+triggerall = rootdist x != 0
+trigger1 = time = 0
+value=atan(abs(fvar(5)) / abs(fvar(4))) * (180.0 / pi)
+
+[State angle];らぢあん。tan=y/x
+type = AngleSet
+triggerall = rootdist x = 0
+trigger1 = time = 0
+value = 90
+
+[State angle]
+type = AngleDraw
+trigger1 =  1
+
+[state 8300,]
+type = destroyself
+triggerall = 1
+trigger1 = !numhelper(100)
+trigger2 = numhelper(100)
+trigger2 = helper(100),stateno = [1640,2190]
+
+[state 8310,]
+type = changestate
+trigger1 = animtime = 0;time >= 30
+value = 710
+
+;-------------------------------------------------ろじゃはぐまんなかのくまさん
+;-------------------------------相手の位置をとらえるための透明張り付
+;-----1800の時点で出して、その間近くの敵、あたったらそっちにすれば記述楽、1種ですむ
+[statedef 720];
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+anim = 6000
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = invisible
+flag3 = noautoturn
+ignorehitpause = 1
+
+;-----------------まだあたってないとき,またはIdがとれなかったとき
+[State 3660,]
+type = posset
+triggerall= enemynear,alive
+trigger1 = parent,stateno = [1800,1810]
+trigger2 = parent,stateno = 1820
+trigger2 = parent,var(3) = 0
+x = enemynear,pos x
+y = enemynear,pos y
+ignorehitpause = 1
+
+;---------あたったらそっちに相手たおしてても有効時ははそのままでいい
+[State 3660,];--
+type = posset
+trigger1 = parent,stateno = 1820
+trigger1 = parent,var(3)
+x = playerID(parent,var(3)),pos x
+y = playerID(parent,var(3)),pos y
+ignorehitpause = 1
+
+[state 1850,];消える前にやることがある
+type = destroyself
+trigger1 = !numhelper(100)
+trigger2 = numhelper(100)
+trigger2 = parent,stateno != [1800,1820]
+ignorehitpause = 0
+
+;---------------------------------------ステージはしヨーヨー戻り用位置固定
+;--ID115
+[statedef 730];うまくいかないのでヘルパーで？
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 0
+anim = 200
+
+[state 1850,];
+type = turn
+trigger1 = numhelper(100)
+trigger1 = time = 0
+trigger1 = helper(100),facing != facing
+ignorehitpause = 0
+
+[state 1850,];
+type = posset
+trigger1 = numhelper(100)
+trigger1 = time = 0
+x = helper(100),pos x
+y = helper(100),pos y
+ignorehitpause = 0
+
+[state 1850,];
+type = destroyself
+trigger1 = !numhelper(100)
+trigger2 = numhelper(100)
+trigger2 = parent,stateno != [1600,1610]
+ignorehitpause = 0
+
+;---------------------------------喜劇目標地点へるぱ？
+[statedef 735];うまくいかないのでヘルパーで？
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+sprpriority = 3
+anim = 3460
+
+[State 1060, 2]; 
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+
+[state 2090,];これやると半透明無効
+type = angledraw
+trigger1 = 1
+scale = 1,0.5
+
+[state 2090,];コレ追加で再び半透明 DOSで動かない
+type = trans
+trigger1 = 1
+trans = add
+
+[State 1060, 2]; 地上固定？
+type = posset
+trigger1 = numhelper(3400)
+x = parent,pos x
+y = 10
+
+[state 1850,];
+type = destroyself
+trigger1 = !numhelper(3400)
+trigger2 = numhelper(3400)
+trigger2 = parent,stateno >= 2460
+
+;---------------------------地上ジャンプ時砂ほこり
+;---Xはroot、Yは地上なのでpostypeｐ１ではずれるようだ
+[statedef 740];うまくいかないのでヘルパーで？
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = -2
+anim = 6040
+
+[state 1850,];
+type = posset
+trigger1 = time = 0
+x = root,pos x
+y = 0
+ignorehitpause = 0
+
+[State 8000x,noturn]
+type = AssertSpecial
+trigger1 =1
+flag = noshadow
+ignorehitpause = 1
+
+[state 1850,];
+type = destroyself
+trigger1 = animtime = 0
+ignorehitpause = 0
+
+;----------------------テスト
+;－－－FD相手引き離しへるぱ、引き戻しのときはどうなるのか不明
+[statedef 745];
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = -2
+anim = 6180
+
+[State 8000x,noturn]
+type = AssertSpecial
+trigger1 =1
+flag = invisible
+flag2 = noshadow
+ignorehitpause = 1
+
+[state 1850,];
+type = nothitby
+trigger1 = 1
+value = sca
+time= 1
+ignorehitpause = 1
+
+[state 1850,];Yは地上にあわせ？空中高度高いところだとあれかも？
+type = posset
+trigger1 = 0
+y = 0
+ignorehitpause = 1
+
+[state 1850,];
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state 1850,];あまり大きいとすりぬける2Pだと逆になる
+type = posadd
+trigger1 = 1
+x = -5
+ignorehitpause = 1
+
+[state 1850,];
+type = destroyself
+trigger1 = time >= 8
+ignorehitpause = 0
+
+;----------------------------------------ここから共通エフェクト
+;-----------------エフェクト　FD			ID 50とする
+[statedef 750];うまくいかないのでヘルパーで？
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 3
+anim = 6000;透明アニメ
+
+[state 2090,]
+type = bindtoroot
+trigger1 = 1
+time = 1
+pos  = 0,0
+
+[state 2090,]
+type = nothitby
+trigger1 = 1
+time = 1
+value = sca
+
+[State 8000x,noturn]
+type = AssertSpecial
+trigger1 =1
+flag = noautoturn
+flag2 = nowalk
+flag3 = noshadow
+
+[state 120x,atc efe];FDエフェクト
+type = Explod
+triggerall = 1;!numexplod(750)
+trigger1 = time = 0
+anim = 6160
+ID = 750
+postype = p1
+pos = 0,-55
+sprpriority = 4
+bindtime = -1
+removetime = -1
+ownpal=0
+removeongethit = 1
+scale = 0.5,0.5
+persistent = 0
+
+[State 2092]
+type = PalFX
+trigger1 = 1
+time = 1
+add = -128,-128,-128
+sinadd = -256,-256,-256,104
+ignorehitpause = 1
+
+[state 3100,]
+type = removeexplod
+triggerall = 1
+trigger1 = root,power <= 0 && root,var(40) = 0
+trigger2 = root,var(22) = 0   
+trigger3 = root,command != "holdback"
+trigger4 = root,movetype = H
+trigger4 = root,stateno != [120,155]
+trigger5 = root,movetype = A 
+trigger6 = root,var(25) != 2 
+ID=750
+
+;----連続であると変
+[state -2,helper partner];----test FDエフェクトヘルパー　はじけあにめ中にもっかいFD入るとでなくなってしまうので、別ヘルパーをだす
+type = Helper
+triggerall = numhelper(55) < 10
+triggerall = !numhelper(55) || (numhelper(55) && random % 3 = 0)
+trigger1 = root,power <= 0 && root,var(40) = 0
+trigger2 = root,var(22) = 0
+trigger3 = root,command != "holdback"
+trigger4 = root,movetype = H
+trigger4 = root,stateno != [120,155]
+trigger5 = root,movetype = A 
+trigger6 = root,var(25) != 2 
+name = "FD helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 1
+persistent = 0
+size.height = 0
+
+[state 2090,]
+type = destroyself
+trigger1 = root,power <= 0 && root,var(40) = 0
+trigger2 = root,var(22) = 0
+trigger3 = root,command != "holdback"
+trigger4 = root,movetype = H
+trigger4 = root,stateno != [120,155]
+trigger5 = root,movetype = A 
+trigger6 = root,var(25) != 2 
+
+
+;-----------------------------------FD終了はじけるようになる  Id55
+;---エクスプロードを依存で色かえ
+;---FD受身ｴﾌｪを色変えて使う、追加はパレット無理
+;-----SBの黄色いのもこれで代用しよう	1F色かわってないかも
+[statedef 755];うまくいかないのでヘルパーで？
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 5
+anim = ifelse(const(size.height) = 0,6161,6162)
+
+[state 2090,]
+type = bindtoroot
+trigger1 = time = 0
+time = 1
+pos  = 0,-55
+ignorehitpause = 1
+
+[state 2090,]
+type = nothitby
+trigger1 = 1
+time = 1
+value = sca
+ignorehitpause = 1
+
+[State 8000x,noturn]
+type = AssertSpecial
+trigger1 =1
+flag = noautoturn
+flag2 = nowalk
+flag3 = noshadow
+ignorehitpause = 1
+
+[state 120x,atc efe];FDエフェクト  解除際のでかいの14F6161
+type = Explod
+trigger1 = 0;time = 0
+;anim = 6161;6170;6161
+anim = ifelse(const(size.height) = 0,6161,6162)
+ID=755
+postype = p1
+pos = 0,-55
+sprpriority = 4
+bindtime = 1
+removetime = -2
+ownpal=0
+persistent = 0
+scale = 0.5,0.5
+
+;-------------------緑の場合
+[State 2092]
+type = PalFX
+triggerall = const(size.height) = 0
+trigger1 = time >= 0
+time = 1
+add = -60,-60,-60
+sinadd = -256,-256,-256,104
+ignorehitpause = 1
+
+;---------------SB黄色リングシリーズ
+[State 2092]
+type = PalFX
+triggerall = const(size.height) = 1
+trigger1 = time >=0
+time = 1
+add = 128 - time * 20,128 - time * 20,-128 - time * 20
+sinadd = -256,-256,-256,104
+ignorehitpause = 1
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = time >= 0
+trans = add
+ignorehitpause = 1
+
+[State 2092];本体拡大にきりかえ
+type = angledraw
+triggerall = 1
+trigger1 = time >= 4
+scale = 1 + (time - 4) * 0.15,1 + (time - 4 ) * 0.15 
+ignorehitpause = 1
+
+[State 3200, ];AIR配列変更、time4kara
+type = ModifyExplod
+trigger1 = Time >= 4;1
+ID = 755
+scale = 0.5 + time * 0.025 ,0.5 + time * 0.025
+ignorehitpause = 1
+
+[state 2090,]
+type = destroyself
+trigger1 = time >= 10
+
+;----------------------------スラッシュバックガード時エフェ擬似代用
+[statedef 756];本来ベージュ円の、ないから黄色バーストエフェで
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 4
+anim = 6163
+
+[state 2090,]
+type = nothitby
+trigger1 = 1
+time = 1
+value = sca
+ignorehitpause = 1
+
+[State 8000x,noturn]
+type = AssertSpecial
+trigger1 =1
+flag = noautoturn
+flag2 = nowalk
+flag3 = noshadow
+ignorehitpause = 1
+
+;---------------SB黄色リングシリーズ
+[State 2092]
+type = PalFX
+triggerall = 1
+trigger1 = 1
+time = 1
+add = 128 - time * 20,128 - time * 20,-128 - time * 20
+sinadd = -256,-256,-256,104
+ignorehitpause = 1
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = 1
+trans = add
+ignorehitpause = 1
+
+[State 2092];本体拡大にきりかえ
+type = angledraw
+triggerall = 1
+trigger1 = time >= 4
+scale = 1 + (time - 4) * 0.1,1 + (time - 4 ) * 0.1 
+ignorehitpause = 1
+
+[state 2090,]
+type = destroyself
+trigger1 = animtime = 0
+
+;--------------------------------
+;----------------------------投げぬけ時エフェ擬似代用
+;----2種類別々にある。別別にしたほうがわかりやすいかもしんないね
+[statedef 757];本来紫円の、ないから青色バーストエフェで
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+velset = 0,0
+sprpriority = 3
+anim = ifelse(const(SIZE.height) = 0,6170,6171)
+
+[state 2090,]
+type = nothitby
+trigger1 = 1
+time = 1
+value = sca
+ignorehitpause = 1
+
+[State 8000x,noturn]
+type = AssertSpecial
+trigger1 =1
+flag = noautoturn
+flag2 = nowalk
+flag3 = noshadow
+ignorehitpause = 1
+
+;---------------むらさきにする1F目にいろかわってなくない？
+;----エフェクト加工するまで我慢
+[State 2092]
+type = PalFX
+trigger1 = const(SIZE.height) = 0
+trigger1 = time >= 0
+time = 1
+add = 164 - time ,-100 - time ,164 - time 
+sinadd = -256,-256,-256,104
+ignorehitpause = 1
+
+[State 2092]
+type = PalFX
+ttrigger1 = const(SIZE.height) = 1
+trigger1 = time >= 0
+time = 1
+add = 164 - time * 20,-100 - time * 20,164 - time * 20
+sinadd = -256,-256,-256,104
+ignorehitpause = 1
+
+[state 2090,];コレ追加で再び半透明
+type = angledraw
+trigger1 = const(SIZE.height) = 0
+value = 0
+scale = 1 + time * 0.1 ,1 + time * 0.1
+ignorehitpause = 1
+
+[state 2090,];コレ追加で再び半透明
+type = angledraw
+trigger1 = const(SIZE.height) = 1
+value = 0
+scale = 1 + time * 0.25 ,1 + time * 0.25
+ignorehitpause = 1
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = 1
+trans = add
+ignorehitpause = 1
+
+[state 2090,]
+type = destroyself
+trigger1 = animtime = 0
+trigger2 = const(SIZE.height) = 0
+trigger2 = root,stateno != [800,890]
+
+;-----------------エフェクト　ロマキャン赤いほう親へるぱ
+;--anglsetで大きさも変えられる
+;-----青いほうもできるぞ。
+[statedef 760];うまくいかないのでヘルパーで？
+type    = A
+movetype= i
+physics = N
+ctrl = 0
+anim = const(size.height)
+velset = 0,0
+sprpriority = 4
+
+[State 8000x,noturn]
+type = AssertSpecial
+trigger1 =1
+flag = noautoturn
+flag2 = nowalk
+flag3 = noshadow
+ignorehitpause = 1
+
+[State 2092]
+type = angleadd
+trigger1 = 1
+value = 8
+ignorehitpause = 1
+
+[State 2092];ここでのSCALEは、元のにaddなので1スタート
+type = angledraw
+trigger1 = time >= 1
+scale = 1 + time * 0.1,1 + time * 0.1
+ignorehitpause = 1
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = 1
+trans = add
+ignorehitpause = 1
+persistent = 1
+
+[State 2092]
+type = PalFX
+trigger1 = time >= 20
+time = 1
+add = time * -5, time * -5,time * -5
+sinadd = 100,100,100,100
+ignorehitpause = 1
+
+[state 2090,]
+type = destroyself
+trigger1 = time >= 30
+
+;----------------------------------------------GG4割、一撃モードの残像
+;-------------------------赤と黄色2種
+;------GGライフ3分の１と同時な場合一撃モード優先、赤。
+;----イントロ、ダウン中、死亡、勝利ポーズでは消えているようだ。
+;---p2stateno中も消す、双子と同じくずれる
+[statedef 770]
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+velset = 0,0
+sprpriority = -2
+
+[state 2090,];むてきとすりぬけ
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+[State 8000x,noturn];かげなし
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+[State 8000x,noturn];透明にする
+type = AssertSpecial
+trigger1 = roundstate != 2
+trigger2 = root,alive = 0 || enemy,alive = 0
+trigger3 = !selfanimexist(root,anim)   
+trigger4 = root,statetype = L  
+trigger5 = root,movetype = H  
+trigger5 = root,stateno != [5000,5155]
+trigger5 = root,stateno != [120,155]    
+flag = noshadow
+flag2 = invisible
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+;-------------------elemも判断できるといいのだけど・・
+;---投げられると落ちる
+[State 3400,]
+type = changeanim
+triggerall = selfanimexist(root,anim)
+trigger1 = root,movetype != H  
+trigger2 = root,movetype = H 
+trigger2 = root,stateno = [5000,5155]
+trigger3 = root,movetype = H 
+trigger3 = root,stateno = [120,155] 
+value = root,anim
+elem = root,animelemno(0)
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+[state 2090,];コレ追加で再び半透明
+type = turn
+trigger1 = root,facing != facing
+supermovetime = 9999
+pausemovetime = 9999
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = 1
+trans = add;alpha
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+[state 2090,];
+type = angledraw
+trigger1 = 1
+scale = time % 20 * 0.005 + 0.95,time % 20 * 0.005 + 0.98
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+[state 2090,];
+type = bindtoroot
+trigger1 = 1
+x = -1
+y = -5
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+;---------------------------赤かなりうすい、ぴんく？
+;---------2種類でいい。
+[State 3400,0];黄色
+type = PALFX
+triggerall = root,var(40) != 1
+trigger1 = root,var(2) = 1 && root,life <= 250
+add = 200,200,-200
+time = 1
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+[State 3400,3];赤
+type = PALFX
+trigger1 = root,var(40) = 1
+add = 80,-200,-150
+time = 1
+ignorehitpause = 1
+supermovetime = 9999
+pausemovetime = 9999
+
+;----消えるには一撃モードじゃなくなったとき GG以外でね
+[state 2097,]
+type = destroyself
+trigger1 = root,var(2) != 1
+trigger1 = root,var(40) <= 0
+trigger2 = root,var(2) = 1
+trigger2 = root,var(40) <= 0
+trigger2 = root,life > 250
+trigger3 = root,alive = 0
+ignorehitpause = 1
+
+
+;-------------------------------ダスト時背景赤くなる
+;------------------★エフェクトは・・どうしましょ
+[statedef 780]
+type    = A
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+velset = 0,0
+anim = 6000
+sprpriority = 0
+
+[State 3400,]
+type = BGPALFX
+triggerall = root,statetype = A
+trigger1 = time < 20
+add = time * 10,time * -10,time * -10
+time = 1
+ignorehitpause = 1
+
+[State 3400,]
+type = BGPALFX
+triggerall = root,statetype = A
+trigger1 = time >= 20
+add = 255,-255,-255
+time = 1
+ignorehitpause = 1
+
+[state 2097,]
+type = changestate
+trigger1 = root,statetype != A
+trigger2 = root,movetype = H 
+trigger3 = time >= 36
+value = 785
+
+;-------------------------終了時、赤から通常にもどす
+[statedef 785]
+type    = A
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+velset = 0,0
+anim = 6000
+sprpriority = 0
+
+[State 3400,]
+type = BGPALFX
+trigger1 = time = 0
+add = 255,0,0
+time = 1
+ignorehitpause = 1
+
+[State 3400,]
+type = BGPALFX
+trigger1 = time > 0
+trigger1 = time < 20
+add = time * -10,0,0
+time = 1
+ignorehitpause = 1
+
+[state 2097,]
+type = destroyself
+trigger1 = time = 10
+
+
+;------------------------------------ダスト相手位置指標
+[statedef 786]
+type    = A
+movetype= I
+physics = N
+ctrl = 0
+anim = 6000
+
+[State 3400,];相手ｎIDわかてれば
+type = posset
+trigger1 = root,var(4)
+x = playerID(root,var(4)),pos x + ifelse(playerID(root,var(4)),facing = 1,75,-75)
+y = playerID(root,var(4)),pos y 
+
+
+[State 3400,];もしはいてなければenemy?
+type = posset
+trigger1 = root,var(4) = 0
+x = enemynear,pos x + ifelse(enemynear,facing = 1,75,-75)
+y = enemynear,pos y
+
+[state -2, displayb];ヒット関係
+type = displaytoclipboard
+trigger1 = 1
+text = "RDX=%f,RDY=%f"
+params = rootdist x,rootdist y
+ignorehitpause = 1
+
+[state 2097,];相手29F中いる
+type = destroyself
+trigger1 = root,var(4)
+trigger1 = playerID(root,var(4)),stateno != [5850,5860]
+trigger2 = root,var(4)
+trigger2 = playerID(root,var(4)),sysvar(0) > 30
+trigger3 = root,var(4) = 0
+
+;----------------------------------暗転演出背景、光の輪、柱粒全部。790
+;----hight=0リングのみ 1+リングと収束、斜め柱　2＋背景
+;----------------------背景Z軸にも動く、みせかけでなんとかならない？かくしゅく？
+[statedef 790]
+type    = A
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+velset = 0,0
+anim = 6000
+sprpriority = 0
+
+[state 3200,rend];ｙはスクリーンポスの関係でめんどpos-70 scpos150
+type = posset
+trigger1 = 0;screenpos y != [145,155];誤差がでる150
+y = pos y + (-1 * (100 - (239 - ScreenPos Y)))
+ignorehitpause = 1
+
+;---------10Fめまでに徐々に暗くする
+[State 3400,]
+type = BGPALFX
+trigger1 = const(size.height) >= 2
+trigger1 = time < 9;10
+add = -50 - time * 5,-50 - time * 5,-50 - time * 5
+time = 1
+ignorehitpause = 1
+
+;---------10Fめまでに徐々に暗くする
+[State 3400,]
+type = BGPALFX
+trigger1 = const(size.height) >= 2
+trigger1 = time >= 9
+add = -255,-255,-255
+time = 1
+ignorehitpause = 1
+
+[State 3400,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = invisible
+ignorehitpause = 1
+
+[State 3400,]
+type = nothitby
+trigger1 = 1
+value = sca
+ignorehitpause = 1
+[state -2,helper partner];---テスト-背景専門孫へるぱー？
+type = Helper
+triggerall = const(size.height) >= 2
+trigger1 = time = 10
+name = "BG"
+ID = 791
+pos = 0,0
+postype = p1
+stateno = 791
+ownpal = 1
+helpertype = normal
+supermovetime  =99999
+pausemovetime = 99999
+size.air.front = const(size.air.front) - 10
+size.air.back = const(size.air.back) -10 
+size.height = const(size.height)
+
+;^----------------------------原作SP発動円
+;------------右上スタート半円1
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) >= 0
+trigger1 = time = 0
+anim = 6550
+id = 6550
+postype = p1
+pos = 0,0 
+sprpriority = 3
+supermove = 9999
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5 ,0.5 
+removeongethit=0
+persistent = 0
+
+;------------左下スタート半円2
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) >= 0
+trigger1 = time = 0
+anim = 6560
+id = 6560
+postype = p1
+pos = 0,0 
+sprpriority = -3
+supermove = 9999
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5 ,0.5 
+removeongethit=0
+persistent = 0
+
+;--------------------FBのとき反転してリングもう１こ
+;------------右上スタート半円1_1
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) = 0
+trigger1 = time = 0
+anim = 6550
+id = 6550
+postype = p1
+pos = 0,0 
+sprpriority = 3
+supermove = 9999
+bindtime = 1
+facing = -1
+removetime = -2
+ownpal=1
+scale = 0.5 ,0.5 
+removeongethit=0
+persistent = 0
+
+;------------左下スタート半円2
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) = 0
+trigger1 = time = 0
+anim = 6560
+id = 6560
+postype = p1
+pos = 0,0 
+sprpriority = -3
+supermove = 9999
+bindtime = 1
+facing = -1
+removetime = -2
+ownpal=1
+scale = 0.5 ,0.5 
+removeongethit=0
+persistent = 0
+
+;--------------------------------------LV2
+;----------------真ん中円 中心 
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) >= 1
+trigger1 = time = 0
+anim = 6570
+id = 6570
+postype = p1
+pos = 0,0 
+sprpriority = 2
+supermove = 9999
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5 
+removeongethit=0
+persistent = 0
+
+;----------------斜めの柱～ 大きすぎる？？
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) >= 1
+trigger1 = time = 0
+anim = 6580
+id = 6580
+postype = p1
+pos = 0,0 
+sprpriority = 1
+supermove = 9999
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5 
+removeongethit=1
+persistent = 0
+
+;----------------斜めの柱～ 大きすぎる？？
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) >= 1
+trigger1 = time = 0
+anim = 6585
+id = 6580
+postype = p1
+pos = 0,0 
+sprpriority = 1
+supermove = 9999
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5 
+removeongethit=1
+persistent = 0
+
+;----------------一点に集まる光の粒　ヘルパーでやるには数が多すぎる
+[state 3400,exp1];
+type = Explod
+triggerall = const(size.height) >= 1
+trigger1 =  time = 0
+anim = 6590 + random % 4
+id = 6590
+postype = p1
+pos = 0,00 
+sprpriority = 4
+supermove = 9999
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+removeongethit=1
+persistent = 0
+
+[state 2092,];背景ありのときだけ
+type = PalFX
+triggerall = const(size.height) >= 2
+trigger1 = Animtime != 0
+time = 1
+add = -256,-128,-128
+sinadd = -256,-256,-256,104
+ignorehitpause = 1
+
+[state 3450,];暗転リングのみの場合さっさとけす
+type = destroyself
+triggerall = const(size.height) <= 1
+trigger1 = time >= 80
+
+[state 3450,];明るく戻す
+type = changestate
+triggerall = const(size.height) = 2
+trigger1 = time >= const(size.air.front)
+trigger2 = root,stateno != [120,155]
+trigger2 = root,movetype = H
+value = 795
+
+
+;-------------------------背景専門、Yを位置固定したい
+;----上でやらないのはリングが固定じゃまずいからー
+[statedef 791]
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+velset = 0,0
+anim = 6000
+
+[state 3200,rend];ｙはスクリーンポスの関係でめんどpos-70 scpos150
+type = posset
+trigger1 = 1
+y = pos y + (-1 * (100 - (239 - ScreenPos Y)))
+ignorehitpause = 1
+
+[State 3400,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = invisible
+ignorehitpause = 1
+
+;----演出長い技に注意
+;--------------------------一番奥の背景　Z軸は、無理
+;-----ねくろカウンタがやたら長い、注意こっちはOｋだけど
+;----かなり後からだった10Ｆめだった
+;---名前不明の一撃のときは背景先にでている
+[state 3400,exp1];
+type = Explod
+trigger1 = time = 0
+anim = 6496;6520
+id = 6550
+postype = p1
+pos = 0,0 
+sprpriority = -4
+supermove = 9999
+bindtime = -1
+removetime = const(size.air.front)
+ownpal=1
+scale = 1,1
+;vel = 1,0 
+supermovetime = 255
+
+[state 3400,exp1];移動するので後半に連結したい	こっちは遅いから大丈夫かもね
+type = Explod
+trigger1 = time = 0
+anim = 6496;6521
+id = 6550
+postype = p1
+pos = -512,0 
+sprpriority = -4
+supermove = 9999
+bindtime = -1
+removetime = const(size.air.front)
+ownpal=1
+scale = 1,1
+;vel = 1,0 
+supermovetime = 255
+
+
+;---------------------------背景２奥
+;---1枚X幅512を８ずつ動かす
+;----すきま対策----新方式、ふすま。でぃじーは一撃で背景先行があるので4枚かな・
+[state 3400,exp1];基本共通手前１
+type = Explod
+trigger1 = time = 0
+anim = 6495;6525
+id = 6550
+postype = p1;back
+pos = 0,0
+sprpriority = -3
+supermove = 9999
+bindtime = -1
+removetime = const(size.air.front)
+ownpal=1
+;vel = 8,0;3
+scale = 1,1
+supermovetime = 255
+
+[state 3400,exp1];基本共通真後ろ１　後半連結AI8ずつなら64かかるので・・
+type = Explod
+trigger1 = time = 0
+anim = 6495;6525
+id = 6550
+postype = p1;back
+pos = -512,0 
+sprpriority = -3
+supermove = 9999
+bindtime = -1
+removetime = const(size.air.front)
+ownpal=1
+;vel = 8,0
+scale = 1,1
+supermovetime = 255
+
+[state 3400,exp1];特殊、後ろ２
+type = Explod
+trigger1 = time = 0
+anim = 6495;6525
+id = 6550
+postype = p1;back
+pos = -512 * 2 ,0 
+sprpriority = -3
+supermove = 9999
+bindtime = -1
+removetime = const(size.air.front)
+ownpal=1
+;vel = 8,0
+scale = 1,1
+supermovetime = 255
+
+[state 3400,exp1];特殊、手前２
+type = Explod
+trigger1 = time = 0
+anim = 6495;6525
+id = 6550
+postype = p1;back
+pos = 512 ,0 
+sprpriority = -3
+supermove = 9999
+bindtime = -1
+removetime = const(size.air.front)
+ownpal=1
+;vel = 8,0
+scale = 1,1
+supermovetime = 255
+
+[state 3450,];同じ条件で消すだけ
+type = removeexplod
+triggerall = const(size.height) = 2
+trigger1 = time >= const(size.air.front)
+trigger2 = root,stateno != [120,155]
+trigger2 = root,movetype = H
+Id = 6550
+
+
+[state 3450,];同じ条件で消すだけ
+type = destroyself
+triggerall = const(size.height) = 2
+trigger1 = time >= const(size.air.front)
+trigger2 = root,stateno != [120,155]
+trigger2 = root,movetype = H
+
+
+
+;-------------------SP演出後徐々に明るく・・だね
+;----時間が切れるか、もしくは本体が食らうとくる
+[statedef 795]
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+velset = 0,0
+
+[state 3400,exp1];背景赤を消す
+type = removeExplod
+trigger1 = time = 0
+id = 6550
+ignorehitpause = 1
+
+[State 3400,]
+type = BGPALFX
+trigger1 = 1
+add = -255 + time * 10,-255 + time * 10,-255 + time * 10
+time = 1
+ignorehitpause = 1
+
+[State 3400,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+flag2 = invisible
+ignorehitpause = 1
+
+[State 3400,]
+type = nothitby
+trigger1 = 1
+value = sca
+ignorehitpause = 1
+
+[State 3400,]
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state 3450,];sizeで
+type = destroyself
+trigger1 = time >= 25
+
+;--------------------------------------固有
+;---------------------------------------------------------------------演出
+[statedef 3130];ループループのよーよー軌道
+type = a
+physics = n
+movetype = i
+hitcountpersist = 0
+sprpriority = 2
+ctrl = 0
+anim =3111
+poweradd = 0
+
+[state 3140,];一撃目：：LL１
+type = changeanim
+trigger1 = root,animelemtime(6) >= 0
+trigger1 = root,animelemtime(7) < 0
+value = 3111 
+ignorehitpause = 1
+
+[state 3140,];以降☆　1-2の間の空転
+type = changeanim
+trigger1 = root,animelem = 7
+value = 3112 
+ignorehitpause = 1
+
+[state 3140,];以降☆ ２げきめ　
+type = changeanim
+trigger1 = root,animelem = 10
+value = 3113 
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 11
+value = 3114
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 12
+value =3115
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 13
+value = 3116
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 14
+value =3117
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 15
+value = 3118
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 16
+value =3119
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 17
+value = 3120
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 18
+value =3121
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 19
+value = 3122
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 20
+value =3123
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 21
+value = 3124
+ignorehitpause = 1
+
+[state 3140,];以降☆　１エレごと？  
+type = changeanim
+trigger1 = root,animelem = 22
+value =3125
+ignorehitpause = 1
+
+[state 3160,]
+type = bindtoroot
+trigger1 = 1
+pos = 80,-55
+ignorehitpause = 1
+
+[state 3140,]
+type = destroyself
+triggerall = 1
+trigger1 = root,movetype != A
+trigger2 = root,movetype = h
+trigger3 = anim = 3125 && animtime = 0
+trigger4 = root,animelemtime(25) >= 1
+
+;-----------------------------------------------------------------------
+;---------------------------------------------------------------------
+[statedef 3140];ループループの☆
+type = a
+physics = n
+movetype = i
+hitcountpersist = 0
+sprpriority = 3
+ctrl = 0
+anim =3126;test
+poweradd = 0
+
+[State 210, 3]
+type = SprPriority
+trigger1 = 1
+value = 3
+ignorehitpause = 1
+persistent = 1
+
+[state 3140,];一撃目：☆一個目：LL１
+type = changeanim
+trigger1 = root,animelemtime(6) >= 0
+trigger1 = root,animelemtime(7) < 0
+value = 3126 
+elem = 1
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？　1-2間の空転
+type = changeanim
+trigger1 = root,animelemtime(7) = 0
+value = 3126 
+elem = 2
+ignorehitpause = 1
+
+[state 3140,];以降☆　ここ２フレごと？　下と同じ  
+type = changeanim
+trigger1 = root,animelemtime(7) = 1
+value = 3126 
+elem = 3
+ignorehitpause = 1
+
+[state 3140,];以降☆　
+type = changeanim
+trigger1 = root,animelemtime(7) = 2
+value = 3126 
+elem = 3
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(8) = 0
+value = 3126 
+elem = 4
+ignorehitpause = 1
+
+[state 3140,];以降☆　ここ２フレごと？　下と同じ  
+type = changeanim
+trigger1 = root,animelemtime(8) = 1
+value = 3126 
+elem = 5
+ignorehitpause = 1
+
+[state 3140,];以降☆　2フレ
+type = changeanim
+trigger1 = root,animelemtime(8) = 2
+value = 3126 
+elem = 5
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(9) = 0
+value = 3126 
+elem = 6
+ignorehitpause = 1
+
+[state 3140,];以降☆　ここ２フレごと？　下と同じ  
+type = changeanim
+trigger1 = root,animelemtime(9) = 1
+value = 3126 
+elem = 7
+ignorehitpause = 1
+
+[state 3140,];以降☆　
+type = changeanim
+trigger1 = root,animelemtime(9) = 2
+value = 3126 
+elem = 7
+ignorehitpause = 1
+
+;-------------------hit2
+[state 3140,];以降☆　１フレごと？  2HITめ　１F
+type = changeanim
+trigger1 = root,animelemtime(10) = 0
+value = 3126 
+elem = 8
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  2HITめ2F
+type = changeanim
+trigger1 = root,animelemtime(10) = 1
+value = 3126 
+elem = 9
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？2hitめ　３F
+type = changeanim
+trigger1 = root,animelemtime(10) = 2
+value = 3126 
+elem = 9
+ignorehitpause = 1
+
+;------------HIT2以降  は１フレごと　エレムじゃないので注意ね　TIMEです 本体はほとんど３フレ固定なのでvarもOK
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(11) = 0
+value = 3126 
+elem = 10
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(11) = 1
+value = 3126 
+elem = 11
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(11) = 2
+value = 3126 
+elem = 12
+ignorehitpause = 1
+
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(12) = 0
+value = 3126 
+elem = 13
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(12) = 1
+value = 3126 
+elem = 14
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(12) = 2
+value = 3126 
+elem = 15
+ignorehitpause = 1
+
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(13) = 0
+value = 3126 
+elem = 16
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(13) = 1
+value = 3126 
+elem = 17
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(13) = 2
+value = 3126 
+elem = 18
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(14) = 0
+value = 3126 
+elem = 19
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(14) = 1
+value = 3126 
+elem = 20
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(14) = 2
+value = 3126 
+elem = 21
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(15) = 0
+value = 3126 
+elem = 22
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(15) = 1
+value = 3126 
+elem = 23
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(15) = 2
+value = 3126 
+elem = 24
+ignorehitpause = 1
+;---------------------------------------ok
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(16) = 0
+value = 3126 
+elem = 25
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(16) = 1
+value = 3126 
+elem = 26
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(16) = 2
+value = 3126 
+elem = 27
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(17) = 0
+value = 3126 
+elem = 28
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(17) = 1
+value = 3126 
+elem = 29
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(17) = 2
+value = 3126 
+elem = 30
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(18) = 0
+value = 3126 
+elem = 31
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(18) = 1
+value = 3126 
+elem = 32
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(18) = 2
+value = 3126 
+elem = 33
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(19) = 0
+value = 3126 
+elem = 34
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(19) = 1
+value = 3126 
+elem = 35
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(19) = 2
+value = 3126 
+elem = 36
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(20) = 0
+value = 3126 
+elem = 37
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(20) = 1
+value = 3126 
+elem = 38
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(20) = 2
+value = 3126 
+elem = 39
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(21) = 0
+value = 3126 
+elem = 40
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(21) = 1
+value = 3126 
+elem = 41
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(21) = 2
+value = 3126 
+elem = 42
+ignorehitpause = 1
+
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(22) = 0
+value = 3126 
+elem = 43
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(22) = 1
+value = 3126 
+elem = 44
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(22) = 2
+value = 3126 
+elem = 45
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(23) = 0
+value = 3126 
+elem = 46
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(23) = 1
+value = 3126 
+elem = 47
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(23) = 2
+value = 3126 
+elem = 48
+ignorehitpause = 1
+
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(24) = 0
+value = 3126 
+elem = 49
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(24) = 1
+value = 3126 
+elem = 50
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(24) = 2
+value = 3126 
+elem = 51
+ignorehitpause = 1
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(25) = 0
+value = 3126 
+elem = 52
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(25) = 1
+value = 3126 
+elem = 53
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(25) = 2
+value = 3126 
+elem = 54
+ignorehitpause = 1
+
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(26) = 0
+value = 3126 
+elem = 55
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(26) = 1
+value = 3126 
+elem = 56
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(26) = 2
+value = 3126 
+elem = 57
+ignorehitpause = 1
+
+;---------------------------------------
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(27) = 0
+value = 3126 
+elem = 58
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？  
+type = changeanim
+trigger1 = root,animelemtime(27) = 1
+value = 3126 
+elem = 59
+ignorehitpause = 1
+
+[state 3140,];以降☆　１フレごと？
+type = changeanim
+trigger1 = root,animelemtime(27) = 2
+value = 3126 
+elem = 60
+ignorehitpause = 1
+;----------------------------
+
+[state 3160,]
+type = bindtoroot
+trigger1 = 1
+pos = 80,-55
+ignorehitpause = 1
+
+[state 3140,]
+type = destroyself
+triggerall = 1
+trigger1 = animtime = 0
+trigger2 = root,movetype != A
+trigger3 = root,movetype = h
+
+
+;------------------------------------------------------GGHITSPARK
+;-8000鈍器弱H　8001鈍器弱G 8002鈍器中H 8003鈍器中G 8004刃物横H 8005刃物共通G 8006刃物縦H 8009相殺 8010必殺H 8011必殺G :8015必殺緑線
+;size.height = Y座標			本体の位置を基準
+;size.ground.front = 相殺時X座標	本体の位置を基準
+;size.ground.back = 持続時間　これすぎるとDESTROY
+;size.head.pos = HIT時、GUARD時のステートNO指定
+
+[statedef 8000];汎用　鈍器通常技1　HIｔ
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 6200
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+[statedef 8001];汎用　鈍器・刃物通常技1　guard
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 6150
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+;--------------------------------------------------------------------
+[statedef 8002];汎用　鈍器通常技2　HIｔ
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 6210
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+[statedef 8003];汎用　鈍器・通常技2　guard
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 6151
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+;--------------------------------------------------------------------
+[statedef 8004];刃物通常技1横　HIｔ  現在横斬アニメ6205のみ、ろじゃぺちで使うのみ
+type    = a
+movetype= I
+physics = N
+ctrl = 0
+anim = 6205
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+;---------刃物ガードは、火花粒子（地上ではねる）があります。やめとく？
+[statedef 8005];刃物通常技1　guard
+type    = a
+movetype= I
+physics = N
+ctrl = 0
+anim = 6151
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+;--------------------------------------------------------------------
+[statedef 8006];刃物通常技2縦　HIｔ  現在横斬アニメ6205のみ、未実装  guardは80005共通でいい
+type    = a
+movetype= I
+physics = N
+ctrl = 0
+anim = 6205
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+;----------------------------------8009相殺----------------------------------
+[statedef 8009];相殺
+type    = a
+movetype= I
+physics = N
+ctrl = 0
+anim = 6230
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[State 1540, 4];光る
+type = palfx
+trigger1 = 1
+time = 1
+add = time * -10,time * -10,time * -10
+ignorehitpause = 1
+
+
+[state 3400,];稲光
+type = explod
+trigger1 = time = 0
+postype = p1
+pos = 0,0
+anim = 6240
+ID = 6240
+facing = ifelse(random % 2 = 0,1,-1)
+vfacing = ifelse(random % 2 = 0,1,-1)
+bindtime = -1
+removetime = -2
+sprpriority = 3
+ownpal  = 1
+persistent = 0
+ignorehitpause = 1
+
+[state 3400,];
+type = destroyself
+trigger1 = animtime = 0
+
+;-------------------------------必殺系HITSPARK　へるぱー最低6(緑) 赤い帯(1) 8010,8015使用　Gは8011
+;---------------複雑なのでアニメを確定設定しておいて、チェんステでこさせる
+[statedef 8010];親へるぱが赤い帯(角度）EXPLODで真ん中の○、herupa6で緑の線(角度）
+type    = a
+movetype= I
+physics = N
+ctrl = 0
+anim = 6320
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 7000,test];真ん中の○
+type = Explod
+trigger1 = time = 0
+anim = 6300
+ID = 8300
+postype = p1
+pos = 0,0
+sprpriority = 3
+removetime = -2
+bindtime = 1
+ownpal = 0
+scale = 0.5,0.5
+persistent = 0
+
+;---------------------------------------------------------------------------緑部分
+[state -2,helper partner];----緑色の線 角度もあるテンキー方向で角度決定する？123
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+sprpriority  = 3
+name = "HITSP GREEN1"
+ID = 8310
+pos = 0,0
+postype = p1
+stateno = 8015
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.ground.back = random % 9 + 1
+size.xscale = 0.5
+size.yscale = 0.5
+
+[state -2,helper partner];----緑色の線 角度もあるテンキー方向で角度決定する？789
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+sprpriority  = 3
+name = "HITSP GREEN2"
+ID = 8310
+pos = 0,0
+postype = p1
+stateno = 8015
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.ground.back = random % 9 + 1
+size.xscale = 0.5
+size.yscale = 0.5
+
+[state -2,helper partner];----緑色の線 角度もあるテンキー方向で角度決定する？
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+sprpriority  = 3
+name = "HITSP GREEN3"
+ID = 8310
+pos = 0,0
+postype = p1
+stateno = 8015
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.ground.back = random % 9 + 1
+size.xscale = 0.5
+size.yscale = 0.5
+
+[state -2,helper partner];----緑色の線 角度もあるテンキー方向で角度決定する？
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+sprpriority  = 3
+name = "HITSP GREEN4"
+ID = 8310
+pos = 0,0
+postype = p1
+stateno = 8015
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.ground.back = random % 9 + 1
+size.xscale = 0.5
+size.yscale = 0.5
+
+[state -2,helper partner];----緑色の線 角度もあるテンキー方向で角度決定する？
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+sprpriority  = 3
+name = "HITSP GREEN5"
+ID = 8310
+pos = 0,0
+postype = p1
+stateno = 8015
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.ground.back = random % 9 + 1
+size.xscale = 0.5
+size.yscale = 0.5
+[state 3400,]
+type = destroyself
+trigger1 = time >= 30
+
+[state -2,helper partner];----緑色の線 角度もあるテンキー方向で角度決定する？
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+sprpriority  = 3
+name = "HITSP GREEN6"
+ID = 8310
+pos = 0,0
+postype = p1
+stateno = 8015
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 1
+size.ground.back = random % 9 + 1
+size.xscale = 0.5
+size.yscale = 0.5
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = 1
+trans = add
+
+[State angle];角度
+type = AngleSet
+trigger1 = time = 0
+value = random % 360 
+
+[State angle];角度描画
+type = Angledraw
+trigger1 = time < 10
+
+[State angle];角度･拡大描画
+type = Angledraw
+trigger1 = time >= 10
+scale = 1 + (time - 10) * 0.1, 1 + (time - 10) * 0.1
+ 
+[State 1540, 4];フェ-ドアウト
+type = palfx
+trigger1 = animelemtime(8) >= 0
+time = 1
+sinadd = 100,100,100
+add = time * -10,time * -10,time * -10
+ignorehitpause = 1
+
+[State angle];あにめしゅうりょ
+type = destroyself
+trigger1 = animtime = 0
+
+[statedef 8011];判断不要直接必殺ガードえふぇ
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 6152
+sprpriority = 3
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[State angle];あにめしゅうりょ
+type = destroyself
+trigger1 = animtime = 0
+
+;----------------------------------------------------必殺ヒットｴﾌｪしりーず
+;-------------------------------------------------------------------------------緑の線
+;---------基本移動量(16)8
+
+;------------------------------------テスト緑線別ばー
+;---------------------------------------------------------
+[statedef 8015];
+type    = a
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+anim = 6305
+sprpriority = 3
+
+[state 2090,];コレ追加で再び半透明
+type = trans
+trigger1 = 1
+trans = add
+ignorehitpause = 1
+
+;---------------------AC赤実験
+
+
+[State 3660,]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+;-----------------------初速基本(16) 8 で19Ｆ動く
+[state 8150,2];Ｘ速度ランダムで決定　狩
+type = varset
+trigger1 = time = 0
+fvar(15) = random % 81 * 0.1 * ifelse(random % 2 = 0,1, -1)
+ignorehitpause = 1
+
+[state 8150,2];Y速度  - x
+type = varset
+trigger1 = time = 0
+fvar(16) = (8 - ABS(fvar(15))) * ifelse(random % 2 = 0,1, -1)
+ignorehitpause = 1
+
+[state 8150,2]
+type = velset
+trigger1 = time = 0
+x = fvar(15)
+y = fvar(16)
+ignorehitpause = 1
+
+[State angle];らぢあん。tan=y/x
+type = AngleSet
+triggerall = fvar(15) != 0
+triggerall = fvar(16) != 0
+trigger1 = time = 0
+value = atan(vel y / vel x) * (-180.0 / pi) 
+
+[State angle];らぢあん。tan=y/x
+type = angleset
+triggerall = fvar(15) = 0
+trigger1 = time = 0
+value = 90
+
+[State angle];らぢあん。tan=y/x
+type = angleset
+triggerall = fvar(16) = 0
+trigger1 = time = 0
+value = 0
+
+[State angle];角度描画
+type = Angledraw
+trigger1 = 1
+
+[State angle];到達点へ
+type = changeanim
+trigger1 = anim = 6305
+trigger1 = animtime = 0
+value = 6310
+
+[State angle];速度すとっぷ
+type = velset
+trigger1 = anim = 6310
+x = 0
+y = 0
+
+[State angle];到達点へ
+type = destroyself
+trigger1 = anim = 6310
+trigger1 = animtime = 0
+
+[state 12, ];
+type = displaytoclipboard
+trigger1 = 1
+text = "fv1=%f,fv2=%f,fv3=%f,fv4=%f.fv5=%f\n"
+params = fvar(1),fvar(2),fvar(3),fvar(4),fvar(5) 
+ignorehitpause = 1
+
+[state 12, ];
+type = appendtoclipboard
+trigger1 = 1
+text = "sgb=%d,\n"
+params = const(size.ground.back)
+ignorehitpause = 1
+
+
+;-----------------------------------------------------------
+;-----------------------------------
+;-----ロジャーが使うと、消えたときにフリーズすることがある、なんか考えて->むり
+;-------8020,ここから8000-8010にSチェンジ
+[statedef 8020];8020ヒットスパークスタートステート  一元管理　条件にあったところへ飛ばす
+type    = a
+movetype= I
+physics = N
+ctrl = 0
+anim = 6000
+sprpriority = 3
+velset = 0,0
+
+[State 3660,];影をなくしておく
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[state 3400,];空中の相手とかにあたるとうまくない const(size.height)をY軸の位置変数に使用します
+type = posset
+trigger1 = time = 0
+y = parent,pos y + const(size.height)
+ignorehitpause = 1
+
+;---位置X１:相殺時	2ヘルパーに当たったとき
+[state 3400,];相殺時のときのXは判定の部分 const(size.ground.front) ID940
+type = posset
+triggerall = anim = 6000
+triggerall = parent,HITPAUSEtime
+trigger1 = parent,movehit
+trigger1 = parent,numtarget(940);p2movetype = A
+trigger2 = parent,movehit		;ヘルパーなどにあたっているとき
+trigger2 = enemynear,movetype != H
+x = parent,pos x + ifelse(facing = 1,-1 * const(size.ground.front), const(size.ground.front))
+ignorehitpause = 1
+persistent = 1
+
+[state 3400,];ステート格納
+type = varset
+trigger1 = time = 0
+var(1) = parent,stateno
+persistent = 0
+ignorehitpause = 1
+
+;----V35に攻撃HITSTOP,V36に被攻撃HITSTOP　の計測それをつかってうまくできない？
+[state 3400,];相打ち時にもでるように気をつけてね	8000,8002,8010
+type = changestate
+triggerall = anim = 6000
+triggerall = parent,numtarget(940) = 0
+trigger1 = var(1) = parent,stateno
+trigger1 = parent,HITPAUSEtime
+trigger1 = parent,var(35);		あてた	ヘルパーあたってもOK
+trigger1 = parent,movehit;ガード時はだめ
+trigger2 = enemynear,movetype = H;相手も被攻撃
+trigger2 = parent,var(36);被攻撃
+value = const(size.head.pos.x)
+persistent = 1
+ignorehitpause = 1
+
+;-----ー
+[state 3400,];相殺：：REVDEFもMOVEHITになるから・・8009
+type = changestate
+triggerall = anim = 6000
+triggerall = var(1) = parent,stateno
+trigger1 = parent,numtarget(940);p2movetype = A
+trigger1 = parent,var(35) = 0;parent,movehit
+trigger2 = parent,var(37);parent,movehit
+trigger2 = parent,hitpausetime || parent,hitshakeover = 0
+value = 8009
+persistent = 1
+ignorehitpause = 1
+
+[state 3400,];---ガード絵に
+type = changestate
+triggerall = anim = 6000
+triggerall = var(1) = parent,stateno
+trigger1 = parent,moveguarded
+trigger1 = parent,HITPAUSEtime
+value = const(size.head.pos.y)
+persistent = 0
+ignorehitpause = 1
+
+[state 3400,];相殺「された」時にきえる?
+type = destroyself
+triggerall = 1
+trigger1 = anim != 6000
+trigger1 = animtime = 0
+trigger2 = anim = 6000
+trigger2 = time >= const(size.ground.back) 
+trigger2 = parent,hitpausetime = 0
+ignorehitpause = 0
+
+[state 12, ];
+type = displaytoclipboard
+trigger1 = 1
+text = "moveH=%d,moveG=%d,v1=%d,px=%f,t=%d\n"
+params = parent,movehit, parent,moveguarded, var(1),pos x ,root,teamside
+ignorehitpause = 1
+
+[state 12, ];
+type = appendtoclipboard
+trigger1 = 1
+text = "pposy =%f,pos=%f,v2=%d,=%d"
+params = parent,pos y, pos y , const(size.ground.back),parent,numtarget(940)
+ignorehitpause = 1
+
+

@@ -1,0 +1,4350 @@
+;ぶりじっと必殺技関連 
+;s1100 R移動	s1200,スターシップ s1300,キックスタートマイハート s1500-YY配置戻し ろじゃ命令形
+;s3100 るーぷざるーぷ s3200 悲劇　s3300喜劇	s3400きるましーん s3600むーん
+
+;ぐるぐる検証　
+;絵的に一回転するまで(12F間)はアイドル状態。13Fから本移動開始、とする
+;ふわり、と浮いてごー。手綱をふるって(12F)走り出す(13F～)なイメージ。
+;---最初の12F(2F以降他ステートにうつれる、ので必ず１Fで速度設定される。
+;0時点でYVELがはいるので、YOYOに近いとはねるようになる。重力をかけて12F目でいったんYが0に。つまり11-12F間同じ場所！
+;-位置によってXもすこしだけ加算する。
+;---ぐるぐる開始(13F～126F(24*5+1F)
+;---このときまず位置によって符号を再設定。これ一度のみ。
+;-目標に向かってくるくると。33F超えるとアニメが2Fずつのに変わる、見た目回転速くなるってこと。
+;-ハグのときは相手に向かうため、相手の周りをぐるぐるすることも。
+;終了は相手ではなく見た目よーよーの指定範囲。なので、ハグ仕様を変更してー＞済
+;下方向の終了判定が狭い。下はくぐりぬけれるが上は終了する
+
+;--よよ配置と引き戻し、ろじゃ系は＃Rのキャプフレームによるものを1500～にしています＃Rモードはたぶんこれ。
+;---もう１種類は1500～をコピーして作った1400～から。これがSLとか。たいていフレームが遅くなって弱体化。
+;---たいてい２種類で、モードによって使いわけることになるので気をつけて
+;--あと、命令と発生は同時ではない。命令をして変身完了するまでの時間がある。ので差がある。
+;--ACタメ経由ろじゃなどは受付３Fぐらい、基本的に無理かこつをつかまないと・
+
+;--1400,開始	よーよーID100に変更、ハグ相手はりつきは200に変更
+;-------１Ｆ目に真上にＶＥＬ。それ以降はＹＯＹＯにむかう　ので１Ｆ
+;---------------地上スタート、1Fから空中だが　2F以降じゃないと動けない
+[Statedef 1100];地上スタート、上にちょっとはねてステートチェンジ
+type = A
+movetype = A
+physics = n
+ctrl = 0
+hitcountpersist = 1
+anim = 1100
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+;----------------------------演出
+[State 1100, sound];ぐるぐるこうかおん
+type = PlaySnd
+trigger1 = time = 0
+value = s80,3
+persistent = 0
+channel = 6
+
+;-----------------回数制限でもある
+[state 1410,];RMスタート判定あとでずらして～27に変更
+type = varadd
+trigger1 = time = 0
+var(27) = 1
+ignorehitpause = 1
+
+;-----------０のときは受付不能？
+[state 1410,];ヨーヨーフラグ
+type = varset
+trigger1 = time = 0
+var(30) = 0
+ignorehitpause = 1
+
+[state 1410,];ヨーヨーフラグ	OKにする
+type = varset
+trigger1 = time > 0
+var(30) = 1
+ignorehitpause = 1
+
+[state 1410,];RM重力	他すてーとでもつかう、重要
+type = varset
+trigger1 = time = 0
+fvar(9) = 0.3
+ignorehitpause = 1
+
+;-----------えっふぇくと
+[state 1400x,atc efe];きらきらエフェクト発生は４Fぐらいから？2枚目あにめから　移動開始と同じであろう
+type = Explod
+triggerall = !numexplod(1400) < 50
+triggerall = time >= 3
+trigger1 = time % 2 = 0 
+anim = 1110 + random % 3
+ID = 1400
+postype = p1
+pos = 0,-55
+random = 25,50
+sprpriority = 2
+bindtime = 1
+removetime = -2
+ownpal = 1
+accel = -0.1,0
+scale = 0.5,0.5
+
+[state 1400x,atc efe];きらきらエフェクト発生は４Fぐらいから？2枚目あにめから　移動開始と同じであろう
+type = Explod
+triggerall = !numexplod(1400) < 50
+triggerall = time >= 3
+trigger1 = time % 2 = 1 
+anim = 1110 + random % 3
+ID = 1400
+postype = p1
+pos = 0,-55
+random = 25,50
+sprpriority = 2
+bindtime = 1
+removetime = -2
+ownpal = 1
+accel = -0.1,0
+scale = 0.5,0.5
+
+;--------ここまでやる？長すぎるとアニメ変更
+[state 1410,];34Fからの２Fずつアニメに変更2枚目からに
+type = changeanim
+triggerall = anim = 1100
+trigger1 = time = 33
+value = 1105
+elem = 2
+persistent = 0
+
+;--------------------とくしゅちぇんすて、すらっしゅばっく　たぶんでる
+[state 120x,];SB　ガード状態フラグ
+type = varset
+triggerall = !var(40) && power >= 20 && fvar(21) = 0
+triggerall = !var(1)  || var(1) = 4
+triggerall = command = "SBS" || command = "SBC" || command = "SBA"
+triggerall = command = "holdS" && command = "holdHS"
+trigger1 = time > 0
+var(25)  = 3
+ignorehitpause = 0
+persistent = 0
+
+[state 120x,];SB　ガード不能時間の発動　成功時１５、失敗時３０、基本30にセットしてガードしたら15に変更	これもガードでやる？
+type = varset
+trigger1 = var(25) = 3 
+trigger1 = time > 0
+fvar(22)  = 30
+ignorehitpause = 0
+persistent = 0
+
+[State -1,SB];SB空中
+type = ChangeState
+value = 132
+trigger1 = var(25) = 3 
+trigger1 = time > 0
+ignorehitpause = 0
+persistent = 0
+
+;----特殊ちぇんすて、FDｃきゃんせる
+;------------------------------ＦＤキャンセル
+;-----------------FD状態にセット 2
+[state 120x,]
+type = varset
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time > 0
+var(25)  = 2
+ignorehitpause = 1
+
+;---------------GGXモードのみＰＫ押しだけしかきかない
+;--------GGXのみ足払いOK  GGX/XXの判断ははV2,間違えないで
+[State -1, FD];フォルトレス たち	しゃがみ
+type = ChangeState
+value = 132
+triggerall = power > 0 && !var(40)
+triggerall = (var(2) != 2 && var(22)) || (var(2) = 2 && (var(22) = 1 || var(22)= 2))
+triggerall = ((!var(1) || var(1) = 4) && var(22) != 7) || ((var(1) >= 1 && var(1) < 4) && var(22))
+triggerall = command = "holdback" 
+trigger1 = time > 0
+
+
+;-----------------特殊ちぇんすて
+;-------------------OR	ろーりんぐ墜落へ
+;---15F目でいいや
+[state 1400,];たまに目を回して落下->墜落 Orモードのみ
+type = changestate
+triggerall = numhelper(100)
+triggerall = !var(1) && var(27) >= 5
+triggerall = random % 5 = 0 
+trigger1 = time = 15
+value = 1150
+ctrl = 0
+
+[state 1400,];
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+;----ちぇんすて着地	地面によよがあってその上でやると跳ねる、着地にはならない、さあどうしよう？4F以降は着地可能かな？
+;----地面にむかっていくと、着地前に１F降下アニメがはいることあり、これは単にXが範囲に入った？
+[state 1410,];タメ中でもでき、その間に戻しにはいるので、yoyo消滅する場合もある。最大126Fまで。
+type = changestate
+triggerall = time > 0
+trigger1 = !numhelper(100)
+trigger2 = time >= 126
+value = 51
+anim = 41
+ctrl = 0
+
+[state 1400,];--------------着地は・・
+type = changestate
+triggerall = time > 5
+trigger1 = vel y > 0 && pos y >= 0
+value = 52
+anim = 47
+ctrl = 0
+
+;----------------------ボイス、ACはあるっぽい	それ～あわないかも？
+[State -3, recove voice]
+type = PlaySnd
+triggerall = var(54) >= 3 && var(54) != 6
+trigger1 = time = 1
+value = s1100,ifelse(var(54) < 6, var(54),random % 3 + 3) + (var(54) <= 2) * 3
+parsistent = 0
+channel = 0
+
+;------ちょうーじゅうよう	ヨーヨーとの向き違い狩りV28 1前に飛びたいとき  V28　INT変数、注意
+[state 8150,2]
+type = varset
+triggerall = numhelper(100)
+triggerall = 1
+trigger1 = helper(100),facing = facing 
+trigger1 = helper(100),rootdist x <= 0
+trigger2 = helper(100),facing != facing 
+trigger2 = helper(100),rootdist x > 0
+var(28) = 1
+ignorehitpause = 1
+
+[state 8150,2]
+type = varset
+triggerall = numhelper(100)
+triggerall = 1
+trigger1 = helper(100),facing = facing 
+trigger1 = helper(100),rootdist x > 0
+trigger2 = helper(100),facing != facing 
+trigger2 = helper(100),rootdist x < 0
+var(28) = -1
+ignorehitpause = 1
+
+;---Y位置特殊、よよが地面にうまっているときの特殊もあるので注意
+;---正確位置を特定しないときびしいかもね
+;--最低５F目まではねる可能性あるようです
+;-----------------------上のとセット1:通常の範囲　2;ハグ中の範囲（敵の青箱の関係で広めにとる)
+;---デバックでR移動の絵で確かめ、DISTY-10あたりが真ん中になってる？位置不正確、完全あわせるの無理
+;---はね特殊ステート用意したほうが、らくかもしんないね
+[state 1400,];time >= 1　以上のとき終了可能  -60
+type = changestate
+triggerall = numhelper(100)
+triggerall = time = [1,5]
+trigger1 = var(30) = [1,2]
+trigger1 = helper(100),rootdist x = [-42,42]
+trigger1 = helper(100),rootdist y <= 10
+trigger1 = helper(100),rootdist y >= -100
+trigger2 = var(30) = 3
+trigger2 = helper(100),rootdist x = [-50,50]
+trigger2 = helper(100),rootdist y <= 10
+trigger2 = helper(100),rootdist y >= -100
+value = 51
+ctrl = 0
+
+[state 1410,];本移動後。規定点達してから）フリーに
+type = changestate
+triggerall = numhelper(100)
+triggerall = time > 5
+trigger1 = var(30) = [1,2]
+trigger1 = helper(100),rootdist x = [-42,42]
+trigger1 = helper(100),rootdist y <= 10
+trigger1 = helper(100),rootdist y >= -60
+trigger2 = var(30) = 3
+trigger2 = helper(100),rootdist x = [-50,50]
+trigger2 = helper(100),rootdist y <= 10
+trigger2 = helper(100),rootdist y >= -60
+value = 51
+anim = 41
+ctrl = 0
+
+;-----------------------------------------特殊上に跳ねるような
+;--------------------------はねろーる有効F内速度
+;-----調整むずい。はね。17dot=8.5;----1F?18 2F-17 3F-14　----16だったりもするたぶん重力かけてる
+;--一回転するまで(3Fアニメ一巡)状態0-14F,この間ふわりとした感じである
+;----世々の高さによって重力も違う、厄介すぎる初速TIM0は同じっぽい、同じ位置
+[state 1405,];Y速度	初速
+type = velset
+trigger1 = time = 0
+y = -9.5
+
+;-----基本数値を設定し・・6配置なら14Fは０の位置、さすがにあわせ無理かな
+[state 1405,];Y重力　9.5/15?
+type = veladd
+triggerall = numhelper(100)
+trigger1 = time = [0,14]
+y = ifelse(helper(100),rootdist y < 0,0.9,0.6)
+
+;----------そこにY距離がはなれているときさらに加算してみる下に距離長いときは逆ですね
+[state 1405,];Y重力	よよが本体より上のほう 重力を増加？
+type = veladd
+triggerall = numhelper(100)
+triggerall = helper(100),rootdist y > 80
+trigger1 = time = [0,14]
+y = -0.2
+
+[state 1405,];Y重力	よよが本体より下　重力を増やす
+type = veladd
+triggerall = numhelper(100)
+triggerall = helper(100),rootdist y < -60
+trigger1 = time = [0,14]
+y = 0.125
+
+;--Xは位置によって少しよよによる1,2では1DOT,?
+;---よよ向き固定のため、facing違いでおかしくなる。
+[state 1400,];目標方向にこしずつ・・　
+type = veladd
+triggerall = numhelper(100) 
+triggerall = time = [1,14]
+trigger1 = helper(100),rootdist x != [-25,25]
+x = 0.25 * var(28)
+
+;---本ぐるぐるは15Fからとしてみる
+;---------ハグ仕様変更により判定はYOYOだけでいいですID100
+;----------範囲認識だけ、V30によってハグのとき広げたり調節
+;--てゆーか、ハグで追跡してないじゃん。なんでおかしくしちゃったの？
+;---ハグのときは極端な話バックする、+が-になることもあるから、注意
+;---X14F目は9,10dot、Yはそのときによって違う
+;---開始前に速度が入ってるため、単純加算ではずれまくるわけで、とくに縦長時。
+;---一度一回転時に長いほう基準で短いほうをセットしなおしたほうがいい？
+;----------rootdist x が負なら、本体向きより前にある。正なら後ろにある。
+;----------rootdist y が負なら、本体より下にある。正なら上.本体地上(posy0)通常配置でdisty=90
+;---AIrで見た目とずらしたため、参照POSYは０でいい。このほうが誤差、不都合でない
+;---hug中でもしきえたらどうする？
+;----たまに直前でとまってしまうことあり、注意
+
+;distが０以外のとき、０除算注意のため
+;---通常なら、一度比で加算すれば終了までどちらかの数値優位は逆転しないはず・・？
+;--はぐ中はXがころころかわるかも
+;------------テスト２つの変数使用
+[state 8150,2];X Y　いったん０
+type = varrangeset
+triggerall = numhelper(100)
+trigger1 = time >= 0
+fvalue = 1
+first = 14
+last = 15
+ignorehitpause = 1
+
+[state 8150,2];X 	X優位なら1、出なければ比率
+type = varset
+triggerall = numhelper(100)
+triggerall = abs(helper(100),rootdist x != 0)
+trigger1 = time >= 1
+fvar(14) = ifelse(abs(helper(100),rootdist x) >= ABS(helper(100),rootdist y), 1,ABS(helper(100),rootdist y) / ABS(helper(100),rootdist x))
+ignorehitpause = 1
+
+[state 8150,2];Y	Y優位なら1、出なければ比率
+type = varset
+triggerall = numhelper(100)
+triggerall = abs(helper(100),rootdist y != 0)
+trigger1 = time >= 1
+fvar(15) = ifelse(abs(helper(100),rootdist y) >= ABS(helper(100),rootdist x),1,ABS(helper(100),rootdist x) / ABS(helper(100),rootdist y))
+ignorehitpause = 1
+
+;----------------------基本移動量＝9,10
+;---facingちがいで符号反転にしてみる
+;---ADDで、ハグ中のことを考えるとタイム制限はだめ、最大速度制限
+;---速度制限すると目標から軌道ずれ
+;----16Fからスタート?t=15
+;-----------スタート、または一回転時、いったん速度を再決定、animtime=0ごとでもいい？
+;--Y長時、重力と位置関係で符号が違うため、とまってしまうように見えるのを防ぐには。。・
+;--直前まで上昇か下降で符号が違うはず、
+;---符号設定していいのは最初の16F時に一度のみ、その後は符号かえない。特にハグで顕著にでるこれ
+;-fv14はXの１か比率　15はYの１か比率
+;---------------もしかして、Y考慮時点でx加算されるのでずれる？varでクッションしないとだめかな？
+;---縦優先のとき止ってしまうように見えるのは？
+;---といてこれやらないととんでもないことになるし
+[state 8150,5];-yが長いとき、xをVel X/比で再設定
+type = velset
+triggerall = numhelper(100)
+triggerall = fvar(14) != 0
+triggerall = ABS(helper(100),rootdist x) <= ABS(helper(100),rootdist y)
+trigger1 = time = 15
+x = abs(vel y) / fvar(14) * var(28)
+ignorehitpause = 1
+
+[state 8150,5];-Xが長いとき、YをVel X/比で再設定
+type = velset
+triggerall = numhelper(100)
+triggerall = fvar(15) != 0
+triggerall = ABS(helper(100),rootdist x) >= ABS(helper(100),rootdist y)
+trigger1 = time = 15
+y = abs(vel x) / fvar(15) * ifelse(helper(100),rootdist y > 0,-1,1)
+ignorehitpause = 1
+
+;--------------ADD加速部15からでいい？
+;---0.25では少ないかも1DOTは0.5
+;----------ADDは位置によっては足さなくいい方向があるから基本０
+[state 8150,5];-
+type = varrangeset
+trigger1 = time >= 15
+fvalue = 0
+first = 16
+last = 17
+ignorehitpause = 1
+
+;--fvが０ならadd０なので書かなくてもいいかなまとめるとどうしても０除算になる、なんでだろうね
+[state 8150,5];-XYADD	1つですまないね。。やっぱ
+type = varset;veladd
+triggerall = numhelper(100)
+trigger1 = time >= 15
+trigger1 = fvar(14) != 0
+fvar(16) = 0.5 / fvar(14) * var(28)
+ignorehitpause = 1
+
+[state 8150,5];-YYADD	1つですまないね。。やっぱ
+type = varset;veladd
+triggerall = numhelper(100)
+trigger1 = time >= 15
+trigger1 = fvar(15) != 0
+fvar(17) = 0.5 / fvar(15) * ifelse(helper(100),rootdist y > 0,-1,1)
+ignorehitpause = 1
+
+[state 8150,5];-YYADD	1つですませると楽
+type = veladd
+triggerall = numhelper(100)
+trigger1 = time >= 15
+x = fvar(16)
+y = fvar(17) 
+ignorehitpause = 1
+
+;---------------速度制限おーばーしたらその分戻し
+;----一回分両方もどさないといけない！
+;--２等辺の時2回実行されてもこまる。真横真縦で実行されないかもこれ
+[state 8150,5];-YYADD	reverseADD	
+type = veladd
+triggerall = numhelper(100)
+triggerall = time >= 15
+trigger1 = vel x > 7 || vel x < -7
+trigger2 = vel y > 7 || vel y < -7
+x = fvar(16) * -1
+y = fvar(17) * -1
+ignorehitpause = 1
+
+;--------------制限部、はぐとかで位置入れ替わるといきなり符合反転しちゃうことない？確認して
+
+
+
+
+
+
+
+;------------------------------------------ここまでぐるぐる
+;---------------
+;---------------デバック用？はね特殊
+[Statedef 1110];
+type = A
+movetype = A
+physics = N
+ctrl = 0
+hitcountpersist = 1
+
+;----------Xはそのまま残す、Yのみセットか加算？
+[state 8150,]
+type = velset
+trigger1 = time = 0
+y = -8.5
+
+[state 8150,]
+type = changeanim
+trigger1 = time = 0
+value = 41
+elem = 8
+
+[state 8150,]
+type = veladd
+trigger1 = 1
+y = fvar(9)
+
+[state 8150,]
+type=changestate
+trigger1 = pos y >= 0 && vel Y > 0
+value = 52
+anim = 47
+
+;--------------------------ろーりんぐ墜落
+;---------------判定あり
+[Statedef 1150];
+type = A
+movetype = A
+physics = N
+anim = 5070 
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+
+[state 100x,atc efe];よろければがちゃエフェクト6480
+type = Explod
+triggerall = !numexplod(6486)
+trigger1 = time = 0
+anim = 6480
+ID = 6486
+postype = left
+pos = ifelse(teamside = 2,240,80),80
+sprpriority = -2
+bindtime = -1
+removetime = -1
+ownpal=1
+ignorehitpause = 1
+scale = 0.5,0.5
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-6,6)
+persistent = 0
+ignorehitpause = 1
+
+[state 810,voice];わぁ!?　ぁれぇっ!?　
+type = playsnd
+trigger1 = time = 0
+value = s800, ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 810,voice];効果音
+type = playsnd
+trigger1 = time = 0
+value = s80, 3
+channel = 3
+
+[state 8150,]
+type = veladd
+trigger1 = 1
+y = fvar(9)
+ignorehitpause = 0
+
+[state 8150,]
+type = nothitby
+trigger1 = time = 0
+value = sca
+time = 4
+ignorehitpause = 1
+
+[state 8150,]
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+trigger1 = movecontact
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,-50
+postype = p2
+stateno = ifelse(movehit,8010,8011);8020
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+size.height = -55;Y座標
+size.ground.front = 20;相殺時X座標
+size.ground.back = 2;持続
+size.head.pos = 8010,8011
+
+[state 7000,];---------------相手V18ガードバランス関係  対応きゃらならFD以外・・不正確だけどしかたないね
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-6,14)
+persistent = 0
+ignorehitpause = 1
+
+;---------特殊浮かせ
+[State 200, 1];LV5にしちゃえ １HITのみ、あたったらもうでない  相殺なし 地上ヒット時気絶効果　空中ダウン効果
+type = HitDef
+triggerall =  !var(34)
+trigger1 = 1
+attr = A, sA                   
+damage = ceil(50 * fvar(0)),1                             
+guardflag = hA                 
+hitflag = MAFD                  
+priority = 4,hit           
+animtype = hard 
+ground.type = High
+air.type = high           
+pausetime = 15, 15 + var(47) * 12
+guard.pausetime = 15, 15          
+hitsound   = s205, 3
+guardsound = s150, 4             
+ground.slidetime = 19 + var(45)
+ground.hittime  = 19 + var(45)
+guard.hittime  = 18	
+guard.slidetime  = 18
+airguard.ctrltime = 19  
+ground.velocity = -6.5 * fvar(5)
+air.velocity = -3 * fvar(5), -6.5 * fvar(6)        
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6)
+guard.velocity = -6.5
+airguard.velocity = -2, -4
+yaccel = 0.5           
+fall = 1
+air.fall = 1                 
+fall.recover = ifelse(enemynear,statetype = S || var(45),0,1)
+fall.recovertime = ceil( (18 + 18 * var(47) ) * var(46) * fvar(4) ) + 15 + 12 * var(47) + (!var(46)) * 7
+ignorehitpause = 0
+;p2stateno = 5310
+getpower = ifelse(Var(40),0,52 + (var(2) = 1 && life <= 250) * 52)
+palfx.time = var(47) * 5
+palfx.add = var(47) * 255,var(47) * -130, var(47) * -108
+ground.cornerpush.veloff = -19
+air.cornerpush.veloff    = -19
+guard.cornerpush.veloff  = -20
+airguard.cornerpush.veloff= -20
+
+[state 8150,];
+type = varset
+trigger1 = movecontact
+var(34) = 1
+ignorehitpause = 1
+
+[state 8150,];気絶着地へ
+type = changestate
+trigger1 = pos y >= 0 && vel y > 0
+value = 1160
+ignorehitpause = 0
+
+;-------------------------気絶　あにめとぼいすを使いたかったのさー
+[Statedef 1160];
+type = s
+movetype = I
+physics = s
+anim = 5101
+ctrl = 0
+velset = 0,0
+hitcountpersist = 1
+
+[state 8150,]
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[state 8150,]
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 1
+value = 60 
+pos = 0, 0
+under = sysvar(1) <= 14
+
+[state 8150,]
+type = posset
+trigger1 = time = 0
+y = 0
+ignorehitpause = 0
+
+[state 8150,];
+type = changeanim
+trigger1 = anim = 5101 && animtime = 0
+value = 5111
+
+[state 8150,];
+type = changeanim
+trigger1 = anim = 5111 && animtime = 0
+value = 5121
+
+[state 8150,];おしまい
+type = changestate
+trigger1 = anim = 5121 && animtime = 0
+value = 1170
+
+[Statedef 1170];
+type = s
+movetype = I
+physics = s
+anim = 5300
+ctrl = 0
+velset = 0,0
+hitcountpersist = 1
+
+[state 100x,atc efe];よろければがちゃエフェクト4680  けし
+type = removeExplod
+trigger1 = time >= 60 
+ID = 6486
+ignorehitpause = 1
+
+[state 8150,];おしまい
+type = changestate
+trigger1 = time >= 60
+value = 0
+ctrl = 1
+
+;----------------R移動--------特殊
+;--------------地面に向かっていくと着地前に１Fアニメはいる、このあにめジャンプとかと同じえでも軸がちがうかのうせい。
+[Statedef 1190];
+type = A
+movetype = A
+physics = N
+ctrl = 0
+hitcountpersist = 1
+
+[state 8150,];おしまい
+type = changeanim
+trigger1 = time = 0
+value = 41
+elem = 8
+
+[state 8150,];おしまい
+type = posset
+trigger1 = time >= 1
+y = 0
+
+[state 8150,];おしまい
+type = changestate
+trigger1 = pos y >= 0 && vel y > 0
+trigger2 = time >= 1
+value = 52
+anim = 47
+
+;------------------------------------------------------------
+;-----------------------------------ここからふつーの必殺技。1200ni変更すたーしっぷ
+;スターシップ
+[Statedef 1200];
+type = S
+movetype =A
+physics = N
+anim = 1200 
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+triggerall = movecontact
+trigger1 = HITPAUSETIME
+trigger1 = var(35) % 5 = 0
+var(18) = ifelse(movehit,-7,10)
+ignorehitpause = 1
+
+[State 1100, sound];空振り音
+type = PlaySnd
+trigger1 = animelem = 4 
+trigger2 = animelem = 9
+value = s210,5
+channel = 4
+
+[State 1100, sound];しゅるしゅる
+type = PlaySnd
+trigger1 = time = 0
+value = s80,1
+channel = 6
+
+;------ACかそれ以外で無敵じかん違い
+[state 1100,];全身無敵1-14	AC1-12
+type = nothitby
+trigger1 = var(1) != 4
+trigger1 = time < 14
+trigger2 = var(1) = 4
+trigger2 = time <= 11
+time = 1
+value = sca
+ignorehitpause = 1
+
+[state 1100,];全身無敵15-26なげむてき AC13-26
+type = nothitby
+trigger1 = var(1) != 4
+trigger1 = time >= 14
+trigger1 = time <= 26
+trigger2 = var(1) = 4
+trigger2 = time >= 12
+trigger2 = time <= 26
+time = 1
+value = sca,nt,st,ht
+ignorehitpause = 1
+
+
+[state 1100,];すりぬけないように
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+[state 7000,];---------------相殺リセット
+type = varrangeset
+trigger1 = animelem = 6 || animelem = 7 || animelem = 8 || animelem = 9 || animelem = 10
+first = 35
+last = 37
+value = 0
+ignorehitpause = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(6) >= 0
+triggerall = animelemtime(7) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(7) >= 0
+triggerall = animelemtime(8) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(8) >= 0
+triggerall = animelemtime(9) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(9) >= 0
+triggerall = animelemtime(10) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(10) >= 0
+triggerall = animelemtime(11) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+;----------------------ヒットスパークへるぱ  LV1----相打ち時OK,複数hitt対策はむり	ヘルパにあたってもでない
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+triggerall = var(38) < 4
+trigger1 = animelem = 6
+trigger2 = animelem = 7
+trigger3 = animelem = 8
+trigger4 = animelem = 9
+trigger5 = animelem = 10
+helpertype = normal
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = 8020
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 0
+size.height = -85;Y座標
+size.ground.front = 40;相殺時X座標
+size.ground.back = 3;持続
+size.head.pos = 8010,8011
+
+;--------------------------特殊：地上ヒットなら受身不能28F,初弾ロマキャンするとお得？
+;14 + var(44) * 14 + var(45) * 14 基本14に地上だったら１４を足す  Lはふつう
+;--------------判定は5発でるけど、最大４HIT。
+;----1発目地上ヒット、21F滞空でダウンへ、(係数１)yaccelをそのように調節して、他技の基準にする0.52?
+;---hitstopが６であれば・・35が
+;---地上ヒットで強制ダウン
+[State 1100, 1];LV3 4HIT  G10  x2y9?とるたびにちがう9.5？
+type = HitDef
+triggerall = var(38) < 4
+trigger1 = animelem = 6
+trigger2 = animelem = 7
+trigger3 = animelem = 8
+trigger4 = animelem = 9
+trigger5 = animelem = 10
+attr = S, sA                   
+damage = ceil(22 * fvar(0)),1                             
+guardflag = M                  
+hitflag = MAFD                  
+priority = 7,hit           
+animtype = medium 
+ground.type = High
+air.type = high         
+pausetime = 6, 6 + var(47) * 4
+guard.pausetime = 6, 6          
+hitsound   = s205, 3
+guardsound = s150, 4
+ground.type = High              
+ground.slidetime = 14 + var(45)
+ground.hittime  = 14 + var(45)
+guard.hittime  = 13	
+guard.slidetime  = 13
+airguard.ctrltime = 13  
+ground.velocity = -2 * fvar(5),-4.75 * fvar(6)           
+air.velocity = -2 * fvar(5), -7.5 * fvar(6)
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6)
+guard.velocity = -5
+airguard.velocity = -2, -4 
+yaccel = 0.5
+fall = 1
+air.fall = 1                 
+fall.recover = ifelse(enemynear,statetype = S || var(45),0,1)
+fall.recovertime = ceil( (14 + 14 * var(47) ) * var(46) * fvar(4) ) + 6 + 4 * var(47) + (!var(46)) * 7;特殊すとっぷ&地上HITかCHなら28？地上はダ確だからいいかな
+getpower = ifelse(Var(40),0,48 + (var(2) = 1 && life <= 250) * 48)
+palfx.time = var(47) * 5
+palfx.add = var(47) * 255,var(47) * -130, var(47) * -108
+ground.cornerpush.veloff = -9
+air.cornerpush.veloff    = -9
+guard.cornerpush.veloff  = -10
+airguard.cornerpush.veloff= -10
+
+[State 200, 7];持続終了したらカウンター判定消失 DOS:バグで効果ない？
+type = statetypeset
+trigger1 = animelem = 11
+movetype = I
+ignorehitpause = 0
+
+;----------------------------------ここまで
+[state 1100x,];真ん中下
+type = Explod
+trigger1 = animelem = 6
+anim = 1250
+ID = 200
+postype = p1
+pos = 0,-60
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+removeongethit=1
+scale= 0.5,0.5
+
+[state 1100x,];左手うえ
+type = Explod
+trigger1 = animelem =6
+anim = 1260
+ID = 200
+postype = p1
+pos = 20,-100
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+removeongethit=1
+scale= 0.5,0.5
+
+[State -1, sike];フォースロマキャン	19,20  HITSTOP中だと普通のロマキャンにいくっぽい
+type = ChangeState
+value = 975
+triggerall = !var(40) && power >= 500 
+triggerall = (command = "ALL" && command != "holdback") || command = "roma" || (var(39) = 975 && var(53)) 
+trigger1 = time = 18 || time = 19
+trigger1 = HITPAUSETIME
+trigger1 = var(35) <= 1
+trigger2 = time = 18 || time = 19
+trigger2 = !HITPAUSETIME && !var(53)
+ignorehitpause = 1
+
+;------上優先だし１でいいかな
+[State -1, sike];普通にロマキャン	9,10  HITSTOP中だと普通のロマキャンにいく
+type = ChangeState
+value = ifelse(HitPauseTime,970,972)
+triggerall = !var(40) && power >= 1000 && !var(53)  
+triggerall = (command = "ALL" && command != "holdback") || command = "roma"
+triggerall = var(34)
+trigger1 = 1
+ignorehitpause = 1
+
+[state 1100x,]
+type = removeexplod
+trigger1 = animelem = 11
+ID = 200
+
+[state 1100,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;--------------空中スターシップ
+;-------上昇スタート	2F目５DOT？	下降２F目6　ダッシュスタート0
+;-----------ダッシュ中ならYも０
+;-----のぼり6D　kudari6　HJ6? もしかして5.5？
+[Statedef 1250]
+type = A
+physics = N
+movetype = a
+anim = 1220
+ctrl = 0
+poweradd = 40 + (var(2) = 1 && life <= 250) * 40
+hitcountpersist = 1
+
+[State 1100, sound];振り回し!	空中は１だけ
+type = PlaySnd
+trigger1 = animelem = 4 
+value = s210,5
+channel = 4
+
+[State 1100, sound];振り回し2
+type = PlaySnd
+trigger1 = time = 0
+value = s80,1
+channel = 6
+
+[state 1100,];全身無敵　対打撃のみ1-13
+type = nothitby
+trigger1 = time < 13
+time = 1
+value = sca,na,sa,ha,np,sp,hp
+ignorehitpause = 1
+
+;------------------------------------速度設定など
+[state 1200,];Xは強制０
+type = velset
+trigger1 = time = 0
+x = 0
+ignorehitpause = 0
+
+;-----------------エフェクトがでたフレームは上昇下降ｄともに０になってる
+;---dassyuv17
+;-----ダスト中はダッシュ中と同じで一定時間とまってから下降、でいいみたい→ホーミングしない
+[state 1200,];ダッシュかうんと有効中ならYも０	prevではだめ、通常技キャンセルできても有効
+type = velset
+trigger1 = var(17)
+trigger1 = time = 0
+trigger2 = !var(17) 
+trigger2 = animelem = 6
+trigger3 = !var(17) 
+trigger3 = animelemtime(7) = 1
+y = 0
+ignorehitpause = 0
+
+[state 1200,];通常状態2Fめが13d?
+type = velset
+trigger1 = !var(17) 
+trigger1 = time = 0
+y = ifelse(vel y < -5,-5 ,-7)
+ignorehitpause = 0
+
+[state 1200,];通常なら・・?2F目-3Fが5なら1F-2Fは6？ 
+type = veladd
+trigger1 = !var(17)
+trigger1 = time >= 1
+y = 0.525
+ignorehitpause = 0
+
+[state 1200,];通常なら AIRダッシュ中なら途中からかかる 2-2-2-3-4-4-4・・？
+type = veladd
+trigger1 = var(17)
+trigger1 = animelemtime(6) >= 0
+y = 0.525 / 2
+ignorehitpause = 0
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+triggerall = movecontact
+trigger1 = HITPAUSETIME
+trigger1 = var(35) % 5 = 0
+var(18) = ifelse(movehit,-7,6)
+ignorehitpause = 1
+
+[state 7000,];---------------相殺リセット
+type = varrangeset
+trigger1 = animelem = 6 || animelem = 7 || animelem = 8 || animelem = 9 || animelem = 10
+first = 35
+last = 37
+value = 0
+ignorehitpause = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(6) >= 0
+triggerall = animelemtime(7) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(7) >= 0
+triggerall = animelemtime(8) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(8) >= 0
+triggerall = animelemtime(9) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(9) >= 0
+triggerall = animelemtime(10) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+[state 600];特殊ヒット数確定V38
+type = varadd
+triggerall = animelemtime(10) >= 0
+triggerall = animelemtime(11) < 0
+trigger1 = movecontact || numtarget(940)
+trigger1 = hitpausetime 
+trogger2 = var(49) = 2
+trigger2 = enemynear,numtarget(940)
+var(38) = 1
+ignorehitpause = 1
+persistent = 0
+
+;----------------------ヒットスパークへるぱ  LV1----相打ち時OK,複数hitt対策はむり	ヘルパにあたってもでない
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+triggerall = var(38) < 3
+trigger1 = animelem = 6
+trigger2 = animelem = 7
+trigger3 = animelem = 8
+trigger4 = animelem = 9
+trigger5 = animelem = 10
+helpertype = normal
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = 8020
+keyctrl = 0
+ownpal = 1
+ignorehitpause = 0
+size.height = -85;Y座標
+size.ground.front = 40;相殺時X座標
+size.ground.back = 3;持続
+size.head.pos = 8010,8011
+
+;--------------------------特殊：地上ヒットなら受身不能28F,初弾ロマキャンするとお得？
+;14 + var(44) * 14 + var(45) * 14 基本14に地上だったら１４を足す  Lはふつう
+;--------------判定は5発でるけど、最大3HIT。
+;---hitstopが６であれば・・15が  x2 y10 x4 y13
+[State 1100, 1];LV3 3HIT 
+type = HitDef
+triggerall = var(38) < 3
+trigger1 = animelem = 6
+trigger2 = animelem = 7
+trigger3 = animelem = 8
+trigger4 = animelem = 9
+trigger5 = animelem = 10
+attr = a, sA                   
+damage = ceil(18 * fvar(0)),1                             
+guardflag = MA                 
+hitflag = MAFD                  
+priority = 7,hit           
+animtype = medium 
+ground.type = High
+air.type = high
+pausetime = 6, 6 + var(47) * 4
+guard.pausetime = 6, 6          
+hitsound   = s205, 3
+guardsound = s150, 4            
+ground.slidetime = 14 + var(45)
+ground.hittime  = 14 + var(45)
+guard.hittime  = 13	
+guard.slidetime  = 13
+airguard.ctrltime = 13  
+ground.velocity = -1 * fvar(5),-5 * fvar(6)           
+air.velocity = -2 * fvar(5), -6.5 * fvar(6)
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6)
+guard.velocity = -5
+airguard.velocity = -2, -4  
+yaccel = 0.5         
+fall = 1
+air.fall = 1                 
+fall.recover = ifelse(enemynear,statetype = S || var(45),0,1)
+fall.recovertime = ceil( (14 + 14 * var(47) ) * var(46) * fvar(4) ) + 6 + 4 * var(47) + (!var(46)) * 7	
+getpower = ifelse(Var(40),0,60 + (var(2) = 1 && life <= 250) * 60)
+palfx.time = var(47) * 5
+palfx.add = var(47) * 255,var(47) * -130, var(47) * -108
+ground.cornerpush.veloff = -9
+air.cornerpush.veloff    = -9
+guard.cornerpush.veloff  = -10
+airguard.cornerpush.veloff= -10
+
+[State 200, 7];持続終了したらカウンター判定消失 DOS:バグで効果ない？
+type = statetypeset
+trigger1 = animelem = 11
+movetype = I
+ignorehitpause = 0
+
+;----------------エフェクトくるくるよーよー
+[state 1100x,];右まんなか
+type = Explod
+trigger1 = animelem = 6
+anim = 1250
+ID = 200
+postype = p1
+pos = 0,-60
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+removeongethit=1
+scale= 0.5,0.5
+
+[state 1100x,];左手うえ
+type = Explod
+trigger1 = animelem =6
+anim = 1260
+ID = 200
+postype = p1
+pos = 20,-100
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+removeongethit=1
+scale= 0.5,0.5
+
+[state 1100x,]
+type = removeexplod
+trigger1 = animelem = 11
+trigger2 = pos y >= 0 && vel y > 0 
+ID = 200
+
+[state 1200,];こう直へ
+type = changestate
+trigger1 = pos y >= 0 && vel y > 0 
+value = 1260
+ctrl = 0
+
+;------------------------------------------------------------
+;空中スターシップ硬直　4ふれ->10じゃ？
+[Statedef 1260];
+type = c
+movetype =I
+physics = c
+anim = 1230 
+velset = 0,0
+ctrl = 0
+hitcountpersist = 1
+
+[state 1100x,];保険えふぇけし
+type = removeexplod
+trigger1 = time = 0
+ID =200
+
+[state 1310,]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = numexplod(52) <= 5
+trigger1 = time <= 5
+anim =6047
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+persistent =0
+scale = 0.5,0.5
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = numexplod(52) <= 5
+trigger1 = time <= 5
+anim =6047
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+persistent =0
+scale = 0.5,0.5
+
+[state 1210,];こう直おわり	しゃがみ状態
+type = changestate
+trigger1 = animtime = 0
+value = ifelse(command = "holddown",11,12)
+ctrl = 1
+
+;------------------------------------------------------------
+;-----------------------------------------
+;キックスタートマイハート
+[Statedef 1300];
+type = S
+movetype = A
+physics = n
+anim = 1300 
+ctrl = 0
+hitcountpersist = 1
+poweradd = 0 
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = animelemtime(5) <= 0
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = animelemtime(5) <= 0
+trigger1 = Vel X <= 0.1
+x = 0
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-6,14)
+ignorehitpause = 1
+persistent = 0
+
+[state 1300,];きーん
+type = playsnd
+trigger1 = time = 0
+value = s80,5
+channel = 6
+
+;-------------------初速；基本15dot	レバーいれで調節MIN.MAX速度があるはず
+[state 1300,]
+type = velset
+trigger1 = animelemtime(6) = 0
+x = 7.5
+
+[state 1300,]
+type = veladd
+triggerall = vel x <= 10
+trigger1 = animelemtime(5) >= 0
+trigger1 = command = "holdF"
+x = 0.3
+
+[state 1300,]
+type = veladd
+triggerall = vel x >= 3
+trigger1 = animelemtime(5) >= 0
+trigger1 = command = "holdB"
+x = -0.3
+
+;----------------------ヒットスパークへるぱ  LV1----相打ち時OK,複数hitt対策はむり	ヘルパにあたってもでない
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+trigger1 = animelem = 6
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = 8020
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+size.height = -10;Y座標
+size.ground.front = 15;相殺時X座標
+size.ground.back = 34;持続
+size.head.pos = 8010,8011
+
+;--足払いキャンせるのとき通り抜けるほど高いはず
+[State 200, 1];LV4	判定上のほうも結構ある  x15
+type = HitDef
+triggerall = !var(34)
+trigger1 = 1
+attr = S, SA                   
+damage = ceil(30 * fvar(0)),1                            
+guardflag = M                  
+hitflag = MAFD                  
+priority = 3,hit           
+animtype = hard 
+ground.type = low
+air.type = low        
+pausetime = 14, 14 + var(47) * 8
+guard.pausetime = 14, 14          
+hitsound   = s205, 3
+guardsound = s150, 4          
+ground.slidetime = 17 + var(45)
+ground.hittime  = 17 + var(45)
+guard.hittime  = 16	
+guard.slidetime  = 16
+airguard.ctrltime = 16  
+ground.velocity = -7.5 * fvar(5)
+air.velocity = -2.5 * fvar(5), -8.5 * fvar(6)
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6)
+guard.velocity = -7.5
+airguard.velocity = -2, -4
+yaccel = 0.5         
+fall = 0
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (16 + 16 * var(47) ) * var(46) * fvar(4) ) + 14 + 8 * var(47) + (!var(46)) * 7	
+getpower = ifelse(Var(40),0,76 + (var(2) = 1 && life <= 250) * 76)
+palfx.time = var(47) * 5
+palfx.add = var(47) * 255,var(47) * -130, var(47) * -108
+ground.cornerpush.veloff = -15
+air.cornerpush.veloff    = -15
+guard.cornerpush.veloff  = -16
+airguard.cornerpush.veloff= -16
+ignorehitpause = 0
+   
+[state 1100x,];摩擦燃え SSのと共通で
+type = Explod
+trigger1 = animelem =5
+anim = 1350
+ID=200
+postype = p1
+pos = -10,0
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 1
+persistent = 1
+ignorehitpause = 1
+removeongethit=1
+scale= 0.5,0.5
+
+[state 1510,helper partner1];----ざんぞうてすと
+type = Helper
+trigger1 = animelem=5
+helpertype = normal
+sprpriority  = 0
+name = "ksmh mirage1"
+ID=1350
+pos = -25,0
+postype = p1
+stateno = 1390 
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[state 1510,helper partner2];----ざんぞうてすと
+type = Helper
+trigger1 = animelemtime(5)=2
+helpertype = normal
+sprpriority  = 0
+name = "ksmh mirage2"
+ID=1350
+pos = -50,0
+postype = p1
+stateno = 1395 
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[state 1300,];分岐、P発射12-45
+type = changestate
+trigger1 = time = [11,44]
+trigger1 = command="K" 
+value = 1330
+ignorehitpause = 0
+
+[state 1300,];分岐、K強制停止
+type = changestate
+trigger1 = time = [11,44]
+trigger1 = command = "P" 
+value = 1310
+ignorehitpause = 0
+
+[state 1100x,];自然停止あにめで
+type = changeanim
+triggerall = anim = 1300
+trigger1 = time >= 45
+value = 1310
+ignorehitpause = 0
+
+[State 200, 7];持続終了したらカウンター判定消失 DOS:バグで効果ない？
+type = statetypeset
+trigger1 = anim = 1310
+movetype = I
+ignorehitpause = 0
+
+[state 1310,2];自然停止はいきなり０
+type = velset
+trigger1 = anim = 1310
+x = 0
+ignorehitpause = 0
+
+[state 1100x,];小さな火花を消す	自然停止あにめで
+type = removeexplod
+trigger1 = anim = 1310
+ID =200
+
+[state 1310,];
+type = changestate
+triggerall = anim = 1310
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-----------------------キックスタート強制停止
+;------------攻撃は飛び道具扱い、はしっこにいるとすかる幅がありすぎる飛び道具消せるか？へるぱで？
+;----12,11,10dot?	1dotずつへってる？速度調節版はどうなる？もしかするMINが12？
+[Statedef 1310];強制停止	へるぱださせるだけ
+type = S
+movetype =A
+physics = N
+anim = 1320 
+ctrl = 0
+hitcountpersist = 1
+
+[state 1100x,];すこしずつへる1dotだったり2だったり
+type = velmul
+trigger1 = time > 0
+x = 0.9
+
+[state 1100x,];ここで確実に０
+type = velset
+trigger1 = animelem = 6
+trigger2 = vel x <= 0
+x = 0
+
+[state 1100x,];小さい火花を消す
+type = removeexplod
+trigger1 =time = 0
+ID =200
+
+[state -2,helper partner];----火花攻撃へるぱー
+type = Helper
+trigger1 = time = 0
+sprpriority  = 0
+name = "KSMH Fire"
+ID = 1300
+pos = 100,0
+postype = p1
+stateno = 1320
+ownpal = 1
+ignorehitpause = 0
+persistent = 0
+
+[State 200, 7];持続終了したらカウンター判定消失 DOS:バグで効果ない？
+type = statetypeset
+trigger1 = time = 13
+movetype = I
+ignorehitpause = 0
+
+[state 1320,];
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;----------------------------------------------helper
+[Statedef 1320];強制停止へるぱ			攻撃ヘルパー飛び道具扱い、飛び道具相殺は？なさそう？
+type = A
+movetype = A
+physics = N
+anim = 1355
+ctrl = 0
+hitcountpersist = 1
+velset = 0,0
+sprpriority  = 2
+
+;----------------------きーん
+[state 1300,]
+type = playsnd
+trigger1 = time = 0
+value = s80,4
+channel = 7
+
+[state 1100x,];火花2　同期
+type = Explod
+trigger1 = time = 0
+anim = 1360
+ID=203
+postype = p1
+pos = 0,0
+sprpriority = 3
+bindtime = 1
+removetime = -2
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+removeongethit=0
+scale = 0.5,0.5
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-7,6)
+ignorehitpause = 1
+persistent = 0
+
+;----------------地上-x10y10
+[State 200, 1];LV2	強制停止　ダウン  とびどうぐそうさいはないようだ。HITSTOPこっちは０
+type = HitDef
+trigger1 = !var(34)
+attr = a, Sp                   
+damage = ceil(40 * root,fvar(0)),1                            
+guardflag = M                  
+hitflag = MAFD                  
+priority = 6,hit           
+animtype = medium 
+ground.type = low
+air.type = low          
+pausetime = 0, 12 + root,var(47) * 2
+guard.pausetime = 0, 12          
+hitsound   = s205, 3
+guardsound = s150, 4             
+ground.slidetime = 12 + root,var(45)
+ground.hittime  = 12 + root,var(45)
+guard.hittime  = 11
+guard.slidetime  = 11
+airguard.ctrltime = 11 
+ground.velocity = -5 * root,fvar(5),-5 * root,fvar(6)         
+air.velocity = -2.5 * root,fvar(5), -6.5 * root,fvar(6)
+down.velocity = ifelse(root,var(2) = 2,-3,-8) * root,fvar(5),ifelse(root,var(2) = 2,-2,-2.5) * root,fvar(6)
+guard.velocity = -6
+airguard.velocity = -2, -4
+yaccel = 0.5         
+fall = 1
+air.fall = 1                 
+fall.recover = ifelse(enemynear,statetype = S || root,var(45),0,1)
+fall.recovertime = ceil( (12 + 12 * root,var(47) ) * root,var(46) * root,fvar(4) ) + 12 + 2 * root,var(47) + (!root,var(46)) * 7
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff    = 0
+guard.cornerpush.veloff  = 0
+airguard.cornerpush.veloff= 0
+getpower = ifelse(root,Var(40),0,24 + (root,var(2) = 1 && root,life <= 250) * 24)
+palfx.time = root,var(47) * 5
+palfx.add = root,var(47) * 255,root,var(47) * 130, root,var(47) * 108
+ignorehitpause = 0
+
+[state 7000,];---------------ひっとした
+type = varset
+trigger1 = movecontact
+var(34) = 1
+ignorehitpause = 1
+
+;--------ヒットスパークへるぱ  LV3----相打ちにならないはず、HIT時でOK
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+trigger1 = movecontact
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = -10,0
+postype = p2
+stateno = ifelse(movehit,8010,8011)
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+size.height = -20;Y座標
+size.ground.front = 10;相殺時X座標
+size.ground.back = 6;持続
+
+[state 1320,];
+type = destroyself
+trigger1 = animtime = 0
+ignorehitpause = 0
+
+;-----------------------キックスタート発射
+;--------------------------------1F目はまだ地上　	statetypesetのバグ考慮、すてーとわけ
+[Statedef 1330];
+type = s
+movetype =A
+physics = N
+anim = 1330 
+ctrl = 0
+hitcountpersist = 1
+
+[state 1100x,];足元火花をけす
+type = removeexplod
+trigger1 = time = 0
+ID =200
+
+[state -3,];両方リセットしてみる KSMH発射、AHMHはtime１でやると不都合そっちでやる
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 36
+value = 0
+ignorehitpause = 1
+
+[state 1320,];2Fめは空
+type = changestate
+trigger1 = time >= 1
+value = 1340
+ctrl = 0
+
+;-------------------------------------発射攻撃空中
+;----------X20dot y16dot?	重力1DOT?
+[Statedef 1340];
+type = a
+movetype = A
+physics = N
+ctrl = 0
+hitcountpersist = 1
+velset = 10,-9
+
+[state 1330,]
+type  = veladd
+trigger1 = 1
+y = 0.525
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-7,10)
+ignorehitpause = 1
+persistent = 0
+
+;----------------------ヒットスパークへるぱ  LV1----相打ち時OK,複数hitt対策はむり	ヘルパにあたってもでない
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+trigger1 = animelem = 2
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = 8020
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+size.height = -55;Y座標
+size.ground.front = 30;相殺時X座標
+size.ground.back = 12;持続
+size.head.pos = 8010,8011
+
+[State 200, 1];LV3	発射	特殊復帰24  x2 y10
+type = HitDef
+triggerall = !var(34)
+trigger1 = !movecontact
+attr = A, SA                   
+damage = ceil(50 * fvar(0)),1                
+guardflag = M                  
+hitflag = MAFD                  
+priority = 7,hit           
+animtype = medium 
+ground.type = High
+air.type = high
+pausetime = 13, 13 + var(47) * 4
+guard.pausetime = 13, 13          
+hitsound   = s205, 3
+guardsound = s150, 4            
+ground.slidetime = 14 + var(45)
+ground.hittime  = 14 + var(45)
+guard.hittime  = 13	
+guard.slidetime  = 13
+airguard.ctrltime = 13 
+ground.velocity = -2 * fvar(5),-10 * fvar(6)         
+air.velocity = -2.5 * fvar(5), -6.5 * fvar(6)
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6) 
+guard.velocity = -6.5
+airguard.velocity = -2, -4
+yaccel = 0.5           
+fall = 1
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (24 + 24 * var(47) ) * var(46) * fvar(4) ) + 13 + 4 * var(47) + (!var(46)) * 7
+ignorehitpause = 0
+getpower = ifelse(Var(40),0,52 + (var(2) = 1 && life <= 250) * 52)
+palfx.time = var(47) * 5
+palfx.add = var(47) * 255,var(47) * -130, var(47) * -108
+ground.cornerpush.veloff = -12
+air.cornerpush.veloff    = -12
+guard.cornerpush.veloff  = -13
+airguard.cornerpush.veloff= -13
+ignorehitpause = 0
+
+[State 200, 7];持続終了したらカウンター判定消失 DOS:バグで効果ない？
+type = statetypeset
+trigger1 = time >= 14
+movetype = I
+ignorehitpause = 0
+
+;----------------------------------ここまで
+[state 1330,];専用硬直ステートヘ
+type = changestate
+trigger1 = vel y > 0 && pos y >= 0
+value = 1350
+ctrl = 0
+
+;-------------------------キックスタート発射硬直ステート
+[Statedef 1350];専用硬直ステート20
+type = S
+movetype = I
+physics = s
+anim = 1340 
+ctrl = 0
+hitcountpersist = 1
+velset = 0,0
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+persistent = 0
+ignorehitpause = 1
+
+[state 1340,]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 2050,  snd];システム着地
+type = PlaySnd
+trigger1 = time = 0
+value = s50,9
+channel = 3
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = 1;time  = 0
+anim =6047;f802
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+persistent =0
+scale = 0.5,0.5
+
+[state 100x,atc efe];着地エフェクト
+type = Explod
+trigger1 = 1;time  = 0
+anim =6047;f802
+ID = 52
+postype = p1
+pos = 0,0
+random = 30,0
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+persistent =0
+scale = 0.5,0.5
+
+[state 1330,];専用硬直
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;--------------------------------------えあほっぷまいはーと
+;-----奪取中だとY消え、通常わざと同じような動作だった
+;----ダッシュ中、MULあり、後ろダッシュ時もへる
+[Statedef 1360];
+type = a
+movetype = A
+physics = N
+ctrl = 0
+hitcountpersist = 1
+anim = 1360
+
+[state 7000,];---------------ロマキャンフラグリセット　ガトリング経由時time=0でやるための
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 39
+value = 0
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+[state 1330,]
+type  = changeanim
+trigger1 = time = 0
+value = 1330
+elem = 2
+
+[state 1330,]
+type  = velset
+trigger1 = time = 0
+x = 9;10
+y = ifelse(!var(17),-7,0)
+
+[state 1330,]
+type  = velmul
+triggerall = var(17)
+trigger1 = time = 0
+x = 0.5
+
+;--------------------------airだっしゅ中の処理Y
+;--------------------------重力がかからない条件は・・
+;--1ダッシュ中かうんと有効時　ダスト有効時
+;----1通常ジャンプ
+[state 600];重力　通常　ダスト以外
+type = veladd
+trigger1 = 1;var(6) <= 1 
+y = fvar(9)
+ignorehitpause = 0
+
+[state 1330,]
+type  = veladd
+trigger1 = 0
+y = 0.525
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = varadd
+triggerall = var(49) <= 1 || (var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = ifelse(movehit,-7,14)
+ignorehitpause = 1
+persistent = 0
+
+;----------------------ヒットスパークへるぱ  LV1----相打ち時OK,複数hitt対策はむり	ヘルパにあたってもでない
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+trigger1 = time = 0
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,0
+postype = p2
+stateno = 8020
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+size.height = -55;Y座標
+size.ground.front = 30;相殺時X座標
+size.ground.back = 12;持続
+size.head.pos = 8010,8011
+
+[State 200, 1];LV3	あえあほっぷ	特殊復帰28  x2 y10
+type = HitDef
+trigger1 = !var(34) && !movecontact
+attr = a, SA                   
+damage = ceil(50 * fvar(0)),1                              
+guardflag = M                  
+hitflag = MAFD                  
+priority = 7,hit           
+animtype = medium 
+ground.type = low
+air.type = low           
+pausetime = 13, 13 + var(47) * 4
+guard.pausetime = 13, 13          
+hitsound   = s205, 3
+guardsound = s150, 4              
+ground.slidetime = 14 + var(45)
+ground.hittime  = 14 + var(45)
+guard.hittime  = 13	
+guard.slidetime  = 13
+airguard.ctrltime = 13  
+ground.velocity = -2 * fvar(5),-10 * fvar(6)       
+air.velocity = -2.5 * fvar(5), -6.5 * fvar(6)
+down.velocity = ifelse(var(2) = 2,-3,-8) * fvar(5),ifelse(var(2) = 2,-2,-2.5) * fvar(6)          
+guard.velocity = -6.5  
+airguard.velocity = -2, -4
+yaccel = 0.5           
+fall = 1
+air.fall = 1                 
+fall.recover = 1
+fall.recovertime = ceil( (28 + 28 * var(47) ) * var(46) * fvar(4) ) + 13 + 4 * var(47) + (!var(46)) * 7
+getpower = ifelse(Var(40),0,144 + (var(2) = 1 && life <= 250) * 144)
+palfx.time = var(47) * 5
+palfx.add = var(47) * 255,var(47) * -130, var(47) * -108
+ground.cornerpush.veloff = -12
+air.cornerpush.veloff    = -12
+guard.cornerpush.veloff  = -13
+airguard.cornerpush.veloff= -13
+ignorehitpause = 0
+
+[State 200, 7];持続終了したらカウンター判定消失 DOS:バグで効果ない？
+type = statetypeset
+trigger1 = time >= 13
+movetype = I
+ignorehitpause = 0
+
+;----------------------------------硬直は発射と共通でいいかな
+[state 1330,];専用硬直ステートヘ
+type = changestate
+trigger1 = vel y > 0 && pos y >= 0
+value = 1350
+ctrl = 0
+
+
+;-----------------------------------演出
+;------------------------------------------ｋｓｍｈ残像
+[Statedef 1390];
+type = A
+movetype =I
+physics = N
+ctrl = 0
+hitcountpersist = 0
+anim = 1365
+
+[state 1330,];
+type = destroyself
+trigger1=root,movetype = H
+trigger2=root,stateno != [1300,1310]
+ignorehitpause = 1
+
+[state 1350,]
+type = nothitby
+trigger1 = 1
+value = sca
+ignorehitpause = 1
+
+[state 1330,];追従アニメ
+type = changeanim
+triggerall =time >= 2
+trigger1 = root,animelemtime(5) >= 0
+trigger1 = root,animelemtime(6) < 0 
+trigger1 = root,movetype != H
+value = 1365
+elem = 3
+ignorehitpause = 1
+
+[state 1330,];追従アニメ
+type = changeanim
+triggerall =time >= 2
+trigger1 = root,animelemtime(6) >= 0
+trigger1 = root,movetype != H
+value = 1365
+elem = 4
+ignorehitpause = 1
+
+[state 1340,]
+type = bindtoroot
+trigger1 = root,movetype != H
+pos = ifelse(root,command = "holdfwd",-35,ifelse(root,command = "holdback",-15,-25)),0
+ignorehitpause=1
+
+[state 2092,]
+type = PalFX
+trigger1 = root,movetype != H
+time = 1
+add = -64,-64,-64
+sinadd = -256,-256,-256,50
+ignorehitpause = 1
+
+[state 1330,];自然停止
+type = changestate
+trigger1 = root,stateno = 1310
+value = 1397
+ctrl = 0
+
+;---------------------------2---------------ｋｓｍｈ残像
+[Statedef 1395];
+type = A
+movetype =I
+physics = N
+ctrl = 0
+hitcountpersist = 0
+anim = 1365
+
+[state 1330,];
+type = destroyself
+trigger1 = root,movetype = H
+trigger2=root,stateno != [1300,1310]
+ignorehitpause = 1
+
+[state 1350,]
+type = nothitby
+trigger1 = 1
+value = sca
+ignorehitpause = 1
+
+[state 1330,];追従アニメ
+type = changeanim
+triggerall =time >= 2
+trigger1 = root,animelemtime(5) >= 0
+trigger1 = root,animelemtime(6) < 0 
+trigger1 = root,movetype != H
+value = 1365
+elem = 4
+ignorehitpause = 1
+
+[state 1330,];追従アニメ
+type = changeanim
+triggerall =time >= 2
+trigger1 = root,animelemtime(6) >= 0
+trigger1 = root,movetype != H
+value = 1365
+elem = 3
+ignorehitpause = 1
+
+[state 1340,]
+type = bindtoroot
+trigger1 = root,movetype != H
+pos = ifelse(root,command = "holdfwd",-70,ifelse(root,command = "holdback",-30,-50)),0
+ignorehitpause=1
+
+[state 2092,]
+type = PalFX
+trigger1 = 1
+time = 1
+add = -128,-128,-128
+sinadd = -256,-256,-256,50
+ignorehitpause = 1
+
+[state 1330,];自然停止
+type = changestate
+trigger1 = root,stateno = 1310
+value = 1397
+ctrl = 0
+
+[Statedef 1397];
+type = A
+movetype =I
+physics = N
+ctrl = 0
+
+[state 1330,];
+type = destroyself
+trigger1 = root,movetype = H
+trigger2=root,stateno != [1300,1310]
+trigger3 = rootdist x <= 0
+trigger4 = anim = 1310 && animtime = 0
+ignorehitpause = 1
+
+[state 1350,]
+type = nothitby
+trigger1 = 1
+value = sca
+ignorehitpause = 1
+
+[state 1330,];
+type = changeanim
+trigger1 = time = 0
+trigger1 = prevstateno = 1350 
+value = 1310
+
+[state 1330,];
+type = changeanim
+trigger1 = time = 2
+trigger1 = prevstateno = 1360 
+value = 1310
+
+[state 1370,]
+type = posadd
+trigger1 = 1
+x = ifelse(prevstateno = 1350,8,10)
+
+
+;-------------------------------------------------------------------------------------
+;-----------------------------1500-地上ヨーヨー配置
+;---------PC#Rコマドリ確認によると6F=time5で方向決定,7Fからアニメチェンジ
+;--#R 8=26F(13) 9=22F(11) 4,7,6=22F(13)
+;--S,E
+[statedef 1500];ここではアニメ変更のみ　じゃない！良く見て・・方向はＶ26、テンキーで
+type = s
+physics = n
+movetype = a
+hitcountpersist = 1
+sprpriority = 0
+ctrl = 0
+anim = 0
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[state 1500,ca];投げ方向格納VARデフォルト 正面は6
+type = varset
+trigger1 = time = 0
+var(26) = 6
+persistent = 0
+
+;------------------方向設定
+[state 1500,ca];レバー斜め前9
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdfwd"
+trigger1 = command = "holdup"
+trigger2 = var(39) = 1509
+var(26) = 9
+persistent = 0
+
+[state 1500,ca];上投げ レバー上8
+type = varset
+triggerall = time = 5
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command = "holdup"
+trigger2 = var(39) = 1508
+var(26) = 8
+persistent = 0
+
+[state 1500,ca];斜め後ろ投げ レバー斜め後ろ7
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdback"
+trigger1 = command = "holdup"
+trigger2 = var(39) = 1507
+var(26) = 7
+persistent = 0
+
+[state 1500,ca];真後ろ投げ レバー後ろ14
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdback"
+trigger1 = command != "holdup"
+trigger2 = command = "holdback"
+trigger2 = command = "holddown"
+trigger3 = var(39) = 1504
+var(26) = 4
+persistent = 0
+
+[state 1500,ca];正面投げ レバー前か７F目にチェンジあにめしてる？236
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdfwd"
+trigger1 = command != "holdup"
+trigger2 = command = "holdfwd"
+trigger2 = command = "holddown"
+trigger3 = var(1) >= 1 && var(1) < 4
+trigger3 = command != "holdfwd"
+trigger3 = command != "holddown"
+trigger3 = command != "holdup"
+trigger3 = command != "holdback"
+trigger4 = var(39) = 1506
+var(26) = 6
+persistent = 0
+
+[state 1500,ca];正面投げ にゅーとらる追加！5
+type = varset
+triggerall = !var(1) || var(1) = 4
+triggerall = time = 5
+trigger1 = command != "holdfwd"
+trigger1 = command != "holddown"
+trigger1 = command != "holdup"
+trigger1 = command != "holdback"
+trigger2 = var(39) = 1505
+var(26) = 5
+persistent = 0
+
+;-----------------------------------------方向に応じたアニメに変更
+;-----SL,EXのアニメは1400～　#R,ORは1500～　　
+[State 1500, 1];それまでは０
+type = Changeanim
+trigger1 = time < 6
+value = 0
+
+;----REORE 1500 ACEXSL1400
+[State 1500, 1];7Fめから	地上は1500+テンキー方向空中は150＋テンキー+10		空チュ発動を判定のため＋10
+type = Changeanim
+trigger1 = time = 6
+value = var(26) + ifelse(var(1) = 2 || var(1) = 3 || var(1) = 4,1400,1500)
+persistent = 0
+
+;----出現場所var格納廃止、var節約
+;----1400 SL,EX 1500,RE,OR
+;---------------------------------出現場所をセット	
+;---でふぉ6
+;var(32) = 30var(33) = -40
+;-----------------------------5方向  地上は早すぎてわからないけど後ろにいかないみたい
+;var(32) = -12var(33) = -12
+[state 1510,helper partner];----ヨーヨー init 1600
+type = Helper
+triggerall = anim = [1400,1590]
+triggerall = !numhelper(100)
+trigger1 = var(26) = 5 && animelem = 6 	;N配置　
+ID = 100
+helpertype = normal
+name = "YoYo Ground Start"
+pos = -8,-13
+stateno = 1600
+postype = p1
+keyctrl = 0
+ownpal = 1
+
+;-----------------------------6方向
+;var(32) = 40var(33) = -40;-45
+[state 1510,helper partner];----ヨーヨー init 1600
+type = Helper
+triggerall = anim = [1400,1590]
+triggerall = !numhelper(100)
+trigger1 = var(26) = 6 && animelem = 8 	;6正面
+ID = 100
+helpertype = normal
+name = "YoYo Ground Start"
+pos = 40,-45
+stateno = 1600
+postype = p1
+keyctrl = 0
+ownpal = 1
+
+;-----------------------------------9方向
+;var(32) = 30var(33) = -45
+[state 1510,helper partner];----ヨーヨー init 1600
+type = Helper
+triggerall = anim = [1400,1590]
+triggerall = !numhelper(100)
+trigger1 = var(26) = 9 && animelem = 6	;9斜め前上投
+ID = 100
+helpertype = normal
+name = "YoYo Ground Start"
+pos = 30,-45
+stateno = 1600
+postype = p1
+keyctrl = 0
+ownpal = 1
+
+;-----------------------------------  8方向
+;var(32) = -20var(33) = -65
+[state 1510,helper partner];----ヨーヨー init 1600
+type = Helper
+triggerall = anim = [1400,1590]
+triggerall = !numhelper(100)
+trigger1 = var(26) = 8 && animelem = 7	;8真上
+ID = 100
+helpertype = normal
+name = "YoYo Ground Start"
+pos = -20,-65
+stateno = 1600
+postype = p1
+keyctrl = 0
+ownpal = 1
+
+;-----------------------------------7
+;var(32) = -40var(33) = -50
+[state 1510,helper partner];----ヨーヨー init 1600
+type = Helper
+triggerall = anim = [1400,1590]
+triggerall = !numhelper(100)
+trigger1 = var(26) = 7 && animelem = 7	;7斜め後上投
+ID = 100
+helpertype = normal
+name = "YoYo Ground Start"
+pos = -40,-50
+stateno = 1600
+postype = p1
+keyctrl = 0
+ownpal = 1
+
+;-----------------------------------4
+;var(32) = -15var(33) = 10
+[state 1510,helper partner];----ヨーヨー init 1600
+type = Helper
+triggerall = anim = [1400,1590]
+triggerall = !numhelper(100)
+trigger1 = var(26) = 4 && animelem = 7	;4真後ろ
+ID = 100
+helpertype = normal
+name = "YoYo Ground Start"
+pos = -15,10
+stateno = 1600
+postype = p1
+keyctrl = 0
+ownpal = 1
+
+[State 1510, atack voice ws];スリープします  共通５F目でいいかな？
+type = PlaySnd
+trigger1 = time = 6
+value = s1500,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[State 1510, 1];
+type = Changestate
+triggerall = anim = [1400,1590]
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;----------------------------------------------------------
+;-----------------------------------------------s1510-空中ヨーヨー配置
+;---アニメ3種類になってしまってる REEX,SL,AC　かうんた扱いなのでMOVE＝A
+[statedef 1510]
+type = A
+physics = N
+movetype = a
+hitcountpersist = 1
+sprpriority = 0
+ctrl = 0
+poweradd = 0
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-3でもやってるけどね
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+;-------------------------------------------
+[state 1500,ca];投げ方向格納VARデフォルト 正面は15
+type = varset
+trigger1 = time = 0
+var(26) = 15
+persistent = 0
+
+;------------------方向設定
+[state 1500,ca];19レバー斜め前9
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdfwd"
+trigger1 = command = "holdup"
+trigger2 = var(39) = 1509
+var(26) = 19
+persistent = 0
+
+[state 1500,ca];18上投げ レバー上8
+type = varset
+triggerall = time = 5
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command = "holdup"
+trigger2 = var(39) = 1508
+var(26) = 18
+persistent = 0
+
+[state 1500,ca];17斜め後ろ上投げ レバー斜め後ろ7
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdback"
+trigger1 = command = "holdup"
+trigger2 = var(39) = 1507
+var(26) = 17
+persistent = 0
+
+[state 1500,ca];14真後ろ投げ レバー後ろ14
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdback"
+trigger1 = command != "holdup"
+trigger2 = command = "holdback"
+trigger2 = command = "holddown"
+trigger3 = var(39) = 1504
+var(26) = 14
+persistent = 0
+
+[state 1500,ca];11斜め後ろ下投げ レバー斜め後ろ11
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdback"
+trigger1 = command = "holddown"
+trigger2 = var(39) = 1501
+var(26) = 11
+persistent = 0
+
+[state 1500,ca];12下投げ 2
+type = varset
+triggerall = time = 5
+trigger1 = command != "holdfwd"
+trigger1 = command != "holdback"
+trigger1 = command = "holddown"
+trigger2 = var(39) = 1502
+var(26) = 12
+persistent = 0
+
+[state 1500,ca];13斜め前下投げ レバー斜め前13
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdfwd"
+trigger1 = command = "holddown"
+trigger2 = var(39) = 1503
+var(26) = 13
+persistent = 0
+
+[state 1500,ca];正面投げ レバー前16 AC以外
+type = varset
+triggerall = time = 5
+trigger1 = command = "holdfwd"
+trigger1 = command != "holdup"
+trigger1 = command != "holddown"
+trigger2 = var(1) >= 1 && var(1) < 4
+trigger2 = command != "holdfwd"
+trigger2 = command != "holddown"
+trigger2 = command != "holdup"
+trigger2 = command != "holdback"
+trigger3 = var(39) = 1506
+var(26) = 16
+persistent = 0
+
+[state 1500,ca];正面投げ にゅーとらる15 AC
+type = varset
+triggerall = !var(1) || var(1) = 4
+triggerall = time = 5
+trigger1 = command != "holdfwd"
+trigger1 = command != "holddown"
+trigger1 = command != "holdup"
+trigger1 = command != "holdback"
+trigger2 = var(39) = 1505
+var(26) = 15
+persistent = 0
+
+;-----　　
+[State 1500, 1];それまで41-8
+type = Changeanim
+trigger1 = time < 6
+value = 41
+elem = 8
+
+;------OR,RE,EX1500系　SL,1400系　,ACは・・どうしよう2300?
+[State 1500, 1];7Fめから	地上は1500+テンキー方向空中は150＋テンキー+10		空チュ発動を判定のため＋10
+type = Changeanim
+trigger1 = time = 6
+value = var(26) + ifelse(var(1) = 3,1400,ifelse(var(1) = 4,2300,1500))
+persistent = 0
+
+;-------------------------射出位置決め部
+;----変更、var節約
+;-----------------------------------1
+;var(32) = -20var(33) = -5
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = var(26) = 11 && animelem = 6	;斜め後ろ下
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = -20,-5
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;-----------------------------------2
+;var(32) = 15var(33) = 0
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = var(26) = 12 && animelem = 6	;真下
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = 15,0
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;-----------------------------------3
+;var(32) = 35var(33) = -15
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = var(26) = 13 && animelem = 6	;斜め前下
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = 35,-15
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;-----------------------------------4
+;var(32) = -27var(33) = -20
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = var(26) = 14 && animelem = 6	;真後ろ
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = -27,-20
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;-----------------------------5 6方向
+;var(32) = 35var(33) = -30
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = (var(26) = 15 || var(26) = 16) && animelem = 6	;正面
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = 35,-30
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;-----------------------------------7
+;var(32) = -17var(33) = -35
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = var(26) = 17 && animelem = 6	;斜め後上投
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = -17,-35
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;-----------------------------------  8方向
+;var(32) = 15var(33) = -70
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = var(26) = 18 && animelem = 6	;真上
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = 15,-70
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+;-----------------------------------9方向
+;var(32) = 30var(33) = -65
+[state 1540,helper partner];----ヨーヨー init1600	SFF位置設定のためアニメ一枚余分(0F)あるので注意
+type = Helper
+triggerall = anim != 41
+triggerall = !numhelper(100) 
+trigger1 = var(26) = 19 && animelem = 6	;斜め前上投
+helpertype = normal
+name = "YoYo Aerial start"
+ID = 100
+pos = 30,-65
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[State 1540, atack voice ws];スリープします	ACだとでない？？意味不明
+type = PlaySnd
+trigger1 = time = 6
+value = s1500,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[State 1540, 1];重力かかり始めは最後の1枚からかもどうやろう？
+type = posfreeze
+trigger1 = 1;anim = [1400,1590]
+value = 1
+ignorehitpause = 1
+
+[State 1540, 1];終わったらフリーに　投げもできるよ
+type = Changestate
+triggerall = anim != 41
+trigger1 = animtime = 0
+value = 51
+ctrl = 1
+anim = 41
+
+[State 1540, 1];着地保険
+type = Changestate
+trigger1 = pos y >= 0 && vel y > 0
+value = 52
+ctrl = 0
+anim = 47
+
+;-----------------------------s1520-ダウン中配置　真上のみ？　
+;-------------起き上がり投げ無敵あり　結構複雑無敵とか？
+[statedef 1520]
+type = L
+physics = C
+movetype = I
+hitcountpersist = 1
+sprpriority = 0
+ctrl = 0
+anim = 1520
+
+[state 1560,ca];
+type = nothitby
+trigger1 = 1
+value = sca
+time = 1
+ignorehitpause = 1
+
+[state 1560,ca];
+type = playerpush
+trigger1 = 1
+value = 1
+ignorehitpause = 1
+
+;----ライフバーのあたりでとまるので、２０系にする 20+方向ね
+[state 1560,ca];方向テンキー格納  
+type = varset
+trigger1 = time = 0
+var(26) = 28
+persistent = 0
+ignorehitpause = 1
+
+[state 1540,helper partner];----ヨーヨー init 1600
+type = Helper
+triggerall = !numhelper(100)
+trigger1 = anim = 1520
+trigger1 = animelem = 6	
+helpertype = normal
+sprpriority  = 0
+name = "YoYo Down Start"
+ID = 100
+pos = 3,0
+postype = p1
+stateno = 1600
+keyctrl = 0
+ownpal = 1
+
+[State 1500, atack voice ws];スリープします
+type = PlaySnd
+trigger1 = anim = 1520
+trigger1 = animelem = 6
+value = s1500,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+persistent = 0
+
+[State 1500, 1];アニメちぇんじ・・
+type = Changeanim
+triggerall = anim = 1520
+trigger1 = animtime = 0
+value = 5120
+elem = 5
+
+[State 1500, 1];起き上がり終了
+type = Changestate
+triggerall = anim = 5120
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-----------------------------s1530-地上ヨーヨー戻す
+[statedef 1530]
+type = s
+physics = n
+movetype = A
+hitcountpersist = 1
+sprpriority = 0
+ctrl = 0
+anim = 1500
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.5
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+[State 1520, 1];1-4で食らうとだめってことは4Fで命令	共通、発生の違いはヨーヨーのフレームで解消。
+type = varset
+trigger1 = time = 3
+var(10) = 1620
+
+[State 1510, atack voice ws];もどします 
+type = PlaySnd
+trigger1 = time = 0
+value = s1500,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3 + 10
+channel = 0
+
+[State 1520, 1];
+type = Changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-----------------------------s1540-空中ヨーヨー　かむばーっく！
+;--------------ダッシュ中にやると、ダッシュかうんと終了しても減速しない。すっとんでく？
+;------------------vel封印タイプ、posfreezかもしくはどこかに格納しておくといい
+[statedef 1535]
+type = A
+physics = n
+movetype = A
+hitcountpersist = 1
+sprpriority = 0
+ctrl = 0
+anim = 1510
+poweradd = 0
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+[State 1550, 1];６枚目の１,２枚目は固定されてる・・？
+type = posfreeze
+trigger1 = animelemtime(6) <= 1
+value = 1
+ignorehitpause = 1
+
+[State 1550, 1];重力	３枚目から有効
+type = veladd
+trigger1 = animelemtime(6) >= 2
+y = fvar(9)
+
+[State 1550, 1];命令？6F		共通でいい
+type = varset
+trigger1 = time = 5
+var(10) = 1620
+
+[State 1550, atack voice ws];もどします
+type = PlaySnd
+trigger1 = time = 0
+value = s1500,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3 + 10
+channel = 0
+
+[State 1550, 1];攻撃判定ありにもどす
+type = Changestate
+trigger1 = animtime = 0
+value = 51
+ctrl = 1
+anim = 41
+
+[State 1550, 1];
+type = Changestate
+trigger1 = pos y >= 0 && vel y > 0
+value = 52
+ctrl = 0
+anim = 47
+
+;--------------------ORモードのみろじゃ性格と命令時のVEL系を変更
+[Statedef 1540];
+type = S
+movetype = A
+physics = n
+anim = 1570
+ctrl = 0
+hitcountpersist = 1
+poweradd = 0
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.5
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+[State -2, voice];せりふいいイメージなし。 効果音のみで
+type = PlaySnd
+trigger1 = animelem = 6
+value = s60, 20
+channel = 3
+
+[state 1600,];変更はここでいいや
+type = varset
+trigger1 = animelem = 6
+var(20) = ifelse(!var(20),1,0)
+persistent = 0
+
+[state 1600,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------空中シフト
+[Statedef 1545];
+type = A
+movetype = A
+physics = n
+anim = 1575
+ctrl = 0
+hitcountpersist = 1
+poweradd = 0
+velset = 0,0
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+;--------振り向き判定は残るがダッシュ減速はない
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+[state 1610,];発生アニメ中まではフリーズ
+type = posfreeze
+trigger1 = animelemtime(8) < 0
+value = 1
+ignorehitpause = 0
+
+[state 1610,];重力は４枚め以降	ろーりんぐのときどうなる？	ダストとかー
+type = veladd
+trigger1 = animelemtime(8) >= 0
+y = fvar(9)
+ignorehitpause = 0
+
+[State -2, voice];せりふいいイメージなし。 効果音のみで
+type = PlaySnd
+trigger1 = animelem = 6
+value = s60, 20
+channel = 3
+
+[state 1600,];変更はここでいいや
+type = varset
+trigger1 = animelem = 6
+var(20) = ifelse(!var(20) , 1,0)
+persistent = 0
+
+[state 3410,c];共通降下へ	空中投げもできるのでアニめは41系(判定ありのほう
+type = changestate
+trigger1 = animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+[state 3410,c];着地へ
+type = changestate
+trigger1 = pos y >= 0 && vel y > 0
+value = 51
+anim = 47
+
+;--------------------------------------ロジャー命令部1550-
+;------地上発動RJGH
+;------空中発動SL,#R=JG EX ALL	
+;-----ジャック発動	全モードフレームは同じで発生同じ
+;-----ACモード、D発動でどうなる？  fvar(14)仮使用。1で戻り、0で逆進  安全確実にするにはステートわけがいい->V32に移動
+[Statedef 1550];jackへ地上 HS押し  安全のためにわけますこれはHS押しばんです
+type = S
+movetype =A
+physics = n
+anim = 1540
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+[State -2, voice];ろじゃ～がむばって～
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(1)
+persistent = 0
+
+[state 1600,];全共通22Fで命令を出すアニメも共通、OK
+type = varset
+trigger1 = time = 21
+var(10) = 1700
+persistent = 0
+
+[State -1, sike];フォースロマキャン22,23  EX以外	
+type = ChangeState
+value = 975
+triggerall = var(1) != 2
+triggerall = !var(40) && power >= 500  
+triggerall = (command = "ALL" && command != "holdback") || command = "roma"
+trigger1 = time = 21 || time = 22
+ignorehitpause = 1
+
+[state 1600,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-------------------------FB　地上ジャック
+[Statedef 1552];ジャックへ地上 ふぉーすぶれーく　D押し このときFろまはできるのかな？できないのかな？
+type = S
+movetype =A
+physics = n
+anim = 1540
+ctrl = 0
+hitcountpersist = 1
+poweradd = 0
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+[State 3400,];FB 最初白く光る
+type = PALFX
+trigger1 = time = 0 
+add = 255,255,255
+time = 4
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State -2, voice];ろじゃ～がむばって～
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(-1)
+persistent = 0
+
+[state 3100,cut];SP発動暗転演出 リングのみにする？
+type = helper
+trigger1 = time = 21
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+size.air.front = 80
+size.air.back = 80
+ownpal = 1
+size.height = 0
+persistent = 0
+
+[State 3100, Super A];暗転する40F動くのも40FでアニメF調整して
+type = SuperPause
+trigger1 = time = 21
+postype = p1
+pos = 0, -50
+anim = -1;
+sound = s60, 0
+poweradd = -500
+persistent = 0
+time = 0
+movetime = 0
+darken = 0
+
+[state 1600,];全共通22Fで命令を出すアニメも共通、OK
+type = varset
+trigger1 = time = 21
+var(10) = 1700
+persistent = 0
+
+[State -1, sike];フォースロマキャン22,23  EX以外	
+type = ChangeState
+value = 975
+triggerall = var(1) != 2 && !var(53)
+triggerall = !var(40) && power >= 500  
+triggerall = (command = "ALL" && command != "holdback") || command = "roma"
+trigger1 = time = 21 || time = 22
+ignorehitpause = 1
+
+[state 1600,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;----------------モードによってＶＥＬの係りが違うSL,#RはVEL封印、他は０
+;-----------------------もーどによっ全体、発生が違う、3枚目になった瞬間？
+;--S&R=37F(29) E=32F(27
+;-----------注意----1560は＃R、1460はEXのフレーム（SL)
+[Statedef 1555];ジャックへ空中   のーまるばん
+type = A
+movetype =A
+physics = n
+anim = ifelse(var(1) = 1 || var(1) = 3 || var(1) = 4,1545,1445) 
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+;--------振り向き判定は残るがダッシュ減速はない
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+;-------VELY は上昇中であれば残り、下降中なら０もしくは下に向かってる・・？0にする必要ないかも？
+;-----Xは強制０でいい
+[state 1610x,];EX TYPE VELOFF	ダッシュでもジャンプでも０になる
+type = velset
+triggerall = time = 0
+trigger1 = var(1) = 2 
+x = 0
+y = 0
+
+[state 1610,];発生アニメ中まではフリーズ
+type = posfreeze
+trigger1 = animelemtime(4) < 0
+value = 1
+ignorehitpause = 0
+
+[state 1610,];重力は４枚め以降	ろーりんぐのときどうなる？	ダストとかー
+type = veladd
+trigger1 = animelemtime(4) >= 0
+y = fvar(9)
+ignorehitpause = 0
+
+[State -2, voice];ろじゃ～がむばって～
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(1)
+persistent = 0
+
+[state 1610,];S,R13 e,11	3枚目にはいった瞬間
+type = varset
+trigger1 = animelem = 3
+var(10) = 1700
+
+[state 3410,c];共通降下へ	空中投げもできるのでアニめは41系(判定ありのほう
+type = changestate
+trigger1 = animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+[state 3410,c];着地へ
+type = changestate
+trigger1 = pos y >= 0 && vel y > 0
+value = 51
+anim = 47
+
+;-----------注意----1560は＃R、1460はEXのフレーム（SL)
+[Statedef 1557];ジャックへ空中  foーすぶれーくばんD  これのみげーじふえる？
+type = A
+movetype =A
+physics = n
+anim = ifelse(var(1) = 1 || var(1) = 3 || var(1) = 4,1545,1445) 
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+[State 3400,];FB 最初白く光る
+type = PALFX
+trigger1 = time = 0 
+add = 255,255,255
+time = 4
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+;--------振り向き判定は残るがダッシュ減速はない
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+;-------VELY は上昇中であれば残り、下降中なら０もしくは下に向かってる・・？0にする必要ないかも？
+;-----Xは強制０でいい
+[state 1610x,];EX TYPE VELOFF	ダッシュでもジャンプでも０になる
+type = velset
+triggerall = time = 0
+trigger1 = var(1) = 2 
+x = 0
+y = 0
+
+[state 1610,];発生アニメ中まではフリーズ
+type = posfreeze
+trigger1 = animelemtime(4) < 0
+value = 1
+ignorehitpause = 0
+
+[state 1610,];重力は４枚め以降	ろーりんぐのときどうなる？	ダストとかー
+type = veladd
+trigger1 = animelemtime(4) >= 0
+y = fvar(9)
+ignorehitpause = 0
+
+[State -2, voice];ろじゃ～がむばって～
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(-1)
+persistent = 0
+
+[state 3100,cut];SP発動暗転演出 リングのみにする？
+type = helper
+trigger1 = animelem = 3
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+size.air.front = 80
+size.air.back = 80
+ownpal = 1
+size.height = 0
+persistent = 0
+
+[State 3100, Super A];暗転する40F動くのも40FでアニメF調整して
+type = SuperPause
+trigger1 = animelem = 3
+postype = p1
+pos = 0, -50
+anim = -1;
+sound = s60, 0
+poweradd = -500
+persistent = 0
+time = 0
+movetime = 0
+darken = 0
+
+[state 1610,];S,R13 e,11	3枚目にはいった瞬間
+type = varset
+trigger1 = animelem = 3
+var(10) = 1700
+
+[state 3410,c];共通降下へ	空中投げもできるのでアニめは41系(判定ありのほう
+type = changestate
+trigger1 = animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+[state 3410,c];着地へ
+type = changestate
+trigger1 = pos y >= 0 && vel y > 0
+value = 51
+anim = 47
+
+
+;-------------------------ロジャーへ命令系　ハグ　モード効果なし
+;------------------SLは１Fおおい
+[Statedef 1560];
+type = S
+movetype =A
+physics = n
+anim = ifelse(var(1) = 3 || var(1) = 4,1440,1540)
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State -2, voice];ろじゃ～がむばって～
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];通常  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(1)
+persistent = 0
+
+[state 1620,];E,R 21 sl,25 elem9ででるように？
+type = varset
+trigger1 = var(1) != 3
+trigger1 = animelem = 9 
+trigger2 = var(1) = 3
+trigger2 = animelem = 9;time = 24
+var(10) = 1800
+persistent = 0
+
+[state 1600,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;-------------------------ロジャーへ命令系1600
+;------------------アニメ１種類、EXのみだね
+;--------
+[Statedef 1565];ハグ 空中！
+type = a
+movetype =A
+physics = n
+anim = 1555
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+;--------振り向き判定は残るがダッシュ減速はない
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+[state 1610x,];EX TYPE VELOFF	ダッシュでもジャンプでも０になる
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+[state 1610,];発生アニメ中まではフリーズ
+type = posfreeze
+trigger1 = animelemtime(4) < 0
+value = 1
+ignorehitpause = 0
+
+[state 1600,];通常  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(1)
+persistent = 0
+
+[state 1610,];重力は４枚め以降	ろーりんぐのときどうなる？	ダストとかー
+type = veladd
+trigger1 = animelemtime(4) >= 0
+y = fvar(9)
+ignorehitpause = 0
+
+[State -2, voice];ろじゃ～がむばって～
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1610,];S,R13 e,11	3枚目にはいった瞬間
+type = varset
+trigger1 = animelem = 3
+var(10) = 1800
+
+[state 3410,c];共通降下へ	空中投げもできるのでアニめは41系(判定ありのほう
+type = changestate
+trigger1 = animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+
+;-------------------------ロジャーへ命令系1600
+;----------------EXかそれ以外の２種？全体は同じだが発生が違う
+;------FB対応Dあり
+[Statedef 1570];ラッシュ   こっちは普通のばーじょん
+type = S
+movetype =A
+physics = N
+ctrl = 0
+hitcountpersist = 1
+anim = ifelse(var(1) = 2,1430,1530)
+poweradd =ifelse(Var(40),0, 40 + (var(2) = 1 && life <= 250) * 40)
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State -2, voice];ろじゃ～がむばって SL
+type = PlaySnd
+triggerall = var(54) <= 2 || var(54) = 6
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[State -2, voice];見せ場はろじゃーに	AC専用せりふ
+type = PlaySnd
+triggerall = var(54) >= 3 && var(54) != 6
+trigger1 = time = 0
+value = s1650,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];通常  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(1)
+persistent = 0
+
+[state 1640,];命令タイミングは共通20 他20　くまAIRで発生調節
+type = varset
+trigger1 = animelem = 6;time = 19
+var(10) = 1900
+
+[State -1, sike];フォースロマキャン16,17  EX以外	
+type = ChangeState
+value = 975
+triggerall = var(1) != 2 && !var(53)
+triggerall = !var(40) && power >= 500  
+triggerall = (command = "ALL" && command != "holdback") || command = "roma"
+trigger1 = time = 15 || time = 16
+ignorehitpause = 1
+
+[state 1640,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-----------ふぉーぶれ　ラッシュDぼたんね
+[Statedef 1572];ラッシュ   FB
+type = S
+movetype =A
+physics = N
+ctrl = 0
+hitcountpersist = 1
+anim = ifelse(var(1) = 2,1430,1530)
+poweradd = 0
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+[State 3400,];FB 最初白く光る
+type = PALFX
+trigger1 = time = 0 
+add = 255,255,255
+time = 4
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+[State -2, voice];ろじゃ～がむばって SL
+type = PlaySnd
+triggerall = var(54) <= 2 || var(54) = 6
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[State -2, voice];見せ場はろじゃーに	AC専用せりふ
+type = PlaySnd
+triggerall = var(54) >= 3 && var(54) != 6
+trigger1 = time = 0
+value = s1650,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+
+[state 1600,];通常  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(-1)
+persistent = 0
+
+[state 3100,cut];SP発動暗転演出 リングのみにする？
+type = helper
+trigger1 = animelem = 6
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+size.air.front = 80
+size.air.back = 80
+ownpal = 1
+size.height = 0
+persistent = 0
+
+[State 3100, Super A];暗転する40F動くのも40FでアニメF調整して
+type = SuperPause
+trigger1 = animelem = 6
+postype = p1
+pos = 0, -50
+anim = -1;
+sound = s60, 0
+poweradd = -500
+persistent = 0
+time = 0
+movetime = 0
+darken = 0
+
+[state 1640,];命令タイミングは共通20 他20　くまAIRで発生調節
+type = varset
+trigger1 = animelem = 6;time = 19
+var(10) = 1900
+
+[State -1, sike];フォースロマキャン16,17  EX以外	
+type = ChangeState
+value = 975
+triggerall = var(1) != 2
+triggerall = !var(40) && power >= 500  
+triggerall = (command = "ALL" && command != "holdback") || command = "roma"
+trigger1 = time = 15 || time = 16
+ignorehitpause = 1
+
+[state 1640,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-------------------------ロジャーへ命令系1600
+[Statedef 1575];ラッシュ 空中！  OR　EXのみ
+type = a
+movetype =A
+physics = n
+anim = 1535
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+;--------振り向き判定は残るがダッシュ減速はない
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+[state 1610x,];EX TYPE VELOFF	ダッシュでもジャンプでも０になる
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+[state 1610,];発生アニメ中まではフリーズ
+type = posfreeze
+trigger1 = animelemtime(4) < 0
+value = 1
+ignorehitpause = 0
+
+[state 1610,];重力は４枚め以降	ろーりんぐのときどうなる？	ダストとかー
+type = veladd
+trigger1 = animelemtime(4) >= 0
+y = fvar(9)
+ignorehitpause = 0
+
+[state 1600,];通常  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(1)
+persistent = 0
+
+
+[State -2, voice];ろじゃ～がむばって SL
+type = PlaySnd
+triggerall = var(54) <= 2 || var(54) = 6
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[State -2, voice];見せ場はろじゃーに	AC専用せりふ
+type = PlaySnd
+triggerall = var(54) >= 3 && var(54) != 6
+trigger1 = time = 0
+value = s1650,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+
+[state 1610,];S,R13 e,11	3枚目にはいった瞬間
+type = varset
+trigger1 = animelem = 3
+var(10) = 1900
+
+[state 3410,c];共通降下へ	空中投げもできるのでアニめは41系(判定ありのほう
+type = changestate
+trigger1 = animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+;-------------------------ロジャーへ命令系1600
+[Statedef 1577];ラッシュ 空中！  ふぉーすぶれーく　ORのみ・・いまのところね将来EXもできるかも
+type = a
+movetype =A
+physics = n
+anim = 1535
+ctrl = 0
+hitcountpersist = 1
+poweradd = 0
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+[State 3400,];FB 最初白く光る
+type = PALFX
+trigger1 = time = 0 
+add = 255,255,255
+time = 4
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+;--------振り向き判定は残るがダッシュ減速はない
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+[state 1610x,];EX TYPE VELOFF	ダッシュでもジャンプでも０になる
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+[state 1610,];発生アニメ中まではフリーズ
+type = posfreeze
+trigger1 = animelemtime(4) < 0
+value = 1
+ignorehitpause = 0
+
+[state 1610,];重力は４枚め以降	ろーりんぐのときどうなる？	ダストとかー
+type = veladd
+trigger1 = animelemtime(4) >= 0
+y = fvar(9)
+ignorehitpause = 0
+
+
+[State -2, voice];ろじゃ～がむばって SL
+type = PlaySnd
+triggerall = var(54) <= 2 || var(54) = 6
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[State -2, voice];見せ場はろじゃーに	AC専用せりふ
+type = PlaySnd
+triggerall = var(54) >= 3 && var(54) != 6
+trigger1 = time = 0
+value = s1650,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+
+[state 1600,];通常  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = ceil(-1)
+persistent = 0
+
+[state 3100,cut];SP発動暗転演出 リングのみにする？
+type = helper
+trigger1 = animelem = 3
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+size.air.front = 80
+size.air.back = 80
+ownpal = 1
+size.height = 0
+persistent = 0
+
+[State 3100, Super A];暗転する40F動くのも40FでアニメF調整して
+type = SuperPause
+trigger1 = animelem = 3
+postype = p1
+pos = 0, -50
+anim = -1;
+sound = s60, 0
+poweradd = -500
+persistent = 0
+time = 0
+movetime = 0
+darken = 0
+
+[state 1610,];S,R13 e,11	3枚目にはいった瞬間
+type = varset
+trigger1 = animelem = 3
+var(10) = 1900
+
+[state 3410,c];共通降下へ	空中投げもできるのでアニめは41系(判定ありのほう
+type = changestate
+trigger1 = animtime = 0
+value = 51
+anim = 41
+ctrl = 1
+
+
+;---------------------------------------------
+[Statedef 1580];げっと地上発動
+type = S
+movetype =A
+physics = n
+anim = 1560
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+
+[State -2, voice];ろじゃ～がむばって SL
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];発生までは変化も含む？
+type = varset
+trigger1 = animelem = 4
+var(10) = 2000
+persistent = 0
+
+[State -1, sike];フォースロマキャン20,21  RE以外	 そもそもREはこない
+type = ChangeState
+value = 975
+triggerall = var(1) != 1 && !var(53)
+triggerall = !var(40) && power >= 500  
+triggerall = (command = "ALL" && command != "holdback") || command = "roma"
+trigger1 = time = 19 || time = 20
+ignorehitpause = 1
+
+[state 1600,]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-------ロジャーゲット　空中発動
+;--------------これだけEXでもｘｙ０にならない。空配置戻しと同じ
+[Statedef 1585];ゲットへ空中	アニメは１種類です	
+type = A
+movetype =A
+physics = n
+anim = 1565
+ctrl = 0
+hitcountpersist = 1
+poweradd = ifelse(Var(40),0,40 + (var(2) = 1 && life <= 250) * 40)
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+;--------振り向き判定は残るがダッシュ減速はない		
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+[state 1610,];VEL封印しておく　０にしないように！
+type = posfreeze
+trigger1 = 1
+value = 1
+ignorehitpause = 0
+
+[State -2, voice];ろじゃ～がむばって SL
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1610,];S,R13 e,11	3枚目にはいった瞬間
+type = varset
+trigger1 = animelem = 4
+var(10) = 2000
+
+[State -1, sike];フォースロマキャン20,21  RE以外	
+type = ChangeState
+value = 985
+triggerall = var(1) != 1 && !var(53)
+triggerall = !var(40) && power >= 500  
+triggerall = time = 19 || time = 20
+trigger1 = (command = "ALL" && command != "holdback") || command = "roma"
+ignorehitpause = 1
+
+[state 3410,c];共通降下へ	空中投げもできるのでアニめは41系(判定ありのほう
+type = changestate
+trigger1 = animtime = 0
+value = 51
+anim = 41
+elem = 8
+ctrl = 1
+
+;------------------キルマシーン
+;-----地上暗転４０？
+[statedef 1590];---- カウンタ扱い
+type    = S
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+anim = 1580
+hitcountpersist = 1
+sprpriority = 0
+velset = ifelse(prevstateno < 99,0,vel x ),0 
+
+;--------------------------ダッシュ経由速度減少、停止処理0,20,99では０になってる
+[State 99,];1.05%?=0.105
+type = Veladd
+trigger1 = vel x > 0
+x = -1 * (vel x * 0.105)
+
+[State 99,]
+type = Velset
+trigger1 = Vel X <= 0.1
+x = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State -2, voice];ろじゃ～がむばって SL
+type = PlaySnd
+trigger1 = time = 0
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 1600,];  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = 1
+persistent = 0
+
+;------------暗転中に命令をだす？絵がすぐかわってしまう
+[state 3400,];絶対発動するのであれば0で命令？ヨーヨー変化12	ここが1＋２３F・・24？じゃない・おかしい
+type  = varset
+trigger1 = animelem = 13
+var(10) = 2100
+ignorehitpause = 1
+supermovetime = 999
+persistent = 0
+
+[state 3400,];1-13案点たすと1-52	AC1ふえ
+type = nothitby
+trigger1 = var(1) = 1 || var(1) = 2 || var(1) = 3
+trigger1 = animelemtime(12) <= 2
+trigger2 = !var(1) || var(1) = 4 
+trigger2 = animelemtime(12) <= 3
+value = SCA
+time = 1
+ignorehitpause = 1
+
+[state 3400,];14-21	AC1ずれ
+type = nothitby
+trigger1 = var(1) = 1 || var(1) = 2 || var(1) = 3
+trigger1 = animelemtime(12) = 3
+trigger2 = !var(1) || var(1) = 4 
+trigger2 = animelemtime(13) = 0
+value = SCA,nt,st,ht
+time = ifelse(!var(1) || var(1) = 4,6,7)
+ignorehitpause = 1
+
+[state 3400,cut];sp演出 
+type = helper
+trigger1 = time = 0
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+size.air.front = 80
+size.air.back = 80
+size.height = 2
+
+[State 99,];暗転してからとめないと・・だね
+type = posfreeze
+trigger1 = time <= 20
+value = 1
+
+[State 3400, Super A];暗転４０、mugでは39
+type = SuperPause
+trigger1 = time = 0
+postype = p1
+pos = 18, -50
+anim = -1;
+sound = s60, 0
+poweradd = -1000
+persistent = 0
+time = 39
+movetime = 39
+ignorehitpause = 1
+darken = 0
+
+
+[state 3400,c];
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;------------------キルマシーン 空中発動EX
+;---------------------------XY速度は強制０
+[statedef 1595];----
+type    = A
+movetype= A
+physics = n
+poweradd= 0
+ctrl = 0
+anim = 1585
+hitcountpersist = 1
+sprpriority = 0
+velset = 0,0
+
+[state -3,59];リセットせんこうがとりんぐ
+type = varset
+trigger1 = time = 0
+var(59) = 0
+
+;-------------重要、カウンタ判定用にAにすると相手がガードにいってしまう
+;---ぐるぐる、かくしゅろじゃなど注意
+[State 1100, ad]
+type = AttackDist
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[state 1500,ca];AIRダッシュ減速を無効にしないと・・-2でやってるから カウント1のとき減速されるのですっとばして０
+type = varset
+trigger1 = time = 0
+var(6) = 0
+persistent = 0
+
+[State -2, voice];
+type = PlaySnd
+trigger1 = animelem =2
+value = s1600,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+channel = 0
+
+[state 3400,]
+type = posfreeze
+trigger1 = animelemtime(10) < 0
+value = 1
+ignorehitpause = 1
+
+[state 3410,];無敵
+type = nothitby
+trigger1 = animelemtime(6) = 0 
+value = SCA
+time = 1
+ignorehitpause = 1
+
+[state 3410,];なげ無敵
+type = nothitby
+trigger1 = animelemtime(6) = 1 
+value = SCA,nt,st,ht
+time = 1
+ignorehitpause = 1
+
+[state 1600,];  fv14仮格納、戻り1  逆-1  安全性をたかめるには・・
+type = varset
+trigger1 = time = 0
+var(32) = 1
+persistent = 0
+
+[state 3400,cut];sp演出
+type = helper
+trigger1 = time = 0
+pos = 0, -50
+postype = p1
+name = "Cut Ex power ring"
+stateno = 790
+id = 790
+supermovetime = 9999
+ownpal = 1
+persistent = 0
+size.air.front = 80
+size.air.back = 80
+size.height = 2
+
+[State 3400, Super A];暗転36？
+type = SuperPause
+trigger1 = time = 0
+postype = p1
+pos = 18, -53
+anim = -1;1001
+sound = s60, 0
+poweradd = -1000
+persistent = 0
+time = 35
+movetime = 35
+ignorehitpause = 1
+darken = 0
+
+
+[state 3410,];ヨーヨー変化	暗転とかあるのでやりづらいね 発生11
+type  =varset
+trigger1 = animelem = 6
+var(10) = 2100
+ignorehitpause = 1
+
+[state 3410,];重力は１０枚目以降
+type = veladd
+trigger1 = animelemtime(10) >= 0
+y = fvar(9)
+ignorehitpause = 0
+
+[state 3410,c];そらP,K，共通降下へ
+type = changestate
+trigger1 = animtime = 0
+value = 51
+ctrl =1
+
+[state 3410,c];下へ
+type = changestate
+trigger1 = vel y > 0 && pos y >= 0
+value = 52
+ctrl = 0

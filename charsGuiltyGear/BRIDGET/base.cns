@@ -1,0 +1,1370 @@
+;No5 code:"candana" base.cns
+;
+[Data]  
+life = 1000  
+attack = 100  
+defence = 93.5 
+fall.defence_up = 75  
+liedown.time = 40  
+airjuggle = 100  
+sparkno = -1  
+guard.sparkno = -1  
+KO.echo = 0           
+volume = 255
+IntPersistIndex = -1
+FloatPersistIndex = -1
+power = 2000
+ 
+[Size]
+xscale = 0.5           
+yscale = 0.5           
+ground.back = 14    
+ground.front = 14   
+air.back = 14        
+air.front = 15      
+height = 70          
+attack.dist = 150    
+proj.attack.dist = 80
+proj.doscale = 0       
+head.pos = -5, -100  
+mid.pos = -5, -70    
+shadowoffset = 0    
+draw.offset = 0,0   
+
+;----通常			これを２で割った数字
+;前進4 後退3 FD8 BD9  AFD17.5 ABD13 FJ6.5 BJ6.5
+;----GGモード	20%UP?		これを２で割った数字
+;前進5 後退3.5 FD11.5 BD11  AFD21 ABD15.5 FJ6.5 BJ6.5
+;----Gカラー	ぜんぜん2倍じゃない	これを２で割った数字
+;前進7 後退6 FD 20 BD18  AFD21 ABD15.5 FJ10 BJ10
+;----GG+Gカラー			これを２で割った数字
+;前進8 後退6.5 FD22.5 BD21.5  AFD26 ABD19 FJ10 BJ10
+
+;--------------前進後退は重力Sがデフォなので、常時摩擦分増やす、かNにする
+[Velocity]
+walk.fwd  = 2      
+walk.back = -1.5     
+run.fwd  = 4    
+run.back = -4.5,-2 
+jump.neu = 0,-10.5    
+jump.back = -3.25   
+jump.fwd = 3.25      
+runjump.back = -3.25,-12 
+runjump.fwd = 3.25,-12     
+airjump.neu = 0,-10.5   
+airjump.back = -3.25     
+airjump.fwd = 3.25        
+
+[Movement];重力以外はMUGENデフォルトにしておく
+airjump.num = 0      
+airjump.height = 35  
+yaccel = 0.525
+stand.friction = 0.85  
+crouch.friction = 0.82 
+
+
+;---------------------------------------------キャラチェック
+;-----------------------------------------イントロ対応きゃら判定、
+[statedef 169]
+type = s
+
+[state 169,var];0クリア
+type = varset
+trigger1 = time = 0
+var(48) = 0
+
+[state 169,var99];筋肉　
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "POTEMKIN"
+var(48) = 99
+
+[state 169,var99];炎の料理人 ジャム	カイと同じでいいかな、青青さんのでやらないようにね
+type = varset
+trigger1 = enemy,authorname = "EL"
+trigger1 = P2name = "jam"
+var(48) = 60
+
+[state 169,var30];赤い服のイノ	
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "I-NO"
+var(48) = 55
+
+[state 169,var30];警察カイ?		
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "ROBO-Ky"
+var(48) = 50
+
+[state 169,var30];警察カイ		
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "Ky Kiske"
+;trigger2 = P2name = "Ky"
+var(48) = 45
+
+[state 169,var30];不精者アクセル	
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "Axl Low"
+var(48) = 40
+
+[state 169,var30];賞金首さん　本命　デイズィー
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "dizzy"
+trigger2 = P2name = "Dizzy By Third"
+var(48) = 30
+
+[state 169,var30];賞金首さん　本命　デイズィー
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "Dizzy"
+trigger1 = enemy,authorname = "EL"
+var(48) = 35
+
+[state 169,var8];賞金首さん　踊る強盗ミトアンジ
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "Anji Mito"
+var(48) = 8
+
+[state 169,var7];賞金首さん　だんでぃーなおにーさんジョニー
+type = varset
+triggerall = 0; time = 0
+trigger1 = P2name = "JOHNNY"
+var(48) = 7
+
+[state 169,var6];賞金首さん　人斬り侍バイケン
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "BAIKEN"
+trigger2 = P2name = "BAIKEN_GGX"
+var(48) = 6
+
+[state 169,var5];賞金首さん　テロ犯チップザナフ
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "Chipp Zanuff"
+trigger2 = P2name = "Chipp_Zanuff"
+var(48) = 5
+
+;-Millia Rage
+[state 169,var20];賞金首さん　女豹ミリアレイジ  中間空白はうちの20or21
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "Millia_Rage"
+trigger2 = P2name = "Millia Rage"
+var(48) = 20
+
+;--------------------相手が誰かのチェック--------------------
+[state 169,1var];ケンカ友達　メイ（メカさんとうちの?）
+type = varset
+triggerall = time = 0
+trigger1 = enemy,authorname = "MEKA"
+trigger1 = P2name = "may"
+trigger2 = enemy,authorname = "EL"
+trigger2 = P2name = "MAY"
+var(48) = 3
+
+;-----------以下は制限キャラ
+;--------------------相手が誰かのチェック--------------------
+[state 169,var];双子システム使用は勝利イントロ対応めんどいので・・
+type = varset
+triggerall = time = 0
+trigger1 = enemy,authorname = "R-R"
+var(48) = 2
+
+;--------------------相手が誰かのチェック--------------------
+[state 169,var];ブリジット　登場イントロ不都合ありにらめっこ状態でじかんぎれになる
+type = varset
+triggerall = time = 0
+trigger1 = P2name = "bridget"
+trigger2 = P4name = "bridget"
+trigger3 = P2name = "BRIDGET"
+trigger4 = P4name = "BRIDGET"
+var(48) = 1
+
+;-----------------------------
+;-他、対応すべきキャラ…？-----------------------------
+;-----------------------------
+[state 169, char chk];に戻す
+type = changestate
+trigger1 = time = 0
+VALUE = 190
+
+;---------------------------------------------------------------------------
+; タイムオーバー  
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 5300
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; 勝動作 start
+;-----181 スカートめくれ -----182 ヨーヨーキャッチ -----183 ヨーヨーキャッチ（相手が。
+;相手が5150で自ステート0がここにくる条件、5110の時点で抽選しているはず
+;---ラウンド終了で全てhitdef無効になる、ので疑似的に当たった演出を。
+[Statedef 180]
+type = S
+;anim = 0
+
+[state 193,];ボイス2連なので固定用
+type = varset
+trigger1 = time = 0
+var(51) = ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+
+[State 180, 1];デバック
+type = ChangeState
+trigger1= 0;time = 0
+value = 183
+
+[State 180, 1];一撃KOの時のみ
+type = ChangeState
+triggerall = numhelper(3600)
+trigger1= time = 0
+value = 185
+
+;双子は除外、スプライト化け対応しきれない。170はnothitbyかかってるので余計変になるよ
+;---相手情報取得のへろぱーですでにDOS<WIN,チームモード判断してるからいらないかも
+;;KO勝ちしんぐるのみ相手キャッチへ行けます。
+[State 180, 1];KO勝ちでないかチームモードなら相手キャッチ以外です
+type = ChangeState
+triggerall = !numhelper(3600) 
+triggerall = numhelper(184)
+trigger1= time >= 0
+value = 181 + var(5);random % 3 
+
+[State 180, 1];それ以外の勝ち方 ぶつけ以外
+type = ChangeState
+triggerall = !numhelper(3600) 
+triggerall = !numhelper(184)
+trigger1= time >= 0
+value = 181 + random % 2 
+
+[State 181, 4]
+type = AssertSpecial
+trigger1 = Time  <= 150
+flag = RoundNotOver
+
+;--------------------勝利イントロ　スカートめくれ
+[Statedef 181]
+type = S
+movetype = i
+physics = n
+ctrl = 0
+anim = 182
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[state 181,];仕上げです
+type = playsnd
+trigger1 = animelem = 1
+persistent = 0
+channel = 0
+value = s183,var(51)
+
+[state 181,];いやん
+type = playsnd
+trigger1 = animelem = 8
+persistent = 0
+channel = 0
+value = s183,var(51) + 10
+
+[state 181,]
+type = changeanim
+trigger1 = time > 210
+value = 182
+elem = 15
+
+[State 181, 4]
+type = AssertSpecial
+trigger1 = Time  <= 400
+flag = RoundNotOver
+
+;---------------------------------------------------------------------------
+; 勝ちポーズ 　s182,win1_1  番号変更
+[Statedef 182];は～い♪　お粗末様でした～♪
+type = S
+ctrl = 0
+anim = 180
+velset = 0,0
+
+[state 182,helper partner];----ヨーヨー
+type = Helper
+triggerall = !NumHelper(180) 
+trigger1 = animelem = 4
+name = "win yoyo1"
+ID = 180
+pos = -15,-45
+postype = p1
+stateno = 6080
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[State 182, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[state 182,];はーい
+type = playsnd
+trigger1 = animelem = 2
+persistent = 0
+channel = 0
+value = s180,var(51)
+
+[state 182,];お粗末様でした～
+type = playsnd
+trigger1 = animelem = 10
+persistent = 0
+channel = 0
+value = s180,var(51) + 10
+
+[state 181,]
+type = changeanim
+trigger1 = time > 200
+value = anim
+elem = 15
+
+[State 182, 4]
+type = AssertSpecial
+trigger1 = Time  <= 300
+flag = RoundNotOver
+
+;---------------------------------------------------------------------------
+; 勝ちポーズ s183, ヨーヨー追い討ち　
+[Statedef 183]
+type = S
+movetype = i
+physics = n
+ctrl = 0
+anim = 181
+
+[state 183,helper partner];----ヨーヨー
+type = Helper
+triggerall = !NumHelper(183) 
+trigger1 = anim = 181
+trigger1 = animelem = 4
+name = "win yoyo2"
+ID = 183
+pos = -15,-45
+postype = p1
+stateno = 6090
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[state 182,];はーい
+type = playsnd
+trigger1 = animelem = 2
+persistent = 0
+channel = 0
+value = s180,var(51)
+
+[state 182,];風の力は
+type = playsnd
+trigger1 = animelem = 9
+persistent = 0
+channel = 0
+value = s180,var(51) + 20
+
+[State 183, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 183, 4]
+type = AssertSpecial
+trigger1 = Time  <= 400
+flag = RoundNotOver
+
+;------------------一撃必殺の時用
+[Statedef 185]
+type = S
+movetype = i
+physics = n
+ctrl = 0
+anim = 0
+
+[State 3660,00]
+type = ALLPalfx
+trigger1 = 0
+add = -250,-250,-250
+sinadd = -250,-250,-250
+time = 1
+ignorehitpause = 1
+
+[State 3620,]
+type = AssertSpecial
+trigger1 =1
+time = 1
+flag = noBG
+flag2 = nobardisplay
+flag3 = noFG
+ignorehitpause = 1
+
+[State 3620,]
+type = AssertSpecial
+trigger1 =1
+time = 1
+flag = invisible
+flag2 = globalnoshadow
+flag3 = nomusic
+ignorehitpause = 1
+
+[State 183, 4]
+type = AssertSpecial
+trigger1 = Time <= 150
+flag = RoundNotOver
+
+
+;-----------------------------------------------------
+;---------------------------------------------------------------------------
+; 開始前の動作 PREINTRO override common190
+[Statedef 190]
+type = S
+ctrl = 0
+velset = 0,0
+anim = 0
+
+[State 190, 2] ;デバック
+type = ChangeState
+trigger1 =0; Time =0
+value = 192 
+
+;-------------ストーリーモードの音声使用しているいんとろは、キャスト制限かかります
+[state 190,];嫌いなもの	筋肉きらいね	これぎゃくにげんなりになるのかな？
+type = poweradd
+triggerall = 0;time = 0
+triggerall = var(48) = 99
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = 2000
+
+[State 190, i] ;イントロ分岐　イノ 通常1,2特殊１　
+type = ChangeState
+triggerall = time = 0
+triggerall = var(48) = 55
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = ifelse((var(54) <= 2 || var(54) = 6) && random % 2 = 0,2980,191 + random % 2)
+
+[State 190, k] ;イントロ分岐　カイ 通常1,2特殊１　これはイントロできるか判断できる
+type = ChangeState
+triggerall = time =0
+triggerall = var(48) = 45
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = ifelse((var(54) <= 2 || var(54) = 6) && random % 2 = 0,2970,191 + random % 2)
+
+[State 190, r] ;イントロ分岐　Rカイ 通常1特殊１　同じ仕様なら・・これはイントロできるか判断できる？
+type = ChangeState
+triggerall = time =0
+triggerall = var(48) = 50
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = ifelse((var(54) <= 2 || var(54) = 6) && random % 2 = 0,2975,191)
+
+[State 190, j] ;イントロ分岐　特定キャラ ジャム　カイとおなじで　これもできる
+type = ChangeState
+triggerall = var(54) <= 2 || var(54) = 6
+triggerall = time =0
+triggerall = var(48) = 60
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = 2985 
+
+[State 190, d] ;イントロ分岐　特定キャラ ディズィ30　特殊１特殊１相手無反応
+type = ChangeState
+triggerall = var(54) <= 2 || var(54) = 6
+triggerall = Time = 0
+triggerall = var(48) = 30 
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = 2950
+
+[State 190, d2] ;イントロ分岐　特定キャラ ディズィ30　特殊１うちのなら判断OK あっちも判断させないとまずい
+type = ChangeState
+triggerall = Time =0
+triggerall = var(48) = 35
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = ifelse((var(54) <= 2 || var(54) = 6) && random % 2 = 0,2990,191) 
+
+
+[State 190, 2] ;イントロ分岐　特定キャラ ミリアレイジ20nanaさん　特殊１相手が発動してしまう・・
+type = ChangeState
+triggerall = Time =0
+triggerall = var(48) = 20
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = 2945 
+
+[State 190, 2] ;イントロ分岐　特定キャラ アンジ8　通常2　特殊１　
+type = ChangeState
+triggerall = Time =0
+triggerall = var(48) = 8
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = ifelse((var(54) <= 2 || var(54) = 6) && random % 2= 0,2940,192) 
+
+[State 190, 2] ;イントロ分岐　特定キャラ ジョニー7
+type = ChangeState
+triggerall = 0;Time =0
+triggerall = var(48) = 7
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = ifelse((var(54) <= 2 || var(54) = 6) && random % 2= 0,2940,192) 
+
+[State 190, 2] ;イントロ分岐　特定キャラ特殊　バイケン,？4.6　通常2　特殊１　相手無反応
+type = ChangeState
+triggerall = var(54) <= 2 || var(54) = 6
+triggerall = Time =0
+triggerall = var(48) = 6
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = 2930
+
+[State 190, 2] ;イントロ分岐　特定キャラ特殊　,チップ セリフ長さによって変更？5
+type = ChangeState
+triggerall = Time =0
+triggerall = var(48) = 5
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value =ifelse((var(54) <= 2 || var(54) = 6) && random % 2= 0,2930,192) 
+
+[State 190, 2] ;イントロ分岐　特定キャラ特殊　メイとじゃれる194 3　特殊１	これはどっちでもできるはず
+type = ChangeState
+triggerall = Time =0
+triggerall = var(48) = 3
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = 194 
+
+[State 190, 2] ;イントロ分岐　同キャラ　ころばさせに２P強制
+type = ChangeState
+triggerall = Time =0
+triggerall = var(48) = 1
+triggerall = teamside = 2
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value =  191
+
+;----------------------------------------
+[State 190, 2test] ;イントロ分岐　シングルモードのみ分岐可能191-192
+type = ChangeState
+triggerall = Time =0
+trigger1 = TeamMode = Simul = 0 && enemy,teammode = simul = 0
+value = 191 + random % 2
+
+[State 190, 2] ;イントロ分岐　シングルモードのみ分岐可能191-192
+type = ChangeState
+trigger1 = Time =0
+value = 191; 
+
+[State 190, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[Statedef 195]
+type = S
+ctrl = 0
+velset = 0,0
+anim = 196
+
+[state 200x,];
+type = playsnd
+trigger1 = time = 5
+value = s2900,32
+persistent = 0
+channel = 3
+
+[state 191,]
+type = changestate
+trigger1 = time>= 180
+value = 0
+
+[State 190, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;--------------------イントロ1に変更ヨーヨートリック
+;-----------------
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[state 191,]
+type = varset
+trigger1 = time = 0
+var(5) = 0
+
+[state 191,];同キャラ時	2Pが転ぶ
+type = changestate
+triggerall = var(48) = 1
+trigger1 = teamside = 2
+trigger1 = p2stateno = 192
+trigger1 = time >= 80
+value = 0
+
+[State 191, 4];ヨーヨー放り上げ、 1Pと2Pで時間違う
+type = Changeanim
+triggerall = anim != 193
+trigger1 = anim = 192 && time = 100 + (teamside = 2) * 30
+value = 193
+
+[State 191, 4];放り上げキャッチ後、せりふ終了
+type = Changeanim
+triggerall = anim != 194
+trigger1 = anim = 193 && time = 250 + (teamside = 2) * 30
+value = 194
+
+[state 191,];たのしんでってくださいね？
+type = playsnd
+trigger1 = anim = 193
+trigger1 = animelem = 17
+persistent = 0
+channel = 0
+value = s192,ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+
+[State 191, 4] 
+type = ChangeState
+trigger1 = anim = 194 && animtime = 0
+value = 0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;----以下イントロ2------------------------- ふみふみげしげし 
+[Statedef 192]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 192, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = noshadow
+flag3 = invisible
+
+[State 192, 4];相手がstate0にいかないキャラの時
+type = ChangeState
+triggerall = time >= 300
+triggerall = NumHelper(192) = 0
+trigger1 = p2stateno != 0
+value = 2900
+
+[state 192,helper partner];----ヨーヨー ｐ２のときY-80,B-420スタートだった
+type = Helper
+triggerall = !NumHelper(192)
+trigger1 = p2stateno = 0
+trigger1 = roundstate = 1
+helpertype = normal
+sprpriority  = 0
+name = "intro yoyo"
+ID = 192
+pos = 400,0
+postype = p1
+stateno = 6000
+keyctrl = 0
+ownpal = 1
+persistent = 0
+
+[state 19,helper partner];----踏みブリジット 距離はなしてちょうせつ
+type = Helper
+triggerall = !NumHelper(193)
+trigger1 = p2stateno = 0
+trigger1 = roundstate = 1
+helpertype = normal
+sprpriority  = 0
+name = "intro bridget"
+ID = 193
+pos = 740,0
+postype = p1
+stateno = 6010
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[State 192, 4] 
+type = ChangeState
+triggerall = numhelper(193)
+trigger1 = helper(193),rootdist x = 0
+value = 193
+
+;---------踏みイントロ　セリフ言って終了へ
+[Statedef 193]
+type = S
+movetype = A
+ctrl = 0
+anim = 190;ifelse(p2stateno = 6050,190,190)
+velset = 0,0
+
+[state 193,]
+type = varset
+trigger1 = time = 0
+var(5) = 0
+
+[State 193, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 193,];ボイス2連なので固定用
+type = varset
+trigger1 = time = 0
+var(51) = ifelse(var(54) < 6, var(54),ifelse(var(54) = 8,random % 6,random % 3)) + (var(54) = 7) * 3
+
+[state 193,];…あら？
+type = playsnd
+triggerall = p2stateno = [5786,5788]
+trigger1 = anim = 190
+trigger1 = animelem = 10
+persistent = 0
+channel = 0
+value = s190,var(51)
+
+[state 193,];寝ちゃうほど待たせちゃいました？	これはタイムで
+type = playsnd
+triggerall = p2stateno = [5786,5788]
+trigger1 = anim = 190
+trigger1 = time = 130;0;animelem = 11
+persistent = 0
+channel = 0
+value = s190,var(51) + 10
+
+;------------無敵とかになってて踏んでない場合
+;---REさ、いきますよ	
+[state 193,];当たらない相手仮に
+type = playsnd
+triggerall = var(54) <= 2 || var(54) = 6 
+triggerall = p2stateno != [5786,5788]
+trigger1 = anim = 190
+trigger1 = animelem = 10
+persistent = 0
+channel = 0
+value = s2900,31
+
+[state 193,];当たらない相手仮にACなら8でもこっちでいいや	ACもうはじめていいですか？VSアクセルのでいけるかな？
+type = playsnd
+triggerall = var(54) >= 3 && var(54) != 6
+triggerall = p2stateno != [5786,5788]
+trigger1 = anim = 190
+trigger1 = animelem = 10
+persistent = 0
+channel = 0
+value = s2900,65
+
+[State 193, 4];喋り終わりアニメへ 
+type = Changeanim
+triggerall = anim != 191
+trigger1 = p2stateno = [5786,5788]
+trigger1 = anim = 190 && time >= 250
+trigger2 = p2stateno != [5786,5788]
+trigger2 = anim = 190 && time >= 120
+value = 191
+
+[state 193,]
+type = varset
+trigger1 = anim = 191 && animtime = 0
+var(50) = 0
+
+[State 193, 4] 
+type = ChangeState
+trigger1 = anim = 191 && animtime = 0
+value = 0
+
+;----以下イントロ3-------------メイと遊ぶ 
+[Statedef 194]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 194, 3]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 0,0
+
+[State 194, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = noshadow
+flag3 = invisible
+
+[state 19,helper partner];----踏みブリジット
+type = Helper
+triggerall = NumHelper(194) = 0
+trigger1 = p2stateno = 0
+trigger1 = roundstate = 1
+helpertype = normal
+sprpriority  = 0
+name = "intro bridget vs may"
+ID = 194
+pos = -200,0
+postype = p2
+stateno = 6030
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[State 194, 4] 
+type = ChangeState
+triggerall = numhelper(194)
+trigger1 = helper(194),rootdist x = 0
+trigger1 = helper(194),anim = 190
+value = 196
+
+;------------------喧嘩がお得意？
+[Statedef 196]
+type = S
+ctrl = 0
+velset = 0,0
+anim = 190
+
+[state 194,];えーっと
+type = playsnd
+trigger1 = time = 0
+persistent = 0
+value = s190,ifelse(var(54) <= 2 || var(54) = 6 ,1,4)
+
+[state 194,];喧嘩がお得意なんですね～（しれっと
+type = playsnd
+trigger1 = time = 75
+persistent = 0
+value = s196,ifelse(var(54) <= 2 || var(54) = 6 ,0,3)
+
+[state 7030,];踏みイベントが始まった証を解除
+type  =varset
+trigger1 = anim = 710 && time >= 130
+var(50) = 0
+
+[state 196,]
+type = changeanim
+trigger1 = time = 0
+value = 190
+elem = 10
+
+[state 196,]
+type = changeanim
+trigger1 = anim = 190 && time >= 75
+value = 191
+
+[state 196,];710は910に変更
+type = changeanim
+trigger1 = anim = 191 && animtime = 0
+value = 910
+
+[state 196,];終了
+type = changestate
+trigger1 = anim = 910 && animtime  = 0;>= 170
+value = 0
+
+[State 196, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;-------------------ヨーヨー追い討ち用相手ステート奪取　7000（同5110--------------------------------------------------------
+;5150で情報消失なので手前の5110に入った瞬間奪取　したがって7000=5110である
+; HIT_LIEDOWN
+;[Statedef 5110]
+[Statedef 7000]
+type    = L
+movetype= H
+physics = N
+
+[State 5110, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 5110, 1] ;For hit up/up-diag type (from state 5081)
+type = ChangeAnim
+persistent = 0
+trigger1 = SelfAnimExist(5110 + (anim % 10))
+trigger1 = anim = [5081,5089]
+trigger2 = anim = 5091
+value = 5110 + (anim % 10)
+
+;--------------ちょっといじったところーー----------------
+[State 5110, 2] ;Hit ground anim (normal)
+type = ChangeAnim
+triggerall = prevstateno != 5071
+triggerall = time = 0
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim != [5161,5169]
+trigger2 = !SelfAnimExist(5170 + (anim % 10))
+value = 5170
+
+[State 5110, 3] ;Hit ground anim (for hit up)
+type = ChangeAnim
+triggerall = prevstateno != 5071
+triggerall = time = 0
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim = [5161,5169]
+trigger1 = SelfAnimExist(5170 + (anim % 10))
+value = 5170 + (anim % 10)
+
+[State 5110, 3] ;Hit ground anim (for hit up)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim = 5070;prevstateno = 5071
+value = 5171
+
+[State 5110, 4]
+type = HitFallDamage
+trigger1 = Time = 0
+
+[State 5110, 5]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, Var] ;Get fall velocity
+type = VarSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) != 0
+sysvar(1) = floor(vel y)
+
+[State 5110, 6]
+type = PlaySnd
+trigger1 = Time = 0
+trigger1 = !SysVar(0)
+;value = F7, 0 ;Hit ground
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 5110, 7]
+type = GameMakeAnim
+trigger1 = Time = 0
+trigger1 = !SysVar(0)
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 10
+
+[State 5110, 8]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, 9] ;For hit up type
+type = ChangeAnim
+persistent = 0
+triggerall = anim = [5171,5179]
+triggerall = SelfAnimExist(5110 + (anim % 10))
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground anim
+value = 5110 + (anim % 10)
+
+;--------------ちょっといじったところーー----------------
+[State 5110, 9ex] ;仕様うつぶせ For hit trip type
+type = ChangeAnim
+persistent = 0
+triggerall = prevstateno = 5071
+;triggerall = anim = [5171,5179]
+;triggerall = SelfAnimExist(5110 + (anim % 10))
+trigger1 = AnimTime = 0
+;trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground anim
+value = 5111 ;+ (anim % 10)
+
+;--------------------------------------------------------
+[State 5110, 10] ;For normal
+type = ChangeAnim
+persistent = 0
+triggerall = Anim != [5111,5119]
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+value = 5110
+
+;--------------------実際は5150に行く所を7010に　7010=5150
+[State 5110, 11] ;If just died
+type = ChangeState
+triggerall = !alive
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+trigger3 = Anim = [5110,5119]
+;value = 7010
+value = 5150
+
+[State 5110, 12]
+type = VarSet
+trigger1 = SysVar(0)
+trigger1 = Time = 0
+sysvar(0) = 0
+
+[State 5110, 13] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 5110, 14]
+type = ForceFeedback
+trigger1 = alive
+trigger1 = Time = 0
+time = 8
+ampl = 240
+waveform = sine
+
+[State 5110, 15]
+type = ForceFeedback
+trigger1 = !alive
+trigger1 = Time = 0
+ampl = 200, 7, -.467
+time = 30
+waveform = sine
+
+;---------------------------------------------------------------------------
+; HIT_LIEDEAD  1p state=0 && ctrl = 1 で 2p state 5150(奪い中でも可)でラウンド終了判定される。
+;--
+[Statedef 15150]
+type    = L
+movetype= H
+physics = N
+sprpriority = 12
+
+[state 3800,];ササリアニメ
+type = changeanim
+triggerall = prevstateno = 3720
+trigger1 = time =0
+trigger1 = SelfAnimExist(5119) 
+value = ifelse(authorname = "R-R",5119 + var(0),5119)
+
+[state 3800,];がないとき 頭中心
+type = changeanim2
+triggerall = prevstateno = 3720
+trigger1 = time =0
+trigger1 = !SelfAnimExist(5119) 
+value = ifelse(authorname = "R-R",3650 + var(0),3650)
+
+[State 5150, 1] ;Normal anim
+type = ChangeAnim
+triggerall = prevstateno != 3720
+triggerall = Time = 0
+triggerall = SelfAnimExist(5140)
+trigger1 = (anim != [5111,5119]) && (anim != [5171,5179])
+trigger2 = !SelfAnimExist(5140 + (anim % 10))
+value = 5140
+
+[State 5150, 3] ;Hit up type anim
+type = ChangeAnim
+triggerall = prevstateno != 3720
+trigger1 = Time = 0
+trigger1 = (anim = [5111,5119]) || (anim = [5171,5179])
+trigger1 = SelfAnimExist(5140 + (anim % 10))
+value = 5140 + (anim % 10)
+
+[State 5150, 4] ;Match over anim
+type = ChangeAnim
+persistent = 0
+triggerall = prevstateno != 3720
+;trigger1 = Time = 0
+trigger1 = MatchOver = 1
+trigger1 = Anim = [5140,5149]
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+
+[State 5150, 5] ;Switch to 5110 if liedead anim does not exist
+type = ChangeAnim
+triggerall = prevstateno != 3720
+trigger1 = Time = 0
+trigger1 = Anim != [5140,5159]
+trigger1 = Anim != [5110,5119]
+value = 5110
+
+[State 5150, 6] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 5150, 7] ;Friction
+type = VelSet
+trigger1 = Vel x < .05
+persistent = 0
+x = 0
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 0;
+value = SCA
+time = 1
+
+[state 5150,]
+type = changestate
+triggerall = prevstateno != 3720
+trigger1 = name = "bridget"
+trigger1 = roundstate=4
+trigger1 = !var(47) && !var(52)
+value = 7010
+
+[state 5150,]
+type = changestate
+triggerall = prevstateno != 3720
+trigger1 = name != "bridget"
+trigger1 = roundstate=4
+value = 7010
+
+;---------------------------
+[Statedef 7010]
+type    = L
+movetype= H
+physics = N
+sprpriority = -3
+velset = 0,0
+
+[state 7010,];-２どはね防止
+type = varset
+trigger1 = name = "bridget"
+trigger1 = time = 0
+var(47) = 1
+
+[state 7010,];ここのこと？
+type = changestate
+;trigger1 = p2stateno = 183
+;trigger1 = time >= 132
+trigger1 = enemy,stateno = 183
+trigger1 = enemy,time = 71+(teamside=2)
+value = 7020
+
+;-------------------------追い討ちくらって吹き飛ぶ
+[Statedef 7020]
+type    = L
+movetype= H
+physics = A
+sprpriority = -3
+velset = -7,-2.5
+
+[State 875, 1]
+type = ChangeAnim
+Triggerall = 0;Time = 0
+trigger1  = anim = 5141
+trigger1 = selfanimexist(5030)
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+
+[State 875, 1]
+type = ChangeAnim
+Triggerall = Time <= 10
+trigger1 = selfanimexist(5080)
+trigger1 = name = "bridget" = 0
+value = ifelse(authorname = "R-R",5080 + var(0),5080)
+
+[State 875, 1]
+type = ChangeAnim
+Triggerall = Time <= 10
+trigger1 = name = "bridget"
+value = ifelse(authorname = "R-R",5030 + var(0),5030)
+
+[state 7020,]
+type = selfstate
+trigger1 = time >= 10;pos y > -20 && vel y > 0
+value = 5050
+
+;------------------------------------commonのはつかわずにここで設定する
+;---------------------------------------------------------------------------
+; Initialize (at the start of the round)
+[Statedef 5900]
+type = S
+
+[State 5900, 1] ;Clear all int variables
+type = VarRangeSet
+trigger1 = roundsexisted = 0
+value = 0
+persistent = 0
+
+[State 5900, 2] ;Clear all float variables
+type = VarRangeSet
+trigger1 = roundsexisted = 0
+fvalue = 0
+persistent = 0
+
+[state 182,helper partner];----モードセレクトへるぱ
+type = Helper
+trigger1 = !numhelper(170)
+trigger1 = RoundsExisted = 0
+helpertype = normal
+sprpriority  = 0
+name = "moce select"
+ID = 170
+pos = ifelse(teamside = 1,5,315),-140
+postype = left
+stateno = 9000
+keyctrl = 1
+
+
+[state 5900,];ヨーヨー食らい勝利イントロ、一撃のリセット
+type = varrangeset
+trigger1 = time = 0
+first = 38
+last = 40
+value = 0
+
+[state 5900,attack];でふぇんすむるここじゃだめかも？
+type = defencemulset
+trigger1 = time =0
+value = 1
+
+[state 5900,attack];テンションゲージ0スタート　
+type = powerset
+trigger1 = RoundsExisted = 0
+value = 0
+
+[state 5900,attack];バーストゲージＭＡＸスタートラウンド１のみ
+type = varset
+trigger1 = RoundsExisted = 0
+fvar(10) = 15000
+
+[state 5900,];ガードバランスリセット
+type = varrangeset
+trigger1 = time = 0
+first = 18
+last = 19
+value = 128
+
+[state -3,];	ろじゃーの性格 固定AC,SL,#R=0 EX=1 	ORは0だがシフト可能
+type = varset
+trigger1 = RoundsExisted = 0
+var(20) = ifelse(var(1) = 2,1,0)
+ignorehitpause = 0
+
+;-------------------------------------ここからCONFIG-OK-------------------------------
+;☆ブラックカラー指定
+;	一色のカラーは作る気まったくありません。変わりに好きなカラーを指定することができます。
+;	たとえば基本色の青(1P)でもごーるどな性能にできたりするわけですね。
+;	それぞれ1～12のどれかを指定します。それ以外はバグの元です。
+;	初期設定では7,8。つまりpal7,pal8となってるわけね。
+;------------------------ブラックカラー指定 1-12
+[state 5900,BLACK COLOR];
+type = varset
+trigger1 = time = 0
+var(41) = 7
+
+;------------------------ゴールドカラー指定 1-12
+[state 5900,GOLD COLOR];
+type = varset
+trigger1 = time = 0
+var(42) = 8
+
+;☆ボイスセレクト1　キャスティング
+;--------------ブリジット　キャスティング default = 6(Random frrom XX)
+;	0,1,2,6(XX)	CV:小西寛子さん	
+;	3,4,5,7(AC)	CV:加藤有希子さん	
+;-------イントロ関係の問題でACはオプション扱い
+;******	XXでないと発動しない特殊いんとろがあります********
+;****** ACにしてもXXボイスでイントロになるキャラがあります*****
+;--- 0 TYPE A ot XX	(#RELOAD,SLASH)			
+;--- 1 TYPE B of XX	(#RELOAD,SLASH)			
+;--- 2 TYPE C of XX	(#RELOAD,SLASH)			
+;--- 3 TYPE A of AC	(ACCENT CORE)			
+;--- 4 TYPE B of AC	(ACCENT CORE)				
+;--- 5 TYPE C of AC	(ACCENT CORE)				
+;--- 6 RANDAM from XX	(#RELOAD,SLASH)	ABCの中でランダム	
+;--- 7 RANDAM from AC	(ACCENT CORE)	ABCの中でランダム	
+[state 5900,voice select1];
+type = varset
+trigger1 = RoundsExisted = 0
+var(54) = 6
+
+;☆ボイスカット(ろじゃー
+;----このコンフィグは設定不可能になりました。
+;---上記ブリジット本体のボイスタイプと連動になります(予定)
+
+;-------------------------------------------------------------------------
+;★各種ゲージ表示位置変更:Ver2
+;一撃必殺、ガードバランス、バーストゲージ(カラーランプ連動)　の3種類のみ。
+;モード表示はvarの残量の関係でコンフィグ対象外。どうしても変えたいならminus.cnsを直接いじって(保証外)
+;それぞれ対応のvarの数値をいじると移動します。小数点以下は無視されます。
+;横位置(X)は1P側の数値をいじります。2P側は自動でその対称位置になります。
+;縦位置(Y)は1P2P共通。普通平行だよね。
+;それぞれのアニメは基準点が違うので、同じ数値でも違う位置になるかも。いろいろ試してみてください。
+;SIMULでは片方はずらして表示します。
+;---------------------以下ゲージ表示位置の設定　2PXは1Pの左右対称位置
+;-------------------------一撃必殺ゲージ表示位置 1P X  Default 20
+[state 5900,one x];fvar(24) is One Kill Gauge X
+type = varset
+trigger1 = time = 0
+fvar(24) = 20
+
+;-------------------------一撃必殺ゲージ表示位置 1P2P Y  Default 230
+[state 5900,one 1P2PY];fvar(25) is One Kill Gauge Y
+type = varset
+trigger1 = time = 0
+fvar(25) = 230
+
+;---------------------------------
+;-------------------------ガードバランスゲージ表示位置 1P X   Default 145
+[state 5900,blance x];fvar(26) is Guard Gauge X
+type = varset
+trigger1 = time = 0
+fvar(26) = 145
+
+;-------------------------ガードバランスゲージ表示位置 1P2P Y  Default 30
+[state 5900,blance 1P2PY];fvar(27) is Guard Gauge Y
+type = varset
+trigger1 = time = 0
+fvar(27) = 30
+
+;--------------------------------
+;-------------------------バーストゲージ＋SPカラー表示位置 1P X Default  30  
+[state 5900,burst x];fvar(28) is burst Gauge X
+type = varset
+trigger1 = time = 0
+fvar(28) = 30
+
+;-------------------------バーストゲージ＋SPカラー表示位置 1P2P Y Default 40
+[state 5900,burst 1p2pY];fvar(29) is burst Gauge Y
+type = varset
+trigger1 = time = 0
+fvar(29) = 40
+
+
+
+;---------------------------------------------------------------------------------------------ここまでコンフィグ
+;-----------------------------ここからは変更不能！
+[state 7000,test];ボイスタイプ・・表示は画面右上右下、普通スコアがでるところ？
+type = Explod
+trigger1 = !numexplod(6050 + var(54)) 
+anim = 7200 + var(54)
+ID = 6050 + var(54)
+postype = left
+pos = ceil(ifelse(teamside = 1,50,255)),10
+sprpriority = 4
+bindtime = -1
+removetime = 300
+ownpal=1
+facing = 1
+scale = 0.5,0.5
+
+;----------------------------チーム時表示位置のずらし
+[state 5900,blance 1P2PY];fvar(27) is Guard Gauge Y
+type = varset
+triggerall = numpartner
+trigger1 = partner,ID < ID
+fvar(27) = fvar(27) + 5
+
+[state 5900,burst 1p2pY];fvar(29) is burst Gauge Y
+type = varset
+triggerall = numpartner
+trigger1 = partner,ID < ID
+fvar(29) = fvar(29) + 10
+
+[State 5900, 3] ;Intro for round 1	ラウンド１ならキャラ判定にとぶ
+type = ChangeState
+trigger1 = roundno = 1
+value = 169
+
+
+
+
+
+
+

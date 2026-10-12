@@ -1,0 +1,2853 @@
+;-------------------------
+;[Statedef -3]
+;意味：
+;	相手のstateに飛ばされていない限り常時実行されるstate
+;	※ＡＩ関連はこっちで組んだほうが良いです
+[Statedef -3]
+;-----------------------------------------------------------------------------------------------
+;ＡＩ判定
+[State -3, varset] 
+type = varset
+TriggerAll = Var(58) = 0
+TriggerAll = RoundState = [1,2]
+trigger1 = command = "AI1"
+trigger2 = command = "AI2"
+trigger3 = command = "AI3"
+trigger4 = command = "AI4"
+trigger5 = command = "AI5"
+trigger6 = command = "AI6"
+trigger7 = command = "AI7"
+trigger8 = command = "AI8"
+trigger9 = command = "AI9"
+trigger10 = command = "AI10"
+trigger11 = command = "AI11"
+trigger12 = command = "AI12"
+trigger13 = command = "AI13"
+trigger14 = command = "AI14"
+trigger15 = command = "AI15"
+trigger16 = command = "AI16"
+trigger17 = command = "AI17"
+trigger18 = command = "AI18"
+trigger19 = command = "AI19"
+trigger20 = command = "AI20"
+trigger21 = command = "AI21"
+trigger22 = command = "AI22"
+trigger23 = command = "AI23"
+trigger24 = command = "AI24"
+trigger25 = command = "AI25"
+trigger26 = command = "AI26"
+trigger27 = command = "AI27"
+trigger28 = command = "AI28"
+trigger29 = command = "AI29"
+trigger30 = command = "AI30"
+trigger31 = command = "AI31"
+trigger32 = command = "AI32"
+trigger33 = command = "AI33"
+trigger34 = command = "AI34"
+trigger35 = command = "AI35"
+trigger36 = command = "AI36"
+trigger37 = command = "AI37"
+trigger38 = command = "AI38"
+trigger39 = command = "AI39"
+trigger40 = command = "AI40"
+trigger41 = command = "AI41"
+trigger42 = command = "AI42"
+trigger43 = command = "AI43"
+trigger44 = command = "AI44"
+trigger45 = command = "AI45"
+trigger46 = command = "AI46"
+trigger47 = command = "AI47"
+trigger48 = command = "AI48"
+trigger49 = command = "AI49"
+trigger50 = command = "AI50"
+v = 58
+value = 1
+
+
+;----------------------------------------------------
+
+[State -3,勝ち一撃必殺準備 with Guilty Gear AI]
+type = ChangeState
+value = 950
+TriggerAll = Var(38) = 0
+triggerAll = NumPartner = 1
+TriggerAll = RoundState = 3
+Trigger1 = partner,stateno = 4000||partner,stateno = 196||partner,stateno = 195||partner,stateno = 2100||partner,stateno = 2114
+Trigger1 = partner,authorname = "muteki"||partner,authorname="Akutagawa"||partner,authorname="高崎　舟"
+Trigger1 = statetype != A
+Trigger1 = ctrl
+persistent=0
+
+;ラウンド終了でストップ
+[State -3]
+type = VarSet
+triggerall = Var(58) = 1
+trigger1 = statetype != A 
+trigger1 = P2life <= 0;プレイヤー２がライフ０以下
+trigger2 = life <= 0;プレイヤー１がライフ０以下
+trigger2 = statetype != A 
+var(58) = 0
+
+[State -3, AI]
+Type = VarSet
+TriggerAll = Var(58) = 1
+Trigger1 = RoundState = 4
+Trigger2 = Win = 1
+Trigger3 = Lose = 1
+Trigger4 = DrawGame = 1
+V = 58
+Value = 0
+
+;[State -3, AI]
+;Type = VarSet
+;TriggerAll = Var(58) = 0;AI がセットされた状態
+;Trigger1 = RoundState = 2;ラウンド開始
+;V = 58
+;Value = 1
+
+;足払い
+[State -1, Crouching Hard Kick]
+type = ChangeState
+value = 450
+TriggerAll = Var(58) = 1
+triggerall = var(59) = 0
+triggerall = var(46) = 0
+TriggerAll = p2statetype != L
+TriggerAll = StateType != A
+Triggerall = P2BodyDist Y >= -24
+Triggerall = P2BodyDist X <= 45
+triggerall = !moveguarded
+;triggerall = prevstateno != 103&&prevstateno != 100
+triggerall = stateno != 1200&&stateno != 1250&&prevstateno != 1250&&prevstateno != 1200
+trigger1 = stateno = 430
+trigger1 = movecontact
+trigger2 = movecontact
+trigger2 = stateno = 215
+trigger3 = stateno = 200
+trigger3 = movecontact
+trigger4 = stateno = 210
+trigger4 = movecontact
+trigger4 = time > 12
+trigger5 = stateno = 240
+trigger5 = movecontact
+trigger5 = time > 15
+trigger6 = stateno = 410
+trigger6 = movecontact
+trigger7 = stateno = 440
+trigger7 = movecontact
+
+;フォルトレスディフェンス用varスイッチオンx+a
+[State -1,foltlessXA var]
+type = Varset
+TriggerAll = Var(58) = 1
+triggerall = var(26) = 0 
+trigger1 = StateNo = [120,155]
+trigger1 = Power > 1000
+Trigger1 = inguarddist
+trigger1 = random <= 1000-life/2
+trigger2 = var(59) = 0
+trigger2 = stateno = 450
+trigger2 = Power > 0
+ignorehitpause = 1
+v = 26
+value = 1
+
+;------------------------------------------------------------
+;フォルキャン
+[State -1, foltless]
+type = ChangeState
+value = 120
+TriggerAll = Var(58) = 1
+triggerall = var(26) = 1
+triggerall = Power > 0
+triggerall = prevstateno != 103&&prevstateno != 100
+trigger1 = stateno = 450
+trigger1 = var(59) = 0
+trigger1 = time <= 2
+;---------------------------------------------
+
+[State -3,]
+type = varset
+TriggerAll = Var(58) = 1
+Trigger1 = var(59) != 0
+Trigger1 = !inguarddist
+Trigger2 = p2movetype != H
+Trigger2 = var(59) = 0
+v = 26
+value = 0
+
+;立ちＫ
+[State -3, Stand Kick]
+type = ChangeState
+value = 230
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+TriggerAll = P2BodyDist X = [-53,53]
+trigger1 = ctrl || sysvar(3)
+trigger1 = Prevstateno = 1002
+trigger2 = stateno = 1008
+
+;立ち→Ｋ（ＸＸ・ＥＸ）
+[State -3, Stand K]
+type = ChangeState
+value = 250
+TriggerAll = Var(58) = 1
+triggerall = var(59) >= 1
+triggerAll = stateno != 250
+Triggerall = EnemyNear,HitDefAttr = S,AA
+Trigger1 = P2BodyDist X = [-30,90]
+trigger1 = statetype != A
+Trigger1 = Random <= 813
+trigger1 = ctrl || sysvar(3)
+
+;空中針・弐式
+[State -3, sin nisiki]
+type = ChangeState
+value = 1100
+TriggerAll = Var(58) = 1
+triggerAll = statetype = A
+;TriggerAll = P2BodyDist X = [-30,60]
+TriggerAll = P2BodyDist Y >= -37
+TriggerAll = p2statetype != L
+trigger1 = stateno = 650
+trigger1 = movehit
+
+;立ち3K
+[State -1, Stand Punch]
+type = ChangeState
+value = 265
+TriggerAll = Var(58)
+triggerall = var(59) >= 1
+triggerall = EnemyNear,HitDefAttr = C,AA
+Trigger1 = EnemyNear,Time >= 2
+Trigger1 = Random <= 813
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X <= 60
+
+;しゃがみＫ
+[State -3, Crouching K]
+type = ChangeState
+value = 430
+TriggerAll = Var(58)
+TriggerAll = Numhelper(1555)
+TriggerAll = helper(1555),stateno = 1565
+triggerAll = statetype != A
+triggerAll = P2statetype = C
+trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [0,57]
+trigger2 = movecontact
+trigger2 = stateno = 400
+trigger3 = movecontact
+trigger3 = stateno = 200
+
+;足払い
+[State -1, Crouching Hard Kick]
+type = ChangeState
+value = 450
+TriggerAll = Var(58)
+TriggerAll = Numhelper(1555)
+TriggerAll = helper(1555),stateno = 1565
+triggerAll = statetype != A
+triggerAll = P2statetype = C
+TriggerAll = P2BodyDist X = [0,76]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 400
+trigger4 = movecontact
+trigger5 = stateno = 410
+trigger5 = movecontact
+trigger6 = stateno = 430
+trigger6 = movecontact
+trigger7 = stateno = 440
+trigger7 = movecontact
+trigger7 = time > 15
+trigger8 = stateno = 200
+trigger8 = movecontact
+trigger9 = stateno = 210
+trigger9 = movecontact
+trigger9 = time > 9
+trigger10 = stateno = 215
+trigger10 = movecontact
+trigger11 = stateno = 230
+trigger11 = movecontact
+trigger12 = stateno = 240
+trigger12 = movecontact
+trigger12 = time > 15
+trigger13 = movecontact
+trigger13 = stateno = 255
+trigger13 = var(59)=1
+
+;一誠奥義・彩
+[State -3, sai]
+type = ChangeState
+value = 3000
+TriggerAll = Var(58)
+triggerall = power >= 1010
+triggerall = var(59) <= 1
+TriggerAll = p2statetype != L
+TriggerAll = !var(46)
+trigger1 = stateno = 100
+trigger1 = p2movetype = A
+Trigger1 = P2BodyDist Y >= -40
+Trigger1 = P2BodyDist X <= 160
+trigger2 = stateno = 103
+trigger2 = p2movetype = A
+Trigger2 = P2BodyDist Y >= -40
+Trigger2 = P2BodyDist X <= 160
+trigger3 = stateno = 240
+trigger3 = movehit
+trigger3 = time > 15
+trigger3 = var(59) = 1||P2BodyDist X >= 95
+Trigger3 = P2BodyDist X <= 160
+Trigger3 = P2BodyDist Y >= -40
+trigger4 = p2stateno = 1061
+Trigger4 = statetype != A
+trigger4 = stateno != 3000
+trigger5 = NumPartner
+Trigger5 = ctrl || sysvar(3)
+trigger5 = statetype != A
+trigger5 = power >= 1000
+trigger5 = enemynear,movetype = H
+;Trigger5 = P2BodyDist Y >= -70
+trigger5 = random < 300
+
+;ハイジャンプキャンセル
+[State -1, Jump cansel]
+type = ChangeState
+value = 900
+TriggerAll = Var(58) = 1
+triggerall = statetype != A
+triggerall = var(11) = 1
+Triggerall = p2statetype = A
+Triggerall = p2movetype = h
+Triggerall = p2bodydist Y < -90
+Triggerall = p2bodydist X < 240
+;Triggerall = Random <= 313
+trigger1 = stateno = 255
+trigger1 = movehit
+trigger2 = stateno = 210
+trigger2 = movehit
+trigger2 = time > 12
+trigger3 = stateno = 215
+trigger3 = movehit
+trigger4 = stateno = 230
+trigger4 = movehit
+trigger5 = stateno = 245
+trigger5 = movehit
+trigger5 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger5 = time > 12
+trigger6 = stateno = 250
+trigger6 = movehit
+trigger6 = time > 9
+trigger7 = stateno = 200
+trigger7 = movehit
+
+;ジャンプキャンセル
+[State -1, Jump cansel]
+type = ChangeState
+value = 40
+TriggerAll = Var(58) = 1
+triggerall = statetype != A
+triggerall = var(11) = 1
+Triggerall = p2statetype = A
+Triggerall = p2movetype = h
+Triggerall = p2bodydist Y <= -60
+Triggerall = p2bodydist X = [0,179]
+;Triggerall = Random <= 313
+trigger1 = stateno = 255
+trigger1 = movehit
+trigger2 = stateno = 210
+trigger2 = movehit
+trigger2 = time > 12
+trigger3 = stateno = 215
+trigger3 = movehit
+trigger4 = stateno = 230
+trigger4 = movehit
+trigger5 = stateno = 245
+trigger5 = movehit
+trigger5 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger5 = time > 12
+trigger6 = stateno = 250
+trigger6 = movehit
+trigger6 = time > 9
+trigger7 = stateno = 200
+trigger7 = movehit
+trigger8 = stateno = 260
+trigger8 = movehit
+trigger8 = time > 13
+
+;風神HS
+[State -3, fuujin_b]
+type = ChangeState
+value = 1250
+TriggerAll = Var(58) = 1
+triggerall = var(59) <= 1
+triggerAll = P2statetype != L
+triggerAll = statetype != A
+trigger1 = stateno = 240
+trigger1 = movehit
+trigger1 = time > 15
+trigger1 = enemynear,pos y >= -28
+trigger1 = P2BodyDist X > 95||(P2BodyDist X > 55&&var(59) = 1)
+Trigger2 = ctrl || sysvar(3)
+trigger2 = p2stateno = [6100,6140]
+trigger2 = P2BodyDist X > 15
+Trigger2 = Random = [252,909]
+trigger3 = p2stateno = 1061
+trigger3 = P2BodyDist X > 15
+trigger3 = stateno != 1250&&stateno != 1251&&stateno != 3000
+trigger3 = var(59) = 0
+
+;EX風神S
+[State -3, fuujin_y]
+type = ChangeState
+value = 1750
+TriggerAll = Var(58) = 1
+triggerAll = var(59) = 2
+triggerAll = statetype != A
+triggerAll = P2statetype != L
+;TriggerAll = P2BodyDist X = [55,120]
+TriggerAll = Random = [2,909]
+trigger1 = stateno = 450
+trigger1 = movehit
+trigger2 = p2stateno = 1061
+trigger2 = P2BodyDist X > 11
+trigger2 = stateno != 1750&&stateno != 1751&&stateno != 3000
+trigger2 = var(59) = 2
+
+;風神S
+[State -3, fuujin_y]
+type = ChangeState
+value = 1200
+TriggerAll = Var(58) = 1
+triggerall = var(59) <= 1
+triggerAll = P2statetype != L
+;TriggerAll = P2BodyDist X = [55,100]
+TriggerAll = Random = [30,760]
+triggerAll = statetype != A
+trigger1 = stateno = 450
+trigger1 = movehit
+trigger2 = stateno = 255
+trigger2 = moveguarded
+;二連疾
+[State -1, situ]
+type = ChangeState
+value = 1500
+TriggerAll = Var(58) = 1
+TriggerAll = Random = [30,360]
+triggerall = Numhelper(1510) = 1
+triggerall = helper(1510),stateno = 1529
+triggerall = var(59) = 0||var(59) = 2
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+
+;二連疾EX
+[State -1, situ]
+type = ChangeState
+value = 1501
+TriggerAll = Var(58) = 1
+TriggerAll = Random = [30,360]
+triggerall = Numhelper(1511) = 1
+triggerall = helper(1511),stateno = 1528
+triggerall = var(59) = 1
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+
+;ジャンプダスト
+[State -3, Jump dust]
+type = ChangeState
+value = 650
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerall = var(59) >= 1
+;triggerAll = statetype = A
+;Triggerall = P2BodyDist Y = [-79,89]
+;TriggerAll = P2BodyDist X = [0,40]
+triggerall = prevstateno = 101
+trigger1 = stateno = 600
+trigger1 = movecontact
+trigger2 = stateno = 640&&var(59)
+trigger2 = movecontact
+trigger2 = Vel Y > 0
+
+;起き攻め疾EX
+[State -3, AI]
+Type = ChangeState
+value = 1501
+TriggerAll = Var(58) = 1
+TriggerAll = StateType = S
+TriggerAll = enemynear(0),HitFall
+triggerall = Numhelper(1510) = 0&&Numhelper(1555) = 0&&Numhelper(1511) = 0
+triggerall = var(59) = 1
+triggerAll = stateno != 440
+Trigger1 = enemynear(0),Pos Y >= -20 
+Trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [50,340]
+
+;起き攻め疾
+[State -3, AI]
+Type = ChangeState
+value = 1500
+TriggerAll = Var(58) = 1
+TriggerAll = StateType = S
+TriggerAll = enemynear(0),HitFall
+triggerall = Numhelper(1510) = 0&&Numhelper(1555) = 0&&Numhelper(1511) = 0
+triggerall = var(59) = 0||var(59) = 2
+triggerAll = stateno != 440
+Trigger1 = enemynear(0),Pos Y >= -20 
+Trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [50,340]
+
+;起き攻めFB疾
+[State -1, FBsitu]
+type = ChangeState
+value = 1550
+TriggerAll = Var(58) = 1
+triggerall = Numhelper(1510) = 0&&Numhelper(1555) = 0&&Numhelper(1511) = 0
+triggerall = var(59) = 1
+TriggerAll = StateType != A
+TriggerAll = P2statetype = L
+Triggerall = P2BodyDist X = [60,170]
+triggerall = power >= 500
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+
+;起き攻め疾EX
+[State -3, AI]
+Type = ChangeState
+value = 1501
+TriggerAll = Var(58) = 1
+TriggerAll = StateType = S
+TriggerAll = P2statetype = L
+triggerall = Numhelper(1510) = 0&&Numhelper(1555) = 0&&Numhelper(1511) = 0
+triggerall = var(59) = 1
+Trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [50,340]
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 12
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 12
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 240
+trigger10 = movecontact
+trigger10 = time > 15
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+
+;起き攻め疾
+[State -3, AI]
+Type = ChangeState
+value = 1500
+TriggerAll = Var(58) = 1
+TriggerAll = StateType = S
+TriggerAll = P2statetype = L
+triggerall = Numhelper(1510) = 0&&Numhelper(1555) = 0&&Numhelper(1511) = 0
+triggerall = var(59) = 0||var(59) = 2
+Trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [50,340]
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 12
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 240
+trigger10 = movecontact
+trigger10 = time > 15
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+
+[State -3,立ちガード]
+Type = ChangeState
+Value = 120
+Triggerall = Var(58) >= 1
+TriggerAll = StateType != A
+TriggerAll = Ctrl || (stateno = [100,101]) || stateno = 52
+TriggerAll = StateNo != [120,159]
+Trigger1 = InguardDist
+Trigger1 = P2BodyDist X >= 0
+Trigger2 = InguardDist
+Trigger2 = Enemy,NumHelper > 0 || Enemy,NumProj > 0
+Trigger3 =! EnemyNear,HitDefAttr = , NT, ST, HT
+Trigger3 = EnemyNear,MoveType = A
+Trigger3 = Enemy,MoveType = A
+Trigger3 = P2BodyDist X < 0
+IgnoreHitPause = 1
+
+[State -3,しゃがみガード]
+Type = ChangeState
+value = 131
+Triggerall = Var(58) >= 1
+TriggerAll = StateType != A
+triggerAll = Ctrl = 1 || (stateno = 100) || stateno = 130
+Trigger1 = inguarddist
+Trigger2 = Enemy,NumHelper > 0 || Enemy,NumProj > 0
+trigger2 = inguarddist
+Trigger3 = EnemyNear,HitDefAttr = C,AA || EnemyNear,HitDefAttr = SCA,AP 
+Trigger4 = EnemyNear,HitDefAttr = S,AA 
+Trigger4 = EnemyNear,Vel Y <= 0 
+Trigger5 = EnemyNear,StateType != S 
+Trigger5 = EnemyNear,HitDefAttr = S,AA 
+Trigger5 = EnemyNear,Vel Y <= 0
+
+;直前ガード
+[state -1,tyokuga]
+type = varset
+Triggerall = Var(58) >= 1
+triggerall = !var(35)
+trigger1 = time = 0
+trigger1 = stateno = 120 || stateno = 131
+var(35)  = 30
+ignorehitpause = 1
+
+[State -3,空中ガード]
+Type = ChangeState
+value = 132
+Triggerall = Var(58) >= 1
+TriggerAll = StateType = A
+Trigger1 = inguarddist
+trigger1 = Ctrl = 1 || (stateno = 110) && time >= 6 || (stateno = 115) && time >= 6
+Trigger2 = Enemy,NumHelper > 0 || Enemy,NumProj > 0;飛び道具ガード
+trigger2 = inguarddist
+trigger2 = Ctrl = 1 || (stateno = 110) && time >= 6 || (stateno = 115) && time >= 6
+
+[state 120x,];SB
+type = varset
+triggerall = var(45)  = 3
+triggerall = !var(24) && power >= 20 && fvar(21) = 0&&fvar(22) != 30
+triggerall = var(59)
+triggerall = var(58)
+trigger1 = ctrl || (sysvar(3) = 1 && stateno != 52)
+trigger1 = stateno != [130,132]
+trigger2 = stateno = 151 || stateno = 153 || stateno  = 155  
+fvar(22) = 30
+ignorehitpause = 0
+
+[state -2,helper partner];----SB発動リング黄色　成功時のはそっちで、代用エフェ
+type = Helper
+triggerall = var(45)  = 3
+triggerall = !var(24) && power >= 20 && fvar(21) = 0
+triggerall = var(59)
+triggerall = var(58)
+trigger1 = ctrl || (sysvar(3) = 1 && stateno != 52)
+trigger1 = stateno != [130,132]
+trigger2 = stateno = 151 || stateno = 153 || stateno  = 155
+name = "SB helper splash"
+ID = 55
+pos = 0,0
+postype = p1
+stateno = 755
+ownpal = 1
+ignorehitpause = 0
+size.height = 1
+
+
+;一誠奥義・彩
+[State -3, sai]
+type = ChangeState
+value = 3000
+TriggerAll = Var(58) = 1
+triggerall = power >= 1000 || (life<=60&&var(59)=0)
+triggerall = var(59) <= 1
+triggerAll = statetype != A
+TriggerAll = p2statetype != L
+TriggerAll = P2BodyDist X = [0,170]
+TriggerAll = P2BodyDist Y >= -50
+trigger1 = stateno = 100
+trigger1 = p2movetype = A
+trigger2 = stateno = 103
+trigger2 = p2movetype = A
+trigger3 = stateno = 210
+trigger3 = movehit
+trigger3 = time > 9
+trigger4 = stateno = 235
+trigger4 = movehit
+trigger4 = time > 12
+trigger5 = stateno = 240
+trigger5 = movehit
+trigger5 = time > 15
+trigger6 = stateno = 245
+trigger6 = movehit
+trigger6 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger6 = time > 12
+trigger7 = stateno = 440
+trigger7 = movehit
+trigger7 = time > 15
+trigger8 = stateno = 450
+trigger8 = movehit
+trigger9 = stateno = 255
+trigger9 = movehit
+trigger10 = ctrl || sysvar(3)
+trigger10 = p2movetype = A
+
+;ダッシュ
+[State -3,]
+Type = ChangeState
+value = 100
+TriggerAll = Var(58) = 1
+TriggerAll = StateType != A
+Triggerall = Var(26) = 0
+TriggerAll = EnemyNear,StateType = A
+TriggerAll = EnemyNear,moveType = H
+Trigger1 = Ctrl || StateNo = 52|| sysvar(3)
+Trigger1 = P2BodyDist X > 50
+Trigger1 = P2BodyDist Y < -40||(p2stateno=[6420,6430])
+
+;ジャンプ
+[State -3]
+Type = ChangeState
+Value = 40
+TriggerAll = Var(58) = 1
+Triggerall = StateType != A
+Triggerall = p2StateType != L
+Triggerall = !inguarddist
+Triggerall = p2bodydist X > -4
+triggerall = prevstateno != 120
+Triggerall = Ctrl || (stateno=[100,101]) || stateno = 52
+trigger1 = random < 90+(P2statetype=C)*10
+Trigger1 = p2bodydist X > 170
+Trigger2 = enemynear,pos y < -95
+Trigger2 = P2Movetype = H
+Trigger2 = p2bodydist X = [0,90]
+trigger3 = p2statetype = C
+Trigger3 = p2bodydist X < 30
+trigger3 = Numhelper(1510)||Numhelper(1511)||Numhelper(1555)
+
+;足払い
+[State -1, Crouching Hard Kick]
+type = ChangeState
+value = 450
+TriggerAll = Var(58) = 1
+TriggerAll = p2statetype != L
+TriggerAll = statetype != A||var(46)
+Triggerall = P2BodyDist X = [0,65]
+Triggerall = p2statetype = S
+triggerall = prevstateno != 103
+triggerall = stateno != 1200
+trigger1 = ctrl || sysvar(3)
+Trigger1 = Random <= 300+(Numhelper(1510)||Numhelper(1555)||Numhelper(1511))*300
+Trigger1 = P2movetype = A
+trigger2 = moveguarded
+trigger2 = stateno = 215
+Trigger2 = Random = [152,479]
+trigger3 = stateno = 200
+trigger3 = movehit
+Trigger3 = Random = [142,979]
+trigger4 = stateno = 210
+trigger4 = moveguarded
+trigger4 = time > 12
+Trigger4 = Random = [152,479]
+trigger5 = stateno = 240
+trigger5 = moveguarded
+trigger5 = time > 15
+Trigger5 = Random = [152,479]
+trigger6 = stateno = 410
+trigger6 = movecontact
+trigger7 = stateno = 440
+trigger7 = movehit
+trigger8 = stateno = 430
+trigger8 = movehit
+
+;ダッシュ
+[State -3, Run Fwd]
+type = ChangeState
+value = 100
+TriggerAll = Var(58) = 1
+Triggerall = StateType != A
+Triggerall = p2StateType != L
+Triggerall = P2MoveType != A
+Triggerall = !inguarddist
+Triggerall = Ctrl || stateno = 52
+triggerall = random = [300,800]
+Trigger1 = P2BodyDist X >= 115
+Trigger2 = P2stateno = 6421
+Trigger2 = P2BodyDist X <= 165
+
+;後退ダッシュ
+[State -3, Run Back]
+type = ChangeState
+value = 105
+Triggerall = Var(58) = 1
+Triggerall = StateType != A
+Triggerall = p2StateType != L
+Triggerall = Var(26) = 0
+Triggerall = P2MoveType = I
+Triggerall = !inguarddist
+Triggerall = p2Stateno != [120,159]
+Triggerall = ctrl || sysvar(3) || (stateno=[100,101]) || stateno = 52
+Triggerall = backedgebodydist >= 62
+Trigger1 = P2BodyDist X = [70,140]
+trigger1 = random < 200+(133-P2BodyDist X)
+
+;後退ダッシュ
+[State -3, Run Back]
+type = ChangeState
+value = 105
+Triggerall = Var(58) = 1
+Triggerall = StateType != A
+Triggerall = p2StateType = L
+Triggerall = !inguarddist
+Triggerall = p2Stateno != [120,159]
+Triggerall = Var(26) = 0
+Triggerall = ctrl || sysvar(3) || (stateno=[100,101]) || stateno = 52
+Trigger1 = P2BodyDist X <= 30
+trigger1 = p2dist X > 0
+trigger1 = BackEdgeBodyDist > 26
+
+;ダッシュ
+[State -3,]
+Type = ChangeState
+value = 100
+TriggerAll = Var(58) = 1
+triggerAll = random < 300
+TriggerAll = StateType != A
+TriggerAll = EnemyNear,StateType = L
+TriggerAll = (StateNo != [100,101])
+TriggerAll = Ctrl || StateNo = 52
+Trigger1 = P2BodyDist X > 50
+
+;敬意
+[State -1, keii]
+type = ChangeState
+value = 196
+TriggerAll = Var(58) = 1
+triggerall = statetype != A
+trigger1 = enemynear,stateno = [195,196]
+trigger1 = enemynear,time <= 27
+trigger1 = ctrl || sysvar(3)
+;死蝶浮月
+[State -1, Sichoufugetu]
+type = ChangeState
+value = 3600
+TriggerAll = Var(58)
+triggerall = statetype != A
+triggerall = var(59) = 2
+triggerall = var(24) = 1
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time <= 15
+trigger2 = stateno = 205
+trigger2 = movehit
+trigger2 = time <= 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time <= 12
+trigger4 = stateno = 245
+trigger4 = movehit
+trigger4 = time <= 12
+trigger5 = stateno = 210
+trigger5 = movehit
+trigger5 = time <= 9
+trigger6 = stateno = 240
+trigger6 = movehit
+trigger6 = time <= 10
+trigger7 = stateno = 250
+trigger7 = movehit
+trigger7 = time <= 8
+trigger8 = stateno = 3290
+trigger8 = movehit
+trigger8 = time <= 27
+trigger9 = stateno = 850
+trigger9 = movehit
+trigger9 = time <= 24
+trigger10 = stateno = 610
+trigger10 = movehit
+trigger10 = time <= 6
+trigger11 = stateno = 265
+trigger11 = movehit
+trigger11 = time <= 6
+trigger12 = stateno = 260
+trigger12 = movehit
+trigger12 = time <= 10
+trigger13 = stateno = 270
+trigger13 = movehit
+trigger13 = time <= 10
+
+;死蝶浮月（キャンセル）
+[State -1, Sichoufugetu]
+type = ChangeState
+value = 3600
+TriggerAll = Var(58)
+triggerall = statetype != A
+triggerall = var(59) = 2
+triggerall = var(24) = 1
+triggerall = var(31)
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time > 15
+trigger2 = stateno = 250
+trigger2 = movehit
+trigger2 = time > 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time > 12
+trigger4 = stateno = 210
+trigger4 = movehit
+trigger4 = AnimElemTime(5) >= 0 && AnimElemTime(7) < 0
+trigger5 = stateno = 240
+trigger5 = movehit
+trigger5 = time > 17
+trigger6 = stateno = 265
+trigger6 = movehit
+trigger6 = time > 10
+trigger7 = stateno = 260
+trigger7 = movehit
+trigger7 = time > 13
+trigger8 = stateno = 270
+trigger8 = movehit
+trigger8 = time > 19
+
+[State -3, zetsu]
+type = ChangeState
+value = 3500
+TriggerAll = Var(58) = 1
+triggerall = var(24) = 1
+triggerall = var(59) <= 1
+triggerAll = statetype = S
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 12
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 240
+trigger10 = movecontact
+trigger10 = time > 15
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = movecontact
+trigger17 = stateno = 255
+trigger17 = movecontact
+
+;亡郷
+[State -1, boukyou]
+type = ChangeState
+value = 3400
+TriggerAll = Var(58) = 1
+triggerall = power >= 2000
+triggerall = var(59) = 2
+triggerall = life <= 140
+TriggerAll = P2BodyDist X = [0,250]
+trigger1 = ctrl || sysvar(3)
+
+;立ち近距離Ｓ
+[State -3, Slash]
+type = ChangeState
+value = 215
+Triggerall = Var(58) = 1
+triggerall = P2statetype != L
+triggerAll = p2bodydist Y = [-69,-33]
+triggerall = p2bodydist X <= 50
+triggerall = statetype != A||var(46)
+trigger1 = movecontact
+trigger1 = stateno = 230
+trigger2 = movecontact
+trigger2 = stateno = 400
+Trigger2 = P2BodyDist X > 30
+trigger3 = ctrl || sysvar(3) = 1
+Trigger3 = Random = [352,509]
+trigger3 = !moveguarded
+Trigger3 = P2StateType != A
+;ＥＸ花鳥風月
+[State -3, kachoufuugetuEX]
+type = ChangeState
+value = 3250
+TriggerAll = Var(58) = 1
+triggerall = power >= 1000
+triggerall = statetype != A
+triggerall = var(59) = 2
+TriggerAll = P2BodyDist X = [0,50]
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time <= 15
+trigger2 = stateno = 205
+trigger2 = movehit
+trigger2 = time <= 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time <= 12
+trigger4 = stateno = 245
+trigger4 = movehit
+trigger4 = time <= 12
+trigger5 = stateno = 210
+trigger5 = movehit
+trigger5 = time <= 9
+trigger6 = stateno = 240
+trigger6 = movehit
+trigger6 = time <= 15
+trigger7 = stateno = 250
+trigger7 = movehit
+trigger7 = time <= 7
+trigger8 = Stateno = 150
+trigger9 = Stateno = 151
+trigger10 = Stateno = 152
+trigger11 = Stateno = 153
+
+;花鳥風月
+[State -3, kachoufuugetu]
+type = ChangeState
+value = 3200
+TriggerAll = Var(58) = 1
+triggerall = statetype != A
+triggerall = var(59) = 1
+triggerall = power >= 1000
+TriggerAll = P2BodyDist X = [0,50]
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time <= 15
+trigger2 = stateno = 205
+trigger2 = movehit
+trigger2 = time <= 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time <= 12
+trigger4 = stateno = 245
+trigger4 = movehit
+trigger4 = time <= 12
+trigger5 = stateno = 210
+trigger5 = movehit
+trigger5 = time <= 9
+trigger6 = stateno = 240
+trigger6 = movehit
+trigger6 = time <= 15
+trigger7 = stateno = 250
+trigger7 = movehit
+trigger7 = time <= 7
+trigger6 = stateno = 265
+trigger6 = movehit
+trigger6 = time < 10
+trigger7 = stateno = 260
+trigger7 = movehit
+trigger7 = time < 13
+trigger8 = stateno = 850
+trigger8 = movehit
+trigger8 = time <= 24
+trigger9 = stateno = 610
+trigger9 = movehit
+trigger9 = time <= 6
+trigger10 = stateno = 265
+trigger10 = movehit
+trigger10 = time <= 6
+trigger11 = stateno = 260
+trigger11 = movehit
+trigger11 = time <= 10
+trigger12 = stateno = 270
+trigger12 = movehit
+trigger12 = time <= 10
+
+;花鳥風月（キャンセル）
+[State -1, kachoufuugetu]
+type = ChangeState
+value = 3200
+TriggerAll = Var(58) = 1
+triggerall = statetype != A
+triggerall = var(59) = 1
+triggerall = power >= 1000
+triggerall = var(31) = 1
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time > 15
+trigger2 = stateno = 250
+trigger2 = movehit
+trigger2 = time > 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time > 12
+trigger4 = stateno = 210
+trigger4 = movehit
+trigger4 = AnimElemTime(5) >= 0 && AnimElemTime(7) < 0
+trigger5 = stateno = 240
+trigger5 = movehit
+trigger5 = time > 17
+trigger6 = stateno = 265
+trigger6 = movehit
+trigger6 = time > 10
+trigger7 = stateno = 260
+trigger7 = movehit
+trigger7 = time > 13
+trigger8 = stateno = 270
+trigger8 = movehit
+trigger8 = time > 19
+
+;紅朱雀
+[State -1, benisuzaku]
+type = ChangeState
+value = 3700
+TriggerAll = Var(58) = 1
+TriggerAll = Var(59) = 2
+triggerall = power >= 1300
+TriggerAll = P2BodyDist Y >= 53
+TriggerAll = P2BodyDist X = [68,199]
+TriggerAll = Random = [200,770]
+trigger1 = statetype = A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 101
+trigger3 = stateno = 102
+trigger4 = stateno = 600
+trigger4 = movecontact
+trigger5 = stateno = 610
+trigger5 = movecontact
+trigger6 = stateno = 630
+trigger6 = movecontact
+trigger7 = stateno = 640
+trigger7 = movecontact
+trigger8 = stateno = 650
+trigger8 = movecontact
+
+;無形
+[State -3, mugyou]
+type = ChangeState
+value = 3300
+TriggerAll = Var(58) = 1
+triggerall = power >= 1000
+triggerall = var(59) = 2
+triggerAll = statetype = S
+triggerAll = P2statetype != L
+TriggerAll = P2BodyDist Y <= 20
+TriggerAll = P2BodyDist X = [0,69]
+TriggerAll = Random = [200,770]
+trigger1 = ctrl || sysvar(3)
+trigger1 = !moveguarded
+trigger2 = stateno = 255
+trigger2= movehit
+trigger3 = stateno = 205
+trigger3 = movehit
+trigger3 = time > 9
+trigger4 = stateno = 210
+trigger4 = movehit
+trigger4 = time > 9
+trigger5 = stateno = 215
+trigger5 = movehit
+trigger6 = stateno = 230
+trigger6 = movehit
+trigger7 = stateno = 235
+trigger7 = movehit
+trigger7 = time > 12
+trigger8 = stateno = 240
+trigger8 = movehit
+trigger8 = time > 15
+
+;デッドアングルアタック
+[State -3, dead angle attack]
+type = ChangeState
+value = 2030
+TriggerAll = Var(58) = 1
+TriggerAll = P2BodyDist X = [0,59]
+triggerall = Power >= 1000
+triggerall = life <= 270
+TriggerAll = p2statetype != L
+trigger1 = Stateno = 150
+trigger2 = Stateno = 151
+trigger3 = Stateno = 152
+trigger4 = Stateno = 153
+
+
+[State -1,脊髄バースト]
+type = ChangeState
+value = 2101
+TriggerAll = Var(58) = 1
+TriggerAll = p2statetype != L
+TriggerAll = Numexplod(7035) = 0&&Numexplod(7030) = 0
+Triggerall = P2BodyDist X = [-60,60]
+Triggerall = P2BodyDist Y = [-80,80]
+triggerall = alive
+triggerall = statetype != L
+triggerall = fvar(10) >= 14998
+triggerall = life <= 270
+TriggerAll = Random = [222,788]
+trigger1 = movetype = H
+trigger2 = Stateno = 150
+trigger3 = Stateno = 151
+trigger4 = Stateno = 152
+trigger5 = Stateno = 153
+
+[State -1,金サイクバースト]
+type = ChangeState
+value = 2100
+TriggerAll = Var(58) = 1
+TriggerAll = p2statetype != L
+triggerall = alive
+triggerall = Numexplod(7035) = 0&&Numexplod(7030) = 0
+Triggerall = P2BodyDist X = [-20,20]
+Triggerall = P2BodyDist Y = [-20,40]
+TriggerAll = Random = [722,988]
+triggerall = fvar(10) >= 14998
+trigger1 = Power < 200
+trigger1 = ctrl || sysvar(3)
+
+;フォースロマンキャンセル地上
+[State -1, romancansel]
+type = ChangeState
+value = 2002
+TriggerAll = Var(58) = 1
+triggerall = power >= 800
+triggerall = var(25) = 1
+TriggerAll = p2statetype != L
+TriggerAll = Random = [322,999]
+trigger1 = stateno = 230
+trigger1 = time = [11,12]
+trigger2 = stateno = 245
+trigger2 = time = [23,24]
+Trigger3 = Random = [22,189]
+trigger3 = stateno = 1450;凪刃
+trigger3 = time = [22,25]
+trigger4 = stateno = 250
+trigger4 = time = [11,12]
+trigger5 = stateno = 1820
+trigger5 = time = [21,27]
+trigger6 = stateno = 1820
+trigger6 = time = [24,27]
+ignorehitpause = 1
+
+;ロマンキャンセル地上
+[State -1, romancansel]
+type = ChangeState
+value = 2000
+TriggerAll = Var(58) = 1
+triggerall = power >= 1350
+TriggerAll = p2statetype != L
+triggerall = var(25) = 1
+TriggerAll = P2BodyDist X = [0,48]
+;Triggerall = p2life <= 150
+TriggerAll = Random = [22,818]
+triggerAll = statetype != A
+TriggerAll = p2Movetype = H
+TriggerAll = movehit
+trigger1 = stateno = 207
+trigger1 = Numhelper(1510) = 0&&Numhelper(1511) = 0
+ignorehitpause = 1
+
+;フォースロマンキャンセル空中
+[State -1, Air romancansel]
+type = ChangeState
+value = 2003
+TriggerAll = Var(58) = 1
+triggerall = power >= 900
+triggerAll = p2movetype = A
+TriggerAll = Random = [882,918]
+trigger1 = stateno = 1351
+trigger1 = time = [13,15]
+trigger2 = stateno = 1051
+trigger2 = time = [4,7]
+trigger3 = stateno = 1006;戒Ｋ
+trigger3 = time = [11,13]
+ignorehitpause = 1
+
+;ロマンキャンセル空中
+[State -3, Air romancansel]
+type = ChangeState
+value = 2001
+TriggerAll = Var(58) = 1
+triggerall = power >= 1200
+triggerall = var(25) = 1
+TriggerAll = p2statetype != L
+triggerAll = statetype = A
+triggerAll = p2movetype = H
+TriggerAll = P2BodyDist X = [0,48]
+TriggerAll = Random = [92,788]
+;Triggerall = pos y <= -70
+;Triggerall = p2life <= 150
+triggerall = !moveguarded
+trigger1 = stateno = 1100&&var(59)=1
+ignorehitpause = 1
+
+[state -3]
+Type = ChangeState
+value = 900
+TriggerAll = Var(58) = 1
+triggerall = var(11) = 1
+TriggerAll = stateType !=A
+TriggerAll = p2StateType !=L
+TriggerAll = P2MoveType !=A
+TriggerAll = ctrl || sysvar(3)
+TriggerAll = Random < 100
+Trigger1 = P2BodyDist X*fvar(8)-vel x*6+EnemyNear,vel x*6>180
+Trigger2 = P2BodyDist Y*fvar(9)+(EnemyNear,vel y!=0)*(EnemyNear,vel y+EnemyNear,Const(MoveMent.Yaccel)*5)*6<-140
+
+;弱
+[State -3, AI]
+Type = ChangeState
+Value = 200
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+TriggerAll = p2statetype != L
+Trigger1 = Random = [10,420]
+Trigger1 = ctrl || sysvar(3)
+trigger1 = p2stateno = [6100,6140]
+Trigger2 = Random = [490,511]
+Trigger2 = ctrl
+Trigger2 = P2BodyDist X = [176,299]
+
+;弱
+[State -3, AI]
+Type = ChangeState
+Value = 200
+TriggerAll = Var(58) = 1
+TriggerAll = StateType = S
+TriggerAll = p2statetype != L
+TriggerAll = Random = [0,550]
+TriggerAll = P2BodyDist X = [0,35]
+triggerall = p2bodydist Y >= -20
+Trigger1 = Random = [350,520]
+Trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger2 = var(59)!=0
+trigger3 = stateno = 103
+trigger4 = movecontact
+trigger4 = stateno = 400
+
+
+;FB紅
+[State -1, kou]
+type = ChangeState
+value = 1810
+TriggerAll = Var(58) = 1
+triggerall = var(59) >= 1
+triggerall = power >= 500
+TriggerAll = P2BodyDist X <= 58
+TriggerAll = P2BodyDist Y <= 0
+TriggerAll = Random = [0,550]
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time <= 15
+trigger2 = stateno = 205
+trigger2 = movehit
+trigger2 = time <= 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time <= 12
+trigger4 = stateno = 245
+trigger4 = movehit
+trigger4 = time <= 12
+trigger5 = stateno = 210
+trigger5 = movehit
+trigger5 = time <= 9
+trigger6 = stateno = 240
+trigger6 = movehit
+trigger6 = time <= 10
+trigger7 = stateno = 250
+trigger7 = movehit
+trigger7 = time <= 8
+trigger8 = stateno = 610
+trigger8 = movehit
+trigger8 = time <= 6
+trigger9 = stateno = 265
+trigger9 = movehit
+trigger9 = time <= 6
+trigger10 = stateno = 260
+trigger10 = movehit
+trigger10 = time <= 10
+trigger11 = stateno = 270
+trigger11 = movehit
+trigger11 = time <= 10
+
+;蒼
+[State -1, kou]
+type = ChangeState
+value = 1800
+TriggerAll = Var(58)
+triggerall = var(59) = 1
+triggerall = statetype != A
+TriggerAll = P2BodyDist X <= 98
+TriggerAll = P2BodyDist Y >= -70
+TriggerAll = Random <= 798
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time <= 15
+trigger2 = stateno = 205
+trigger2 = movehit
+trigger2 = time <= 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time <= 12
+trigger4 = stateno = 245
+trigger4 = movehit
+trigger4 = time <= 12
+trigger5 = stateno = 210
+trigger5 = movehit
+trigger5 = time <= 9
+trigger6 = stateno = 240
+trigger6 = movehit
+trigger6 = time <= 10
+trigger7 = stateno = 250
+trigger7 = movehit
+trigger7 = time <= 8
+trigger8 = stateno = 610
+trigger8 = movehit
+trigger8 = time <= 6
+trigger9 = stateno = 265
+trigger9 = movehit
+trigger9 = time < 10
+trigger10 = stateno = 260
+trigger10 = movehit
+trigger10 = time < 13
+
+;紅
+[State -3, kou]
+type = ChangeState
+value = 1600
+TriggerAll = Var(58) = 1
+triggerall = statetype != A
+TriggerAll = P2BodyDist X = [0,79]
+TriggerAll = P2BodyDist Y <= -40
+TriggerAll = Random = [682,998]
+trigger1 = stateno = 440
+trigger1 = movehit
+trigger1 = time <= 15
+trigger2 = stateno = 205
+trigger2 = movehit
+trigger2 = time <= 9
+trigger3 = stateno = 235
+trigger3 = movehit
+trigger3 = time <= 12
+trigger4 = stateno = 245
+trigger4 = movehit
+trigger4 = time <= 12
+trigger5 = stateno = 210
+trigger5 = movehit
+trigger5 = time <= 9
+trigger6 = stateno = 240
+trigger6 = movehit
+trigger6 = time <= 15
+trigger7 = stateno = 250
+trigger7 = movehit
+trigger7 = time <= 7
+trigger8 = stateno = 265
+trigger8 = movehit
+trigger8 = time < 10
+trigger9 = stateno = 260
+trigger9 = movehit
+trigger9 = time < 13
+trigger10 = stateno = 270
+trigger10 = movehit
+trigger10 = time <= 10
+
+;空中投げ
+[State -3, Air Throw]
+type = ChangeState
+value = 860
+TriggerAll = Var(58) = 1
+triggerall = p2statetype = A
+triggerall = ctrl || sysvar(3)
+triggerall = var(59) >= 1
+triggerall = var(8) = 0
+triggerall = statetype = A
+triggerall = p2movetype != H
+trigger1 = p2bodydist X < 20
+trigger1 = P2bodyDist Y >= -35
+trigger1 = P2bodyDist Y <= 35
+trigger2 = p2bodydist X < 20
+trigger2 = P2bodyDist Y >= -35
+trigger2 = P2bodyDist Y <= 35
+
+;投げ
+[State -3, Throw]
+type = ChangeState
+value = 800
+TriggerAll = Var(58) = 1
+triggerall = statetype = S
+triggerAll = P2statetype != L
+triggerall = stateno != 100
+;triggerall = MoveGuarded
+triggerall = Random = [81,722]
+Triggerall = ctrl || sysvar(3)
+trigger1 = p2bodydist X < 22
+trigger1 = (p2statetype = S) || (p2statetype = C)
+trigger1 = p2movetype != H
+trigger2 = p2bodydist X < 22
+trigger2 = (p2statetype = S) || (p2statetype = C)
+trigger2 = p2movetype != H
+
+;一撃準備
+[State -3, ichigeki junbi]
+type = ChangeState
+value = 950
+triggerall = var(24) != 2
+triggerall = var(58) = 1
+triggerall = P2life >= 800
+triggerall = life <= 40
+triggerall = Random = [11,822]
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [130,430]
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+
+;立ち3Ｐ
+[State -1, Stand Punch]
+type = ChangeState
+value = 207
+TriggerAll = Var(58) = 1
+triggerall = var(59) = 1
+triggerall = statetype != A
+triggerall = (p2statetype = C&&Random <= 669)||Numhelper(1510) = 1||Numhelper(1511) = 1
+triggerall = moveguarded
+;Triggerall = Random <= 869
+TriggerAll = P2BodyDist X = [7,43]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = movecontact
+trigger4 = stateno = 200
+trigger5 = movecontact
+trigger5 = stateno = 230
+trigger6 = movecontact
+trigger6 = stateno = 215
+trigger7 = movecontact
+trigger7 = stateno = 400
+trigger8 = movecontact
+trigger8 = stateno = 430
+trigger9 = movecontact
+trigger9 = stateno = 210
+trigger9 = time > 9
+trigger10 = movecontact
+trigger10 = stateno = 250
+trigger11 = movecontact
+trigger11 = stateno = 255
+trigger12 = stateno = 260
+trigger12 = movehit
+trigger12 = time > 13
+
+;ダストアタック
+[State -3, dust attack]
+type = ChangeState
+value = 850
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+triggerAll = P2statetype = C
+TriggerAll = P2BodyDist X < 50
+TriggerAll = Random = [6,400]
+trigger1 = ctrl || sysvar(3)
+trigger1 = Numhelper(1510)||Numhelper(1511)||Numhelper(1555)
+
+[State -3, air dash];空中ダッシュ
+type = ChangeState
+value = 101
+TriggerAll = Var(58) = 1
+triggerall = Var(4) = 0
+triggerall = Var(2) <= 1
+Triggerall = Random = [65,129]
+Triggerall = statetype = A
+Triggerall = ctrl || sysvar(3)
+Triggerall = (p2statetype != A)||(p2statetype = A && p2Movetype != H)
+Triggerall = (StateNo = [50,59])||(StateNo = [5200,5210])||StateNo = 5040
+Triggerall = !inguarddist || P2BodyDist Y >= 30
+Triggerall = pos y <= -20
+Trigger1 = (P2statetype != A&&P2statetype != L) || P2BodyDist X > 80
+Trigger1 = P2Movetype = H
+
+[State 空中ダッシュ]
+type = ChangeState
+value = 101
+TriggerAll = Var(58) = 1
+triggerall = Var(4) = 0
+triggerall = Var(2) <= 1
+Triggerall = statetype = A
+Triggerall = ctrl || sysvar(3)
+Triggerall = p2Movetype != H
+Triggerall = (StateNo = [50,59])||(StateNo = [5200,5210])||StateNo = 5040
+Triggerall = pos y <= -35
+trigger1 = p2bodydist X != [-30,60]
+Trigger1 = Random <= 230
+trigger2 = BackEdgeBodyDist < -30
+
+;立ち3S
+[State -1, Stand Punch]
+type = ChangeState
+value = 260
+TriggerAll = Var(58)
+triggerall = var(59) = 1
+TriggerAll = P2BodyDist X <= 30
+TriggerAll = P2BodyDist Y >= -30
+trigger1 = movecontact
+trigger1 = stateno = 215
+trigger2 = movecontact
+trigger2 = stateno = 240
+
+;立ち3K
+[State -1, Stand Punch]
+type = ChangeState
+value = 265
+TriggerAll = Var(58)
+triggerall = var(59) >= 1
+Trigger1 = P2BodyDist X = [50,138]
+Trigger1 = P2BodyDist Y = [-65,8]
+Trigger1 = Random <= 230
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger1 = P2Movetype != A
+trigger2 = statetype != A
+trigger2 = ctrl || sysvar(3)
+trigger2 = EnemyNear,HitDefAttr = C,AA
+Trigger2 = P2BodyDist X <= 60
+
+;立ちＨＳ
+[State -3, Standing Hard Slash]
+type = ChangeState
+value = 240
+TriggerAll = Var(58)
+triggerAll = P2statetype != L
+triggerAll = statetype != A||var(46)
+TriggerAll = P2BodyDist X = [40,108]
+TriggerAll = P2BodyDist Y = [-35,8]
+trigger1 = stateno = 210
+trigger1 = movehit
+trigger1 = time > 9
+trigger2 = stateno = 100
+trigger2 = statetype != A
+trigger2 = Var(59) != 0
+trigger2 = prevstateno != 120
+trigger3 = ctrl || sysvar(3)
+trigger3 = statetype != A
+Trigger3 = Random = [210,539]
+trigger3 = prevstateno != 120
+trigger3 = Var(59) != 0
+trigger4 = stateno = 260
+trigger4 = time = [8,9]
+trigger5 = stateno = 270
+trigger5 = movehit
+trigger5 = time > 19
+
+;EX立ち3S
+[State -1, Stand Punch]
+type = ChangeState
+value = 270
+TriggerAll = Var(58)
+Triggerall = P2BodyDist X <= 60
+triggerall = var(59) = 2
+Triggerall = Random <= 830
+trigger1 = movecontact
+trigger1 = stateno = 215
+trigger2 = movecontact
+trigger2 = stateno = 240
+;立ち近距離Ｓ
+[State -3, Slash]
+type = ChangeState
+value = 215
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype = A
+triggerAll = p2bodydist X > -10 && p2bodydist X < 26
+triggerall = p2bodydist Y = [-55,-30]
+Triggerall = statetype != A||var(46)
+;Triggerall = enemynear,pos y = [-70,-20]
+Triggerall = P2Movetype = H
+trigger1 = movecontact
+trigger1 = stateno = 230
+trigger2 = stateno = 103
+trigger3 = stateno = 255
+trigger3 = movehit
+trigger4 = ctrl || sysvar(3) = 1
+Trigger4 = P2StateType != A
+trigger5 = movecontact
+trigger5 = stateno = 400
+trigger6 = stateno = 260
+trigger6 = time = [8,9]
+
+; 立ちS
+[State -3, AI]
+Type = ChangeState
+Value = 210
+TriggerAll = Var(58) = 1
+TriggerAll = statetype != A||var(46)
+TriggerAll = p2statetype != L
+TriggerAll = Random = [321,850]
+Trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [24,99]
+Trigger1 = P2BodyDist Y = [-10,98]
+trigger2 = stateno = 100
+trigger2 = var(59)!=0
+Trigger2 = P2BodyDist X = [24,99]
+Trigger2 = P2BodyDist Y = [-10,98]
+trigger3 = stateno = 103
+Trigger3 = P2BodyDist X = [24,99]
+Trigger3 = P2BodyDist Y = [-10,98]
+trigger4 = movehit
+trigger4 = stateno = 230
+trigger5 = movehit
+trigger5 = stateno = 215
+
+;立ちＫ
+[State -3, Stand Kick]
+type = ChangeState
+value = 230
+TriggerAll = Var(58) = 1
+triggerall = numhelper(3010) = 0
+triggerAll = P2statetype != L
+TriggerAll = P2BodyDist X = [0,53]
+triggerAll = p2bodydist Y = [-62,-10]
+triggerAll = statetype != A||var(46)
+Triggerall = Random = [500,821]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = movecontact
+trigger4 = stateno = 400
+
+;立ち→ＨＳ
+[State -3, Hard Slash]
+type = ChangeState
+value = 245
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A||var(46)
+TriggerAll = Random = [91,450]
+Triggerall = P2BodyDist Y = [-59,59]
+trigger1 = ctrl || sysvar(3)
+Trigger1 = P2BodyDist X = [49,99]
+trigger1 = P2statetype != L
+trigger2 = stateno = 100
+Trigger2 = P2BodyDist X = [46,99]
+trigger2 = P2statetype != L
+trigger2 = prevstateno != 120
+trigger3 = stateno = 103
+Trigger3 = P2BodyDist X = [46,99]
+trigger3 = P2statetype != L
+trigger4 = moveguarded
+trigger4 = stateno = 230
+Trigger4 = P2BodyDist X = [46,99]
+trigger4 = P2statetype != L
+trigger5 = stateno = 255
+trigger5 = movehit
+trigger5 = P2statetype != L
+trigger5 = random >= 700
+
+[State -3, air dash];空中後ダッシュ
+type = ChangeState
+value = 102
+TriggerAll = Var(58) = 1
+triggerall = Var(4) = 0
+triggerall = Var(2) <= 1
+Triggerall = StateType = A
+Triggerall = p2StateType != L
+Triggerall = p2Movetype != H
+triggerall = pos y <= -35
+Triggerall = backedgebodydist >= 62
+Trigger1 = P2BodyDist X <= 170
+Trigger1 = random < 300+(140-P2BodyDist X)
+trigger1 = ctrl
+
+[State -3];空繋ぎ飛行
+Type = ChangeState
+TriggerAll = Var(58) = 1
+TriggerAll = stateno != 99
+TriggerAll = Var(59) = 0
+TriggerAll=StateType=A
+TriggerAll=!InGuardDist
+TriggerAll=Pos Y<=-25
+TriggerAll=MoveContact
+TriggerAll=StateNo=610
+Trigger1 = MoveGuarded
+Trigger2 = vel y>=0
+Trigger2 = P2StateType=A
+Value = 99
+
+[State -1,闇慈、飛びまーす！]
+type = ChangeState
+value = 99
+TriggerAll = Var(58) = 1
+TriggerAll = stateno != 99
+TriggerAll = P2StateType=L
+TriggerAll = Var(59) = 0
+Trigger1 = stateno != 99
+Trigger1 = StateType=A
+Trigger1 = Ctrl
+Trigger1 = Pos Y<=-25
+Trigger1 = P2BodyDist X=[-60,60]
+
+[State 50, 0];二段ジャンプ
+type = ChangeState
+Value = 45
+TriggerAll = Var(58) = 1
+TriggerAll = StateType=A
+TriggerAll = P2StateType != L
+TriggerAll = P2StateNo != [120,159]
+triggerAll = prevstateno != 1352
+TriggerAll = var(3) != 1
+triggerAll = var(2) = 1
+Trigger1 = Random <= 780
+Trigger1 = Ctrl
+trigger1 = pos y <= -35
+Trigger1 = P2BodyDist Y = [-90,90]
+Trigger1 = vel y > -1
+Trigger2 = P2Dist Y < -4
+Trigger2 = StateNo = 610
+Trigger2 = Movehit
+
+;挑発
+[State -3, Taunt]
+type = ChangeState
+value = 195
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+triggerAll = Movetype != H
+trigger1 = ctrl
+trigger1 = life >= 500
+Trigger1 = P2BodyDist X = [200,350]
+Trigger1 = Random = [564,579]
+
+;モードチェンジ
+[State -3, mode change]
+type = ChangeState
+value = 7050
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+triggerAll = statetype != C
+trigger1 = ctrl
+Trigger1 = Random = 777
+
+;しゃがみＰ
+[State -3, Crouching P]
+type = ChangeState
+value = 400
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerAll = statetype != A||var(46)
+TriggerAll = P2BodyDist X = [0,30]
+triggerAll = p2bodydist Y >= -10
+triggerall = P2statetype != A
+trigger1 = ctrl || sysvar(3)
+Trigger1 = Random <= 300+(Numhelper(1510)||Numhelper(1555)||Numhelper(1511))*300
+trigger2 = stateno = 100
+Trigger2 = Var(59) != 0
+trigger2 = P2statetype != A
+trigger3 = stateno = 103
+trigger3 = P2statetype != A
+trigger4 = movecontact
+trigger4 = stateno = 400
+trigger4 = P2statetype != A
+trigger5 = prevstateno = 1301
+trigger5 = P2statetype = A
+
+;しゃがみＫ
+[State -3, Crouching K]
+type = ChangeState
+value = 430
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A||var(46)
+triggerAll = P2statetype != A
+TriggerAll = p2statetype != L
+triggerAll = p2bodydist Y >= -20
+trigger1 = ctrl || sysvar(3)
+Trigger1 = Random <= 190+(Numhelper(1510)||Numhelper(1555)||Numhelper(1511))*300
+Trigger1 = P2BodyDist X = [0,57]
+trigger2 = movecontact
+trigger2 = stateno = 400
+
+;しゃがみＳ
+[State -3, Crouching Slash]
+type = ChangeState
+value = 410
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerAll = P2statetype != A
+triggerAll = statetype != A||var(46)
+triggerAll = p2bodydist Y >= -20
+trigger1 = ctrl || sysvar(3)
+Trigger1 = Random <= 600+(Numhelper(1510)||Numhelper(1555)||Numhelper(1511))*300
+Trigger1 = P2BodyDist X = [12,69]
+trigger2 = movehit
+trigger2 = stateno = 400
+trigger3 = movehit
+trigger3 = stateno = 430
+trigger4 = movehit
+trigger4 = stateno = 230
+
+
+;しゃがみＨＳ
+[State -3, Crouching Hard Slash]
+type = ChangeState
+value = 440
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+Triggerall = Random = [302,800]
+triggerAll = statetype != A
+Triggerall = P2BodyDist X = [0,88]
+triggerAll = p2bodydist Y >= -17
+trigger1 = ctrl || sysvar(3)
+
+[State -3];飛行
+Type = ChangeState
+value = 99
+TriggerAll=var(58)
+TriggerAll=var(59)=0
+TriggerAll=StateType=A
+TriggerAll=P2StateType!=L
+TriggerAll=P2MoveType!=H
+TriggerAll=Pos Y<=-25
+TriggerAll=Ctrl
+TriggerAll=P2BodyDist X>170
+TriggerAll=Random<800
+TriggerAll=stateno!=99
+Trigger1 = P2StateType!=A
+Trigger1 = vel y>0
+Trigger2 = P2StateType=A
+
+;EX蒼
+[State -1, fuujin_b]
+type = ChangeState
+value = 1800
+TriggerAll = Var(58)
+triggerall = var(59) = 2
+TriggerAll = P2BodyDist X <= 100
+TriggerAll = P2BodyDist Y >= -90
+triggerAll = P2statetype != L
+triggerall = random <= 700
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 103
+trigger3 = stateno = 240
+trigger3 = movecontact
+trigger3 = time > 15
+trigger4 = stateno = 440
+trigger4 = movecontact
+trigger4 = time > 15
+trigger5 = stateno = 255
+trigger5 = movecontact
+trigger6 = stateno = 270
+trigger6 = movehit
+trigger6 = time > 19
+
+;龍炎舞
+[State -1, Ryuenbu]
+type = ChangeState
+value = 1820
+TriggerAll = Var(58)
+triggerall = var(59) = 2
+triggerall = random <= 600
+TriggerAll = P2BodyDist X <= 70
+TriggerAll = P2BodyDist Y >= -40
+triggerAll = P2statetype != L
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 210
+trigger4 = movecontact
+trigger4 = time > 9
+trigger5 = stateno = 230
+trigger5 = movecontact
+trigger6 = stateno = 235
+trigger6 = movecontact
+trigger6 = time > 12
+trigger7 = stateno = 240
+trigger7 = movecontact
+trigger7 = time > 15
+trigger8 = stateno = 440
+trigger8 = movecontact
+trigger8 = time > 15
+trigger9 = stateno = 450
+trigger9 = movecontact
+trigger10 = stateno = 255
+trigger10 = movecontact
+trigger11 = stateno = 265
+trigger11 = movecontact
+trigger11 = time > 10
+trigger12 = stateno = 260
+trigger12 = movecontact
+trigger12 = time > 13
+trigger13 = stateno = 270
+trigger13 = movecontact
+trigger13 = time > 13
+
+;紅
+[State -1, kou]
+type=changestate
+value=1601
+TriggerAll = Var(58) = 1
+triggerall = var(59) = 2
+triggerall = enemynear,stateno!=[120,155]
+triggerall = P2Statetype!=L && (P2Dist y=[-140,0]) 
+triggerall = p2bodydist x=[0,80]
+triggerall = random <= 500
+triggerAll = P2statetype != L
+trigger1 = p2statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 270
+trigger2 = movehit
+trigger2 = time > 19
+
+;胡蝶夢
+[State -1, kotyoumu]
+type = ChangeState
+value = 1920
+TriggerAll = Var(58)
+triggerall = var(59) = 2
+TriggerAll = P2BodyDist X > 110
+TriggerAll = P2BodyDist Y = [-50,0]
+triggerall = power >= 640
+triggerAll = p2movetype != A
+triggerAll = P2statetype != L
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+
+;EX風神HS
+[State -3, EXfuujin_b]
+type = ChangeState
+value = 1700
+TriggerAll = Var(58)
+triggerall = var(59) = 2
+triggerAll = P2statetype != L
+triggerAll = statetype != A
+TriggerAll = P2BodyDist X > 110
+TriggerAll = P2BodyDist Y = [-30,0]
+TriggerAll = Random = [582,999]
+triggerAll = p2movetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+
+;風神HS
+[State -3, fuujin_b]
+type = ChangeState
+value = 1250
+TriggerAll = Var(58) = 1
+triggerall = var(59) <= 1
+triggerAll = P2statetype != L
+triggerAll = statetype != A||var(46)
+TriggerAll = P2BodyDist X = [75,180]
+TriggerAll = P2BodyDist Y = [0,100]
+TriggerAll = Random = [582,810]
+trigger1 = ctrl
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movehit
+trigger5 = time > 9
+trigger6 = stateno = 215
+trigger6 = movehit
+trigger7 = stateno = 230
+trigger7 = movehit
+trigger8 = stateno = 235
+trigger8 = movehit
+trigger8 = time > 12
+trigger9 = stateno = 245
+trigger9 = movehit
+trigger9 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger9 = time > 12
+
+;EX風神S
+[State -3, fuujin_y]
+type = ChangeState
+value = 1750
+TriggerAll = Var(58) = 1
+triggerAll = var(59) = 2
+triggerAll = statetype != A
+triggerAll = P2statetype != L
+TriggerAll = P2BodyDist X = [55,120]
+TriggerAll = P2BodyDist Y = [0,100]
+TriggerAll = Random = [112,499]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 255
+trigger6 = movecontact
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 240
+trigger10 = movecontact
+trigger10 = time > 15
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = movehit
+trigger17 = stateno = 265
+trigger17 = movecontact
+trigger17 = time > 10
+trigger19 = stateno = 270
+trigger19 = movecontact
+trigger19 = time > 13
+
+;風神S
+[State -3, fuujin_y]
+type = ChangeState
+value = 1200
+TriggerAll = Var(58) = 1
+triggerall = var(59) <= 1
+triggerAll = P2statetype != L
+TriggerAll = P2BodyDist X = [55,100]
+TriggerAll = P2BodyDist Y = [0,100]
+TriggerAll = Random = [172,330]
+triggerAll = statetype != A||var(46)
+trigger1 = ctrl
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 450
+trigger6 = movehit
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+;trigger11 = stateno = 240
+;trigger11 = movehit
+;trigger11 = time > 15
+trigger10 = stateno = 245
+trigger10 = movecontact
+trigger10 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger10 = time > 12
+trigger11 = stateno = 260
+trigger11 = movecontact
+trigger11 = time > 13
+
+;ジャンプP
+[State -3, Jump Punch]
+type = ChangeState
+value = 600
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerAll = statetype = A
+TriggerAll = Random = [90,810]
+triggerall = p2stateno != 1061
+Triggerall = P2BodyDist Y = [-20,35]
+Triggerall = P2BodyDist X = [-10,50]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 600
+trigger2 = moveguarded
+Trigger2 = Random = [170,779]
+trigger3 = stateno = 630
+trigger3 = movecontact
+trigger3 = p2dist y > 0
+trigger3 = vel y < -3
+trigger4 = stateno = 101
+trigger5 = stateno = 102
+trigger6 = stateno = 610
+trigger6 = movecontact
+trigger6 = p2dist y > 0
+trigger6 = vel y < -3
+
+;ジャンプK
+[State -3, AI]
+type = ChangeState
+value = 630
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerAll = statetype = A
+Triggerall = P2BodyDist Y = [-50,50]
+Triggerall = P2BodyDist X = [0,80]
+Triggerall = Random = [201,800]
+;Triggerall = Random = [101,890]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 600
+trigger2 = moveguarded
+trigger3 = stateno = 101
+trigger3 = p2statetype != C
+trigger4 = stateno = 102
+trigger4 = p2statetype != C
+
+;ジャンプS
+[State -3, Jump Slash]
+type = ChangeState
+value = 610
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerAll = statetype = A
+Triggerall = Random = [101,950]
+Trigger1 = P2BodyDist Y = [-40,40]
+Trigger1 = P2BodyDist X = [0,88]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 600
+trigger2 = movehit
+trigger3 = Vel Y > 0
+trigger3 = ctrl || sysvar(3)
+Trigger3 = P2BodyDist Y = [-40,60]
+Trigger3 = P2BodyDist X = [0,68]
+trigger4 = stateno = 101
+Trigger4 = P2BodyDist Y = [-30,50]
+Trigger4 = P2BodyDist X = [0,58]
+trigger5 = stateno = 102
+Trigger5 = P2BodyDist Y = [-30,50]
+Trigger5 = P2BodyDist X = [0,58]
+trigger6 = stateno = 630
+trigger6 = movecontact
+
+;ジャンプHS
+[State -3, AI]
+type = ChangeState
+value = 640
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerAll = statetype = A
+Triggerall = P2BodyDist Y = [-40,90]
+TriggerAll = P2BodyDist X = [-20,80]
+;triggerall = enemynear,vel y > 0
+triggerall = stateno != 630
+trigger1 = ctrl && var(2) = 0
+Trigger1 = Random = [551,700]
+Trigger2 = Random = [551,700]
+trigger2 = stateno = 102
+trigger3 = stateno = 610
+trigger3 = movehit
+trigger3 = var(2) = 2
+trigger3 = P2BodyDist Y < -8
+trigger4 = stateno = 101
+Trigger4 = Random = [551,700]
+
+;ジャンプダスト
+[State -3, Jump dust]
+type = ChangeState
+value = 650
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerall = var(59) >= 1
+triggerAll = statetype = A
+Triggerall = P2BodyDist Y = [-71,21]
+TriggerAll = P2BodyDist X = [-10,72]
+trigger1 = ctrl || sysvar(3)
+trigger1 = p2movetype != H
+Trigger1 = Random = [701,999]
+trigger2 = stateno = 600
+trigger2 = moveguarded
+trigger3 = stateno = 610
+trigger3 = movehit
+trigger4 = stateno = 101
+trigger5 = stateno = 102
+trigger6 = stateno = 630
+trigger6 = movehit
+trigger6 = var(2) = 0
+trigger7 = stateno = 640
+trigger7 = movecontact
+
+;空中針・弐式
+[State -3, sin nisiki]
+type = ChangeState
+value = 1100
+TriggerAll = Var(58) = 1
+triggerAll = statetype = A
+TriggerAll = P2BodyDist X = [-10,65]
+TriggerAll = P2BodyDist Y = [-60,85]
+TriggerAll = p2statetype != L
+trigger1 = ctrl || sysvar(3)
+trigger1 = prevstateno != 2001
+Trigger1 = p2statetype = C
+trigger2 = stateno = 610
+trigger2 = movehit
+Trigger2 = var(2) = 2
+trigger3 = stateno = 650
+trigger3 = movehit
+trigger4 = ctrl || sysvar(3)
+Trigger4 = pos y >= -40
+
+;立ち→Ｋ（ＸＸ・ＥＸ）
+[State -3, Stand K]
+type = ChangeState
+value = 250
+TriggerAll = Var(58) = 1
+triggerall = var(59) >= 1
+triggerAll = stateno != 250
+triggerAll = P2statetype != L
+TriggerAll = Random = [500,750]
+TriggerAll = P2BodyDist X = [16,47]
+TriggerAll = P2BodyDist Y >= -30
+triggerall = statetype = S
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = movecontact
+trigger4 = stateno = 230
+Trigger5 = EnemyNear,HitDefAttr = S,AA
+trigger5 = ctrl || sysvar(3)
+
+;立ち→Ｐ（ＸＸ）
+[State -3, Stand Punch]
+type = ChangeState
+value = 255
+TriggerAll = Var(58) = 1
+triggerall = var(59) = 1
+triggerAll = P2statetype != L
+triggerAll = statetype = S
+triggerAll = stateno != 210
+triggerAll = stateno != 240
+triggerAll = stateno != 245
+triggerAll = stateno != 255
+triggerAll = stateno != 1750
+triggerAll = stateno != 1200
+triggerAll = stateno != 1251
+triggerAll = stateno != 1720
+triggerAll = stateno != 1751
+triggerAll = stateno != 3200
+triggerAll = stateno != 3250
+TriggerAll = Random = [200,793]
+TriggerAll = P2BodyDist X = [58,138]
+TriggerAll = P2BodyDist Y >= -60
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+Trigger2 = Random = [935,950]
+trigger3 = stateno = 103
+Trigger3 = Random = [935,950]
+
+;立ち→Ｐ
+[State -3, Stand Punch]
+type = ChangeState
+value = 205
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype != L
+triggerall = var(59) = 0 || var(59) = 2
+TriggerAll = P2BodyDist X = [48,89]
+triggerall = statetype = S
+trigger1 = ctrl || sysvar(3)
+Trigger1 = Random = [292,310]
+trigger2 = stateno = 100
+Trigger2 = Random = [940,950]
+trigger3 = stateno = 103
+Trigger3 = Random = [940,950]
+trigger4 = movecontact
+trigger4 = stateno = 215
+Trigger4 = Random = [940,950]
+
+;立ち→Ｋ（Ｘ）
+[State -3, Stand K]
+type = ChangeState
+value = 235
+TriggerAll = Var(58) = 1
+triggerall = var(59) = 0
+triggerAll = statetype = S
+triggerAll = stateno != 235
+triggerAll = P2statetype != L
+TriggerAll = Random = [370,550]
+TriggerAll = P2BodyDist X = [8,31]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 103
+trigger3 = movecontact
+trigger3 = stateno = 230
+
+;陰
+[State -3, AI]
+Type = ChangeState
+Value = 1050
+TriggerAll = Var(58) = 1
+triggerAll = P2statetype = A
+TriggerAll = statetype != A||var(46)
+triggerAll = P2statetype != L
+triggerAll = Prevstateno != 1002
+TriggerAll = EnemyNear,Vel Y <= 3
+Triggerall = Random = [40,950]
+TriggerAll = P2BodyDist X = [8,67]
+TriggerAll = P2BodyDist Y = [-103,-39]
+trigger1 = ctrl || sysvar(3)
+Trigger1 = EnemyNear,Time >= 10
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movehit
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 12
+trigger7 = stateno = 215
+trigger7 = movehit
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 255
+trigger10 = movecontact
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+
+
+;天神脚
+[State -3, tenjinkyaku]
+type = ChangeState
+value = 3100
+TriggerAll = Var(58) = 1
+triggerall = power >= 1000
+triggerall = var(59) = 1
+triggerAll = statetype != A
+triggerall = statetype != L
+TriggerAll = Random = [200,970]
+triggerAll = movetype != H
+TriggerAll = !moveguarded
+triggerAll = p2stateno != [120,170]
+TriggerAll = P2StateType !=L
+TriggerAll = P2BodyDist X = [106,149]
+TriggerAll = P2BodyDist Y >= -100
+trigger1 = ctrl || sysvar(3)
+Trigger1 = Random = [741,930]
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 40
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 12
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 240
+trigger10 = movecontact
+trigger10 = time > 15
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = movecontact
+trigger17 = stateno = 255
+trigger17 = movecontact
+
+;針・壱式
+[State -3, sin]
+type = ChangeState
+value = 1350
+TriggerAll = Var(58) = 1
+triggerall = var(59) = 2
+triggerAll = statetype != A
+TriggerAll = p2statetype != L
+TriggerAll = p2movetype != H
+TriggerAll = P2BodyDist X = [56,330]
+TriggerAll = Random = [712,910]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 12
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 255
+trigger10 = movecontact
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = movecontact
+
+
+;戒Ｐ
+[State -3, kai_x]
+type = ChangeState
+value = 1000
+TriggerAll = Var(58) = 1
+triggerAll = var(59) <= 1
+TriggerAll = P2StateType = C
+triggerAll = statetype != A
+triggerall = numhelper(3010) = 0
+TriggerAll = P2BodyDist X = [49,90]
+trigger1 = ctrl || sysvar(3)
+Trigger1 = Random = [100,350]
+trigger2 = stateno = 100
+Trigger2 = Random = [570,950]
+trigger3 = stateno = 103
+Trigger3 = Random = [770,950]
+trigger4 = stateno = 200
+trigger4 = moveguarded
+Trigger4 = Random = [770,950]
+trigger5 = stateno = 205
+trigger5 = moveguarded
+trigger5 = time > 9
+Trigger5 = Random = [770,950]
+trigger6 = stateno = 210
+trigger6 = moveguarded
+trigger6 = time > 12
+Trigger6 = Random = [770,950]
+trigger7 = stateno = 215
+trigger7 = moveguarded
+Trigger7 = Random = [770,950]
+trigger8 = stateno = 230
+trigger8 = moveguarded
+Trigger8 = Random = [770,950]
+trigger9 = stateno = 235
+trigger9 = moveguarded
+trigger9 = time > 12
+Trigger9 = Random = [770,950]
+trigger10 = stateno = 240
+trigger10 = moveguarded
+trigger10 = time > 15
+Trigger10 = Random = [770,950]
+trigger11 = stateno = 245
+trigger11 = moveguarded
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+Trigger11 = Random = [770,950]
+trigger12 = stateno = 400
+trigger12 = moveguarded
+Trigger12 = Random = [770,950]
+trigger13 = stateno = 410
+trigger13 = moveguarded
+Trigger13 = Random = [770,950]
+trigger14 = stateno = 430
+trigger14 = moveguarded
+Trigger14 = Random = [770,950]
+trigger15 = stateno = 440
+trigger15 = moveguarded
+trigger15 = time > 15
+Trigger15 = Random = [770,950]
+trigger16 = stateno = 450
+trigger16 = moveguarded
+Trigger16 = Random = [770,950]
+trigger17 = stateno = 255
+trigger17 = moveguarded
+Trigger17 = Random = [770,950]
+
+;FB紅EX
+[State -1, kou]
+type = ChangeState
+value = 1810
+TriggerAll = Var(58)
+triggerall = var(59) = 2
+triggerall = statetype != A
+triggerall = p2statetype != L
+TriggerAll = Random = [340,800]
+triggerall = power >= 500
+TriggerAll = P2BodyDist X <= 58
+TriggerAll = P2BodyDist Y >= -60
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movehit
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 9
+trigger7 = stateno = 215
+trigger7 = movehit
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 240
+trigger10 = movecontact
+trigger10 = time > 15
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = movecontact
+trigger17 = stateno = 255
+trigger17 = movecontact
+trigger18 = stateno = 265
+trigger18 = movecontact
+trigger18 = time > 10
+trigger19 = stateno = 260
+trigger19 = movecontact
+trigger19 = time > 13
+trigger20 = stateno = 270
+trigger20 = movecontact
+trigger20 = time > 13
+
+;戒Ｋ
+[State -3, kai_a]
+type = ChangeState
+value = 1005
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+TriggerAll = P2BodyDist X = [120,199]
+TriggerAll = p2statetype = C
+triggerAll = Prevstateno != 1008
+TriggerAll = Random = [40,800]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = moveguarded
+trigger5 = stateno = 205
+trigger5 = moveguarded
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = moveguarded
+trigger6 = time > 12
+trigger7 = stateno = 215
+trigger7 = moveguarded
+trigger8 = stateno = 230
+trigger8 = moveguarded
+trigger9 = stateno = 235
+trigger9 = moveguarded
+trigger9 = time > 12
+trigger10 = stateno = 240
+trigger10 = moveguarded
+trigger10 = time > 15
+trigger11 = stateno = 245
+trigger11 = moveguarded
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = moveguarded
+trigger13 = stateno = 410
+trigger13 = moveguarded
+trigger14 = stateno = 430
+trigger14 = moveguarded
+trigger15 = stateno = 440
+trigger15 = moveguarded
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = moveguarded
+trigger17 = stateno = 255
+trigger17 = moveguarded
+
+;鳳蝶紋
+[State -1, Agehamon]
+type = ChangeState
+value = 1900
+TriggerAll = Var(58)
+triggerall = var(59) = 2
+triggerall = power >= 680
+triggerall = !InguardDist
+TriggerAll = P2BodyDist X > 80
+TriggerAll = (P2BodyDist Y != [-12,-2])&&(p2movetype = H)
+TriggerAll = P2BodyDist Y = [-62,52]
+TriggerAll = Random = [40,700]
+triggerAll = P2statetype != L
+trigger1 = statetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+
+;花蝶扇
+[State -1, Katyousen]
+type = ChangeState
+value = 1830
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+triggerall = !InguardDist
+TriggerAll = P2BodyDist X > 129
+triggerall = var(59) = 2
+TriggerAll = Random = [40,700]
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+
+;疾
+[State -3, situ]
+type = ChangeState
+value = 1500
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+TriggerAll = P2BodyDist X = [129,190]
+triggerall = Numhelper(1510) = 0&&Numhelper(1555) = 0&&Numhelper(1511) = 0
+Triggerall = Random = [102,800]
+triggerall = var(59) = 0||var(59) = 2
+triggerall = !InguardDist
+triggerall = p2movetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 9
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 255
+trigger10 = movecontact
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = movecontact
+
+;疾EX
+[State -3, situ]
+type = ChangeState
+value = 1501
+TriggerAll = Var(58) = 1
+triggerAll = statetype != A
+TriggerAll = P2BodyDist X = [129,190]
+triggerall = Numhelper(1510) = 0&&Numhelper(1555) = 0&&Numhelper(1511) = 0
+Triggerall = Random = [102,800]
+triggerall = var(59) = 1
+triggerall = !InguardDist
+triggerall = p2movetype != A
+trigger1 = ctrl || sysvar(3)
+trigger2 = stateno = 100
+trigger3 = stateno = 103
+trigger4 = stateno = 200
+trigger4 = movecontact
+trigger5 = stateno = 205
+trigger5 = movecontact
+trigger5 = time > 9
+trigger6 = stateno = 210
+trigger6 = movecontact
+trigger6 = time > 9
+trigger7 = stateno = 215
+trigger7 = movecontact
+trigger8 = stateno = 230
+trigger8 = movecontact
+trigger9 = stateno = 235
+trigger9 = movecontact
+trigger9 = time > 12
+trigger10 = stateno = 255
+trigger10 = movecontact
+trigger11 = stateno = 245
+trigger11 = movecontact
+trigger11 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+trigger11 = time > 12
+trigger12 = stateno = 400
+trigger12 = movecontact
+trigger13 = stateno = 410
+trigger13 = movecontact
+trigger14 = stateno = 430
+trigger14 = movecontact
+trigger15 = stateno = 440
+trigger15 = movecontact
+trigger15 = time > 15
+trigger16 = stateno = 450
+trigger16 = movecontact

@@ -1,0 +1,2984 @@
+;イントロ　イントロ関連をここに。
+;s2800 勝利ぶつけイントロ用  2850一撃必殺用 2900イントロ相手が０にならない、または当たらないとき
+;--2930 ミリア、チップ、バイケン,ジョニー　アンジ　2940アンジ専用 2945みりあ専用(両方)　2950でぃずいー１
+;2970カイ専用 2975ろぼかい 2980いの(両方)　2985じゃむ(うちの)2990-95でぃじぃー(うちの)
+;6000　イントロTRIPヨーヨー
+;--ASSRTでらいふばーけすイントロ相手、カイ。イノ
+
+;--------------決着後、相手の情報が取れなくなります。そのタイミング直前で一度引き込んで位置情報などを確保する。
+;----------S5110であたるはず。5150いくと判断できなくなる
+[statedef 2800];倒した相手に貼りつく。ID184へるぱー
+type = A
+movetype = A
+physics = n
+anim = 6000
+ctrl = 0
+velset = 0,0
+sprpriority = -4
+
+[state 2810,]
+type  = posset
+trigger1 = 1
+x = enemy,pos x
+y = enemy,pos y
+
+[state 8000,];フィードバックリセット181か182を選ばせるため0か1を引く
+type = parentvarset
+trigger1 = time = 0
+var(5) = random % 3
+ignorehitpause = 1
+
+[state 8000,];各種フラグ0リセット
+type = varrangeset
+trigger1 = time = 0
+first = 34
+last = 38
+value = 0
+ignorehitpause = 1
+
+;---------挑発とかで長く0に戻らないとずれる
+;---んー攻撃戻り時とかの判断できない、
+;---この時点で動かさないと以降制御不可能、
+[State 2800, 1];5110にとばすまたはぶつけにとばすが・・るーとが勝利ぽーずずれてたら？
+type = HitDef
+triggerall = time = 0
+trigger1 = 1;root,stateno = [0,20]
+attr = a, NT         
+hitflag = MAFD          
+priority = 7, hit   
+sprpriority = -1      
+numhits = 0
+pausetime = 0, 0                 
+hitsound = 0
+hitcount = 0
+p1stateno = ifelse(root,var(5) = 2 ,2810,2805)   
+p2stateno = ifelse(root,var(5) = 2 ,5115,5110)   
+;p1stateno = ifelse(root,var(5) = 2 && root,stateno <= 20,2810,2805)   
+;p2stateno = ifelse(root,var(5) = 2 && root,stateno <= 20,5115,5110)   
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+ignorehitpause = 1
+
+[state 2810,];当たらなかった場合 消すとしつこくでてくるので・・
+type = changestate
+trigger1 = time >= 1
+value = 2805
+
+;------------------------------------------------------------- 
+[statedef 2805];とれなかった、もしくは相手に当てない場合はこっちで待機
+type = A
+movetype = A
+physics = n
+ctrl = 0
+anim = 6000
+sprpriority = -4
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5150]
+type = parentvarset
+trigger1 = time = 0
+var(5) = random % 2
+ignorehitpause = 1
+
+;------------------------------------------------------------- 
+;----targetstateも無効！まずtime０で相手の速度をとっておいて・・5150にいかれた時点でnumtargetきかなくなる
+[statedef 2810];当たった場合待機して・・もしぶつけの場合は移動させる
+type = A
+movetype = A
+physics = n
+ctrl = 0
+anim = 6000
+sprpriority = -4
+
+[state 8000,];フィードバックリセット183にいくようにする
+type = parentvarset
+trigger1 = time = 0
+var(5) =  2
+ignorehitpause = 1
+
+[State 5110, 13] ;ヒットカウントをとれるかな？
+type = Varset
+triggerall = numtarget
+trigger1 = time = 0
+var(20) = target,gethitvar(hitcount)
+ignorehitpause = 1
+persistent = 0
+
+[State 5110, 13] ;相手の速度と同期する
+type = Velset
+triggerall = numtarget
+trigger1 = time = 0
+x = target,vel x
+persistent = 0
+ignorehitpause = 1
+
+[State 5110, 13] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+ignorehitpause = 0
+
+[State 5150, 7] ;Friction
+type = VelSet
+trigger1 = Vel x < .05
+persistent = 0
+x = 0
+
+[state 2810,]
+type = destroyself
+trigger1 = 0
+
+
+;----------------------------げしげしイントロ
+;---------------------相手がいつまでも0にならないとき	
+;-----------これは本体動作
+[statedef 2900];
+type = s
+movetype = i
+physics = s
+anim = 0
+ctrl = 0
+
+[state 2900,helper partner];----stateno0にならない時の後ろから走ってくる
+type = Helper
+triggerall = NumHelper(193) = 0
+trigger1 = time = 60
+helpertype = normal
+sprpriority  = 0
+name = "intro bridget"
+ID = 193
+pos = -100,0
+postype = p1
+stateno = 2920
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[State 190, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = invisible
+
+[State 2900, 4] 
+type = ChangeState
+triggerall = numhelper(193)
+trigger1 = helper(193),stateno = 2925
+value = 2910
+
+;---------------------------------
+[statedef 2910];本体動作・終了
+type = s
+movetype = i
+physics = s
+anim = 0
+ctrl = 0
+anim = 0
+
+[State 2910, 4] 
+type = ChangeState
+trigger1 = time = 0;animtime = 0
+value = 0
+
+;-------------------イントロ走ってくるブリジット
+;----------はしってくるだけ
+[statedef 2920]
+type = s
+movetype=i
+ctrl = 0
+sprpriority = 2
+physics = N
+anim = 100
+velset = 6,0
+
+[state 7030,]
+type = turn
+trigger1 = root,facing != facing
+trigger1 = time = 0
+persistent = 0
+ 
+[state 2950,]
+type = changestate
+trigger1 = abs(rootdist x) = [0,20]
+value =2925
+
+;---------イントロ本体と重なって終了
+[statedef 2925]
+type = s
+movetype=i
+ctrl = 0
+physics = s
+velset = 0,0
+anim = 0
+
+[state 2925,]
+type = posset
+trigger1 = time = 0
+x = root,pos x
+
+[state 2925,]
+type = destroyself
+trigger1 = time = 2
+
+;------------------------------------------ 
+;--------------------イントロ ＶＳ愉快な賞金首たち
+;------------------VS　ミリア、チップ、バイケン,ジョニー　アンジ
+;-----声が違う場合どうしようか相手側強制発動あり
+[Statedef 2930]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 191, 4]; 
+type = Changeanim
+trigger1 = time = 0
+value = 190
+elem = 10
+
+[state 191,];var(48)にあわせて相手専用セリフ
+type = playsnd
+trigger1 = time = 10
+persistent = 0
+channel = 0
+value = s2900,var(48)
+
+[State 191, 4];セリフ短め　ミリア、チップ、バイケン,ジョニー
+type = Changestate
+trigger1 =var(48) = [4,7] 
+trigger1 = time >= 300
+value = 2935
+
+[State 191, 4];セリフ長め　アンジ、 
+type = Changestate
+trigger1 =var(48) = [8,9] 
+trigger1 = time >= 400
+value = 2935
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;------------------汎用共通セリフ　賞金首としてうちのお縄に
+[Statedef 2935]
+type = S
+ctrl = 0
+anim = 193
+velset = 0,0
+
+[state 191,];賞金首として…
+type = playsnd
+trigger1 = anim = 193
+trigger1 = animelem = 17
+persistent = 0
+channel = 0
+value = s2900,0
+persistent = 0
+
+[State 191, 4]; 
+type = Changeanim
+trigger1 =anim =193 && time >= 300
+value = 194
+
+[State 191, 4] 
+type = ChangeState
+trigger1 = anim = 194 && animtime = 0
+value = 0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;--------------------イントロ ＶＳannji
+;舞と称して…　ぬがー！　図星をさされると　お望みどおり
+[Statedef 2940]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 191, 4]; 
+type = Changeanim
+trigger1 = time = 0
+value = 190
+elem = 10
+
+[state 191,];var(48)にあわせて相手専用セリフ
+type = playsnd
+trigger1 = time = 10
+persistent = 0
+channel = 0
+value = s2900,var(48)
+
+[State 191, 4];舞と称して喋りおわりアニメ固定
+type = Changeanim
+trigger1 = time >= 450
+value = 190
+elem = 12
+
+[state 191,];ぬがーが終わるころにちぇんすて
+type = changestate
+trigger1 = anim = 190
+trigger1 = time >= 600
+value = 2942
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;--------------------------続き　あんじ
+;---------よーよーぽんぽんあにめはは1に変更
+[Statedef 2942]
+type = S
+ctrl = 0
+velset = 0,0
+
+[State 191, 4]; 
+type = Changeanim
+trigger1 = time = 0
+value = 190
+elem = 10
+
+[state 191,];図星をさされると怒る
+type = playsnd
+trigger1 = time = 0
+persistent = 0
+channel = 0
+value = s2900,var(48) + 1
+
+[state 191,];間違いないようですね
+type = playsnd
+trigger1 = anim = 1 
+persistent = 0
+channel = 0
+value = s2900,10
+
+[State 191, 4];最初喋り終わり固定
+type = Changeanim
+trigger1 = anim = 190 
+trigger1 = time >= 200
+value = 190
+elem = 12
+
+[State 191, 4];おのぞみどおりー->間違いないようですね
+type = Changeanim
+trigger1 = anim = 190
+trigger1 = time >= 400 
+value = 191
+
+[State 191, 4];
+type = Changeanim
+trigger1 = anim = 191 && animtime = 0
+value = 1
+
+[state 191,]
+type = changestate
+trigger1 = anim = 1
+trigger1 = time >= 500
+value = 0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;--------------------イントロ ＶＳみりあ
+;------ぱたーん１　きんぱつのめひょーnanaさん用、ボイスどうしよ
+;----ぱたーん2-1,2-2　そこいくお嬢さんしりーず
+;みりあ
+[Statedef 2945]
+type = S
+ctrl = 0
+velset = 0,0
+
+;------------------------きんぱつのめひょーまたは男女かまわず
+;---V49でうちのかどうか判断できる,はずなんだけどT0の時点でまだV49とか入ってないんだよねー・・1?
+[State 191, 4];1
+type = Changeanim
+triggerall = var(49) = 0
+trigger1 = time <= 45
+value = 190
+elem = 10
+
+[State 191, 4]; しゃべり
+type = Changeanim
+triggerall = !var(49)
+trigger1 = time = 45
+value = 190
+elem = 10
+
+[state 191,];相手専用セリフ
+type = playsnd
+triggerall = !var(49)
+trigger1 = time = 46
+persistent = 0
+channel = 0
+value = s2900,20 + random % 2
+
+[State 191, 4];再び固定
+type = Changeanim
+triggerall = !var(49)
+trigger1 = time >= 300
+value = 190
+elem = 12
+
+[state 191,]
+type = changeanim
+triggerall = !var(49)
+trigger1 = anim = 190
+trigger1 = time = 550
+value = 1
+
+[state 191,];では、さて
+type = playsnd
+triggerall = !var(49)
+trigger1 = anim = 1
+persistent = 0
+channel = 0
+value = s2900,22 + random % 2
+
+;-------------------終了は共通だっていいよね
+[state 191,]
+type = changestate
+trigger1 = !var(49)
+trigger1 = time = 650
+trigger2 = anim = 194 && animtime = 0
+trigger3 = anim = 191 && animtime = 0
+value = 0
+
+
+;-------------------------お嬢さんシリーズ3人目
+;----------1-----おじょうさんー＞おじょうさんじゃありません賞金稼ぎー＞やっぱり子供が～
+;----------2-おじょうさんー＞うちおとこですけどー＜(間をあける？)今なんていった？
+[state 193,];パターン選択？
+type = varset
+triggerall = var(49)
+trigger1 = time = 1
+var(51) = random % 2 
+
+[State 191, 4];1:いのと同じｽﾀｰﾄのしかた？0だとまだVAR設定されてない
+type = Changeanim
+triggerall = var(49) && !var(51)
+trigger1 = time = 1
+value = 192
+
+[State 191, 4];1:ヨーヨー終わり 
+type = Changeanim
+triggerall = var(49) && !var(51)
+triggerall = anim != 193
+trigger1 = anim = 192 && time >= 180
+value = 193
+
+[State 191, 4];1:しゃべりおわり
+type = Changeanim
+triggerall = anim != 194
+triggerall = anim = 193
+triggerall = var(49) && !var(51)
+trigger1 = time >= 480  
+value = 194
+
+[state 191,];1:しようきんかせぎ
+type = playsnd
+triggerall = var(49) && !var(51)
+trigger1 = anim = 193
+trigger1 = animelem = 17
+persistent = 0
+channel = 0
+value = s2900,51
+
+;------------------------ぱたーん２　おとこですけどー
+[State 191, 4];2	まず口に指あててんー？なかんじ
+type = Changeanim
+triggerall = var(49) && var(51)
+trigger1 = time <= 230
+trigger2 = time = [300,449]
+value = 190
+elem = 10
+
+[State 191, 4];2	喋ったら終了
+type = Changeanim
+triggerall = var(49) && var(51)
+trigger1 = time = 450
+value = 191
+
+[state 191,];2おとこですけど
+type = playsnd
+triggerall = var(49) && var(51)
+trigger1 = time = 220
+value = s2900,50
+persistent = 0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+
+;--------------------イントロ ＶＳでぃずぃ 未定？　仮
+[Statedef 2950]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 190, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = invisible
+
+[state 2900,helper partner];----
+type = Helper
+triggerall = NumHelper(193) = 0
+trigger1 = time = 100
+helpertype = normal
+sprpriority  = 0
+name = "intro bridget"
+ID = 193
+pos = -100,0
+postype = p1
+stateno = 2920
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[state 191,];見つけましたよ賞金首さん！  相手対応無反応　当たり前だけど
+type = playsnd
+trigger1 = time = 0
+persistent = 0
+channel = 0
+value = s2900,30
+persistent = 0
+
+[State 2900, 4] 
+type = ChangeState
+triggerall = numhelper(193)
+trigger1 =helper(193),stateno = 2925
+value = 2955
+
+;-------------------でぃじ続き
+;----走ってきて見つけましたよ、止まってしばらく、さあいきますよ
+[Statedef 2955]
+type = S
+ctrl = 0
+velset = 0,0
+anim =0
+
+[state 193,]
+type = changeanim
+trigger1 =time=280
+value =193
+elem = 17
+
+[State 191, 4];
+type = Changeanim
+trigger1 = anim = 193
+trigger1 = time=300
+value = 194
+
+[state 191,];
+type = playsnd
+trigger1 = time=280
+value = s2900,31
+persistent = 0
+
+[state 191,];
+type = playsnd
+trigger1 = 0;time=250
+value = s2900,31
+
+[State 191, 4] 
+type = ChangeState
+trigger1 =  anim = 194 && animtime = 0
+value = 0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;-------------------------------------------------カイ。
+;--------あ、けーさつの人だ。どうしました？お嬢さん。ウチおとこですけど　これは失礼・・え？！
+[Statedef 2970]
+type = S
+ctrl = 0
+velset = 0,0
+anim =190
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 2970];最初アニメ固定
+type = changeanim
+trigger1 = time <= 30
+value = 190
+elem = 10
+
+[state 2970];警察の人だ　終わりご固定
+type = changeanim
+trigger1 = time = [200,399]
+value = 190
+elem = 12
+
+[state 191,];あ、警察の人だ
+type = playsnd
+trigger1 = anim = 190
+trigger1 = animelem = 10 
+value = s2900,45
+persistent = 0
+
+[state 191,];おとこですけど
+type = playsnd
+trigger1 = time = 400
+value = s2900,50
+persistent = 0
+
+[state 2970];おとこですけどー
+type = changeanim
+trigger1 = time = 400
+value = 195
+
+[state 2970];え？がきてしばらくして終了へ
+type = changeanim
+triggerall = anim = 195
+triggerall = animelem = 9
+trigger1 = time >= 600
+value = 910
+elem = 9
+persistent = 0
+
+
+[state 2970];owari
+type = changestate
+trigger1 = anim = 910 && animtime = 0
+value = 0
+
+;-------------------------------ロボカイ
+;あ、けーさつの人だ。ギギ。ぎぎ？　っていうかあなた警察じゃないでしょ！
+[Statedef 2975]
+type = S
+ctrl = 0
+velset = 0,0
+anim =190
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 2970];最初アニメ固定
+type = changeanim
+trigger1 = time <= 30
+value = 190
+elem = 10
+
+[state 2970];警察の人だ　終わりご固定
+type = changeanim
+trigger1 = time = [200,399]
+value = 190
+elem = 11
+
+[state 191,];あ、警察の人だ
+type = playsnd
+trigger1 = anim = 190
+trigger1 = animelem = 10 
+value = s2900,45
+persistent = 0
+
+[state 2970];ぎぎ？
+type = changeanim
+trigger1 = anim = 190
+trigger1 = time = 400
+value = 190
+elem = 10
+
+[state 2970];しゃべりおわり口とじ
+type = changeanim
+trigger1 = anim = 197
+trigger1 = time = [415,549]
+value = 190
+elem = 11
+
+[state 2970];ていうか～
+type = changeanim
+trigger1 = anim = 190
+trigger1 = time = 550
+value = 197
+
+[state 191,];ぎぎ？
+type = playsnd
+trigger1 = time = 400
+value = s2900,46
+persistent = 0
+
+[state 191,];けーさつじゃない！
+type = playsnd
+trigger1 = anim = 197
+value = s2900,47
+persistent = 0
+
+[state 2970];ていうかおわり固定
+type = changeanim
+trigger1 = anim = 197
+trigger1 = time = [740,800]
+value = 197
+elem = 1
+
+[state 2970];owari
+type = changestate
+trigger1 = time >= 800
+value = 0
+
+;----------------------------------------いの　平然と
+; お嬢さん->じゃありません->　じゃあぼうや♪
+[Statedef 2980]
+type = S
+ctrl = 0
+velset = 0,0
+anim =192
+
+[state 193,]
+type = varset
+trigger1 = time = 0
+var(54) = 1;random % 2 
+
+[State 191, 4];ヨーヨー終わり 
+type = Changeanim
+triggerall = anim != 193
+trigger1 = var(54) = 1
+trigger1 = anim = 192 && time >= 180
+value = 193
+
+[State 191, 4];しゃべりおわり
+type = Changeanim
+triggerall = anim != 194
+triggerall = anim = 193
+trigger1 = var(54) = 0
+trigger1 = time >= 370
+trigger2 = var(54) = 1
+trigger2 = time >= 480  
+value = 194
+
+[state 191,];VSINO  絵的に変なので1種類へらす
+type = playsnd
+trigger1 = anim = 193
+trigger1 = animelem = 17
+persistent = 0
+channel = 0
+value = s2900,51; + var(54)
+
+[State 191, 4] 
+type = ChangeState
+trigger1 = anim = 194 && animtime = 0
+value = 0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;--------------------------------------じゃむ
+;---------------------青さんのでやらないように注意
+;--------------カイと同じ台詞でいい？　－＞せっかくですけど遠慮します
+[Statedef 2985]
+type = S
+ctrl = 0
+velset = 0,0
+anim = 192
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 191, 4] 
+type = Changeanim
+trigger1 = time = 450
+value = 196
+persistent = 0
+
+[state 191,];VS	せっかくだけどえんりょします。
+type = playsnd
+trigger1 = anim = 196
+trigger1 = animelem = 3
+persistent = 0
+channel = 0
+value = s2900,55
+
+[State 191, 4] 
+type = ChangeState
+trigger1 = anim = 196 && animtime = 0
+value = 0
+
+
+;------------------------------でぃじー2
+;-------------------------見つけましたよ～がちゃり
+;--------お仕事ご苦労さま～手錠吹き飛ばし　→負けませんよ～
+[Statedef 2990]
+type = S
+ctrl = 0
+velset = 0,0
+anim = 6000
+
+[State 190, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = invisible
+
+[state -2,helper partner];----ろじゃー地上ダッシュでせまる　  タイホ絵はでぃじで用意
+type = Helper
+trigger1 = time = 60
+name = "dizzy get"
+ID = 100
+pos = 300,40
+postype = p2
+stateno = 2995
+facing = -1
+ownpal = 1
+
+[state 2900,helper partner];----ぶりちゃん後ろから走ってくるへるぱ 時間切れのときのと共通で使える
+type = Helper
+triggerall = NumHelper(193) = 0
+trigger1 = time = 150
+helpertype = normal
+sprpriority  = 0
+name = "intro bridget"
+ID = 193
+pos = -100,0
+postype = p1
+stateno = 2920
+keyctrl =0
+ownpal = 1
+persistent = 0
+
+[state 191,];見つけましたよ賞金首さん！
+type = playsnd
+trigger1 = time = 120
+persistent = 0
+channel = 0
+value = s2900,30
+persistent = 0
+
+[State 2900, 4] 
+type = ChangeState
+triggerall = numhelper(193)
+trigger1 = helper(193),stateno = 2925
+value = 2991
+
+;-------------------でぃじ子続き
+;----走ってきて見つけましたよ、止まってしばらく
+[Statedef 2991]
+type = S
+ctrl = 0
+anim = 192
+
+[State 0, 1];しゃべりよう
+type = changeanim
+trigger1 = time = 300
+value = 193
+persistent = 0
+
+;--------------お仕事ご苦労～のあと　せりふは？
+;----まけませんよー
+[state 191,];
+type = playsnd
+triggerall = anim = 193
+trigger1 = animelem = 16
+value = s2900,53
+persistent = 0
+
+[State 191, ca];終了
+type = Changeanim
+trigger1 =  time >= 430
+value = 194
+persistent = 0
+
+[State 191, cs] 
+type = ChangeState
+trigger1 =  anim = 194 && animtime = 0
+value = 0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+;----------------------------------でぃじーげっと　ろじゃー
+[Statedef 2995]
+type = S
+movetype=I
+physics = N
+sprpriority = 2
+velset = 8,0
+anim = 2050
+ctrl = 0
+
+[state 100x,atc efe];ダッシュエフェクト
+type = Explod
+triggerall = numexplod(100) <= 6
+trigger1 = time % 10 = 0
+anim =6100
+ID = 100
+postype = p1
+pos = 0,-40
+sprpriority = -2
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+
+[State 3100, voice];きーん
+type = PlaySnd
+trigger1 = time=0
+value = s80,4
+channel = 5
+persistent = 0
+
+[State 191, 2] 
+type = nothitby
+trigger1 = 1
+value = sca
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 191, 2] 
+type =velset
+trigger1 = p2dist x < 40
+x = 0
+
+[State 191, 4] 
+type = ChangeState
+trigger1 =  time >= 90
+value = 2090
+
+
+;----------------------------------メイ特殊
+;----------------せりふがあるのでこっちに
+
+;-------だうんしたまんま
+[statedef 5788]
+type = L
+movetype = H
+physics = n
+ctrl = 0
+velset = 0,0
+sprpriority = 0
+
+[State 6010, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 6052,]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 1
+;value = 61
+;pos = 0, 0
+;under = 1
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 10
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 1
+;value = F7, 0 ;Hit ground
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[state 6055,];地面ダウンアニメ
+type = changeanim
+trigger1 = 1
+value = ifelse(authorname = "R-R",5111 + var(0),5111)
+
+
+[State -3, damage s];しゃれがつうじない なんか消される
+type = PlaySnd
+trigger1 = Time = 80
+;value = s5200, 2 + vaR(0);ifelse(var(54) = 3, random % 3,var(54)) + var(0)
+value = s5200,ifelse(var(54) <= 2 || var(54) = 6 ,2,5)
+channel = 0
+ignorehitpause = 1
+
+[state 6050,];おきあがりへ  これもこっちにかく=5120
+type = changestate 
+trigger1 = time >= 100
+value = 5790
+
+[state 6050,];保険
+type = changestate 
+trigger1 = roundstate >= 2
+value = 0
+
+;--------------------------------5120と同じ
+[Statedef 5790]
+type    = L
+movetype= H
+physics = N
+
+[State 5120, 1a] ;Get up anim (normal)
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+triggerall = time = 0
+trigger1 = anim != [5111,5119]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120)
+
+[State 5120, 1a] ;Get up anim (normal)双子
+type = ChangeAnim
+triggerall = authorname = "R-R" 
+triggerall = time = 0
+trigger1 = anim != [5111 + var(0),5119 + var(0)]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120)
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = authorname = "R-R" = 0
+triggerall = time = 0
+trigger1 = anim = [5111,5119]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120) + (anim % 10)
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = authorname = "R-R"
+triggerall = time = 0
+trigger1 = anim = [5111 + var(0),5119 + var(0)]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = ifelse(authorname = "R-R",5120 + var(0),5120) + (anim % 10)
+
+[State 5120, 2]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 5120, 3]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5120, 7]
+type = changestate
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 0
+
+[state 6050,];保険
+type = changestate 
+trigger1 = roundstate >= 2
+value = 0
+
+
+
+
+;----------------------げしげしイントロ
+;-------------------イントロバックスタフYOYO
+[statedef 6000]
+type = s
+movetype=A
+ctrl = 0
+sprpriority = -4
+physics = N
+anim = 1690;絵も0のよーよー
+velset = -6,0
+
+[state 6000,]
+type = turn
+trigger1 = enemy,facing != facing
+trigger1 = time = 0
+persistent = 0
+
+[state 7000,];---------------相手V18ガードバランス関係  対応きゃらならFD以外・・不正確だけどしかたないね
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = -10
+persistent = 0
+ignorehitpause = 1
+
+;----------------------------複数herupa-にあたることもあるtime０で１っかいなのにね
+;--双子用にHITSTOP2にする。
+;--------HITSTOP0,計測不能、ヒットスパークはどうしたものかな？
+[State 6000, 1]
+type = HitDef
+trigger1 = time = 0
+attr = S, NA                     
+damage = 0              
+animtype = back   
+guardflag = -1                  
+hitflag = MFD                   
+priority = 7            
+pausetime = 2,6
+hitsound = s205,1                
+ground.type = trip    
+ground.slidetime = 20           
+ground.hittime  = 20             
+ground.velocity = 0,-2
+yaccel = 0.525             
+getpower = 0,0
+givepower = 0,0
+fall = 1
+fall.recover = 0
+p2stateno = 5770
+
+[state 200x,atc efe];hit	双子まざると相手のシェーク計測されない、非常手段
+type = Explod
+triggerall = numtarget
+trigger1 = hitpausetime
+anim = 6210
+ID = 6000
+pos = 0,-10
+postype = p1
+sprpriority = 3
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+ignorehitpause = 1
+facing = 1
+
+
+
+[state 6000,];透明の本体近くにきたら・・とまる
+type = changestate 
+trigger1 = rootdist x < -20 
+value = 6005
+
+[state -2, displayb]
+type = displaytoclipboard
+trigger1 = 1
+text = "posx=%f,posy=%f,Rdistx=%f,Rdisty=%f,faci=%d\n"
+params =pos x,pos y,rootdist x,rootdist y,facing
+[state -2, displayb];ヒット関係
+type = appendtoclipboard
+trigger1 = 1
+text = "34=%d,v35=%d,v36=%d,37=%d.38=%d"
+params = var(34),var(35),var(36),var(37),var(38)
+ignorehitpause = 1
+;---------------------踏みintroのヨーヨー横倒しあにめ
+[statedef 6005]
+type = s
+movetype = i
+physics = s
+anim = 1695
+ctrl = 0
+velset = 0,0
+sprpriority = -4
+
+[state -2, displayb]
+type = displaytoclipboard
+trigger1 = 1
+text = "posx=%f,posy=%f,Rdistx=%f,Rdisty=%f,faci=%d\n"
+params =pos x,pos y,rootdist x,rootdist y,facing
+
+[state 6005,]
+type = turn
+trigger1 = time = 0
+trigger1 = root,facing != facing
+persistent = 0
+
+[state 6005,]
+type = posset
+trigger1 = time = 0
+x = root,pos x
+
+[state 6010,]
+type = destroyself
+trigger1 = time >= 60;animtime = 0
+trigger2 = root,anim = 190 
+trigger2 = root,animelem = 3 
+
+;-------------------イントロバックスタフブリジット(YY6000->6005) 6010->6015
+;-----------ここでダウン中にあたることになる？
+[statedef 6010]
+type = s
+movetype=A
+ctrl = 0
+sprpriority = -4
+physics = N
+anim = 100
+velset = -6,0
+
+[state 6010,];踏みイベントが始まった証、解放ヘルパー出させるための
+type = parentvarset
+trigger1 = time = 0
+var(50) = 1
+
+[state 6010,]
+type = turn
+trigger1 = enemy,facing != facing
+trigger1 = time = 0
+persistent = 0
+ 
+[state 7000,];---------------相手V18ガードバランス関係  対応きゃらならFD以外・・不正確だけどしかたないね
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 = movecontact
+var(18) = -10
+persistent = 0
+ignorehitpause = 1
+
+[State 6010, 1];LV3? HITSTOP0で	非常手段2にしてみる
+type = HitDef
+trigger1 = time = 0
+attr = S, NA                     
+damage = 0              
+animtype = back               
+guardflag = -1                  
+hitflag = MFD                   
+priority = 7            
+pausetime = 2, 6
+hitsound = s205,1                  
+guardsound = s150,1
+ground.type = high             
+ground.slidetime = 20           
+ground.hittime  = 20             
+ground.velocity = 0,0   
+down.velocity = 0,-4
+getpower = 0,0
+givepower = 0,0
+fall = 1
+fall.recover = 0
+p2stateno = 5785
+
+;----へるぱにでない、なんで？はじっこすぎて見えてないだけ。だいじょぶ
+[state 200x,atc efe];hit	双子まざると相手のシェーク計測されない、非常手段
+type = Explod
+triggerall = numtarget
+trigger1 = hitpausetime
+anim = 6210
+ID = 6000
+pos = 10,-10
+postype = p1
+sprpriority = 3
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+ignorehitpause = 1
+facing = 1
+
+[state 6010,]
+type = changestate 
+trigger1 = rootdist x < 0
+value = 6015
+
+;-------------------イントロ 2 YY拾うアニメ、本体と向き違い、０でなおす
+[statedef 6015]
+type = s
+movetype = i
+physics = s
+ctrl = 0
+velset = 0,0
+sprpriority = -4
+anim = 190
+
+[state 6015,]
+type = turn
+trigger1 = time = 0
+trigger1 = root,facing != facing
+persistent = 0
+
+[state 6015,]
+type = posset
+trigger1 = time = 0
+x = root,pos x
+
+[State 6015, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = noshadow
+
+[state 6015,];本体とアニメシンクロさせて消える
+type =destroyself
+trigger1 = time = 5;animtime = 0
+
+;--------------------------イントロ踏み　イントロ飛ばし時ステート解放
+[statedef 6020]
+type = s
+movetype = A
+physics = s
+ctrl = 0
+sprpriority = 0
+anim = 6000
+
+[State 6020, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = invisible
+flag2 = noshadow
+
+;--------------でいじーのときは魔方陣が消えるため出さないように
+[State 6020, 1]
+type = HitDef
+triggerall = time = 0
+trigger1 = root,var(49) = 2 && enemy,name = "DIZZY" = 0
+trigger2 = root,var(49) != 2
+attr = a, Nt                     
+damage = 0              
+animtype = light              
+guardflag = -1                  
+hitflag = MAFD                   
+priority = 7            
+pausetime = 0, 0
+sparkno = -1
+guard.sparkno = -1
+sparkxy = 0, -10       
+numhits = 0        
+hitsound = -1
+guardsound =-1     
+ground.type = high             
+ground.slidetime = 20           
+ground.hittime  = 20             
+ground.velocity = 0,0             
+getpower = 0,0
+givepower = 0,0
+p2stateno = 6070
+
+[state 6020,];解放した証
+type = parentvarset
+trigger1 = time = 0
+var(50) = 10
+
+[state 6020,]
+type = destroyself
+trigger1 = time = 1
+
+;------------------特殊イントロ　vsメイ　子供の喧嘩　ブリジットヘルパー
+[statedef 6030]
+type = s
+movetype=A
+ctrl = 0
+sprpriority = 2
+physics = N
+anim = 100
+velset = 6,0
+hitcountpersist = 1
+
+[state 6030,];踏みイベントが始まった証、解放ヘルパー出させるための
+type  =parentvarset
+trigger1 = time = 0
+var(50) = 1
+
+[state 6030,]
+type = turn
+trigger1 = enemy,facing != facing
+trigger1 = time = 0
+persistent = 0
+ 
+[State 6030, 1];ダッシュ体当たり攻撃
+type = HitDef
+trigger1 = time = 0
+attr = S, NT                     
+damage = 0              
+animtype = hard               
+guardflag = -1                  
+hitflag = MAFD                   
+priority = 7            
+pausetime = 2, 10
+sparkxy = 0, -50               
+hitsound = s205,1                  
+guardsound = s150, random % 3     
+ground.type = trip             
+ground.slidetime = 20           
+ground.hittime  = 20             
+ground.velocity = 0,-3             
+getpower = 0,0
+givepower = 0,0
+fall = 1
+fall.recover = 0
+p2stateno = 5770
+
+[state 200x,atc efe];hit guardエフェクト  hitdefだとサイズが大きくなる。のでこうする？ 中サイズ
+type = Explod
+triggerall = numtarget
+trigger1 = hitpausetime
+anim = 6210
+ID=200
+pos = -10,-10
+postype = p1
+sprpriority = 3
+bindtime = 1
+removetime = -2
+ownpal=1
+scale = 0.5,0.5
+persistent = 0
+ignorehitpause = 1
+facing = -1
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1)
+trigger1 = movehit
+var(18) = -10
+ignorehitpause = 1
+persistent = 0
+
+[state 6030,]
+type = changestate
+trigger1 = movehit
+trigger1 = time >= 43
+value = 6035
+ignroehitpause = 0
+
+
+;----------------------------------
+;-------------アニメふれーむをなおしたらおかしくなった、VELで調整
+[statedef 6035]
+type = A
+movetype = A
+physics = n
+ctrl = 0
+velset = -1,-6
+sprpriority = 2
+anim = 800
+
+[state 6035,]
+type = changeanim
+trigger1 = time = 0
+value = 800
+elem = 7
+
+[state 6035,]
+type = veladd
+trigger1 = 1
+y = 0.4
+
+[State 6035, 1];しりもちおいうち
+type = HitDef
+triggerall = anim = 800
+trigger1 = 1;animelem = 11
+trigger1 = pos y > 10
+attr = A, nt                     
+damage = 0              
+animtype = back               
+guardflag = -1                  
+hitflag = MAFD                   
+priority = 7            
+pausetime = 15, 15
+hitsound = s205,3                  
+guardsound = s150, random % 3     
+ground.type = trip             
+ground.slidetime = 19           
+ground.hittime  = 19            
+ground.velocity = 0,-4             
+getpower = 0,0
+givepower = 0,0
+fall = 1
+fall.recover = 0
+ID = 194
+p2stateno = 6060
+down.velocity = 0,-5	;後ろに弾き飛ばし，ここは未定
+persistent = 0
+getpower = 0,0
+
+[state 7000,];---------------相手V18ガードバランス関係
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1)
+trigger1 = movehit
+var(18) = -10
+ignorehitpause = 1
+persistent = 0
+
+;----------------------ヒットスパークへるぱ  LV1----相打ち時OK,複数hitt対策はむり	ヘルパにあたってもでない
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+trigger1 = movehit
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 10,-20
+postype = p2
+stateno = 8010
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+size.height = -85;Y座標
+size.ground.front = 70;相殺時X座標
+size.ground.back = 2;持続
+
+[state -2, displayb];通常 R移動以外
+type = displaytoclipboard
+trigger1 = 1
+text = "psx=%f,psy=%f,Ebdx=%f,Ebd=%f\n"
+params =pos x,pos y,p2bodydist x,p2bodydist y
+ignorehitpause = 1
+
+[state 6030,]
+type = changestate
+trigger1 = movehit
+value = 6040
+ignorehtipause = 0
+
+;-------------------ぴょんとはねて着地
+[statedef 6040]
+type = A
+movetype = A
+physics = N
+ctrl = 0
+velset = 2,-6
+sprpriority = 2
+anim = 810
+
+[state 6040,]
+type = veladd
+trigger1 = 1
+y = 0.38
+
+[state 6040,]
+type = velset
+trigger1 = anim = 0
+y = 0
+x = 0
+
+[state 6040,]
+type = posset
+trigger1 = anim = 0
+y = 0
+
+[state 6040,]
+type = changeanim
+trigger1 = anim = 810
+trigger1 = vel y > 0 && pos y >= 0
+value = 0
+
+[state 6040,]
+type = turn
+trigger1 = anim = 0
+persistent = 0
+
+[state 6040,]
+type = changestate
+trigger1 = anim = 0
+trigger1 = time >= 60
+value = 6045
+
+;-------------debug クリップボード
+[state 8100x, clip];基本編
+type = displaytoclipboard
+trigger1 = 1
+text = "RdiX=%f RdiY=%f,EdiX=%f,EdiY=%f,RFCRv30=%d\n"
+params =rootDist X,rootdist y,p2bodydist x,p2bodydist y,root,var(30) 
+
+[State 8100x,];追加
+type = AppendToClipboard
+trigger1 =1
+text = "posX=%f,posY=%f,velX=%f,velY=%f ID=%d"
+params = pos x,pos y,vel x, vel y,ID
+;-----ここまで基本
+
+;------------------------バックステップしておおぼけセリフ
+[statedef 6045]
+type = A
+movetype = A
+physics = n
+ctrl = 0
+velset = rootdist x / 20,-3
+sprpriority = -3
+anim = 105
+
+[state 6045,]
+type = changeanim
+trigger1 = anim = 105
+trigger1 = pos y >= 0 && vel y > 0
+value = 190
+elem  = 7
+
+[state 6045,]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 6045,]
+type = posset
+trigger1 = anim = 190
+y = 0
+x = root,pos x
+
+[state 6045,]
+type = turn
+trigger1 = root,facing != facing
+trigger1 = anim = 190
+persistent = 0
+
+[state 6045,]
+type =veladd
+trigger1 = anim = 105
+y = 0.38
+
+[state 6045,]
+type =velset
+trigger1 = anim = 190
+y = 0
+x  =0
+
+[state 6045,]
+type = changeanim 
+trigger1 = 0;0 && time >= 100
+value = 0
+
+[state 6045,]
+type = destroyself
+trigger1 = anim = 190 && animelemtime(7) = 1;8
+
+;-------------debug クリップボード
+[state 8100x, clip];基本編
+type = displaytoclipboard
+trigger1 = 1
+text = "RdiX=%f RdiY=%f,EdiX=%f,EdiY=%f,RFCRv30=%d\n"
+params =rootDist X,rootdist y,p2bodydist x,p2bodydist y,root,var(30) 
+
+[State 8100x,];追加
+type = AppendToClipboard
+trigger1 =1
+text = "posX=%f,posY=%f,velX=%f,velY=%f ID=%d"
+params = pos x,pos y,vel x, vel y,ID
+;-----ここまで基本
+
+
+
+
+
+;-------------------踏みイントロ 踏みp2　メイ専用
+;ヒットポーズ中
+[Statedef 6060]
+type    = S
+movetype= H
+physics = N
+velset = 0,0
+
+[State 6060,]
+type = ChangeAnim
+Trigger1 = Time >= 0
+value = 5080
+
+[State 6060,]
+type = posset
+Trigger1 = 1
+y = 0
+ignorehitpause = 1
+
+[State 6060,]
+type = changestate
+trigger1 = hitshakeover
+value = 6061
+ctrl = 0
+
+[state 8100x, clip];基本編
+type = displaytoclipboard
+trigger1 = 1
+text = "posX=%f,posY=%f,velX=%f,velY=%f ID=%d"
+params = pos x,pos y,vel x, vel y,ID
+ignroehitpause = 1
+
+;---------------------------------------------------------------------------
+[statedef 6061]
+type = A
+movetype = H
+physics = n
+ctrl = 0
+velset = 0,-5
+sprpriority = -2
+
+[state 6061,]
+type = veladd
+trigger1 = 1
+y = 0.40
+
+;-----めかさんのとうちので違うね・・
+[state 6061,];うつぶせだうんヒット
+type = changeanim 
+triggerall = selfanimexist(5081)
+trigger1 = time = 0
+value = 5081
+
+[state 6061,];あおむけダウンヒット
+type = changeanim 
+triggerall = !selfanimexist(5081)
+trigger1 = time = 0
+value = 5080
+
+[state 6061,];地面バウンドアニメ
+type = changeanim 
+triggerall = anim = 5080
+trigger1 = vel y > 0
+trigger1 = pos y > -5
+value = 5110
+
+[state 6061,];地面バウンドアニメ
+type = changeanim 
+triggerall = anim = 5081
+trigger1 = vel y > 0
+trigger1 = pos y > -5
+value = 5111
+
+[state 6061,];地面バウンドアニメでSちぇんじ
+type = changestate 
+trigger1 =anim = [5110,5111]
+value = 6062
+
+;-----------------踏まれ相手　ダウン中
+[statedef 6062]
+type = A
+movetype = H
+physics = S
+ctrl = 0
+velset = 0,0
+sprpriority = -4
+
+[state 6062,];地面ダウンアニメ
+type = changeanim
+trigger1 = 0;time = 0
+value = 5110
+ignorehitpause = 1
+
+[state 6062,]
+type = posset
+trigger1 = time = 0
+y = 0
+ignorehitpause = 1
+
+[State 6062, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[state 6062,];--------------ここをだだっこイントロ開始
+type = selfstate
+trigger1 = alive
+trigger1 = time >= 7;10
+value = 194
+ctrl = 0
+
+;-----------------踏まれ相手　イントロ飛ばし解放用
+[statedef 6070]
+type = s
+movetype = H
+physics = S
+ctrl = 0
+velset = 0,0
+sprpriority = -4
+
+[state 6070,]
+type = selfstate
+trigger1  = time= 0
+value = 0
+
+;----------------------------勝利時　ヨーヨー　キャッチ成功---
+[statedef 6080]
+type = A
+movetype = i
+physics = n
+anim = 1600
+ctrl = 0
+velset = 0,-20.5
+sprpriority = 4
+
+[state 6020,]
+type = veladd
+trigger1 = 1
+y = 1
+
+[state 6020,];ちょっと前にずらす
+type = posadd
+trigger1 = vel y > 0
+x = 5
+persistent = 0
+
+[state 6020,]
+type = destroyself
+trigger1 = vel y > 0 && pos y >= -10
+
+[state -2, displayb]
+type = displaytoclipboard
+trigger1 = 1
+text = "posx=%f,posy=%f,Rdistx=%f,Rdisty=%f,faci=%d\n"
+params =pos x,pos y,rootdist x,rootdist y,facing
+
+[state -2, displayb]
+type = appendtoclipboard
+trigger1 = 1
+text = "vx=%f,veY=%f"
+params = vel x,vel y
+
+
+;----------------------------勝利時　ヨーヨー　キャッチ成功　相手が　自分キャッチのときと速度が違うようだ?
+;---------------------ラウンド終わるとでhitdefはすべて無効。らしい
+[statedef 6090];dist x，相手倒すと情報消える…
+type = A
+movetype = A
+physics = n
+anim = 1600
+ctrl = 0
+velset = 0,-20.5
+sprpriority = 4
+
+[state 6090,]
+type = turn
+trigger1 = root,facing != facing
+ 
+[state 6090,]
+type = veladd
+trigger1 = 1
+y = 1
+
+[state 6090,];もし相手確保できていたら
+type = posset
+triggerall = numhelper(184)
+trigger1 = helper(184),stateno = 2810
+trigger1 = vel y > 0
+persistent = 0
+x = helper(184),pos x
+
+[state 6090,]
+type = changestate
+trigger1 = pos y >= 40
+trigger1 = vel y > 0
+value = 6091
+
+[state -2, displayb];通常
+type = displaytoclipboard
+trigger1 = 1
+text = "posx=%f,posy=%f,Eposx=,Eposy=,p2st=\n"
+params = pos x, pos y 
+;params =pos x,pos y,p2bodydist x,p2bodydist y,facing
+
+[state -2, displayb];通常
+type = appendtoclipboard
+trigger1 = 1
+text = "h2posx=%f,h2posy=%f,h2distx=%f,h2disy=%f"
+params = helper(184),pos x, helper(184),pos y ,helper(184),rootdist x,helper(184),rootdist y
+;params =pos x,pos y,p2bodydist x,p2bodydist y,facing
+
+;---------------------擬似HITPAYSE
+[statedef 6091]
+type = A
+movetype = A
+physics = n
+ctrl = 0
+velset = 0,0
+sprpriority = 4
+
+[state 7000,];---------------相手V18ガードバランス関係  対応きゃらならFD以外・・不正確だけどしかたないね
+type = parentvaradd
+triggerall = root,var(49) <= 1 || (root,var(49) = 2 && enemynear,var(25) < 1) 
+trigger1 =time = 0
+var(18) = -15
+persistent = 0
+ignorehitpause = 1
+
+[State 6091 ];2810で取った時点で＋１になってるからそのままでいい
+type = HitAdd
+triggerall = numhelper(184) 
+trigger1 = time = 0
+value = helper(184),var(20) 
+persistent = 0
+
+[State 6090, sound];
+type = PlaySnd
+trigger1 = time = 0
+value = s205, 3
+persistent = 0
+channel = 3
+
+[State 6090, env]
+type = EnvShake
+trigger1 = time = 0
+time = 20
+freq = 100
+ampl = -4
+phase = 0
+persistent = 0
+
+;--------ヒットスパークへるぱ  LV3----相打ちにならないはず、HIT時でOK
+[state 1540,helper partner];----2pでもチーム時当たったほうに出るが同時ヒット時に片方のみ？
+type = Helper
+trigger1 = time = 0
+name = "HIT SPARK"
+ID = 8000 + stateno 
+pos = 0,-45
+postype = p1
+stateno = 8010
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+
+[state 6092,]
+type = changestate
+trigger1 = time >= 14
+value = 6092
+
+;---------------------追い討ち後はねて地上まで
+[statedef 6092]
+type = A
+movetype = A
+physics = n
+ctrl = 0
+velset = -2,-5
+sprpriority = 4
+
+[state 6092,]
+type = veladd
+trigger1 = 1
+y = 0.5
+
+[state 6092,]
+type = changestate
+trigger1 = pos y >= 52
+trigger1 = vel y > 0
+value = 6095
+
+;---------------------追い討ち後のヨーヨー横倒しにならないみたい
+[statedef 6095]
+type = s
+movetype = A
+physics = n
+ctrl = 0
+velset = 0,0
+sprpriority = -4
+
+[state -2, displayb]
+type = displaytoclipboard
+trigger1 = 1
+text = "posx=%f,posy=%f,Rdistx=%f,Rdisty=%f,faci=%d\n"
+params =pos x,pos y,rootdist x,rootdist y,facing
+
+[state 8150,2];地面	固定　現SFFAIRではY=52がちょうどぴったし
+type = posset
+trigger1 = 1
+y = 52
+
+[state 6095,]
+type =destroyself
+trigger1 = 0;time >= 60;animtime = 0
+
+
+;----------------------------------------------------------modeselect
+;---AC追加
+;0-OR 1=#R 2=EX 3=SL 4=AC
+;----------------------------------------------------------modeselect
+[Statedef 9000];mode select
+type    = a                      
+movetype= i                      
+physics = n  
+ctrl = 0    
+anim = 6000  
+sprpriority = 0
+
+[State 1430, sound];音
+type = PlaySnd
+trigger1 = command = "Ba" 
+trigger2 = command = "Fr" 
+value = s60,20
+channel = 8
+ignorehitpause = 1
+
+[State 1430, sound];音
+type = PlaySnd
+trigger1 = command = "Up" 
+trigger2 = command = "Do"
+value = s210,8
+channel = 9
+ignorehitpause = 1
+
+[state 3160,];SL,R,EXなど
+type = parentvarset
+trigger1 = command = "Fr"
+var(1) = abs((root,var(1) + 1) % 5)
+
+[state 3160,];SL,R,EXなど
+type = parentvaradd
+trigger1 = command = "Ba"
+trigger1 = 1
+var(1) = ifelse(root,var(1) = 0,4,-1) % 5
+
+[state 3160,];GG,GGX,GGXX
+type = parentvarset
+trigger1 = command = "Do"
+var(2) = abs((root,var(2) + 1) % 3)
+
+[state 3160,];GG.GGX,GGXX
+type = parentvaradd
+trigger1 = command = "Up"
+trigger1 = 1
+var(2) = ifelse(root,var(2) = 0,2,-1) % 3
+
+[state 3140,]
+type = destroyself
+trigger1 = roundstate >= 2
+
+
+
+;----------------------------------------------------------voice select
+;----表をだすのにすこし間をもたせる
+[Statedef 9010];voice select start
+type    = a                      
+movetype= i                      
+physics = n  
+ctrl = 0    
+anim = 7303
+sprpriority = 6
+velset = 0,0
+
+;-------------------相対移動用XY初期
+;----------相対移動用XY：汎用
+[state 7000,test];
+type = varset
+trigger1 = time = 0 
+var(0) = 40;ifelse(teamside = 1,40,315)
+
+[state 7000,test];
+type = varset
+trigger1 = time = 0 
+var(1) = 185
+
+;--------ボイス設定を代入
+[state 7000,test];
+type = varset
+trigger1 = time = 0 
+var(54) = root,var(54)
+
+;-------受付確認音　なんかいいのない？
+[State 1430, sound];音
+type = PlaySnd
+trigger1 = time = 0
+value = s50,7
+channel = 8
+
+[state 3140,];むき
+type = turn
+triggerall = time = 0
+trigger1 = teamside = 1
+trigger1 = facing != 1
+trigger2 = teamside = 2
+trigger2 = facing != -1
+
+[state 3140,]
+type = posset
+trigger1 = time = 0
+x = ifelse(teamside = 1,-150,150)
+
+[state 3140,]
+type = posset
+trigger1 = 1
+Y = pos y + (-1 * (230 - (239 - ScreenPos Y)))
+
+
+[state 7000,test];
+type = changestate
+trigger1 = time = 30 
+value = 9015
+
+;-------------実際のセレクト処理
+;----イントロ中は誤動作の元！続きせりふがあったりするのでやっぱ禁止かな。
+;---あくまでデバック用ということを忘れないように！
+[Statedef 9015];
+type    = a                      
+movetype= i                      
+physics = n  
+ctrl = 0    
+anim = 6000
+
+[State 3660,];
+type = trans
+trigger1 = 1
+trans = addalpha
+alpha = time,time - 256
+
+
+;-----------------ここから初期設定  -------ブリジット
+;-------------レバーによって移動させる、
+;---->閉じたら有効とする。ので直接RV54はいじらない
+;------Y0---Y1
+;-X0---×
+;-X1-- 0    3
+;-X2-- 1    4
+;-X3-- 2    5
+;-X4-- 6    7
+;-----X20,X21で擬似表
+[state 3160,];X0表代入
+type = varset
+triggerall = time = 0
+trigger1 = var(54) <= 2
+trigger2 = var(54) = 6
+trigger3 = var(54) = 8
+var(20) = 0
+[state 3160,];X1表代入
+type = varset
+triggerall = time = 0
+trigger1 = var(54) = 3
+trigger2 = var(54) = 4
+trigger3 = var(54) = 5
+trigger4 = var(54) = 7
+var(20) = 1
+
+[state 3160,];Y0表代入
+type = varset
+triggerall = time = 0
+trigger1 = var(54) = 8
+var(21) = 0
+[state 3160,];Y1表代入
+type = varset
+triggerall = time = 0
+trigger1 = var(54) = 0 
+trigger2 = var(54) = 3
+var(21) = 1
+[state 3160,];Y2表代入
+type = varset
+triggerall = time = 0
+trigger1 = var(54) = 1
+trigger1 = var(54) = 4
+var(21) = 2
+[state 3160,];Y3表代入
+type = varset
+triggerall = time = 0
+trigger1 = var(54) = 2 
+trigger2 = var(54) = 5
+var(21) = 3
+[state 3160,];Y4表代入
+type = varset
+triggerall = time = 0
+trigger1 = var(54) = 6 
+trigger2 = var(54) = 7
+var(21) = 4
+
+;-----------------レバー動かし
+;----即動かしはいや
+[state 3160,];左右移動0か１  0のときは動かさない
+type = varadd
+triggerall = time >= 30
+triggerall = var(21) > 0 
+trigger1 = command = "Ba" 
+var(20) = ifelse(var(20) = 0,1,-1)
+[state 3160,];左右移動0か１
+type = varadd
+triggerall = time >= 30
+triggerall = var(21) > 0 
+trigger1 = command = "Fr" 
+var(20) = ifelse(var(20) = 0,1,-1)
+
+;-------------------Y0にいかない。
+[state 3160,];上下＋  Y軸01234  0で上押すと４になる
+type = varadd
+triggerall = time >= 30
+trigger1 = command = "Up"
+var(21) = ifelse(var(21) <= 1,3 ,-1)
+[state 3160,];上下＋  01234  4で倒すと０になる
+type = varadd
+triggerall = time >= 30
+trigger1 = command = "Do"
+var(21) = ifelse(var(21) = 4,-3 ,1)
+
+;---------------------
+;---汎用表示位置設定：イノ以外
+;---Y　＋で下方向へ---root,var(54)と対応
+;---2Pのこと忘れてたー 2Pは数値減らすと右にいく
+[state 3160,];X0,1,2	XX-A,B,C,R共通縦
+type = varset
+trigger1 = var(20) = 0
+var(10) = ifelse(teamside = 1, -25,-25)
+[state 3160,];X3,4,5	AC-A,B,C,R共通縦
+type = varset
+trigger1 = var(20) = 1
+var(10) = ifelse(teamside = 1,5,5)
+[state 3160,];X8	ALL-RANDOM強制1列
+type = varset
+trigger1 = var(21) = 0 && (var(20) = 0 || var(20) = 1)
+var(10) = ifelse(teamside = 1,-28,-28)
+
+;-------------------------相対移動用Y
+[state 3160,];1Y	ALL-RANDOM
+type = varset
+trigger1 = var(21) = 0
+var(11) = -90
+[state 3160,];Y0,3	XX-A,AC-A
+type = varset
+trigger1 = var(21) = 1
+var(11) = -59
+[state 3160,];Y1,4	XX-B,AC-B
+type = varset
+trigger1 = var(21) = 2
+var(11) = -47
+[state 3160,];Y2,5	XX-C,AC-C
+type = varset
+trigger1 = var(21) = 3
+var(11) = -35
+[state 3160,];Y6,7	XX-R,AC-R
+type = varset
+trigger1 = var(21) = 4
+var(11) = -25
+
+;---------------動かす音
+[State 1430, sound];音
+type = PlaySnd
+triggerall = time >= 30
+trigger1 = var(21) > 0
+trigger1 = command = "Ba" || command = "Fr" 
+trigger2 = command = "Up" || command = "Do"
+value = s60,20
+channel = 8
+
+;-------
+[state 7000,test];背景 場合によってはいらないね
+type = Explod
+trigger1 = time = 0;!numexplod(9010) 
+anim = 7301
+ID = 9010
+postype = left
+pos = ifelse(teamside = 1,var(0),319 - var(0)),var(1)
+sprpriority = -5
+bindtime = -1
+removetime = -1
+ownpal = 1
+facing = 1
+scale = 0.5,0.5
+
+[state 7000,test];ボイス選択表 汎用 むきちゅうい  ２P側でだしても反転させないように
+type = Explod
+trigger1 = !numexplod(9011) 
+anim = 7302
+ID = 9011
+postype = left
+pos =  ifelse(teamside = 1,var(0),319 - var(0)),var(1)
+sprpriority = 3
+bindtime = -1
+removetime = -1
+ownpal = 0
+facing = 1
+scale = 0.5,0.5
+
+;--------アイコン消去
+[state 7000,test];あいこん
+type = removeExplod
+trigger1 = numexplod(9015) 
+ID = 9015
+;-----アイコン発生
+[state 7000,test];あいこん  ２P側でだしても反転させないように
+type = Explod
+trigger1 = !numexplod(9015) 
+anim = 7300
+ID = 9015
+postype = left
+pos = ifelse(teamside = 1,var(0),319 - var(0)) + var(10),var(1) + var(11)
+sprpriority = 2
+bindtime = -1
+removetime = -1
+ownpal = 0
+facing = 1
+scale = 0.5,0.5
+
+;-------------決定本体反映処理
+;----閉じる条件はボタンまたは時間として
+;----キャンセルは時間切れ
+;----ほかのボタンは確定
+[state 3140,];0を戻す  XXA
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 0 && var(21) = 1
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start"
+var(54) = 0
+
+[state 3140,];1を戻す XXB
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 0 && var(21) = 2
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start"
+var(54) = 1
+
+[state 3140,];2を戻す XXC
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 0 && var(21) = 3
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+var(54) = 2
+
+[state 3140,];3を戻す ACA
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 1 && var(21) = 1
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start"
+var(54) = 3
+
+[state 3140,];4を戻す  ACB
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 1 && var(21) = 2
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+var(54) = 4
+
+[state 3140,];5を戻す ACC
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 1 && var(21) = 3
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+var(54) = 5
+
+[state 3140,];6を戻す  XXR
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 0 && var(21) = 4
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start"
+var(54) = 6
+
+[state 3140,];7を戻す ACR
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(20) = 1 && var(21) = 4
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start"
+var(54) = 7
+
+[state 3140,];8を戻す ALLRA
+type = parentvarset
+triggerall = time >= 30
+triggerall = var(21) = 0
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start"
+var(54) = 8
+
+[state 7000,test];背景や表を消す
+type = removeExplod
+triggerall = time >= 30
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start" || time >= 300
+ID = 9010
+
+[state 7000,test];背景や表を消す
+type = removeExplod
+triggerall = time >= 30
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start" || time >= 300
+ID = 9011
+
+[state 7000,test];背景や表を消す
+type = removeExplod
+triggerall = time >= 30
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start" || time >= 300
+ID = 9015
+
+[State 1430, sound];確定の音
+type = PlaySnd
+triggerall = time >= 30
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+value = s50,7
+channel = 8
+
+;-------------------消えるまをもたせたいので9020に移動
+[state 3140,]
+type = changestate;destroyself
+triggerall = time >= 30
+trigger1 = command = "P" || command = "K"
+trigger2 = command = "S" || command = "HS"
+trigger3 = command = "D" || command = "ALL"
+trigger4 = command = "start" || time >= 300
+value = 9020
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "V0=%d,V1=%d,V10=%d,V11=%d,V54=%d\n"
+params =var(0),var(1),var(10),var(11),root,var(54)
+
+[state -2, displayb];
+type = appendtoclipboard
+trigger1 = 1
+text = "V20=%d,V21=%d,V10=%d,V11=%d.TS=%d\n"
+params =var(20),var(21),var(10),var(11),teamside  
+
+;-------
+[statedef 9020]
+type = A
+movetype= I
+ctrl = 0
+anim = 7303
+sprpriority = 6
+
+[state 3140,];むき
+type = turn
+triggerall = time = 0
+trigger1 = teamside = 1
+trigger1 = facing != 1
+trigger2 = teamside = 2
+trigger2 = facing != -1
+
+[state 3140,]
+type = velset
+trigger1 = time = 0
+x = 2
+y = 0
+
+[state 3140,]
+type = posset
+trigger1 = time = 0
+x = ifelse(teamside = 1,-160,160)
+
+[state 3140,]
+type = posset
+trigger1 = 1
+Y = pos y + (-1 * (230 - (239 - ScreenPos Y)))
+
+[state 3140,]
+type = destroyself
+trigger1 = time >= 60
+
+;---------------------------------inte
+;--------------------------50000		bridget
+[statedef 50000];AI命令管理	基本待機
+type = A
+movetype = I
+physics = n
+anim = 6000
+ctrl = 0
+
+[state 3140,];命令感覚
+type = varset
+trigger1 = 1
+var(59) = gametime % 60
+
+;----------------本体と情報同期
+[state 3140,]
+type = posset
+trigger1 = 1
+x = root,pos x
+y = root,pos y
+ignorehitpause = 1
+[state 3140,]
+type = velset
+trigger1 = 1
+x = root,vel x
+y = root,vel y
+[state 3140,]
+type = turn
+trigger1 = root,facing != facing
+
+[state 3140,];本体すてーと
+type = varset
+trigger1 = 1
+var(0) = root,stateno
+
+;--------Var系
+[state 3140,];モード１
+type = varset
+trigger1 = 1
+var(1) = root,var(1)
+[state 3140,];モード2
+type = varset
+trigger1 = 1
+var(2) = root,var(2)
+
+[state 3140,];モード１
+type = varset
+trigger1 = 1
+var(1) = root,var(1)
+[state 3140,];モード2
+type = varset
+trigger1 = 1
+var(2) = root,var(2)
+[state 3140,];本体状態 1立ち 2しゃがみ 3空 4だうん？		V3
+type = varset
+trigger1 = root,statetype = S || root,statetype = C  
+var(3) = ifelse(root,statetype = S,1,2)
+[state 3140,];本体状態 1立ち 2しゃがみ 3空 4だうん？		V3
+type = varset
+trigger1 = root,statetype = A || root,statetype = L  
+var(3) = ifelse(root,statetype = A,3,4)
+
+[state 3140,];手近な相手状態 1立ち 2しゃがみ 3空 4だうん？	V4
+type = varset
+trigger1 = enemynear,statetype = S || enemynear,statetype = C  
+var(4) = ifelse(enemynear,statetype = S,1,2)
+[state 3140,];手近な相手 1立ち 2しゃがみ 3空 4だうん？		V4
+type = varset
+trigger1 = enemynear,statetype = A || enemynear,statetype = L  
+var(4) = ifelse(enemynear,statetype = A,3,4)
+
+[state 3140,];本体状態 0A 1I 　2H	V5
+type = varset
+trigger1 = 1
+var(5) = ifelse(root,movetype = A,0,ifelse(root,movetype = I,1,2))
+
+[state 3140,];手近な相手状態 0A 1I 　2H	V6
+type = varset
+trigger1 = 1
+var(6) = ifelse(enemynear,movetype = A,0,ifelse(enemynear,movetype = I,1,2))
+
+[state 3140,];本体CTLR状態　擬似CTRLは通常OKなら１、ALLOKなら2
+type = varrangeset
+trigger1 = 1
+value = 0
+first = 10
+last = 12
+[state 3140,];本体CTLR状態通常系OK　擬似CTRLは通常OKなら１、ALLOKなら2,判断しにくいねわける
+type = varset
+trigger1 = root,ctrl || root,sysvar(3) = 1
+trigger2 = root,stateno = [0,20]
+trigger3 = root,stateno = [50,51]
+var(10) = 1
+[state 3140,];本体CTLR状態必殺系もOK　擬似CTRLは通常OKなら１、ALLOKなら2,判断しにくいねわける
+type = varset
+trigger1 = root,ctrl || root,sysvar(3)
+trigger2 = root,stateno = [0,20]
+trigger3 = root,stateno = [50,51]
+var(11) = 1
+[state 3140,];本体	movecontact、重要  ヒットなら1、ガードされたら-１,あたってるだけを判断ならvar(12)だけですむ
+type = varset
+trigger1 = root,movecontact
+var(12) = ifelse(root,movehit,1,-1)
+
+[state 3140,];本体MOVEHITなど・・
+type = varset
+trigger1 = 1
+var(13) = ifelse(root,hitpausetime, 1,0)
+[state 3140,];本体HITSHARKなど・・
+type = varset
+trigger1 = 1
+var(14) = ifelse(root,HitShakeOver, 1,0)
+
+;--------------ブリちゃん特殊、よーよーの位置関連
+
+
+
+;------------------------相手との距離
+;---最低距離は14？。幅の関係？
+;--Xは＋なら対面して前　　Yはマイナスなら相手が上、プラスなら相手が下
+;--BDISTでなければ密着ーにいく・・
+[state 3140,];X距	めくりっぽく、空中戦用？
+type = varset
+trigger1 = p2dist x <= -10
+fvar(0) = -1
+[state 3140,];X距	ちょー至近距離１	地上投げれる範囲
+type = varset
+trigger1 = p2dist x > -10
+trigger1 = p2dist x <= 20
+fvar(0) = 0
+[state 3140,];X距	至近距離１_1	
+type = varset
+trigger1 = p2dist x = 20
+trigger1 = p2dist x <= 45
+fvar(0) = 0.5 
+[state 3140,];X距	至近距離2 Kがとどくぎりぎり
+type = varset
+trigger1 = p2dist x > 45
+trigger1 = p2dist x <= 70
+fvar(0) = 1
+[state 3140,];X距	中距離1  
+type = varset
+trigger1 = p2dist x > 70
+trigger1 = p2dist x <= 100
+fvar(0) = 2
+[state 3140,];X距	中距離1	
+type = varset
+trigger1 = p2dist x > 100
+trigger1 = p2dist x <= 170
+fvar(0) = 3 
+[state 3140,];X距	遠距離1	FSはとどかない
+type = varset
+trigger1 = p2dist x > 170
+trigger1 = p2dist x <= 210
+fvar(0) = 4 
+[state 3140,];X距	遠距離2	
+type = varset
+trigger1 = p2dist x > 210
+fvar(0) = 5 
+
+;----------------------------------------Yはマイナスなら相手が上、プラスなら相手が下------Y
+[state 3140,];y距	相手上 かなり離れている。2キャラ分ぐらい？ 自分地上で相手ジャンプ？
+type = varset
+trigger1 = p2dist y <= -50
+fvar(1) = -2
+[state 3140,];y距	相手上、1キャラ分ぐらい？	空中同士なら投げれるかも？
+type = varset
+trigger1 = p2dist y < -10
+trigger1 = p2dist y > -50
+fvar(1) = -1
+[state 3140,];Y距	高さほぼ同じ,基準位置？
+type = varset
+trigger1 = p2dist y >= -10 
+trigger1 = p2dist y <= 10 
+fvar(1) = 0 
+[state 3140,];y距	6Pはとどくはず,6Sも？
+type = varset
+trigger1 = p2dist y > 10
+trigger1 = p2dist y < 50
+fvar(1) = 1
+[state 3140,];y距	高い、じゃんぷ頂点ぐらい？
+type = varset
+trigger1 = p2dist y >= 50
+trigger1 = p2dist y <= 120
+fvar(1) = 2 
+
+[state 3140,];	行動常時りせっと
+type = parentvarset
+trigger1 = 1
+var(53) = 1
+
+[state 3140,];	AI命令ほけんりせっと(かり
+type = parentvarset
+trigger1 = root,stateno = root,var(39)
+var(39) = 0
+
+[state 3140,];思考ぱたーん、HPに応じて？	
+type = varset
+trigger1 = 1
+var(58) = ifelse(life >= 500,0,ifelse(life >= 250,2,3)) 
+
+[state 3140,];全行動で連続抽選停止・	あまり連続は変なので
+type = varset
+trigger1 = root,var(53); = [1,21]
+trigger1 = !var(57)
+var(57) = 400
+[state 3140,];	
+type = varadd
+trigger1 = var(57) > 0
+var(57) = -1
+
+;------------------------共通系？
+[state 3140,];きいろばーすと	こうげきをすかすようなかんじにね
+type = parentvarset
+triggerall = power <= 500 && root,fvar(10) >= 15000  
+triggerall = fvar(0) <= 1 && !var(6) && random % 10 = 0  
+trigger1 = var(0) = [0,20]
+trigger2 = var(0) = [99,100]
+trigger3 = var(0) = [50,51]
+var(39) = 950
+
+[state 3140,];青ばーすと	なぐられすぎたら？
+type = parentvarset
+triggerall = root,fvar(10) >= 15000 && enemy,hitcount >= 5 
+triggerall = fvar(0) <= 1 && !var(6) && var(5) = 2 && random % 10 = 0  
+trigger1 = var(0) = [5000,5070]
+var(39) = 960
+
+;------------42は前Jしろという意味、すてーとNOじゃないよ！
+[state 3140,];位置調整	とびこみ2は相手が-2のあたりでHIT状態、つまりういてるSSなど・・？
+type = parentvarset
+triggerall = var(0) = [0,20]
+trigger1 = var(3) <= 2 && fvar(0) <= 2 && fvar(0) <= 0 && !fvar(1) && var(4) <= 2 
+trigger1 = random % 560 = 0
+trigger2 = fvar(0) <= 2 && fvar(1) <= 0 && var(4) = 3 && var(6) = 2 
+var(39) = 42
+
+;----------------空中と地上でべつ
+[state 3140,];位置調整	地上じゃんぷきゃんせ200,210,220,420,230,
+type = parentvarset
+triggerall = fvar(0) <= 2 && fvar(1) <= 0 && var(4) = 3 && var(6) = 2
+trigger1 = var(12) && (var(0) = 420 || var(0) = 210 || var(0) = 230) && random % 4 = 0 
+var(39) = 42
+
+[state 3140,];位置調整	空中じゃんぷきゃんせ610,630  回数確認必須！
+type = parentvarset
+triggerall  = !root,var(15) || (root,var(14) && root,var(15) = 1)
+triggerall = fvar(0) <= 2 && fvar(1) <= 1 && var(4) = 3 && var(6) = 2
+trigger1 = var(12) = 1 && var(0) = 630 
+trigger2 = var(12) = 1 && var(0) = 610 && random % 5 = 0 
+var(39) = 42
+
+[state 3140,];ろまきゃんせよ　てすと、すたしぷFR	パワー確認いるよ？
+type = parentvarset
+triggerall = !root,var(40)
+triggerall = fvar(0) <= 2 && fvar(1) <= 1
+trigger1 = var(0) = 1200 && var(12) = 1 && power >= 500 && random % 10 = 0
+var(39) = 975
+
+;------------------------------ここから攻撃動作命令V52使用
+;---コンボはストップ中のみ抽選する？じゃないと延々とやるよ？
+;-------------------------------------------------------
+;-----------------------------たちすたーと必殺系----
+;---------------げーじがあったらやらせてみよう
+[state 7000,];るーぷるーぷ
+type = parentvarset
+triggerall = power >= 1000 && !root,var(40) && random % 30 = 0
+trigger1 = !var(59) && fvar(0) <= 2 && !fvar(1) && var(4) < 3 
+trigger1 = var(11) && var(3) <= 2 && !root,var(12)
+trigger2 = var(13) && var(12) = 1 && (var(0) = 220 || var(0) = 235 || var(0) = 230 || var(0) = 420)
+var(39) = 3100
+
+[state 7000,];喜劇 なげ。	キャンセルでださない
+type = parentvarset
+triggerall = power >= 1000 && !root,var(40)
+triggerall = !var(1) || var(1) = 2
+triggerall = !root,var(39) && var(11) && !var(59) && var(4) <= 2 
+trigger1 = fvar(0) <= 1 && !fvar(1) && random % 20 = 0 && !root,var(12)
+var(39) = 3300
+
+[state 7000,];きるましーん、よよの位置を相対観測しないとだめかも・・保留
+type = parentvarset
+triggerall = numhelper(100) && var(3) < 4 && root,var(30)
+triggerall = power >= 1000 && !root,var(40)
+triggerall = helper(100),p2dist x = [-40,40]
+triggerall = helper(100),p2dist y = [-90,90]
+trigger1 = !root,var(39) && !var(59) && var(10) && var(3) <= 2 && random % 5 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) && (var(0) = 200 || var(0) = 410) && random % 30 = 0
+var(39) = ifelse(var(3) = 3,1595,1590)
+
+;---必殺技とか、
+[state 7000,];すたーしっぷ　	地上
+type = parentvarset
+triggerall = var(1) != 2
+triggerall = fvar(0) <= 2 && fvar(1) <= -2 && var(4) < 4 
+trigger1 = !root,var(39) && !var(59) && var(11) && var(3) <= 2 ;&& random % 20 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) = 1 && (var(0) = 220 || var(10) = 230 || var(0) = 410)
+var(39) = 1200
+
+[state 7000,];すたーしっぷ　	空中	こっちは確率少な目でいいや
+type = parentvarset
+triggerall = var(1) != 2
+triggerall = fvar(0) <= 1 && fvar(1) <= -2 && var(4) < 4 
+trigger1 = !root,var(39) && !var(59) && var(11) && var(3) <= 2 && random % 40 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) = 1 && var(0) = 600
+var(39) = 1250
+
+[state 7000,];KSMH　
+type = parentvarset
+triggerall = fvar(0) <= 2 && fvar(1) <= -2 && var(4) < 4 
+trigger1 = !root,var(39) &&!var(59) && var(11) && var(3) <= 2 && random % 20 = 0
+trigger2 = var(13) && var(12) = 1 && (var(0) = 210 || var(0) = 225) && random % 20 = 0 && !root,var(12)
+var(39) = 1300
+
+[state 7000,];KSMH　強制停止　ひっとじのみ？
+type = parentvarset
+triggerall = fvar(0) <= 3  
+trigger1 = var(13) && var(12) && var(0) = 1300
+var(39) = 1310
+
+[state 7000,];AHMH EX
+type = parentvarset
+triggerall = !var(1) || var(1) = 2
+triggerall = fvar(0) <= 2 && fvar(1) <= -2 && var(4) < 4 
+trigger1 = !root,var(39) &&!var(59) && var(11) && var(3) <= 2 && random % 40 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) = 1 && (var(0) = 600 || var(0) = 610)
+var(39) = 1360
+
+;----------必殺技	とおかったら6設置とか・・どうやろう1500+方向
+[state 7000,];
+type = parentvarset
+triggerall = !numhelper(100)
+triggerall = fvar(0) >= 4 && fvar(1) <= 0 && var(4)   
+trigger1 = !root,var(39) &&!var(59) && var(11) && var(3) <= 2 && random % 20 = 0 && !root,var(12)
+var(39) = 1506
+
+
+;----------必殺技	戻しなどよよ
+[state 7000,];きる
+type = parentvarset
+triggerall = power >= 1000
+triggerall = numhelper(100) && root,var(30)
+triggerall = helper(100),p2dist x = [-40,40]
+triggerall = helper(100),p2dist y = [-90,90]
+trigger1 = !root,var(39) && !var(59) && var(10) && var(3) <= 2 && random % 5 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) && (var(0) = 200 || var(0) = 410) && random % 30 = 0
+var(39) = 1590
+
+[state 7000,];NOならじゃっくかな？
+type = parentvarset
+triggerall = numhelper(100) && root,var(30)
+triggerall = helper(100),p2dist x = [-40,40]
+triggerall = helper(100),p2dist y = [-90,90]
+trigger1 = !root,var(39) && !var(59) && var(10) && var(3) <= 2 && random % 5 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) && (var(0) = 200 || var(0) = 410) && random % 30 = 0
+var(39) = 1550
+
+;----------------通常技、間合いにあわせててきとー
+;------またはコンボ
+;--------------------基本行動足払いD
+[state 7000,];
+type = parentvarset
+triggerall =  fvar(0) <= 3 && !fvar(1) && var(4) < 4 
+trigger1 = !root,var(39) && !var(59) && var(10) && var(4) = 1 && random % 3 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) = 1 && (var(0) = 220 || var(0) = 410)
+var(39) = 440
+
+;--------------------基本行動だすと。3P6K6S以外から	下段ガードされてたら、とかね
+;----YOYOでキャンセルできるけどー
+[state 7000,];
+type = parentvarset
+triggerall = fvar(0) < 2 && !fvar(1) 
+trigger1 = !root,var(39) && !var(59) && var(10) && !var(6) && var(4) = 2 && random % 60 = 0 && var(4) = 2 && !root,var(12) 
+trigger2 = var(13) && var(12) = -1 && (var(0) = 220 || var(0) = 410)
+var(39) = 240
+
+;----------基本行動 、2S	ちょーじゅうよう、要の技である
+;----てきとーにふってても強い。当たると痛い。空中でもいけるはず。。近いとダメか
+[state 7000,];
+type = parentvarset
+triggerall =  fvar(0) >= 2 && fvar(0) <= 3 && var(4) < 4 
+trigger1 = !root,var(39) && !var(59) && var(10) && random % 10 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) && (var(0) = 220 || var(0) = 410)
+var(39) = 420
+
+;----------基本行動 、3P	きゃんせるふか
+;-----おしり。相手しゃがみ中とかかな？下段すかしで。
+[state 7000,];
+type = parentvarset
+triggerall = fvar(0) <= 1 && !fvar(1) && var(4) = 2 
+trigger1 = !root,var(39) && var(59) && var(10) && random % 30 = 0 && !root,var(12)
+var(39) = 235
+
+;-------------基本行動6S
+[state 7000,];
+type = parentvarset
+triggerall = fvar(0) <= 4 && fvar(1) >= -1 && var(4) < 4 
+trigger1 = !root,var(39) && !var(59) && var(10) && var(3) <= 2 && random % 20 = 0 && fvar(0) >= 2 && !root,var(12)
+trigger2 = var(13) && var(12) && (var(0) = 420 && var(4) = 3) || (var(0) = 220 && var(4) < 3)
+var(39) = 225
+
+;----------基本行動 、NS	距離判定必須
+;----2段技ではあるけど・・
+[state 7000,];
+type = parentvarset
+triggerall = p2bodydist X <= 35
+triggerall = !fvar(0) && !fvar(1) && var(4) < 4 
+trigger1 = !root,var(39) &&!var(59) && var(10) && var(3) <= 2 && !root,var(12)
+trigger2 = var(13) && var(12) && var(0) = 200
+var(39) = 220
+
+;----------基本行動 、FS	リーチ最長、使用頻度高いかも
+;----
+[state 7000,];
+type = parentvarset
+triggerall =  fvar(0) <= 3 && fvar(1) >= -1 && var(4) < 4 
+trigger1 = p2bodydist X > 35
+trigger1 = !root,var(39) && !var(59) && var(10) && var(3) <= 2 && random % 20 = 0 && !root,var(12)
+trigger2 = var(13) && var(12) && (var(0) = 210 || var(0) = 220)
+var(39) = 225
+
+;----------基本行動 、K
+;---2SからもOK	りーちみじかい
+[state 7000,];
+type = parentvarset
+triggerall = fvar(0) <= 1 && !fvar(1) && var(4) = 1  
+trigger1 = !root,var(39) &&!var(59) && var(10) && random % 5 = 1 && !root,var(12)
+trigger2 = var(13) && var(12) && (var(0) = 400 || var(0) = 200 || var(0) = 420)
+var(39) = 210
+
+;---基本行動 6P 	上半身無敵、対空？	
+[state 7000,];基本行動 、
+type = parentvarset
+triggerall = fvar(0) <= 2 && fvar(1) >= -1 
+trigger1 = !root,var(39) &&!var(59) && var(10) && random % 5 = 0 && var(4) = 3  && !root,var(12)
+trigger2 = var(13) && var(12) = -1 && (var(0) = 400 || var(0) = 200)
+trigger3 = var(13) && var(12) = 1 && var(0) = 220 && root,hitcount >= 2
+var(39) = 205
+
+;-------------------------空中行動ぶ
+;-------------------空中必殺 発射か泡か
+;------くうちゅーこんぼ？みせどころなのかなー
+;---基本行動 、D 	
+;----めくりにつかわせるかな？
+[state 7000,];
+type = parentvarset
+triggerall = fvar(0) < 1 && fvar(1) > 0 && var(4) <= 3 
+trigger1 = !root,var(39) && !var(59) && var(10) && var(3) = 3 && random % 5 = 0
+trigger2 = var(13) && var(12) = 1 &&  var(0) = 600
+var(39) = 640
+
+;---基本行動 、A2S 	コンボでも対地でもよりどりみどり。
+[state 7000,];
+type = parentvarset
+triggerall = fvar(0) < 2 && fvar(1) <= 1 && var(3) = 3 && var(4) <= 3
+trigger1 = !root,var(39) && !var(59) && var(10) && random % 5 = 0
+trigger2 = var(13) && var(12) && (var(0) = 600 || var(0) = 620)
+trigger3 = var(0) = 55 && root,var(12) = 16
+var(39) = 630
+
+;---基本行動 、S 	このあとA2Sへつないで・・JC	JCあともやらせるだすとこんぼすたーとで
+;--5はうきあとおいうち？
+[state 7000,];NOのほう？
+type = parentvarset
+triggerall = fvar(0) <= 2 && fvar(1) >= -2 && var(3) = 3 
+trigger1 = !root,var(39) && !var(59) && var(10) && random % 5 = 0 && var(4) <= 3  
+trigger2 = var(13) && var(12) && (var(0) = 600 || var(0) = 610)
+trigger3 = var(10) && root,var(15) 
+trigger4 = var(0) = 55 && (root,var(12) = 3 || root,var(12) = 28) 
+var(39) = 620
+
+;---基本行動 、K 	りーちかいむ	
+[state 7000,];
+type = parentvarset
+triggerall = fvar(0) < 2 && fvar(1) >= 0 && var(4) = 3  
+trigger1 = !root,var(39) && !var(59) && var(10) && var(3) = 3 && random % 30 = 0
+trigger2 = var(13) && var(12) && var(0) = 600 
+var(39) = 610
+
+
+
+;--------------
+[state 3140,]
+type = destroyself
+trigger1 = root,alive = 0
+trigger2 = enemy,alive = 0
+trigger3 = roundstate >= 3
+
+[state -2, displayb];
+type = displaytoclipboard
+trigger1 = 1
+text = "EDX=%f,EDY=%f,fv0=%f,fv1=%f,V53=%d\n"
+params = p2bodydist x,p2bodydist y,fvar(0),fvar(1),root,var(53)
+
+[state -2, displayb];
+type = appendtoclipboard
+trigger1 = 1
+text = "v10=%d,v11=%d,V12=%d,v13=%d.R52=%d"
+params = var(10),var(11),var(12),var(13),root,var(39)
+
+[state -2, displayb];
+type = appendtoclipboard
+trigger1 = 0
+text = "v3=%d,v4=%d,v5=%d,V6=%d,V12=%d"
+params = var(3),var(4),var(5),var(6),var(12)
+
