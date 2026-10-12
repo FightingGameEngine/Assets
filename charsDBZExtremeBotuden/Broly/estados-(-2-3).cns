@@ -1,0 +1,1087 @@
+;================================================================================================
+;================================================================================================
+;-Estados especiales -2 -3
+;-Aquí se encuentran ctrls para varios sonidos y
+;-y códigos especiales para varias cosas.
+;================================================================================================
+;================================================================================================
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+[State 1000, ]
+type = Varset
+trigger1 = Enemy,Stateno = 5100
+var(10) = 0
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = Movetype = H
+trigger2 = Stateno != 2100
+channel = 5
+
+[State 701]
+type = Explod
+triggerall = animelem = 2
+trigger1 = Statetype != S
+trigger2 = Movetype = I
+anim = 112
+scale = 1.6,1.6
+ID = 110
+bindtime = -1
+removetime = -1
+postype = P1
+pos = 85,-88
+removeongethit= 1
+sprpriority = 5
+ownpal = -1
+
+
+[State 1002]
+type = RemoveExplod
+trigger1 = Statetype = S
+trigger2 = MoveType != I
+trigger3 = Anim = [113,9999]
+trigger4 = Anim = [0,109]
+;trigger4 = StateNo = [180,194]
+;trigger4 = StateNo = [700,710]
+;trigger5 = Anim = 700
+;trigger6 = Anim = 700
+ID = 110
+
+;--------------------------------------------------------------------------------
+
+
+;===============================================================================
+;<<<<<<<<<<-Poses de perder especiales vs RED ARREMER y Athena y Ryu->>>>>>>>>>
+ ; :------Código por shammahomega1-------:
+;================================================================================
+;-Ctrl para mandar a los estados de perder contra
+;-Athena y Red Adremer .
+
+[State -2, ChangeState]
+type = Changestate
+triggerall = MatchOver
+triggerall =lose
+triggerall =loseko
+triggerall = StateNo =5150
+triggerall =time= [40,100]
+trigger1 = Enemy, Name = "svcathena" && EnemyNear,AuthorName = "Warusaki3"
+trigger2 = Enemy, Name = "Athena-Goddess" && EnemyNear,AuthorName = "EternalBliss"
+value = 171
+
+[State -2, ChangeState]
+type = Changestate
+triggerall = MatchOver
+triggerall =lose
+triggerall =loseko
+triggerall = StateNo =5150
+triggerall =time= [40,100]
+trigger1 = Enemy, Name = "RED ARREMER" && EnemyNear,AuthorName = "Hh"
+value = 172
+
+
+;================================================================================
+;>>>>>>>>>>>>>Cheap K.O. system By Warusaki3<<<<<<<<<<<<<:
+ ;:------Código por Warusaki3 y modificado por shammahomega1-------:
+;===============================================================================
+;-Este ctrl te manda al estado de colapso k.o.
+;-estando en los estados 5000 al 5050,allí en
+;esos estados e codificado como prohibidas las
+;-animaciones de back en el aire y también para up
+;-al haber k.o.,y deje las normales,asi funciona mejor el código,
+;-como en el juego svc-chaos,importante no removerlo.
+
+
+[State -2,selfState 1]
+type =selfState
+triggerall =loseko
+triggerall = Alive=0
+trigger1 = PrevStateNo =130 ||PrevStateNo =120 || PrevStateNo =[150,151]
+trigger1 =stateno= [5000,5050]
+value = 5400
+ignorehitpause = 1
+
+
+[State -2, selfState 2]
+type =selfState
+triggerall =loseko
+triggerall = Alive=0
+trigger1 = PrevStateNo =131 ||PrevStateNo =120 || PrevStateNo =[152,153]
+trigger1 =stateno=[5000,5050]
+value = 5401
+ignorehitpause = 1
+
+
+[State -2,KO,1]
+type = Varset
+triggerall = StateNo = [120,159]
+trigger1 = StateType = S
+ignorehitpause = 1
+fvar(1) = 0
+
+
+[State -2,KO,2]
+type = Varset
+triggerall = StateNo = [120,159]
+trigger1 = StateType = C
+ignorehitpause = 1
+fvar(1) = 1
+
+
+[State -2,KO,3]
+type = Varset
+triggerall = StateNo = [120,159]
+trigger1 = StateType = A
+ignorehitpause = 1
+fvar(1) = 2
+
+;================================================================================
+; ------- Jump stuff --------
+;===============================================================================
+[State -2, reset]
+type = VarSet
+trigger1 = stateno != [40,50]
+var(2) = 0
+
+;================================================================================
+;Parar el sonido de intros como en kof
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Este ctrl. hace que se pare el sonido de
+;-las intros .
+[State -2, StopSnd]
+type = StopSnd
+trigger1 =time=1
+trigger1 =anim=0
+channel =9
+;ignorehitpause =
+persistent =1
+;===============================================================================
+ ;<<<<<<<-Remover AfterImage al ser golpeado->>>>>
+  ; :------Código por shammahomega1-------:
+;================================================================================
+;-Este ctrl remueve los AfterImage,si eres golpeado
+;-estando el personaje en la animación 2500,3000,3001,así
+;-evitamos que siga el AfterImage y se vea mal en
+;-nuestro personaje ,cambia el numero con tus nuevas animaciones
+;-si usas otros números diferentes en el air.
+;-ejemplo:
+;trigger1 =anim=500
+;trigger2 =anim=2000
+;trigger3 =anim=3200
+
+[State -2, AfterImageTime]
+type = AfterImageTime
+triggerALL =movetype =H
+trigger1 =anim=2500
+trigger2 =anim=3000
+trigger3 =anim=3001
+trigger4 =anim=[40,51]
+time = 0
+;ignorehitpause =
+;persistent =
+
+;===============================================================================
+;         <<<<<<<<<<-mbliss->>>>>>>>>>
+ ; :------Código por Leandro 1412-------:
+;================================================================================
+;Compatibilidad Mbliss con Demitri by bad darkness
+[State -2, M.Bliss]
+type = ChangeAnim
+triggerall = Stateno = 2021 && Selfanimexist(9020)
+trigger1 = Numenemy = 1
+trigger1 = Enemynear,name = "Demitri"
+trigger2 = Numenemy = 2
+trigger2 = Enemynear(0),name = "Demitri" || Enemynear(1),name = "Demitri"
+value = 9020
+elem = 1
+ignorehitpause =1
+
+[State -2, M.Bliss]
+type = ChangeAnim
+triggerall = Stateno = 2022 && Selfanimexist(9020)
+trigger1 = Numenemy = 1
+trigger1 = Enemynear,name = "Demitri"
+trigger2 = Numenemy = 2
+trigger2 = Enemynear(0),name = "Demitri" || Enemynear(1),name = "Demitri"
+value = 9020
+elem = 2
+ignorehitpause =1
+
+[State -2, M.Bliss]
+type = ChangeAnim
+triggerall = Stateno = 2023 && Selfanimexist(9020)
+trigger1 = Numenemy = 1
+trigger1 = Enemynear,name = "Demitri"
+trigger2 = Numenemy = 2
+trigger2 = Enemynear(0),name = "Demitri" || Enemynear(1),name = "Demitri"
+value = 9020
+elem = 3
+ignorehitpause =1
+
+[State -2, M.Bliss]
+type = ChangeAnim
+triggerall = Stateno = 2024 && Selfanimexist(9020)
+trigger1 = Numenemy = 1
+trigger1 = Enemynear,name = "Demitri"
+trigger2 = Numenemy = 2
+trigger2 = Enemynear(0),name = "Demitri" || Enemynear(1),name = "Demitri"
+value = 9020
+elem = 4
+ignorehitpause =1
+
+[State -2, M.Bliss]
+type = ChangeAnim
+triggerall = Stateno = 2025 && Selfanimexist(9020)
+trigger1 = Numenemy = 1
+trigger1 = Enemynear,name = "Demitri"
+trigger2 = Numenemy = 2
+trigger2 = Enemynear(0),name = "Demitri" || Enemynear(1),name = "Demitri"
+value = 9020
+elem = 5
+ignorehitpause =1
+
+[State -2, M.Bliss]
+type = ChangeAnim
+triggerall = Stateno = 2026 && Selfanimexist(9020)
+trigger1 = Numenemy = 1
+trigger1 = Enemynear,name = "Demitri"
+trigger2 = Numenemy = 2
+trigger2 = Enemynear(0),name = "Demitri" || Enemynear(1),name = "Demitri"
+value = 9020
+elem = 6
+ignorehitpause =1
+
+
+;===============================================================================
+ ;-Limitación de esquinas estilo kof.
+ ; :------Código de Iron y modificado por shammahomega1-------:
+;===============================================================================
+;-Limite de pasar a la esquina estando el enemigo allí,
+;-funciona perfecto,poniendo este código en el estado 100 y 20.
+[State -2, VelSet]
+type = VelSet
+trigger1 = movetype!=H
+trigger1 = RoundState =2
+trigger1 = FrontEdgeDist <10 && vel x > 0.1;const(velocity.jump.fwd.x)
+x = 0.1
+;-Se desactiva por un tiempo sino se cumplen los triggers
+[State -2,Null; VelSet]
+type =Null; VelSet
+trigger1 = movetype!=H
+trigger1 = RoundState =2
+trigger1 = FrontEdgeDist <10 && vel x > 0.1;const(velocity.jump.fwd.x)
+x = 0.1
+;===============================================================================
+;-Sin barras estilo kof.
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Sin barras de vida y de poder estilo kof,
+;-en intros y al final de cada raund.
+[State -2, AssertSpecial]
+type = AssertSpecial
+trigger1 = RoundState = [0,1 ]
+trigger2 = RoundState = [3,4]
+flag = nobardisplay
+
+;================================================================================
+;- Limitación de agarres
+;:-----Código por OrochiKOF97---------:
+;===============================================================================
+;-Varset para limitar agarres en estados que
+;el sistema kof no permite.
+[State -2, Guard Var]
+type = VarSet
+trigger1 = stateno = [200,299] ; Non-Air basic moves states.
+trigger1 = moveguarded > 0 ; This is the key : checks if opponent has guarded a basic attack
+trigger2 = stateno = [600,699] ; Air Basic Moves
+trigger2 = movecontact > 0 ; This includes both moveguarded & movehit as well
+v = 15
+value = 30
+persistent = 0
+ignorehitpause = 1
+
+[State -2, Guard Var 2]
+type = VarAdd
+trigger1 = var(15) > 0
+var(15) = -1
+ignorehitpause = 1
+
+[State -2, Guard Var 3]
+type = VarSet
+trigger1 = var(15) < 0
+var(15) = 0
+persistent = 0
+ignorehitpause = 1
+
+;End of Throw Limitation===========================================================
+;================================================================================
+; COUNTER HIT (Based on Sander's Method, Stolen from Vans, Adapted by thedge)
+;===============================================================================
+[State -2, VarSet];Checks if opponent is in attack state
+type = VarSet
+triggerall = numenemy
+trigger1 = enemy, movetype = a
+var(56) = 1
+ignorehitpause = 1
+
+[State -2, VarSet];This resets the condition if counter not succesful and succesful
+type = VarSet
+triggerall = numenemy
+trigger1 = enemy, movetype = i || var(57) >= 1  ;Enemy is Idle | Counter was Succesful
+trigger2 = var(57) > var(55) && enemy, movetype = h  ; ticks passed & enemy is on gethit state
+var(56) = 0
+ignorehitpause = 1
+
+[State -2, VarSet];Counter Hit Succesful
+type = VarSet
+trigger1 = var(56) = 1 && movehit ;Counter Check Ok, Move Hit Succesfully.
+trigger1 = stateno != [800,999] ;Does not activate during throws.
+trigger2 = var(56) = 1 && projhit = 1  ;Counter Check Ok, Projectile Hit Succesfully.
+var(57) = 1
+ignorehitpause = 1
+
+[State -2, VarAdd];Counter Hit Timer
+type = VarAdd
+trigger1 = var(57) >= 1 ;Counter was succesful
+var(57) = 1
+ignorehitpause = 1
+
+[State -2, VarSet];Counter Hit Reset
+type = VarSet
+trigger1 = var(57) >= var(55) && movehit ;Reset if 22 ticks passed and move hit
+trigger2 = p2movetype != h ;Reset if P2 is no longer in gethit state
+trigger3 = movetype = h ;Reset if P1 is getting hit
+trigger4 = var(57) >= var(55) && projhit = 1 ;Reset if 22 ticks passed and projectile hit
+var(57) = 0
+ignorehitpause = 1
+
+
+[State -2, Explod 1];Counter Explod for P1 Side.
+type = Explod
+triggerall =enemy,GetHitVar(hittime) =[0,17]
+triggerall = numenemy
+triggerall = var(56)=1  && numexplod(7280) <= 0 && teamside = 1 ;Counter Ok, Explod has not played, P1 Side
+triggerall =enemy,movetype = h  ;Enemy was indeed HIT, otherwise this'd be retarded.
+triggerall = stateno != [800,999] ;Does not activate during throws.
+trigger1 = movehit=1
+trigger2 = projhit = 1 ;Projectile Hits
+anim = 7280
+scale = 0.5,0.5
+id = 7280
+pos =-420,87; 160,234
+postype = right
+bindtime = -1
+supermove = 1
+facing = 1
+ontop = 1
+ownpal = 1
+ignorehitpause = 1
+persistent = 1
+;scale = 0.5,0.5
+
+
+
+[State -2, Explod 2];Counter Explod for P2 Side.
+type = Explod
+triggerall =enemy,GetHitVar(hittime) =[0,17 ]
+triggerall = numenemy
+triggerall = var(56)=1  && numexplod(7281) <= 0 && teamside = 2 ;Counter Ok, Explod has not played, P2 Side
+triggerall =enemy,movetype = h  ;Enemy was indeed HIT, otherwise this'd be retarded.
+triggerall = stateno != [800,999] ;Does not activate during throws.
+trigger1 = movehit=1
+trigger2 = projhit = 1 ;Projectile Hits
+anim = 7281
+scale = 0.5,0.5
+id = 7281
+pos =330,87; 160,234
+postype = left
+bindtime = -1
+supermove = 1
+facing = 1
+ontop = 1
+ownpal = 1
+ignorehitpause = 1
+persistent = 1
+
+
+; End of Counter System ===================================================
+
+;===============================================================================
+;-Ctrl para los explods de quema amarilla
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Explods de quema amarillo al impactar los proyectiles de fuego que
+;-que tiene programado el personaje.
+;-Puedes usar este codigo si tu personaje lanza
+;-proyectiles de fuego,solo debes poner los numeros
+;-que tu le as dado a los proyectiles tuyos.
+;-ejemplo:
+;-trigger1 =ProjHit9004 =1
+[State -2, Explod,NumExplod(8028)amaillo]
+type = Explod
+triggerall = NumExplod(8028)= 0
+trigger1 =ProjHit1004 =1
+trigger2 =ProjHit1005 =1
+trigger3 =ProjHit1008 =1
+trigger4 =ProjHit1009 =1
+trigger5 =ProjHit1012 =1
+trigger6 =ProjHit1013 =1
+trigger7 =ProjHit1016 =1
+trigger8 =ProjHit1017 =1
+trigger9 =ProjHit2002 =1
+trigger10=ProjHit2004 =1
+trigger11=ProjHit2008 =1
+trigger12=ProjHit2010 =1
+anim =8028
+ID =8028
+pos = -10,-30
+facing=-1
+postype = p2  ;p2,front,back,left,right
+random = 20,30
+removetime = -2
+sprpriority = 0
+ontop = 1
+ownpal = 1
+removeongethit = 1
+;ignorehitpause =
+;persistent =
+
+;===============================================================================
+;-Ctrl para los explods de quema morada
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Explods de quema morada al impactar los proyectiles de fuego que
+;-que tiene programado el personaje.
+;-Puedes usar este codigo si tu personaje lanza
+;-proyectiles de fuego,solo debes poner los numeros
+;-que tu le as dado a los proyectiles tuyos.
+;-ejemplo:
+;-trigger1 =ProjHit9004 =1
+[State -2, Explod,NumExplod(8032)morada]
+type = Explod
+triggerall = NumExplod(8032)= 0
+trigger1 =ProjHit1006 =1
+trigger2 =ProjHit1007 =1
+trigger3 =ProjHit1010 =1
+trigger4 =ProjHit1011 =1
+trigger5 =ProjHit1014 =1
+trigger6 =ProjHit1015 =1
+trigger7 =ProjHit1018 =1
+trigger8 =ProjHit1019 =1
+trigger9 =ProjHit2003 =1
+trigger10=ProjHit2005 =1
+trigger11=ProjHit2009 =1
+trigger12=ProjHit2011 =1
+anim =8032
+ID =8032
+pos = -10,-30
+facing=-1
+postype = p2  ;p2,front,back,left,right
+random = 20,30
+removetime = -2
+sprpriority = 0
+ontop = 1
+ownpal = 1
+removeongethit = 1
+;ignorehitpause =
+;persistent =
+
+;===============================================================================
+;-Ctrl para los sonidos de quema.
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Sonidos del fuego al impactar los proyectiles.
+;-Usa este ctrl para llamar el sonido de quema
+;-si tus personaje tiene proyectiles de fuego.
+;-tendrás que cambiarlos de acuerdo a los números
+;-que tu les des a tus proyectiles de fuego.
+;-ejemplo:
+;trigger1 =ProjHit8004 =1
+[State -2,sonido de quema de fuego ,PlaySnd ]
+type = PlaySnd
+trigger1 =ProjHit1004 =1
+trigger2 =ProjHit1005 =1
+trigger3 =ProjHit1008 =1
+trigger4 =ProjHit1009 =1
+trigger5 =ProjHit1012 =1
+trigger6 =ProjHit1013 =1
+trigger7 =ProjHit1016 =1
+trigger8 =ProjHit1017 =1
+trigger9 =ProjHit1006 =1
+trigger10=ProjHit1007 =1
+trigger11=ProjHit1010 =1
+trigger12=ProjHit1011 =1
+trigger13=ProjHit1014 =1
+trigger14=ProjHit1015 =1
+trigger15=ProjHit1018 =1
+trigger16=ProjHit1019 =1
+trigger17=ProjHit2002 =1
+trigger18=ProjHit2003 =1
+trigger19=ProjHit2004 =1
+trigger20=ProjHit2005 =1
+trigger21=ProjHit2008 =1
+trigger22=ProjHit2009 =1
+trigger23=ProjHit2010 =1
+trigger24=ProjHit2011 =1
+value = S1000,2
+loop=0
+channel = 12
+;volume=130
+
+;===============================================================================
+ ;-Ctrl que detiene lopp de sonido de quema.
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Ctrl para detener el sonido de quema  al pegar el super Hadouken de fuego,
+;-y se escuche un loop muy malo,solo se escuchará en un hit.
+
+[State -2, StopSnd]
+type = StopSnd
+trigger1 = MoveHit  >1
+channel = 12
+;ignorehitpause =
+;persistent =
+;===============================================================================
+;-Ctrl para cambiar el sonido de k.o.
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Este ctrl elimina por defaul el sonido de k.o.
+;-en las animaciones de defensa donde se pierde por
+;-colapso k.o. que lleva otro grito de k.o
+[State -2, AssertSpecial,]
+type = AssertSpecial
+triggerALL =STATETYPE=S
+trigger1 =anim =[120,152]
+flag = nokosnd
+
+;===============================================================================
+ ;<<<Ctrls para detener el lopp del sonido de correr.
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Te preguntaras porque cree este bg control de sonido para el
+;-estado de stand ósea el 0, bueno esto lo hice por la razón
+;-del sonido de correr del estado 100 para que cuando pases
+;-al estado de parado, el sonido de correr  no siga y se
+;-escuche el sonido de stand que no suena,  así evitamos que el
+;-loop del sonido de correr siga y como vez le he agregado
+;-prioridad y persistencia lo cual lo hace estar por encima de otro sonido,
+;-esto solo es para evitar el lopp del sonido de correr cosa que en otros
+;-chars tiende a trabarse.
+
+[State -2, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 0 ;- Standing
+value = s100, 2
+loop=1
+channel = 11
+lowpriority = 1
+persistency = 1
+
+
+;-Este bg control lo hice por la misma razón del sonido de correr,
+;-igual que el anterior es para evitar el loop del sonido de correr,
+;-es el estado de caminar hacia adelante igual que el anterior,
+;-el sonido no se escucha y así cortamos el loop infinito del
+;-sonido de correr.
+
+[State -2, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 20 ;- Walking Forward
+value = s100, 2
+loop=1
+channel =11; 0
+lowpriority = 1
+persistency = 1
+
+
+;-Ahora aquí esta el bg control del sonido de correr hacia adelante,
+;-creeme es efectivo y junto con el siguiente bg control abajo
+;-es como se para, agrégale a esto los dos bg controles de arriba de
+;-sonido previos del estado 0  de stand y 20 al caminar hacia adelante
+;-que paran con mas persistencia el loop  de este sonido.
+
+[State -2, Landing Sound]
+type = PlaySnd
+trigger1 = time = 2
+trigger1 = stateno = 100
+value = S100, 0
+channel = 10
+loop = 0
+
+
+;-Ahora este bg control es el primordial para parar el sonido de correr,
+;-del anterior bg control, que dice aquí, pues que el sonido del canal 10
+;-arriba mencionado se tendrá que parar,
+;-este es principalmente el que detiene el loop del sonido de correr.
+
+[State -2, Landing Sound]
+type = StopSnd
+trigger1 = stateno != 100
+channel = 10
+;==================================================================================
+[State -2, Debug display]
+trigger1 = 1
+type = DisplayToClipboard
+ignorehitpause = 1
+text = "DIZZY VAR = %d GUARD CRUSH = %d"
+params = var(13) , var(11)
+
+;==================================================================================
+;-Varset que activan el nockear en batalla.
+; ------- DIZZY CODE --------
+;===============================================
+[State -2, reset Dizzy]
+type = VarSet
+trigger1 = RoundState = 0 || RoundState = 3 || (movetype = H &&  var(14) = 1 && stateno != 5250)
+ignorehitpause = 1
+var(13) = 0
+
+[State -2, reset Dizzy]
+type = VarSet
+trigger1 = var(13) <= 0 && var(14) = 1
+ignorehitpause = 1
+var(14) = 0
+
+[State -2, DIZZY CODE]
+type = VarAdd
+trigger1 = (var(13) = [1,999]) && movetype = H && enemy, hitdefattr = SCA, HA, HP
+var(13) = -50
+ignorehitpause = 1
+
+[State -2, DIZZY CODE]
+type = VarAdd
+trigger1 = (var(13) = [1,999]) && movetype = H && gethitvar(hitcount) >= 5
+var(13) = -20
+ignorehitpause = 1
+
+[State -2, DIZZY CODE]
+type = VarAdd
+trigger1 = var(13) = [1,999]
+var(13) = -1
+ignorehitpause = 1
+
+[State -2, DIZZY CODE]
+type = Varset
+trigger1 = var(13) > 1000
+var(13) = 1000
+ignorehitpause = 1
+;================================================================================
+; KOF Cornerpush System
+;- <<< Código por Vans>>>
+;===============================================================================
+[State -2, Superpause Check]
+type = VarAdd
+trigger1 = Var(6)
+var(6) = -1
+
+[State -2, Reset Time counter]
+type = VarSet
+trigger1 = movecontact = 1
+var(12) = 0
+
+[State -2, Accel]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = Var(6) <= 0
+triggerall = numtarget >= 1
+trigger1 = target, hitshakeover
+fvar(6) = (target, gethitvar(xvel)*exp((-0.1886)*((var(12)))))
+
+[State -2, Push]
+type = PosAdd
+triggerall = roundstate = 2
+triggerall = !var(6)
+triggerall = numtarget >= 1
+triggerall = (target, BackEdgeBodyDist <= 0) || (target, FrontEdgeBodyDist <= 0)
+triggerall = ProjContact = 0, < 50
+triggerall = stateno != [810,821]
+triggerall = stateno != [840,851]
+triggerall = enemynear,statetype != A
+trigger1 = Statetype != A
+x = ifelse(facing = -1 && target, BackEdgeBodyDist <= 0,fvar(6),-fvar(6))
+
+[State -2, Increase]
+type = VarSet
+triggerall = numtarget >= 1
+triggerall = target, hitshakeover
+trigger1 = Var(6) <= 0
+trigger1 = var(12)
+var(12) = var(12)+1
+
+[State -2, Time counter]
+type = VarSet
+trigger1 = !var(12)
+trigger1 = fvar(6)
+var(12) = 1
+
+[State -2, Freeze Pos During Superpause]
+type = PosFreeze
+trigger1 = Var(6)
+value = 1
+
+[State -2, Drop]
+type = VarSet
+triggerall = fvar(6)
+trigger1 = !numtarget
+trigger2 = projcontact = 1
+trigger3 = movecontact = 1
+fvar(6) = 0
+ignorehitpause = 1
+;End of Corner Push===========================================================
+
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+[Statedef -3]
+
+[State -3, VarAdd]
+type = null
+trigger1 = winko
+;trigger1= Roundstate >= 2
+var(22) = 1
+ignorehitpause=1
+
+[State -3, Pause]
+type = null
+trigger1 = winko
+trigger1 = var(22) = 1
+ignorehitpause=1
+time = 30
+
+;-------------------------------------
+; just defence
+;-------------------------------------
+;Seteo con limitador
+[State -3, 0]
+type = VarSet
+triggerall = var(54) > 14
+trigger1 = command = "back" || command = "downback"
+var(54)=0
+
+;Cuenta
+[State -3, 0]
+type = VarAdd
+trigger1 = var(54) >= 0
+var(54)=1
+ignorehitpause = 1
+
+;Cambio al estado del Stand JustCover
+[State -3, 0]
+type = ChangeState
+triggerall = Time = 0
+triggerall = stateno = 150
+triggerall = PrevStateNo =126||PrevStateNo =136||PrevStateNo =146 ||(PrevStateNo !=[130,159])
+trigger1 = Var(54) <= 6
+value = 126
+
+;Cambio al estado del Crouch JustCover
+[State -3, 0]
+type = ChangeState
+triggerall = Time = 0
+triggerall = stateno = 152
+triggerall = PrevStateNo =126||PrevStateNo =136||PrevStateNo =146 ||(PrevStateNo !=[130,159])
+trigger1 = var(54) <= 6
+value = 136
+
+;PalFX para el Just Cover
+[State -3, 0]
+type = PalFX
+trigger1 = (stateno = 126 ||StateNo =136 ||stateno=146) && time %2=1&& time = [1,12]
+time = 1
+add = 90,152,228
+persistent = 0
+
+
+
+;Explod "Cartel Just Cover"
+[State -3, 0]
+type = Explod
+triggerall = NumExplod(9310)
+triggerall = roundstate = 2
+trigger1 = (stateno = 126 ||StateNo =136 ||stateno=146) && time = 1
+anim = F4800+(teamside-1)
+ID = 9310
+Pos = 0+(teamside-1)*200,85
+postype = left
+OnTop = 1
+supermove = 1
+BindTime = -1
+ownpal = 1
+removetime = 40
+scale = 0.5,0.5
+ignorehitpause=1
+persistent = 0
+
+;Sonido del JustCover
+[State -3, 0]
+type = PlaySnd
+triggerall = roundstate = 2
+trigger1 = (stateno = 126 ||StateNo =136 ||stateno=146) && time = 1
+value = f150,0
+
+
+;===============================================================================
+;-Ctrl que elimina un bug de SprPriority(opcional)
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Puse este ctrl porque los sprites de estas animaciones
+;-siempre quedaban delante del que golpeaba y no debía ser
+;-asi,más bien tienen que verse detrás del que golpea.
+;[State -3, ]
+;type = SprPriority
+;trigger1 = MoveType=H
+;value = -1
+
+
+
+;===============================================================================
+;-Ctrls para los sonidos al ser golpeado.
+;:------Código por thedge-------:
+;===============================================================================
+;-Sonidos en estados, donde es golpeado el personaje.
+; Play sound when hit by light
+[State -3, 1.2]
+type = PlaySnd
+triggerall = Time = 1
+triggerall = alive
+triggerall = Random <= 500;use random
+trigger1 = stateno = 5001
+trigger1 = anim = 5000
+trigger2 = stateno = 5001
+trigger2 = anim = 5010
+trigger3 = stateno = 5011
+trigger3 = anim = 5020
+value = S5000,0
+channel = 17
+;VOLUME=110
+ignorehitpause = 1
+
+[State -3, StopSnd,channel = 17]
+type = StopSnd
+trigger1 = MoveHit >2
+channel = 17
+;ignorehitpause =
+
+; Play sound when hit by medium
+[State -3, 1.3]
+type = PlaySnd
+triggerall = Time = 1
+triggerall = alive
+triggerall = Random <= 600;use random
+trigger1 = stateno = 5001
+trigger1 = anim = 5001
+trigger2 = stateno = 5001
+trigger2 = anim = 5011
+trigger3 = stateno = 5011
+trigger3 = anim = 5021
+value = S5000,1
+channel = 18
+;VOLUME=110
+ignorehitpause = 1
+
+[State -3, StopSnd,channel = 18]
+type = StopSnd
+trigger1 = MoveHit >2
+channel = 18
+;ignorehitpause =
+
+; Play sound when hit by hard
+[State -3, 1.4]
+type = PlaySnd
+triggerall = GetHitVar(hitcount)<=1
+triggerall = P2BodyDist X =[0,100]
+triggerall = Time = 1
+triggerall = alive
+triggerall = Random <= 700;use random
+trigger1 = stateno = 5001
+trigger1 = anim = 5002
+trigger2 = stateno = 5001
+trigger2 = anim = 5012
+trigger3 = stateno = 5011
+trigger3 = anim = 5022
+trigger4 = stateno = 5070
+value = S5000,2
+channel = 19
+;VOLUME=110
+ignorehitpause = 1
+
+
+
+[State -3, StopSnd,channel = 19]
+type = StopSnd
+trigger1 = MoveHit >2
+channel = 19
+;ignorehitpause =
+
+;-Este sonido es más que nada para cuando
+;-impactan los Hadouken de lejos.
+[State -3, 1.4]
+type = PlaySnd
+triggerall = alive
+triggerall = Random <= 800;use random
+triggerall = P2BodyDist X >=100
+trigger1 = stateno = 5001
+trigger1 = anim = 5002
+trigger2 = stateno = 5001
+trigger2 = anim = 5012
+trigger3 = stateno = 5011
+trigger3 = anim = 5022
+trigger4 = stateno = 5001
+trigger4 = anim = 20002
+trigger5 = stateno = 5001
+trigger5 = anim = 20012
+trigger6 = stateno = 5011
+trigger6 = anim = 20022
+trigger7 = stateno = 5001
+trigger7 = anim = 22002
+trigger8 = stateno = 5001
+trigger8 = anim = 22012
+trigger9 = stateno = 5011
+trigger9 = anim = 22022
+value = S5000,3
+channel = 20
+;VOLUME=110
+ignorehitpause = 1
+
+;-Sonido al rebotar después de los agarres.
+[State -3, 1.4]
+type = PlaySnd
+triggerall = alive
+triggerall = Random <= 200;use random
+triggerall =stateno=5100
+trigger1 = prevstateno = 821
+trigger2 = prevstateno = 851
+value = S5000,3
+channel = 20
+;VOLUME=110
+ignorehitpause = 1
+
+
+[State -3, StopSnd,channel = 20]
+type = StopSnd
+trigger1 = MoveHit  >=1
+channel = 20
+;ignorehitpause =
+;persistent =
+
+;===============================================================================
+;-Otro ctrl para quitar barras estilo kof.
+;:------Código por shammahomega1-------:
+;===============================================================================
+;-Con este ctrl. quitamos las barras de vida y poder como en el juego de kof.
+;-al haber k.o.
+[State -3, Helper,"barras"]
+type = Helper
+triggerall =STATENO!=7100 && (NumHelper(7100) = 0)
+trigger1= WinKO
+trigger2 =enemy,winko
+helpertype = Normal
+name = "barras"
+id = 7100
+pos = 0,0
+postype = p1
+stateno = 7100
+keyctrl = 0
+ownpal = 1
+supermovetime = 1000
+pausemovetime = 1000
+ignorehitpause = 1
+
+;===============================================================================
+ ;-Vars de códigos para romper defenza estilo kof.
+;----------------------------------------------------------------------------------------------
+; State -3 / Guard Crush System / var(11) : Guard Crush Variable
+;----------------------------------------------------------------------------------------------
+;===============================================================================
+[State -3, Light Hit Guard]
+type = VarAdd
+triggerall = var(11) > 0
+trigger1 = stateno = 5001
+trigger1 = anim = 5000
+trigger2 = stateno = 5001
+trigger2 = anim = 5010
+trigger3 = stateno = 5011
+trigger3 = anim = 5020
+persistent = 0
+var(11) = -1
+ignorehitpause = 1
+
+[State -3, Medium Hit Guard]
+type = VarAdd
+triggerall = var(11) > 0
+trigger1 = stateno = 5001
+trigger1 = anim = 5001
+trigger2 = stateno = 5001
+trigger2 = anim = 5011
+trigger3 = stateno = 5011
+trigger3 = anim = 5021
+persistent = 0
+var(11) = -3
+ignorehitpause = 1
+
+[State -3, Strong Hit Guard]
+type = VarAdd
+triggerall = var(11) > 0
+trigger1 = stateno = 5001
+trigger1 = anim = 5002
+trigger2 = stateno = 5001
+trigger2 = anim = 5012
+trigger3 = stateno = 5011
+trigger3 = anim = 5022
+persistent = 0
+var(11) = -6
+ignorehitpause = 1
+
+[State -3, Fall Hit Guard]
+type = VarAdd
+trigger1 = var(11) > 0
+trigger1 = PrevStateNo = 5050
+persistent = 0
+var(11) = -10
+ignorehitpause = 1
+
+[State -3, Special Add]
+type = VarAdd ; Add when hitshaketime had at lease 15 ticks - Heavy Guard
+triggerall = GetHitVar(hitshaketime) =20 ;15
+trigger1 = stateno = 150
+trigger2 = stateno = 152
+var(11) =6 ;6
+ignorehitpause = 1
+
+[State -3, Special Add 2]
+type = Varadd ; Add when hitshaketime had at lease 12 ticks - Medium Guard
+triggerall = GetHitVar(hitshaketime) =15; 12
+trigger1 = stateno = 150
+trigger2 = stateno = 152
+var(11) =4;4
+ignorehitpause = 1
+
+[State -3, Special Add 3]
+type = Varadd ; Add when hitshaketime had at lease 8 ticks - Light Guard
+triggerall = GetHitVar(hitshaketime) =10; 8
+trigger1 = stateno = 150
+trigger2 = stateno = 152
+var(11) = 2;2
+ignorehitpause = 1
+
+[State -3, Guard Crush]
+type = ChangeState ; Change To Guard Crush When Var(11) Limits Are Reached.
+trigger1 = var(11) >= 55
+value = 9000
+ctrl = 0
+ignorehitpause = 1
+
+;===============================================================================
+
+;===============================================================================
+

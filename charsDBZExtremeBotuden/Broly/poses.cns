@@ -1,0 +1,1217 @@
+;================================================================================================
+;================================================================================================
+;-Poses de Intros,victorias,perder.
+;================================================================================================
+;================================================================================================
+; Lose by Time Over
+; CNS difficulty: basic
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+;-Este ctrl es para volverte invisible,es para cuando
+;-tu personaje pierde contra el mismo,sirve para que se
+;-vea bien el winner escreen o anuncio del ganador como
+;-en el juego kof.
+[State 170,AssertSpecial ]
+type = AssertSpecial
+;-Cambia este triggerall de acuerdo al nombre de tu personaje y tu nombre de autor.
+;-Ejemplo:
+;triggerALL =ENEMYNEAR,Name = "loquito" && AuthorName = "spammer"
+triggerALL =ENEMYNEAR,Name = "kof" && AuthorName = "shammahomega1"
+triggerall = Matchover = 1
+trigger1 = Time >=190
+flag = invisible
+
+[State 181, AssertSpecial]
+type = AssertSpecial
+trigger1 = Time <= 230
+flag= roundnotover
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 =time=0
+;trigger1 = Random < 50
+value = S0,3
+
+[State 170,NotHitBy 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+
+;---------------------------------------------------------------------------
+; Pose de perder contra Athena svc-chaos.
+; CNS difficulty: basic
+[Statedef 171]
+type = S
+ctrl = 0
+ANIM=13000
+facing = 1
+postype = p1
+
+;Este ctrl es importante hace que se gire
+;al enemigo.
+[State 171,Turn]
+type = Turn
+trigger1 =facing = enemy,facing
+
+[State 171, Explod,NumExplod(8029)1]
+type = Explod
+trigger1 =TIME=0
+anim =8029
+ID =8029
+pos = -25,-65
+postype = p1  ;p2,front,back,left,right
+random = 30,50
+removetime = -2
+ontop = 1
+
+[State 171, Explod,NumExplod(8029)2]
+type = Explod
+trigger1 =TIME=3
+anim =8029
+ID =8029
+pos = 15,-35
+postype = p1  ;p2,front,back,left,right
+random = 40,60
+removetime = -2
+ontop = 1
+
+[State 171, Explod,NumExplod(8029)3]
+type = Explod
+trigger1 =TIME=6
+anim =8029
+ID =8029
+pos = -10,-15
+postype = p1  ;p2,front,back,left,right
+random = 70,20
+removetime = -2
+ontop = 1
+
+[State 171, Explod,NumExplod(8029)4]
+type = Explod
+trigger1 =TIME=9
+anim =8029
+ID =8029
+pos = 10,-55
+postype = p1  ;p2,front,back,left,right
+random = 70,20
+removetime = -2
+ontop = 1
+
+
+[State 171, Explod,NumExplod(8029)5]
+type = Explod
+trigger1 =TIME=12
+anim =8029
+ID =8029
+pos = 0,-20
+postype = p1  ;p2,front,back,left,right
+random = 70,20
+removetime = -2
+ontop = 1
+
+
+[State 171,NotHitBy 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 171, CtrlSet]
+type = CtrlSet
+trigger1 =time=200
+value = 0
+
+[State 171, CtrlSet]
+type = null
+trigger1 =time=200
+value = 0
+
+;---------------------------------------------------------------------------
+; Pose de perder contra Red Adremer svc-chaos.
+; CNS difficulty: basic
+[Statedef 172]
+type = S
+ctrl = 0
+ANIM=14000
+facing = 1
+postype = p1
+
+;Este ctrl es importante hace que se gire
+;al enemigo.
+[State 172,Turn]
+type = Turn
+trigger1 =facing = enemy,facing
+
+
+[State 172, Explod,NumExplod(8029)1]
+type = Explod
+trigger1 =TIME=0
+anim =8029
+ID =8029
+pos = -25,-65
+postype = p1  ;p2,front,back,left,right
+random = 30,50
+removetime = -2
+ontop = 1
+
+[State 172, Explod,NumExplod(8029)2]
+type = Explod
+trigger1 =TIME=3
+anim =8029
+ID =8029
+pos = 15,-35
+postype = p1  ;p2,front,back,left,right
+random = 40,60
+removetime = -2
+ontop = 1
+
+[State 172, Explod,NumExplod(8029)3]
+type = Explod
+trigger1 =TIME=6
+anim =8029
+ID =8029
+pos = -10,-15
+postype = p1  ;p2,front,back,left,right
+random = 70,20
+removetime = -2
+ontop = 1
+
+[State 172, Explod,NumExplod(8029)4]
+type = Explod
+trigger1 =TIME=9
+anim =8029
+ID =8029
+pos = 10,-55
+postype = p1  ;p2,front,back,left,right
+random = 70,20
+removetime = -2
+ontop = 1
+
+
+[State 172, Explod,NumExplod(8029)5]
+type = Explod
+trigger1 =TIME=12
+anim =8029
+ID =8029
+pos = 0,-20
+postype = p1  ;p2,front,back,left,right
+random = 70,20
+removetime = -2
+ontop = 1
+
+
+[State 172,NotHitBy 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+
+[State 172, CtrlSet]
+type = CtrlSet
+trigger1 =time=200
+value = 0
+
+
+[State 172,null, CtrlSet]
+type = null
+trigger1 =time=200
+value = 0
+
+
+;---------------------------------------------------------------------------
+; Win state decider
+; CNS difficulty: basic
+[Statedef 180]
+type = S
+
+;-Este ctrl es para cambiarte a un random de 3 poses de victoria,
+;-es contra de cualquier personaje que no tenga una pose de victoria especial
+[State 180, ChangeState]
+type = ChangeState
+trigger1 =time=0
+value = 181
+
+;---------------------------------------------------------------------------
+; Win pose 1
+; CNS difficulty: basic
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 180
+velset = 0,0
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 =animelem = 3
+;trigger1 = Random < 50
+value = S0,20 +(random %2)
+;volume = 0
+
+[State 181, AssertSpecial]
+type = AssertSpecial
+trigger1 = Time <= 190
+flag= roundnotover
+;ignorehitpause =
+;persistent =
+
+[State 181,ChangeState]
+type = null
+triggerall = Matchover = 1
+triggerall = Time >= 190
+trigger1 = TeamMode =single
+trigger2 = TeamMode =turns
+value = 188
+persistent =1
+
+[State 181,NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+;---------------------------------------------------------------------------
+; Win pose 2
+; CNS difficulty: basic
+[Statedef 182]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 181, PlaySnd]
+type = null
+trigger1 =ANIMELEM=1
+value = S0,19
+;volume = 0
+
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 10
+value = 0, 0
+
+[State 181, AssertSpecial]
+type = AssertSpecial
+trigger1 = Time <= 190
+flag= roundnotover
+;ignorehitpause =
+;persistent =
+
+[State 181,ChangeState]
+type = null
+triggerall = Matchover = 1
+triggerall = Time >= 190
+trigger1 = TeamMode =single
+trigger2 = TeamMode =turns
+value = 188
+persistent =1
+
+
+[State 181,NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+;---------------------------------------------------------------------------
+; Win pose 3
+; CNS difficulty: basic
+[Statedef 183]
+type = S
+ctrl = 0
+anim = 183
+velset = 0,0
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 =ANIMELEM=3
+value = S0,20 +(random %2)
+
+;volume = 0
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 18
+value = 1000, 0
+
+
+[State 183,AssertSpecial]
+type = AssertSpecial
+trigger1 = time = [0,200]
+flag = roundnotover
+
+[State 183, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win pose 4
+; CNS difficulty: basic
+[Statedef 184]
+type = S
+ctrl = 0
+anim = 182
+velset = 0,0
+
+[State 181, PlaySnd]
+type = null
+trigger1 =ANIMELEM=3
+value = S0,20 +(random %2)
+
+;volume = 0
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 1000, 11
+
+[State 181,ChangeState]
+type = null
+triggerall = Matchover = 1
+triggerall = Time >= 190
+trigger1 = TeamMode =single
+trigger2 = TeamMode =turns
+value = 188
+persistent =1
+
+[State 183, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;----------------------------------------------------------------------
+;-Estado donde están los carteles de winners estilo svc-chaos.
+[Statedef 188]
+type = S
+ctrl = 0
+velset = 0,0
+
+
+
+;-Este ctrl cambia al estado 189, es para textos de winner
+;-contra ciertos enemigos,debes de cambiarlos de acuerdo al
+;-nombre del personaje enemigo que tu elijas ,asi como el autor
+;-de esos personajes.
+;-ejemplo:
+;-trigger1 = Enemy,Name="chacharas" && EnemyNear,AuthorName ="ogro"
+
+[State 188, ChangeState]
+type = ChangeState
+triggerall =time=0
+trigger1 = Enemy,Name="GOUKEN" && EnemyNear,AuthorName ="Shammahomega1"
+trigger2 = Enemy,Name="SUPREMO AKUMA" && EnemyNear,AuthorName ="Shammahomega1"
+trigger3 = Enemy,Name="KEN" && EnemyNear,AuthorName ="Shammahomega1"
+trigger4 = Enemy,var(20)&& Enemy,Name="KEN" && EnemyNear,AuthorName ="Shammahomega1"
+trigger5 = Enemy,Name="Sean Matsuda" && EnemyNear,AuthorName ="thedge"
+trigger6 = Enemy,Name="Luise Meyrink" && EnemyNear,AuthorName ="Blue Blood"
+trigger7 = Enemy,Name ="kof" && EnemyNear,AuthorName ="shammahomega1"
+value =189
+ctrl = 0
+ignorehitpause =1
+;persistent =
+
+
+
+
+[State 188, PlaySnd]
+type = PlaySnd
+trigger1= time=0
+value = S189,0
+volume = 0
+
+
+[State 188,BGPalFX ROJO]
+type = BGPalFx
+triggerall = time= 0
+trigger1 = PalNo =1
+trigger2 = PalNo =2
+trigger3 = PalNo =3
+trigger4 = PalNo =4
+trigger5 = PalNo =5
+trigger6 = PalNo =6
+time = 100000
+add = 44,44,0
+mul = 100,-16,0
+sinadd = -6,-8,-8,0
+invertall = 0
+color = time*200
+ignorehitpause =1
+persistent =1000
+
+
+[State 188,BGPalFX AZUL]
+type =BGPalFX
+triggerall = time= 0
+trigger1 = PalNo =7
+trigger2 = PalNo =8
+trigger3 = PalNo =9
+trigger4 = PalNo =10
+trigger5 = PalNo =11
+trigger6 = PalNo =12
+time = 100000
+add = -74,0,50
+mul = 12,60,100
+sinadd = 100,-256,-53,0
+invertall = 0
+color = 0
+color =TIME* 0
+ignorehitpause =1
+persistent =1000
+
+
+[State 188,AssertSpecial 1]
+type = AssertSpecial
+trigger1 = Time = [0,380]
+flag = RoundNotOver
+
+
+
+[State 188,AssertSpecial 2]
+type = AssertSpecial
+trigger1 = Time = [0,4000]
+flag = nobardisplay
+flag2 = globalnoshadow
+flag3 = nomusic
+
+
+
+[State 188,AssertSpecial 3]
+type = AssertSpecial
+trigger1 = Time = [0,4000]
+flag = noFG
+flag2 = invisible
+flag3 = noKOSLOW
+
+
+[State 188,Explod cartel winner p1]
+type = Explod
+triggerall = numexplod(7300) <= 0 && teamside = 1
+trigger1 = Time = 0
+anim = 7300
+ID =7300
+pos = 0,0
+postype = left
+sprpriority = 5
+ownpal = 1
+removetime = -1
+
+
+[State 188,Explod cartel winner p2]
+type = Explod
+triggerall = numexplod(7301) <= 0 && teamside = 2
+trigger1 = Time = 0
+anim = 7301
+ID =7301
+pos = 0,0
+postype = left
+sprpriority = 5
+ownpal = 1
+removetime = -1
+
+
+[State 188,Explod,kof-imagen ]
+type = Explod
+triggerall = Time =15
+trigger1 = numexplod(7290) <= 0 && teamside = 1
+trigger2 = numexplod(7290) <= 0 && teamside = 2
+anim = 7290
+pos = 0,0
+postype = left
+sprpriority = 4
+ownpal = 1
+removetime = -1
+
+
+
+[State 188,Explod,textos winners de kof ]
+type = Explod
+triggerall = Time = 20
+trigger1 = numexplod(7302) <= 0 && teamside = 1
+trigger2 = numexplod(7302) <= 0 && teamside = 2
+anim =7302+ (random %3)
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+
+[State 188, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;-----------------------------------------------------------------------
+;-Estado donde están los carteles de winners contra
+;-ciertos personajes enemigos.
+[Statedef 189]
+type = S
+ctrl = 0
+velset = 0,0
+
+
+[State 189, PlaySnd]
+type = PlaySnd
+trigger1= time=0
+value = S189,0
+volume = 0
+
+
+[State 189,BGPalFX ROJO]
+type = BGPalFx
+triggerall = time= 0
+trigger1 = PalNo =1
+trigger2 = PalNo =2
+trigger3 = PalNo =3
+trigger4 = PalNo =4
+trigger5 = PalNo =5
+trigger6 = PalNo =6
+time = 100000
+add = 44,44,0
+mul = 100,-16,0
+sinadd = -6,-8,-8,0
+invertall = 0
+color = time*200
+ignorehitpause =1
+persistent =1000
+
+
+[State 189,BGPalFX AZUL]
+type =BGPalFX
+triggerall = time= 0
+trigger1 = PalNo =7
+trigger2 = PalNo =8
+trigger3 = PalNo =9
+trigger4 = PalNo =10
+trigger5 = PalNo =11
+trigger6 = PalNo =12
+time = 100000
+add = -74,0,50
+mul = 12,60,100
+sinadd = 100,-256,-53,0
+invertall = 0
+color = 0
+color =TIME* 0
+ignorehitpause =1
+persistent =1000
+
+
+[State 189,AssertSpecial 1]
+type = AssertSpecial
+trigger1 = Time = [0,380]
+flag = RoundNotOver
+
+
+
+[State 189,AssertSpecial 2]
+type = AssertSpecial
+trigger1 = Time = [0,4000]
+flag = nobardisplay
+flag2 = globalnoshadow
+flag3 = nomusic
+
+
+
+[State 189,AssertSpecial 3]
+type = AssertSpecial
+trigger1 = Time = [0,4000]
+flag = noFG
+flag2 = invisible
+flag3 = noKOSLOW
+
+
+[State 189,Explod cartel winner p1]
+type = Explod
+triggerall = numexplod(7300) <= 0 && teamside = 1
+trigger1 = Time = 0
+anim = 7300
+ID =7300
+pos = 0,0
+postype = left
+sprpriority = 5
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod cartel winner p2]
+type = Explod
+triggerall = numexplod(7301) <= 0 && teamside = 2
+trigger1 = Time = 0
+anim = 7301
+ID =7301
+pos = 0,0
+postype = left
+sprpriority = 5
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod,Ryu-imagen ]
+type = Explod
+triggerall = Time =15
+trigger1 = numexplod(7290) <= 0 && teamside = 1
+trigger2 = numexplod(7290) <= 0 && teamside = 2
+anim = 7290
+pos = 0,0
+postype = left
+sprpriority = 4
+ownpal = 1
+removetime = -1
+
+
+;-Los siguientes ctrls son para anunciar el texto de winner
+;-contra ciertos enemigos,debes de cambiarlos de acuerdo al
+;-nombre del personaje enemigo que tu elijas ,asi como el autor
+;-de esos personajes,e igual las imagenes en el sff.
+[State 189,Explod,textos winners,vs ?]
+type = Explod
+triggerall = Enemy,Name="GOUKEN" && EnemyNear,AuthorName ="Shammahomega1"
+triggerall = Time = 20
+trigger1 = numexplod(7305) <= 0 && teamside = 1
+trigger2 = numexplod(7305) <= 0 && teamside = 2
+anim =7305
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod,textos winners,vs ?]
+type = Explod
+triggerall = Enemy,Name="SUPREMO AKUMA" && EnemyNear,AuthorName ="Shammahomega1"
+triggerall = Time = 20
+trigger1 = numexplod(7306) <= 0 && teamside = 1
+trigger2 = numexplod(7306) <= 0 && teamside = 2
+anim =7306
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod,textos winners,vs ?]
+type = Explod
+triggerall = Enemy,Name="KEN" && EnemyNear,AuthorName ="Shammahomega1"
+triggerall = Time = 20
+trigger1 = numexplod(7307) <= 0 && teamside = 1
+trigger2 = numexplod(7307) <= 0 && teamside = 2
+anim =7307
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod,textos winners,vs ?]
+type = Explod
+triggerall =Enemy,var(20)&& Enemy,Name="KEN" && EnemyNear,AuthorName ="Shammahomega1"
+triggerall = Time = 20
+trigger1 = numexplod(7308) <= 0 && teamside = 1
+trigger2 = numexplod(7308) <= 0 && teamside = 2
+anim =7308
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod,textos winners,vs ?]
+type = Explod
+triggerall = Enemy,Name="Sean Matsuda" && EnemyNear,AuthorName ="thedge"
+triggerall = Time = 20
+trigger1 = numexplod(7309) <= 0 && teamside = 1
+trigger2 = numexplod(7309) <= 0 && teamside = 2
+anim =7309
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod,textos winners,vs ?]
+type = Explod
+triggerall = Enemy,Name="Luise Meyrink" && EnemyNear,AuthorName ="Blue Blood"
+triggerall = Time = 20
+trigger1 = numexplod(7310) <= 0 && teamside = 1
+trigger2 = numexplod(7310) <= 0 && teamside = 2
+anim =7310
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+[State 189,Explod,textos winners,vs ?]
+type = Explod
+triggerall =Enemy,Name ="kof" && EnemyNear,AuthorName ="shammahomega1"
+triggerall = Time = 20
+trigger1 = numexplod(7311) <= 0 && teamside = 1
+trigger2 = numexplod(7311) <= 0 && teamside = 2
+anim =7311
+pos = 0,0
+postype = left
+sprpriority = 7
+ownpal = 1
+removetime = -1
+
+
+
+[State 189, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+;-----------------------------------------------------------------------------
+;-Este estado es donde están programadas las
+;-introducciones de nuestro personaje,es también
+;-como una ruleta variable que te mandara a los
+;-estados de las intros.
+; Intro state decider
+; CNS difficulty: basic
+[Statedef 190]
+type = S
+
+
+[State 190,AssertSpecial]
+type = AssertSpecial
+trigger1 =1
+flag = Intro
+flag2 = nobardisplay
+
+;-Este ctrl es para cambiarte a una intro especial,puedes
+;-hacer varios intros especiales contra ciertos personajes enemigos,
+;-debes de cambiarlo de acuerdo al nombre del personaje enemigo
+;-que tu elijas ,asi como el autor de esos personajes,
+;-e igual las imagenes en el air.
+;-ejemplo:
+;-trigger1 = Enemy,Name="chacharas" && EnemyNear,AuthorName ="ogro"
+
+;-Este ctrl es para cambiarte a un random de 3 intros,
+;-es contra cualquier personaje que no tenga una intro
+;-especial como el de arriba.
+[State 190, ChangeState]
+type = ChangeState
+trigger1 =time=0
+value = 191 +(random %2)
+;---------------------------------------------------------------------------
+; Introducción
+; CNS dificultad: básico
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 191, AssertSpecial] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = nobardisplay
+
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1=  animelem = 2
+value = S0,2
+channel=9
+;volume = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 100
+value = S500,0
+volumescale = 100
+channel = 1
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = animelem= 28
+channel = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 100
+anim = 912
+ID = 910
+pos = 5,5
+postype = p1
+bindtime = -1
+removetime = 125
+pausemovetime = 0
+supermovetime = 0
+scale = 1.5,1.5
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 100
+anim = 911
+ID = 910
+pos = -5,2
+postype = p1
+bindtime = -1
+removetime = 125
+pausemovetime = 0
+supermovetime = 0
+scale = 0.8,0.8
+sprpriority = -1
+ownpal = 1
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 25
+anim = 910
+ID = 910
+pos = 5,5
+postype = p1
+bindtime = -1
+removetime = 60
+pausemovetime = 0
+supermovetime = 0
+scale = 1.6,1.6
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 25
+anim = 911
+ID = 910
+pos = -5,2
+postype = p1
+bindtime = -1
+removetime = 60
+pausemovetime = 0
+supermovetime = 0
+scale = 0.9,0.9
+sprpriority = -1
+ownpal = 1
+removeongethit = 1
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = time = 150
+time = 75
+freq = 60
+ampl = -4
+phase = 80
+
+[State 191,ChangeState] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+;--------------------------------------------------------------------------
+;-Estado de la segunda introducción de nuestro personaje.
+[Statedef 192]
+type = S
+ctrl = 0
+anim = 191
+velset = 0,0
+
+[State 191, AssertSpecial] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+flag2 = nobardisplay
+
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1=  animelem = 2
+value = S0,1
+channel=9
+;volume = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 100
+value = S500,0
+volumescale = 100
+channel = 1
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = animelem= 28
+channel = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 100
+anim = 912
+ID = 910
+pos = 5,5
+postype = p1
+bindtime = -1
+removetime = 125
+pausemovetime = 0
+supermovetime = 0
+scale = 1.5,1.5
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 100
+anim = 911
+ID = 910
+pos = -5,2
+postype = p1
+bindtime = -1
+removetime = 125
+pausemovetime = 0
+supermovetime = 0
+scale = 0.8,0.8
+sprpriority = -1
+ownpal = 1
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 25
+anim = 910
+ID = 910
+pos = 5,5
+postype = p1
+bindtime = -1
+removetime = 60
+pausemovetime = 0
+supermovetime = 0
+scale = 1.6,1.6
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 25
+anim = 911
+ID = 910
+pos = -5,2
+postype = p1
+bindtime = -1
+removetime = 60
+pausemovetime = 0
+supermovetime = 0
+scale = 0.9,0.9
+sprpriority = -1
+ownpal = 1
+removeongethit = 1
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = time = 150
+time = 75
+freq = 60
+ampl = -4
+phase = 80
+
+
+
+[State 192,ChangeState] ;Change to stand state
+type = ChangeState
+trigger1 = AnimTime = 0 ; Cuando la animacion termine.
+value = 0
+;---------------------------------------------------------------------------
+;-Estado de la tercera introducción de nuestro personaje.
+; CNS dificultad: básico
+[Statedef 193]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 192, begin]
+type = AssertSpecial
+trigger1 = 1
+flag = intro
+flag2 = nobardisplay
+
+[State 191, PlaySnd]
+type = PlaySnd
+trigger1=  Animelem = 6
+value = S0,222
+channel=9
+
+
+
+[State 193,ChangeState] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+
+;---------------------------------------------------------------------------
+;-Estado de la introducción vs Gouken o contra algún enemigo
+;-que tenga una intro especial con tu personaje.
+; CNS dificultad: básico
+[Statedef 194]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 192, begin]
+type = AssertSpecial
+trigger1 = 1
+flag = intro
+flag2 = nobardisplay
+
+[State 192, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = S0,3
+;channel=9
+;volume = 0
+
+[State 192, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 1000, 0
+
+[State 194,ChangeState] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+;---------------------------------------------------------------------------
+;-Estado de burla o de arengar al enemigo.
+; Taunt
+; CNS difficulty: easy
+[Statedef 195]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+
+[State 195, PlaySnd]
+type = PlaySnd
+trigger1 =time=0
+value = S0,23
+channel=9
+;volume = 0
+
+;-Ctrl para recuperar el ctrl tal como en el juego
+;-svc-chaos.
+[State 195, CtrlSet]
+type = null
+triggerALL=TIME >=30
+trigger1 =command ="holdfwd"
+trigger2 =command ="holdback"
+value = 1
+;ignorehitpause =
+;persistent =
+
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;-Estado de burla o de arengar al enemigo.
+; Taunt
+; CNS difficulty: easy
+[Statedef 196]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+
+[State 195, PlaySnd]
+type = PlaySnd
+trigger1 =ANIMELEM=4
+value = S0,22 +(random %2)
+;volume = 0
+
+[State 195, 1]
+type = Explod
+triggerall = NumExplod(196) = 0
+trigger1 = AnimElem = 2
+anim = 196
+id = 196
+removeongethit = 1
+pos = 40,-100
+bindtime = -1
+ownpal = 1
+ontop = 1
+
+;-Ctrl para recuperar el ctrl tal como en el juego
+;-svc-chaos.
+[State 195, CtrlSet]
+type = null
+triggerALL=TIME >=30
+trigger1 =command ="holdfwd"
+trigger2 =command ="holdback"
+value = 1
+;ignorehitpause =
+;persistent =
+
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;-Estado de burla o de arengar al enemigo.
+; Taunt
+; CNS difficulty: easy
+[Statedef 197]
+type = S
+ctrl = 0
+anim = 197
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+
+[State 195, PlaySnd]
+type = PlaySnd
+trigger1 =ANIMELEM=4
+value = S0,22 +(random %2)
+;volume = 0
+
+;-Ctrl para recuperar el ctrl tal como en el juego
+;-svc-chaos.
+[State 195, CtrlSet]
+type = null
+triggerALL=TIME >=30
+trigger1 =command ="holdfwd"
+trigger2 =command ="holdback"
+value = 1
+;ignorehitpause =
+;persistent =
+
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;--------------------------------------------
