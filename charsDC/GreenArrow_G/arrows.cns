@@ -1,0 +1,271 @@
+[StateDef 32000 - Kryptonite Arrow]
+type    = S
+movetype = A
+physics = S
+ctrl = 0
+anim = 3280
+velset = 0,0
+poweradd = 15
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2
+value = 173,15
+
+[State 0, Explod]
+type = Explod
+trigger1 =  animelem = 2
+anim = 3204
+ID = 3200
+pos = 0,0
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = -2
+supermovetime = 999999999999
+pausemovetime = 999999999999
+scale = 1,1
+sprpriority = 2
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 =  animelem = 7
+anim = 1040
+ID = 1040
+pos = 90,-80
+postype = p1  ;p2,front,back,left,right
+bindtime = -1
+removetime = -2
+scale = 0.6,0.6
+sprpriority = 10
+removeongethit = 1
+
+[State 200, swoosh]
+type = PlaySnd
+trigger1 = animelem = 7
+value = 173,5
+
+[State 0, Projectile]
+type = Projectile
+trigger1 = animelem = 7
+ProjID = 3224
+projanim = 3224
+projhitanim = 1015
+projremanim = 1015
+projcancelanim = 1015
+projscale = 1,1
+projremove = 1
+projremovetime = -1
+velocity = 16,0
+remvelocity = 0,0
+accel = 0,0
+velmul = 1
+projhits = 1
+projmiss = 0
+projpriority = 1
+projsprpriority = 3
+projedgebound = 40
+projstagebound = 40
+projheightbound = -240
+offset = 60,-80
+postype = p1         ;p2,front,back,left,right
+attr = S,SP        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+priority = 2,Hit   ;Hit,Miss,Dodge
+damage = 100,10
+pausetime = 3,3
+sparkno = s3244
+sparkxy = 30,0
+hitsound = s171,8
+guardsound = s3,0
+ground.type = High      ;Low,Trip,None
+ground.slidetime = 15
+ground.hittime = 15
+air.hittime = 20
+ground.velocity = -3,0
+air.velocity = -3,0
+p2stateno = 7324
+
+[State 3110, back to stance]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1 
+
+[StateDef 32002 - Boomerang Arrow]
+type    = S
+movetype = A
+physics = S
+ctrl = 0
+anim = 3280
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2
+value = 173,15
+
+; end DCvM stuff
+[State 0, Explod]
+type = Explod
+trigger1 =  animelem = 2
+anim = 3203
+ID = 3200
+pos = 0,0
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = -2
+supermovetime = 999999999999
+pausemovetime = 999999999999
+scale = 1,1
+sprpriority = 2
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 =  animelem = 7
+anim = 1040
+ID = 1040
+pos = 90,-80
+postype = p1  ;p2,front,back,left,right
+bindtime = -1
+removetime = -2
+scale = 0.6,0.6
+sprpriority = 10
+removeongethit = 1
+
+[State 200, swoosh]
+type = PlaySnd
+trigger1 = animelem = 7
+value = 173,5
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 7
+helpertype = normal ;player
+name = "fboom"
+ID = 3223
+stateno = 3223
+pos = 30,-80
+postype = p1    ;p2,front,back,left,right
+facing = 1
+ownpal = 1
+size.xscale =1
+size.yscale =1
+
+[State 3110, back to stance]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+ 
+
+[StateDef 3223 - Boomerang Arrow]
+type = A
+movetype = A
+physics = N
+anim = 3223
+ctrl = 0
+velset = 15,0
+sprpriority = 8
+juggle = 1
+
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time >= 0
+flag = noshadow
+ignorehitpause = 1
+
+
+[State 610, HitDef]
+type = HitDef
+trigger1 = time = 0
+attr = A,SA
+damage = 60,3
+animtype = medium
+guardflag = MA
+hitflag = MAFD
+priority = 3, Hit
+pausetime = 7,7
+sparkno = 0
+sparkxy = 5,0
+hitsound = s171,9
+guardsound = s3,0
+ground.type = High      ;Low,Trip,None
+ground.slidetime = 15
+ground.hittime = 25
+air.hittime = 20
+ground.velocity = -5,0
+air.velocity = -5,-3
+getpower = 0
+
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 =  time > 60
+value = 3243
+ctrl = 0
+
+[StateDef 3243 - Boomerang Arrow]
+type = A
+movetype = A
+physics = N
+anim = 3243
+ctrl = 0
+velset = -11,0
+sprpriority = 8
+juggle = 1
+
+[State 0, VelAdd]
+type = VelAdd
+triggerall = movehit
+trigger1 = 1
+x = 0.25
+
+
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time >= 0
+flag = noshadow
+ignorehitpause = 1
+
+[State 610, HitDef]
+type = HitDef
+trigger1 = timemod = 8,1
+attr = A,SA
+damage = 30,5
+animtype = medium
+guardflag = MA
+hitflag = MAFD
+priority = 3, Hit
+pausetime = 1,1
+sparkno = 0
+sparkxy = 5,0
+hitsound = s171,9
+guardsound = s3,0
+ground.type = High      ;Low,Trip,None
+ground.slidetime = 25
+ground.hittime = 25
+air.hittime = 20
+ground.velocity = -5,0
+air.velocity = -5,-3
+getpower = 0
+
+
+[State 0, ChangeState]
+type = destroyself
+trigger1 =  time > 450
+
+ 
+
+ 

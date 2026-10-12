@@ -1,0 +1,212 @@
+[Data]
+life = 1000			;Amount of life to start with
+attack = 100			;attack power (more is stronger)
+defence = 100			;defensive power (more is stronger)
+fall.defence_up = 50		;Percentage to increase defense everytime player is knocked down
+liedown.time = 60		;Time which player lies down for, before getting up
+airjuggle = 15			;Number of points for juggling
+sparkno = 2			;Default hit spark number for HitDefs
+guard.sparkno = 40		;Default guard spark number
+KO.echo = 0			;1 to enable echo on KO
+volume = 0			;Volume offset (negative for softer)
+IntPersistIndex = 50
+FloatPersistIndex = 20
+
+[Size]
+xscale = 0.9           ;Horizontal scaling factor.
+yscale = 1           ;Vertical scaling factor.
+ground.back = 12      ;Player width (back, ground)
+ground.front = 16     ;Player width (front, ground)
+air.back = 12         ;Player width (back, air)
+air.front = 16        ;Player width (front, air)
+height = 92           ;Height of player (for opponent to jump over)
+attack.dist = 160     ;Default attack distance
+proj.attack.dist = 90 ;Default attack distance for projectiles
+proj.doscale = 0      ;Set to 1 to scale projectiles too
+head.pos = 10, -105   ;Approximate position of head
+mid.pos = 0, -70     ;Approximate position of midsection
+shadowoffset = 0      ;Number of pixels to vertically offset the shadow
+draw.offset = 0,0     ;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 5           ;Walk forward
+walk.back = -4.5          ;Walk backward
+run.fwd  = 8.5, 0         ;Run forward (x, y)
+run.back = -7.8,-6.3      ;Hop backward (x, y)
+jump.neu = 0,-9.2         ;Neutral jumping velocity (x, y)
+jump.back = -3.2,-8.8     ;Jump back Speed (x, y)
+jump.fwd = 4.2,-8.8       ;Jump forward Speed (x, y)
+runjump.back = -3.55,-9.6 ;Running jump speeds (opt)
+runjump.fwd = 5,-9.2      ;.
+
+[Movement]
+airjump.num = 0      ;Number of air jumps allowed (opt)
+yaccel = .44         ;Vertical acceleration
+stand.friction = .85  ;Friction coefficient when standing
+crouch.friction = .82 ;Friction coefficient when crouching
+
+;-----------------------
+;  DCvM Template Files
+;      provided by
+;       Buyog2099
+;(based on MEE template
+;  by Kitsune Sniper)
+;         ***
+;   Thanks, Kitsune!
+;-----------------------
+
+[Statedef 800]
+type = S
+movetype= A
+physics = S
+juggle = 0
+velset = 0,0
+ctrl = 0
+anim = 0
+
+[State 800, 1]
+type = HitDef
+Trigger1 = Time = 0
+attr = S, NT
+hitflag = M
+priority = 1, Miss
+sparkno = -1
+sprpriority = 1
+p1facing = ifelse (command = "holdfwd", -1, 1)
+p2facing = 1
+p1stateno = 810
+p2stateno = 820
+fall = 1
+
+[State 800, 2]
+type = ChangeState
+Trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;----------------------------------------------------------------------
+; Throw Beam
+[Statedef 810]
+type = S
+movetype = I
+physics = N
+ctrl = 0
+anim = 810
+
+[State 810, 1]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = s191,7
+
+[State 810, 1]
+type = PlaySnd
+trigger1 = AnimElem = 4 && random <= 500
+value = s190,6 
+
+[State 810, 2]
+type = Sprpriority
+trigger1 = Animelem >= 4
+value = -1
+
+[State 810, 3]
+type = Width
+trigger1 = AnimElem = 3
+edge = 40, 0
+
+[State 810, Bind 5]
+type = TargetBind
+trigger1 = AnimElemNo(0) = 2
+pos = 30,0
+
+[State 810, 4]
+type = ChangeState
+Trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[State 810, 5]
+type = explod
+trigger1 = animelem = 3
+Anim = 7701
+postype = P1
+pos = 100, -78
+persistent = 0
+sprpriority = 5
+scale = 0.4, 1.3
+
+; Throw Beam (Opponent)
+[Statedef 820]
+type = S
+movetype = H
+physics = N
+velset = 0,0
+ctrl = 0
+
+[State 0, Explod]
+type = Explod
+trigger1 = animelem = 4
+anim = 8220+random%2
+pos = 20,-60
+postype = p1  
+facing = 1
+bindtime = -2
+sprpriority = 4
+ownpal = 0
+
+[State 810, 1]
+type = PlaySnd
+trigger1 = animelem = 4
+value = s8000,7
+
+[State 820, 1]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 820
+
+[State 820, 2]
+type = Width
+trigger1 = AnimElem = 1, >= 0
+edge = 0, 0
+
+[State 820, 3]
+type = LifeAdd
+Trigger1 = AnimElem = 4
+value = -110
+
+[State 820, 4]
+type = VelAdd
+trigger1 = time = 33
+y = -5
+
+[State 820, 4]
+type = VelAdd
+trigger1 = AnimElem = 4
+x = -10
+
+[State 820, 4]
+type = VelAdd
+trigger1 = time = 40
+y = 7
+
+[State 820, 5]
+type = EnvShake
+Trigger1 = Time = 48
+persistent = 0
+time = 20
+ampl = -5
+freq = 100
+phase = 10
+
+;In case attacker loses binding on player for any reason, this controller
+;guarantees that the player will never get stuck in this thrown state.
+[State 820, 6]
+type = SelfState
+trigger1 = time > 47
+trigger1 = !gethitvar(isbound)
+value = 5050
+
+[State 820, 7]
+type = SelfState
+trigger1 = animtime = 0
+value = 5050
+ctrl = 0

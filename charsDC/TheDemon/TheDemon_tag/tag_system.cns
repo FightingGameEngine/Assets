@@ -1,0 +1,404 @@
+
+
+
+; Entering the screen
+[Statedef 4501]
+type = A
+movetype = A
+physics = A
+anim = 42	; <- You can use the standard running animation or put another one
+sprpriority = 2
+ctrl = 0
+
+[State 4501, 1]
+type = ChangeAnim
+trigger1 = Partner, Life <= 0
+trigger1 = Anim != 4501
+value = 4501
+
+[State 4501, position]
+type = PosSet
+trigger1 = time = 0
+x = -243*facing
+y = -100
+
+
+[State 4501, velocity]
+type = VelSet
+trigger1 = Anim != 4501
+x = 14
+Y= 4
+
+[State 4501, velocity2]
+type = VelSet
+trigger1 = Anim = 4501
+trigger1 = AnimElem = 2, >= 0
+x = 24
+Y = 4
+
+[State 4501, invincibility] ; the character cannot be hit until he has fully entered on the stage
+type = NotHitBy
+trigger1 = BackEdgeBodyDist <= 0
+value = SCA
+time = 2
+
+[State 4501, invincibility] ; if partner was KOed, appear being invincible
+type = NotHitBy
+trigger1 = Partner, Life <= 0
+value = SCA
+time = 6
+
+[State 4501, screen bound] ; Prevents the camera from following the char
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 4501, attack state] ; the character attacks his opponent when :
+type = ChangeState
+triggerall = BackEdgeBodyDist >= 0	; he is on the stage
+triggerall = selfanimexist (640)					; <--- change this...
+trigger1 = partner, life > 0		; and his partner is alive
+;trigger1 = P2BodyDist X = [0, 50]           ; and his enemy is close
+trigger1 = !Win && !Lose
+;trigger1 = power >= 0
+value = 640
+ctrl = 1	
+
+
+[State 4501, 3]
+type = VelSet
+triggerall = BackEdgeBodyDist >= 0
+trigger1 = FrontEdgeBodyDist <= 0	; he has reached the other side of the screen
+trigger2 = partner, life <= 0		; his partner has just died
+trigger2 = (Time >= 50) || (P2BodyDist X = [-100, 100])
+trigger3 = P2Dist X < 0                 ; his enemy is behind him
+trigger4 = P2BodyDist X = [-100, 100]
+trigger4 = Win
+trigger5 = Win
+trigger5 = Time >= 20
+x = 0
+y = 0
+
+
+[State 4501, end state] ; the character does not attack his opponent if:
+type = ChangeState
+triggerall = BackEdgeBodyDist >= 0
+trigger1 = FrontEdgeBodyDist <= 0	; he has reached the other side of the screen
+trigger2 = Partner, Life <= 0           ; his partner has just died
+trigger2 = (Time >= 50) || (P2BodyDist X = [-100, 100])
+trigger3 = P2Dist X < 0                 ; his enemy is behind him
+trigger4 = P2BodyDist X = [-100, 100]
+trigger4 = Win
+trigger5 = Win
+trigger5 = Time >= 20
+value = 0
+ctrl = 1
+
+[State 4501, end state] ; cancel if:
+type = ChangeState
+triggerall = BackEdgeBodyDist <= 0
+trigger1 = Time >= 100
+value = 0
+ctrl = 1
+
+
+; Leaving Taunt
+;--------------
+
+[Statedef 4502] ; Define your own taunt here
+type = S
+movetype = I
+physics = S
+anim = 195
+sprpriority = -2
+velset = 0,0
+ctrl = 0
+
+;[state 4502, poweradd]
+;type = poweradd
+;trigger1 = partner, life
+;trigger1 = life
+;trigger1 = time = 0
+;value = -1000
+
+[State 4502, invincibility] ; the character cannot be hit since he is leaving
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 4502, ghost] ; Prevents the camera from following the char
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 4502, end state]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 4503
+
+[State 4502, end state] ; cancel if:
+type = ChangeState
+trigger1 = Time >= 80
+value = 4503
+
+; Leave the stage
+;----------------
+
+[Statedef 4503]
+type = S
+movetype = I
+physics = N
+anim = 40	; <- Jump Start animation
+sprpriority = -2
+ctrl = 0
+
+[State 4503, anim]
+type = ChangeAnim
+trigger1 = Anim = 40 && AnimTime = 0 ; <- plays the jump back animation when the jump start animation is finished
+value = 43
+
+[State 4503, state type]
+type = StateTypeSet
+
+trigger1 = Anim = 43 && AnimElem = 1
+statetype = A
+
+[State 4503, velocity]
+type = VelSet 
+trigger1 = Anim = 43 && AnimElem = 1 ; <- jumping back animation
+x = -12
+y = -7.5
+
+[State 4503, invincibility]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 4503, ghost]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 4503, screen bound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 4503, wait outside state]
+type = ChangeState
+trigger1 = backedgedist < -30
+value = 4504
+
+[State 4503, end state] ; cancel if: ;sludge add
+type = ChangeState
+trigger1 = Time >= 100
+value = 4504
+
+
+; Wait out of the screen
+;-----------------------
+
+[Statedef 4504]
+type = A
+movetype = I
+physics = N
+anim = 0
+velset = 0,0
+ctrl = 0
+
+[State 4504, invincibility]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 4504, ghost]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 4504, screen bound] ; Prevents the camera from following the char
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 4504, life add] ; Gains life (optional)
+type = LifeAdd
+trigger1 = (gametime%10) = 0
+value = 1
+
+[State 4504, turn] ; always face the same direction as partner
+type = turn
+trigger1 = facing != partner,facing
+
+[State 4504, position] ; always stay behind and at the same distance of the char on the stage
+type = posset
+trigger1 = 1
+x = (partner, pos x) - 1000*facing
+y = -150
+
+;---------------------------------------------------------------------------
+; Jumping in
+[Statedef 4505]
+type = A
+movetype = I
+physics = A
+anim = 40	; <- You can use the standard running animation or put another one
+sprpriority = 2
+ctrl = 0
+
+
+[State 4505, 1]
+type = ChangeAnim
+trigger1 = Partner, Life <= 0
+trigger1 = Anim != 4505
+value = 4505
+
+[State 4505, position]
+type = PosSet
+trigger1 = time = 0
+x = -243*facing
+y = -150
+
+[State 4505, velocity]
+type = VelSet
+trigger1 = Anim != 4505
+x = 8
+Y = 8
+
+[State 4505, velocity2]
+type = VelSet
+trigger1 = Anim = 4505
+trigger1 = AnimElem = 2, >= 0
+Y = 4
+x = 2
+
+[State 4505, invincibility] ; the character cannot be hit until he has fully entered on the stage
+type = NotHitBy
+
+trigger1 = BackEdgeBodyDist <= 0
+value = SCA
+time = 2
+
+[State 4505, invincibility] ; if partner was KOed, appear being invincible
+type = NotHitBy
+trigger1 = Partner, Life <= 0
+value = SCA
+time = 6
+
+[State 4505, screen bound] ; Prevents the camera from following the char
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+[State 4505, 3]
+type = VelSet
+triggerall = BackEdgeBodyDist >= 0
+trigger1 = FrontEdgeBodyDist <= 0	; he has reached the other side of the screen
+trigger2 = partner, life <= 0		; his partner has just died
+trigger2 = (Time >= 50) || (P2BodyDist X = [-100, 100])
+trigger3 = P2Dist X < 0                 ; his enemy is behind him
+trigger4 = P2BodyDist X = [-100, 100]
+trigger4 = Win
+trigger5 = Win
+trigger5 = Time >= 20
+x = 0
+y = 0
+
+[State 4505, end state] ; the character does not attack his opponent if:
+type = ChangeState
+triggerall = BackEdgeBodyDist >= 0
+trigger1 = FrontEdgeBodyDist <= 0	; he has reached the other side of the screen
+trigger2 = Partner, Life <= 0           ; his partner has just died
+trigger2 = (Time >= 50) || (P2BodyDist X = [-100, 100])
+trigger3 = P2Dist X < 0                 ; his enemy is behind him
+trigger4 = P2BodyDist X = [-100, 100]
+trigger4 = Win
+trigger5 = Win
+trigger5 = Time >= 20
+value = 4506
+ctrl = 1
+
+
+
+[State 4505, end state] ; cancel if:
+type = ChangeState
+triggerall = BackEdgeBodyDist <= 0
+trigger1 = Time >= 100
+value = 4506
+ctrl = 1
+
+
+;---------------------------------------------------------------------------
+; Landing
+[Statedef 4506]
+type = S
+movetype = I
+physics = N
+anim = 47
+sprpriority = 2
+
+ctrl = 0
+
+[State 4505, 0]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 4505, 5]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 6
+
+[State 4505, 10]
+type = ChangeState
+trigger1 = AnimTime >= 0
+value = 0
+ctrl = 1
+
+
+;---------------------------------------------------------------------------
+; Initialize (at the start of the round)
+[Statedef 5900]
+type = S
+
+[State 5900, 0] ;Clear all int variables
+type = VarRangeSet
+trigger1 = roundno = 1
+value = 0
+last = 49
+
+[State 5900, 1] ;Clear all float variables
+type = VarRangeSet
+trigger1 = roundno = 1
+fvalue = 0
+
+
+[State 5900, 7]
+type = VarSet
+triggerall = NumPartner
+trigger1 = RoundState < 2
+trigger1 = Var(51) = 0
+v = 51
+value = 1
+
+[State 5900, 10] ;Intro W/Partner
+type = TagIn
+triggerall = partner, stateno != [4502,4504]	; Partner not waiting outside the screen (thus on stage)
+triggerall = NumPartner
+triggerall = ID > Partner,ID
+trigger1 = roundno = 1
+trigger1 = Time = [0, 1]
+trigger1 = RoundState <= 2
+trigger1 = Partner, Life > 0
+trigger1 = StateNo != [4502, 4504]
+stateno = 4502
+partnerstateno = 190
+
+[State 5900, 11] ;Intro
+type = ChangeState
+trigger1 = roundno = 1
+trigger1 = !NumPartner ; partner does not exist
+value = 190
+
+

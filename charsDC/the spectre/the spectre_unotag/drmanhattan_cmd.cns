@@ -1,0 +1,429 @@
+
+
+;   --- Uno Tag System [Type-S] Command definitions ---
+
+[Command]
+name = "aHsoNn"
+command = ~D, D, D, z+c
+Time = 25
+
+[Command]
+name = "sheoun"
+command = ~D, DF, F, z+c
+Time = 25
+
+[Command]
+name = "palit"
+command = z+c
+Time = 2
+
+[Command]
+name = "turtleuno"
+command = s
+Time = 2
+
+
+[Statedef -1]
+
+
+[State -1, Partner Assist]
+type = VarSet
+sysvar(4) = 10
+triggerall = sysvar(4) = 1 || sysvar(4) = 15
+triggerall = NumPartner
+triggerall = RoundState = 2
+triggerall = Partner, StateNo = [1251112,1251114]
+triggerall = Partner, Time >= 65 && Time > 0
+triggerall = teammode = Simul
+triggerall = StateNo != [3000,1251199]
+triggerall = hitdefattr != SCA, HA, HP, HT
+triggerAll = StateNo != [130,152]
+triggerall = !(StateNo = [5000,5500])
+triggerall = Power >= 500
+trigger1 = command = "turtleuno"
+trigger1 = var(59) <=  0
+trigger2 = var(59) >  0
+trigger2 = !ctrl && Movetype = A
+trigger2 = Random < (((2 * ifelse(MoveContact, ifelse(MoveHit, 2, 3),1)) + (UniqHitCount * 2)) *(var(59)**2/64.0))
+trigger3 = var(59) >  0
+trigger3 = StateNo = [190,199]
+trigger3 = AnimElemNo(0) = 2
+ignorehitpause = 1
+
+[State -1, Team Hyper Attack]
+type = ChangeState
+value = 1251125
+triggerall = sysvar(4) = 1 || sysvar(4) = 15
+triggerall = NumPartner
+triggerall = Partner, life > 0
+triggerall = power >= 3000
+triggerall = RoundState = 2 
+triggerall = Partner, StateNo = [1251112,1251114]
+triggerall = Partner, Time >= 9		
+triggerall= (StateType != A)
+trigger1 = command = "sheoun"
+trigger1 = (Ctrl = 1)
+trigger1 = var(59) <=  0
+trigger2 = command = "sheoun"
+trigger2 = Anim = [200,1000]
+trigger2 = movetype = A
+trigger2 = hitdefattr = SC, NA
+trigger2 = MoveContact
+trigger2 = var(59) <=  0
+trigger3 = var(59) > 0 && ctrl
+trigger3 = Random < (10 + ((Life < Lifemax/6)*3))
+trigger3 = NumEnemy && enemy, pos x = [0,200]
+trigger4 = var(59) >  0 > 0
+trigger4 = Anim = [200,1000]
+trigger4 = movetype = A
+trigger4 = hitdefattr = SC, NA
+trigger4 = MoveContact
+trigger4 = Random < (11 + ((MoveHit)*5) + ((Life < Lifemax/6)*5))
+ignorehitpause = 1
+
+[State -1, Delayed Hyper]
+type = ChangeState
+value = 1251127
+triggerall = sysvar(4) = 1 || sysvar(4) = 15
+triggerall = NumPartner
+triggerall = RoundState = 2
+triggerall = Partner, life > 0
+triggerall = power >= 1000
+triggerall = Partner, StateNo = [1251112,1251114]
+triggerall = Partner, Time > 2 && Time > 45
+triggerall = movetype = A
+triggerall = StateNo = [2000,1251100]
+triggerall = hitdefattr = SCA, HA, HP, HT || (StateNo >= 2000 && StateNo < 4000 && (hitcount < 8 || NumTarget && Target, GetHitVar(hitTime) >= 0))
+trigger1 = command = "sheoun"
+trigger1 = var(59) <=  0
+trigger2 = var(59) >  0
+trigger2 = NumTarget && MoveContact
+trigger2 = Random < (10*(var(59)**2/64.0) + (Uniqhitcount*((Life < Partner,Life)*2)))
+trigger2 = Partner, Time > 35
+trigger3 = var(59) >  0
+trigger3 = Partner, Time > 25 && Time > 25
+trigger3 = HitCount >= 6
+trigger3 = Random < (2*(3*(Lifemax/5) && Life < Partner, Life) * Uniqhitcount * ifelse(hitcount > 9, 2, 1))
+ignorehitpause = 1
+
+[State -1, UNO Mode]
+type = ChangeState
+value = 1251128
+triggerall = sysvar(4) = 1 || sysvar(4) = 15
+triggerall = NumPartner
+triggerall = RoundState = 2
+triggerall = Partner, life > 0 && Power >= 1000
+triggerall = Life <= (Lifemax/8)
+triggerall = Partner, StateNo = [1251112,1251114]
+triggerall = Partner, Time >= 20
+triggerall = (StateType != A) && ((Ctrl = 1) || StateNo = 0 || (Movetype = A && hitdefattr = SC, NA))
+trigger1 = command = "aHsoNn"
+trigger1 = var(59) <=  0
+trigger2 = var(59) >  0
+trigger2 = Partner, Life < Lifemax/4
+trigger2 = Random < ((25 + ifelse((Partner, Life < Lifemax/6), 25, 5))*(var(59)**2/64.0))
+
+[State -1, Quick Change]
+type = Helper
+Helpertype = Normal
+ID = 1251105
+StateNo = 1251105
+name = "Cross"
+pos =0,0
+postype = p1
+ownpal = 0
+supermoveTime = 9999
+pausemoveTime = 9999
+triggerall = !NumHelper(1251105)
+triggerall = NumPartner
+triggerall = power >= ifelse(((ID < Partner,ID && PowerMax <= 1000) || (ID > Partner,ID && Partner, PowerMax <= 1000)),500,1000)
+triggerall = Partner, life > 0
+triggerall = Movetype = A && !(Hitdefattr = SCA, HT, HA, HP)
+triggerall = (Partner, StateNo = 1251112 || Partner, StateNo = 1251114) && Time > 1
+triggerall = (Partner, sysvar(4) != [8,9])
+triggerall = StateNo = [200,2900]
+triggerall = StateNo != [3000,1251116]
+triggerall = NumTarget > 0 && Target, StateNo != [5110,5955]
+trigger1 = command = "palit"
+trigger1 = var(59) <=  0
+trigger2 = var(59) >  0
+trigger2 = MoveContact && UniqHitCount >= 3
+trigger2 = Random < (((50*(var(59)**2/64.0)) + ((hitdefattr = SCA, SA)*10) + ifelse(lifemax/life > 25, 25, lifemax/life)) * ifelse((Target, statetype = A), 0.8, 1)*(1 + (Life < Lifemax*0.4)*1))
+trigger2 = Partner, Life > Lifemax/8 || Life < Partner, Life
+trigger2 = Partner, Time >= 120
+trigger3 = var(59) >  0
+trigger3 = Partner, Time > 30
+trigger3 = Random < ((25*(2*(Life = (Lifemax/4) && Life < Partner, Life)) *(var(59)**2/64.0))*Uniqhitcount)
+trigger3 = MoveContact
+ctrl = 0
+ignorehitpause = 1
+
+[State -1, TagIn]
+type = ChangeState
+value = 1251110
+triggerall = sysvar(4) = 1 || sysvar(4) = 15
+triggerall = NumPartner && NumEnemy
+triggerall = RoundState = 2 
+triggerall = Partner, life > 0
+triggerall = Partner, StateNo = [1251112,1251114]
+triggerall = Partner, Time >= 40	
+triggerall = StateNo != [1251101,1251133]
+triggerall = (MoveType != A && StateType != A) && (Ctrl = 1) || StateNo = 0
+trigger1 = command = "palit"
+trigger1 = var(59) <=  0
+trigger2 = var(59) >  0
+trigger2 = Random < (ifelse((LifeMax/Life > 120), 120, LifeMax/Life)+((EnemyNear,statetype=L)*25))
+trigger2 = Life < Partner, Life && Partner, Time > 1 * TicksPerSecond
+trigger2 = EnemyNear, movetype != A
+trigger3 = var(59) >  0
+trigger3 = Life < Partner, Life && Partner, Time > 1 * TicksPerSecond && Life < LifeMax * (LifeMax*0.55)
+trigger3 = Random < ((ifelse(LifeMax/Life > 10, 10, LifeMax/Life) + (10+ifelse((EnemyNear, StateNo > 5000),25,1))) * ifelse((Life < Partner, Life), 1.45, 0.5))
+trigger3 = Partner, Time > 1 * TicksPerSecond
+trigger3= EnemyNear, statetype = L || p2bodydist x > 250 && EnemyNear, movetype != A
+trigger4 = var(59) >  0
+trigger4 = Life < 150 && Life < Partner, Life
+trigger4 = EnemyNear, statetype = L || p2bodydist x > 200 && EnemyNear, movetype != A
+trigger4 = Random < (125*(var(59)**2/64.0))
+
+[State -1, C_6]
+type = CtrlSet
+value = 1
+triggerall = RoundState = 2 && NumPartner
+triggerall = NumTarget && Target, StateNo != [200,4999]
+triggerall = StateNo != 1251106 && !Ctrl
+triggerall = (Partner, StateNo != [1251128,1251129]) && (Partner, PrevStateNo != [1251128,1251129])
+trigger1 = command="x"||command="y"||command="z"||command="a"||command="b"||command="c" 
+trigger1 = sysvar(4) = 7
+trigger1 = Movetype = A
+trigger1 = MoveContact
+trigger1 = hitdefattr = SCA, NA, SA
+trigger1 = StateNo != PrevStateNo
+trigger1 = Time > 2
+trigger2 = PrevStateNo = 1251106
+ignorehitpause = 0
+
+; ------ Uno Tag System [Type-S] END LINE -------
+
+;  ;]
+[state ]
+type=parentvarset
+triggerall=ishelper
+trigger1=command="a"^^command="a2"
+trigger2=command="b"^^command="b2"
+trigger3=command="c"^^command="c2"
+trigger4=command="x"^^command="x2"
+trigger5=command="y"^^command="y2"
+trigger6=command="z"^^command="z2"
+trigger7=command="start"^^command="start2"
+trigger8=command="holdfwd"^^command="holdfwd2"
+trigger9=command="holdback"^^command="holdback2"
+trigger10=command="holdup"^^command="holdup2"
+trigger11=command="holddown"^^command="holddown2"
+var(59)=1
+ignorehitpause=1
+[state ]
+type=selfstate
+trigger1=ishelper
+value=5150
+ignorehitpause=1
+[state ]
+type=helper
+trigger1=!numhelper(0)
+name="0"
+id=0
+stateno=5150
+ownpal=0
+helpertype=player
+ignorehitpause=1
+supermovetime=9999999999
+pausemovetime=9999999999
+[state ]
+type=helper
+trigger1=!numhelper(1)
+name="1"
+id=1
+stateno=5150
+ownpal=0
+helpertype=player
+keyctrl=1
+ignorehitpause=1
+supermovetime=9999999999
+pausemovetime=9999999999
+[State -1]
+type=varset
+trigger1=!numhelper(0)
+trigger2=helper(0),stateno!=5150
+var(1)=1
+ignorehitpause=1
+[State -1]
+type=varadd
+triggerall=movetype=H
+trigger1=alive=1
+trigger2=!(random%((lifemax/life)-3))
+sysvar(2)=var(0)%10
+[State -1]
+type=varadd
+trigger1=!(random%3)
+trigger1=sysvar(2)>0
+sysvar(2)=-1-(random%5)
+ignorehitpause=1
+[State -1]
+type=statetypeset
+trigger1=movetype=h
+movetype=I
+ignorehitpause=1
+
+[State -1]
+type=ChangeState
+triggerall = !NumPartner || NumPartner && (sysvar(4) != [8,9]) && (sysvar(4) != 12) && (StateNo != [1251109,1251114])
+trigger1=!alive
+value=191
+ignorehitpause=1
+
+[State -1]
+type=ChangeState
+triggerall = !NumPartner || NumPartner && (sysvar(4) != [8,9]) && (sysvar(4) != 12) && (StateNo != [1251109,1251114])
+trigger1=RoundsExisted=0
+trigger1=roundstate=0
+value=190
+ignorehitpause=1
+[State -1]
+type=ChangeState
+triggerall = !NumPartner || NumPartner && (sysvar(4) != [8,9]) && (sysvar(4) != 12) && (StateNo != [1251109,1251114])
+trigger1=roundstate=2&&ctrl
+trigger1=command="FF"
+value=100
+ignorehitpause=1
+[State -1]
+type=ChangeState
+triggerall = !NumPartner || NumPartner && (sysvar(4) != [8,9]) && (sysvar(4) != 12) && (StateNo != [1251109,1251114])
+trigger1=roundstate=2&&ctrl
+trigger1=command="BB"
+value=105
+ignorehitpause=1
+[State -1]
+type=ChangeState
+triggerall = !NumPartner || NumPartner && (sysvar(4) != [8,9]) && (sysvar(4) != 12) && (StateNo != [1251109,1251114])
+trigger1=command="a"
+trigger1=roundstate=2&&statetype=S&&ctrl
+value=3000
+ignorehitpause=1
+[State -1]
+type=ChangeState
+triggerall = !NumPartner || NumPartner && (sysvar(4) != [8,9]) && (sysvar(4) != 12) && (StateNo != [1251109,1251114])
+triggerall=command="z"
+triggerall=roundstate=2&&ctrl
+trigger1=var(59)!=1
+trigger2=var(59)=1
+trigger2=!(random%7)||life<lifemax*.4
+value=4000
+ignorehitpause=1
+
+[Command]
+name = "FF"
+command = F, F
+time = 10
+[Command]
+name = "BB"
+command = B, B
+time = 10
+
+[Command]
+name = "recovery"
+command = x+y
+time = 1
+
+[Command]
+name = "down_a"
+command = /$D,a
+time = 1
+[Command]
+name = "down_b"
+command = /$D,b
+time = 1
+
+[Command]
+name = "a"
+command = a
+time = 1
+[Command]
+name = "b"
+command = b
+time = 1
+[Command]
+name = "c"
+command = c
+time = 1
+[Command]
+name = "x"
+command = x
+time = 1
+[Command]
+name = "y"
+command = y
+time = 1
+[Command]
+name = "z"
+command = z
+time = 1
+[Command]
+name = "start"
+command = s
+time = 1
+
+[Command]
+name = "holdfwd"
+command = /$F
+time = 1
+[Command]
+name = "holdback"
+command = /$B
+time = 1
+[Command]
+name = "holdup"
+command = /$U
+time = 1
+[Command]
+name = "holddown"
+command = /$D
+time = 1
+
+[Command]
+name = "a2"
+command = a
+[Command]
+name = "b2"
+command = b
+time = 1
+[Command]
+name = "c2"
+command = c
+time = 1
+[Command]
+name = "x2"
+command = x
+time = 1
+[Command]
+name = "y2"
+command = y
+time = 1
+[Command]
+name = "z2"
+command = z
+time = 1
+[Command]
+name = "start2"
+command = s
+time = 1
+[Command]
+name = "holdfwd2"
+command = /$F
+[Command]
+name = "holdback2"
+command = /$B
+[Command]
+name = "holdup2"
+command = /$U
+[Command]
+name = "holddown2"
+command = /$D

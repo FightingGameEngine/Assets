@@ -1,0 +1,672 @@
+;---------------------------------------------------------------------------
+; Crouching Strong Punch
+[Statedef 8000]
+type    = C
+movetype= A
+physics = C
+juggle  = 6
+poweradd= 50
+ctrl = 0
+anim = 420
+
+[State 420, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5 
+value = 220, 0
+
+[State 226, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+value = 0, 9
+
+[State 420, Hitdef]
+type = HitDef
+trigger1 = AnimElem = 3
+attr = SC, NA
+animtype  = Heavy
+damage    = (1000.0/160.0)*(9.0)
+guardflag = MA
+hitflag = MAF
+priority = 6
+pausetime = 12,12
+sparkno = S6013
+guard.sparkno = S6019
+sparkxy = -35,-70
+hitsound = s220,1
+guardsound = s120,1
+ground.type = High
+ground.slidetime = 20
+ground.hittime  = 15
+ground.velocity = -.5
+air.velocity = -1,-3
+fall.recover = 0
+
+[State 420, Hitdef]
+type = HitDef
+trigger1 = AnimElem = 4
+attr = SC, NA
+animtype  = Heavy
+damage    = ifelse((Hitcount < 1),(1000.0/160.0)*(5.0),(1000.0/160.0)*(4.0))	
+guardflag = MA
+hitflag = MAF
+priority = 6
+pausetime = 12,12
+sparkno = S6013
+guard.sparkno = S6019
+sparkxy = -35,-70
+hitsound = s220,1
+guardsound = s120,1
+ground.type = High
+ground.slidetime = 20
+ground.hittime  = 15
+ground.velocity = -1,-8 
+air.velocity = -1,-6
+fall.recover = 0
+fall = 1
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 8011
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 8011]
+type    = S
+physics = S
+ctrl = 0
+anim = 0
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 52, 4]
+type = ChangeState
+trigger1 = Time = 10
+value = 8001
+
+;---------------------------------------------------------------------------
+; Chariot Tackle_A
+[Statedef 8001]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+poweradd= 65
+ctrl = 0
+velset = 0,0
+anim = 1200
+
+[State 1200, Explod] 
+type = Explod
+trigger1 = animelem = 2
+anim = 6007
+pos = 0, 0
+facing = 1
+scale = 1, 1
+
+[State 1200, Velset]
+type = Velset
+trigger1 = animelem = 2
+x = 20
+
+[State 1200, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = 1200, 0
+volume = 255
+
+[State 1200, Hitdef]
+type = HitDef
+trigger1 = Time = 0
+attr = S, SA
+animtype  = Heavy
+damage    = (1000.0/160.0)*(16.0),(1000.0/160.0)*(1.0)
+guardflag = MA
+hitflag = MAF
+priority = 6
+pausetime = 12,11
+sparkno = S6014
+guard.sparkno = S6018
+sparkxy = -10,-70
+hitsound = s220,1
+guardsound = s120,1
+ground.type = High
+ground.slidetime = 20
+ground.hittime  = 15
+ground.velocity = -8
+air.velocity = -6,-6.5
+air.fall = 1
+fall.recover = 0
+guard.velocity = -12*1.3
+airguard.velocity = -8*1.3
+ground.cornerpush.veloff = -30
+air.cornerpush.veloff = -20
+sprpriority = -2
+
+[State 1200, VarSet]
+type = VarSet
+trigger1 = Animtime = 0
+var(37) = 0
+
+[State 1200, Changestate]
+type = ChangeState
+trigger1 = MoveHit
+value = 8003
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 1200, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Aegis Reflector
+[Statedef 8003]
+type    = S
+movetype= A
+physics = S
+poweradd= -1000
+ctrl = 0
+velset = 0,0
+anim = 3000
+
+[State 3030, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = 3000, 1
+volume = 255
+
+[State 3030, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = 3000, 0
+
+[State 3030, Explod]
+type = Explod
+trigger1 = time = 0
+removetime = -2
+id = 6015
+anim = 6015
+pos = 0, -90
+postype = p1
+sprpriority = 3
+facing = -1
+ownpal = 1
+bindtime = 1
+supermove = 1
+ontop = 1
+ignorehitpause = 1
+removeongethit = 1
+
+[State 3030, Explod]
+type = Explod
+trigger1 = time = 30
+removetime = -2
+id = 6016
+anim = 6016
+pos = 150, floor(screenpos y)-27
+postype = left
+sprpriority = 3
+facing = -1
+ownpal = 1
+bindtime = 1
+supermove = 1
+ontop = 1
+ignorehitpause = 1
+removeongethit = 1
+
+[State 3030, Explod]
+type = Explod
+trigger1 = time = 42
+removetime = -2
+id = 6017
+anim = 6017
+pos = 20, 0
+postype = p1
+sprpriority = 3
+facing = -1
+ownpal = 1
+bindtime = 1
+supermove = 1
+ontop = 1
+ignorehitpause = 1
+removeongethit = 1
+
+[State 3030, SuperPause]
+type = SuperPause
+trigger1 = animelem = 1
+pos = 10, -30
+movetime = 50
+time = 51
+anim = -1
+
+[State 3030, Helper] 
+type = Helper
+trigger1 = Animelem = 12
+name = "Aegis Reflector"
+anim = 3006
+Stateno = 3006
+pos = 0, 0
+facing = 1 
+bindtime = -1
+sprpriority = 3
+ownpal = 1
+
+[State 3030, VarSet]
+type = VarSet
+trigger1 = Time = 0
+var(15) = 0
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 3030, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 8012
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 8012]
+type    = S
+physics = S
+ctrl = 0
+anim = 0
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 52, 4]
+type = ChangeState
+trigger1 = Time = 10
+value = 8004
+
+;---------------------------------------------------------------------------
+; Chariot Tackle_C
+[Statedef 8004]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+poweradd= 65
+ctrl = 0
+velset = 0,0
+anim = 1202
+
+[State 1202, Explod] 
+type = Explod
+trigger1 = animelem = 2
+anim = 6007
+pos = 0, 0
+facing = 1
+scale = 1, 1
+
+[State 1202, Velset]
+type = VelSet
+trigger1 = animelem = 3
+x = 33
+
+[State 1202, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = 1200, 0
+volume = 255
+
+[State 1202, Width]
+type = Width
+trigger1 = Time >= 2
+value = 5,0
+
+[State 1201, Hitdef]
+type = HitDef
+trigger1 = Time = 0
+attr = S, SA
+animtype  = Heavy
+damage    = (1000.0/160.0)*(20.0),(1000.0/160.0)*(1.0)
+guardflag = MA
+hitflag = MAF
+priority = 6
+pausetime = 12,12
+sparkno = S6014
+guard.sparkno = S6018
+sparkxy = -10,-70
+hitsound = s220,1
+guardsound = s120,1
+ground.type = High
+ground.slidetime = 20
+ground.hittime  = 25
+ground.velocity = -6
+air.velocity = -6,-6.5
+air.fall = 1
+fall.recover = 0
+guard.velocity = -12*1.3
+airguard.velocity = -8*1.3
+ground.cornerpush.veloff = -30
+air.cornerpush.veloff = -20
+sprpriority = -2
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 1202, Changestate]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 8005
+
+;---------------------------------------------------------------------------
+; Violence Knee Drop_C
+[Statedef 8005]
+type    = A
+movetype= A
+physics = S
+juggle  = 4
+velset = 0,0
+ctrl = 0
+poweradd = 25
+sprpriority = 2
+anim = 1002
+
+[State 1000, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 12 
+value = 1000, 0
+volume = 255
+
+[State 1000, Velset]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+y = -10
+
+[State 1000, Velset]
+type = VelSet
+trigger1 = animelem = 12
+x = 30
+y = 6
+
+[State 1000, Hitdef]
+type = HitDef
+trigger1 = Time = 0
+attr = S, SA
+damage = (1000.0/160.0)*(15.0),(1000.0/160.0)*(1.0)
+animtype = Heavy
+guardflag = HA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 6, 8
+sparkno = S6014
+sparkxy = 0, -60
+hitsound = S220,1
+guardsound = S5,1
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 20
+ground.velocity = -3,6
+airguard.velocity = -2,-1
+air.type = High
+air.velocity = -2,6
+fall = 1
+
+[State 1000, Vel]
+type = VelAdd
+trigger1 = 1
+y = .40
+
+[State 1000, Changestate]
+type = ChangeState
+trigger1 = time > 15
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 8006
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 1000, Changestate]
+type = ChangeState
+trigger1 = movecontact
+value = 1003
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 8006]
+type    = S
+physics = S
+ctrl = 0
+anim = 47
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 52, 4]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 8007
+
+;---------------------------------------------------------------------------
+; Dash
+[Statedef 8007]
+type = S
+physics = N
+velset = 0,0
+ctrl = 0
+
+[State 50, 0]
+type = Turn
+trigger1 = Time = 0
+trigger1 = p2dist X < -5
+
+[State 100, 0]
+type = ChangeState
+trigger1 = time = 0
+value = 8008
+
+;---------------------------------------------------------------------------
+; Dash (Continue)
+[Statedef 8008]
+type    = A
+physics = N
+
+[State 50, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 100
+
+[State 100, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 2 
+value = 100, 0
+
+[State 105, 1]
+type = VelSet
+trigger1 = Animelem = 2
+x = 5.5
+y = -3.5
+
+[State 255, Gravity]
+type = VelAdd
+trigger1 = Animelem = 3, >= 0
+x = .04
+y = .7
+
+[State 220, 5]
+type = ChangeState
+trigger1 = Time > 5
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 8009
+
+;---------------------------------------------------------------------------
+; Dash (Continue)
+[Statedef 8009]
+type    = S
+physics = N
+sprpriority = 1
+anim = 101
+
+[State 100, PosSet]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 100, VelSet]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+y = 0
+
+[State 100, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 420, Changestate]
+type = ChangeState
+trigger1 = Animtime = 0
+trigger1 = P2Life = 0
+value = 0
+ctrl = 1
+
+[State 52, 4]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 8010
+
+;---------------------------------------------------------------------------
+; Chariot Tackle_C
+[Statedef 8010]
+type    = S
+movetype= A
+physics = S
+juggle  = 3
+poweradd= 65
+ctrl = 0
+velset = 0,0
+anim = 1202
+
+[State 1202, Explod] 
+type = Explod
+trigger1 = animelem = 2
+anim = 6007
+pos = 0, 0
+facing = 1
+scale = 1, 1
+
+[State 1202, Velset]
+type = VelSet
+trigger1 = animelem = 3
+x = 33
+
+[State 1202, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+value = 1200, 0
+volume = 255
+
+[State 1202, Width]
+type = Width
+trigger1 = Time >= 2
+value = 5,0
+
+[State 1201, Hitdef]
+type = HitDef
+trigger1 = Time = 0
+attr = S, SA
+animtype  = Heavy
+damage    = (1000.0/160.0)*(20.0),(1000.0/160.0)*(1.0)
+guardflag = MA
+hitflag = MAF
+priority = 6
+pausetime = 12,12
+sparkno = S6014
+guard.sparkno = S6018
+sparkxy = -10,-70
+hitsound = s220,1
+guardsound = s120,1
+ground.type = High
+ground.slidetime = 20
+ground.hittime  = 25
+ground.velocity = -6
+air.velocity = -6,-6.5
+air.fall = 1
+fall.recover = 0
+guard.velocity = -12*1.3
+airguard.velocity = -8*1.3
+ground.cornerpush.veloff = -30
+air.cornerpush.veloff = -20
+sprpriority = -2
+
+[State 1202, Changestate]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1

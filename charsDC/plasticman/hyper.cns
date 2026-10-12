@@ -1,0 +1,156 @@
+;Plastic Ball by Ryou Win
+;---------------------------------------------------------------------------
+[Statedef 3000]
+type    = A
+movetype= A
+physics = N
+juggle  = 4
+;poweradd= 110
+velset = 0,0
+ctrl = 0
+poweradd = 100;ifelse(PrevStateNo = 9000, 0, 100)                    ;Power to add (Def: 0)
+anim = 3001
+;sprpriority = 2                  ;Set layering priority to 2 (in front)
+
+;Super Portrait by  Buyog
+;----------
+[State 3000, super portrait]
+type = Explod
+trigger1 = animelem = 1
+anim = 10000
+ID = 10000
+pos = 0,0
+postype = back
+bindtime = 999
+removetime = 40
+supermove = 40
+pausemovetime = 40
+sprpriority = -1
+ownpal = 1
+
+[State 3000, super bg]
+type = Explod
+trigger1 = animelem = 1
+anim = 10005
+ID = 10005
+pos = 0,0
+postype = back
+bindtime = 999
+removetime = 40
+supermove = 40
+pausemovetime = 40
+sprpriority = -2
+ownpal = 1
+
+[State 3000, sound]
+type = PlaySnd
+trigger1 = Time = 2
+value = 3000, 0
+
+;----------
+
+[State 1000, 0]
+type = ChangeState
+trigger1 = Time = 21
+value = 3001
+
+[Statedef 3001]
+type    = A
+movetype= A
+physics = N
+juggle  = 4
+;poweradd= 110
+velset = 6,5
+ctrl = 0
+poweradd = 100;ifelse(PrevStateNo = 9000, 0, 100)                    ;Power to add (Def: 0)
+anim = 3000
+;sprpriority = 2                  ;Set layering priority to 2 (in front)
+
+[State 1000, 1]; virar
+type = Turn
+trigger1 = time = 0
+trigger1 = p2dist X < -5
+
+[State 200, 1]
+type = HitDef
+trigger1 = (time%6)=0;!movecontact
+attr = S, HA                     ;Attribute: Standing, Normal Attack
+damage = 23, 9                   ;Damage that move inflicts, guard damage
+animtype = Light                 ;Animation type: Light, Medium, Heavy, Back (def: Light)
+guardflag = MA                   ;Flags on how move is to be guarded against
+hitflag = MAF                    ;Flags of conditions that move can hit
+priority = 3, Hit                ;Attack priority: 0 (least) to 7 (most), 4 default
+;Hit/Miss/Dodge type (Def: Hit)
+pausetime = 8, 8                 ;Time attacker pauses, time opponent shakes
+sparkno = 0                      ;Spark anim no (Def: set above)
+sparkxy = -10, -36               ;X-offset for the "hit spark" rel. to p2,
+;Y-offset for the spark rel. to p1
+hitsound = 1,1;5, 0                  ;Sound to play on hit
+guardsound = 6, 0                ;Sound to play on guard
+ground.type = High               ;Type: High, Low, Trip (def: Normal)
+ground.slidetime = 5             ;Time that the opponent slides back
+ground.hittime  = 12             ;Time opponent is in hit state
+ground.velocity = -4             ;Velocity at which opponent is pushed
+airguard.velocity = -1.9,-.8     ;Guard velocity in air (def: (air.xvel*1.5, air.yvel/2))
+air.type = High                  ;Type: High, Low, Trip (def: same as ground.type)
+air.velocity = -1.4,-3           ;X-velocity at which opponent is pushed,
+;Y-velocity at which opponent is pushed
+air.hittime = 12                 ;Time before opponent regains control in air
+
+[State 3000, Super A]
+type = SuperPause
+trigger1 = time = 0;1;AnimElem = 2, 1
+pos = 0, -57
+anim = 100
+sound = 20, 0
+poweradd = -1000
+time =50
+movetime =0;48
+
+[State 1014, 0]
+type = AfterImage
+trigger1 = (time%30) = 0
+time = 30
+TimeGap  = 1
+FrameGap = 2
+length = 6
+PalBright   = 0,0,0
+PalContrast = 128,128,128;190
+PalAdd      = 0,0,0
+PalMul      = 1,1,1
+trans = add1
+
+[State 3000, Super D]
+type = ScreenBound;NotHitBy
+trigger1 = anim=3000;time = 0;1;AnimElem = 2
+value = 0;SCA;, NA, SA, AT
+;time = 12
+
+[State 50, 1]
+type = ChangeAnim
+trigger1 = anim = 3000 && time=300
+value = 43
+
+[State 50, 2]
+type = velset
+trigger1 = anim = 43 && time=300
+x=-3
+y=-2.5
+
+[State 50, 3]
+type = velset
+trigger1 = BackEdgeBodyDist < 1 && vel x < 0
+trigger2 = FrontEdgeBodyDist < 1 && vel x > 0
+x= (vel x)*-1.1
+
+[State 50, 3]
+type = velset
+trigger1 = ScreenPos Y > 239 && vel y > 0
+trigger2 = ScreenPos Y < 40 && vel y < 0
+y= (vel y)*-1.005
+
+[State 1000, 7]
+type = ChangeState
+trigger1 = Anim = 43; && vel y > 2
+value = 50
+ctrl = 0

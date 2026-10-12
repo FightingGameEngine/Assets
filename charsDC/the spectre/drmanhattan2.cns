@@ -1,0 +1,2753 @@
+[Statedef 0]
+type=S
+physics=S
+sprpriority=0
+ctrl=1
+[State ]
+type=ChangeState
+trigger1=ctrl
+trigger1=command="holdup"
+value=40
+ignorehitpause=1
+[State ]
+type=ChangeState
+trigger1=ctrl
+trigger1=command="holdback"||command="holdfwd"
+value=20
+ignorehitpause=1
+[State ]
+type=ChangeAnim
+trigger1=Anim!=0
+value=0
+[State ]
+type=VelSet
+trigger1=vel y
+y=0
+[State ]
+type=VelSet
+trigger1=abs(vel x)<2
+x=0
+[State ]
+type=ChangeState
+trigger1=win&&roundstate=4
+value=180
+[State ]
+type=ChangeState
+trigger1=!alive
+value=5050
+[statedef 180]
+[State ]
+type=ChangeAnim
+trigger1=win&&roundstate=4
+trigger1=anim!=180
+value=180
+[State ]
+type=PlaySND
+trigger1=animelemtime(1)=60
+value=180,random%3
+channel=-1
+volume=180
+;---------------------------------------------------------------------------
+[Statedef 40]
+type=S
+physics=S
+ctrl=0
+sprpriority=1
+[State ]
+type=ChangeAnim
+trigger1=Anim!=40
+value=40
+[State 40, 1]
+type=VarSet
+trigger1=AnimElemTime(1)=0
+sysvar(1)=0
+[State 40, 2]
+type=VarSet
+trigger1=command="holdfwd"||command="holdback"
+sysvar(1)=1-(command="holdback"*2)
+[State 40, 4]
+type=VelSet
+trigger1=AnimTime=0
+x=ifelse(sysvar(1)=0, const(velocity.jump.neu.x), ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))
+y=const(velocity.jump.y)
+[State 40, 6]
+type=ChangeState
+trigger1=AnimTime=0
+value=50
+ctrl=1
+;---------------------------------------------------------------------------
+[Statedef 41]
+type=u
+physics=A
+[State ]
+type=ChangeState
+trigger1=1
+value=50
+[Statedef 42]
+type=u
+physics=A
+[State ]
+type=ChangeState
+trigger1=1
+value=50
+[Statedef 43]
+type=u
+physics=A
+[State ]
+type=ChangeState
+trigger1=1
+value=50
+;---------------------------------------------------------------------------
+; Jump Up
+[Statedef 50]
+type=A
+physics=A
+[State 50, 2]
+type=ChangeAnim
+trigger1=Anim!=[41,43]
+value=ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+[State 50, 1]
+type=VarSet
+trigger1=AnimElemTime(1)=0
+sysvar(1)=0
+;---------------------------------------------------------------------------
+; Jump Down (empty state for compatibility)
+[Statedef 51]
+type    = A
+physics = A
+[State 51, 1]
+type = Null
+trigger1 = 1
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 52]
+type=S
+physics=S
+ctrl=0
+anim=52
+[State 音]
+type = PlaySnd
+trigger1=AnimElemTime(1)=0
+persistent = 0
+value = 40,1
+volume = 60
+channel = -1
+lowpriority = 0
+freqmul = 1
+loop = 0
+pan = 0
+[State 52, 1]
+type=VelSet
+trigger1=AnimElemTime(1)=0
+y=0
+[State 52, 2]
+type=PosSet
+trigger1=AnimElemTime(1)=0
+y=0
+[State 52, 4]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+;---------------------------------------------------------------------------
+[statedef 10]
+[state ]
+type=changestate
+trigger1=1
+value=0
+ctrl=1
+ignorehitpause=1
+[statedef 11]
+[state ]
+type=changestate
+trigger1=1
+value=0
+ctrl=1
+ignorehitpause=1
+[statedef 12]
+[state ]
+type=changestate
+trigger1=1
+value=0
+ctrl=1
+ignorehitpause=1
+;---------------------------------------------------------------------------
+[Statedef 20]
+type=S
+physics=S
+sprpriority=0
+[State ]
+type=VelSet
+trigger1=command="holdfwd"
+x=const(velocity.walk.fwd.x)
+[State ]
+type=VelSet
+trigger1=command="holdback"
+x=const(velocity.walk.back.x)
+[State ]
+type=ChangeAnim
+trigger1=Anim=100
+value=20
+elemno=animelemno(0)
+[State ]
+type=ChangeAnim
+trigger1=Anim=105
+value=21
+elemno=animelemno(0)
+[State ]
+type=ChangeAnim
+trigger1=vel x>0
+trigger1=Anim!=20
+value=20
+[State ]
+type=ChangeAnim
+trigger1=vel x<0
+trigger1=Anim!=21
+value=21
+[State ]
+type=ChangeState
+trigger1=command="holdup"
+value=40
+[State ]
+type=ChangeState
+trigger1=command!="holdfwd"
+trigger1=command!="holdback"
+value=0
+ctrl=1
+;---------------------------------------------------------------------------
+[Statedef 21]
+type=S
+physics=S
+sprpriority=0
+[State ]
+type=VelSet
+trigger1=command="holdback"
+x=const(velocity.walk.back.x)
+[State ]
+type=ChangeAnim
+trigger1=Anim=105
+value=21
+elemno=animelemno(0)
+[State ]
+type=ChangeAnim
+trigger1=Anim!=21
+value=21
+[State ]
+type=ChangeState
+trigger1=command="holdup"
+value=40
+[State ]
+type=ChangeState
+trigger1=command!="holdback"
+value=0
+ctrl=1
+;---------------------------------------------------------------------------
+[statedef 120]
+[state ]
+type=changestate
+trigger1=ishelper(2)
+value=3010
+[Statedef 5000]
+[state ]
+type=null
+trigger1=1
+[Statedef 5001]
+[state ]
+type=null
+trigger1=1
+[Statedef 5010]
+[state ]
+type=null
+trigger1=1
+[Statedef 5011]
+[state ]
+type=null
+trigger1=1
+[Statedef 5020]
+[state ]
+type=null
+trigger1=1
+[Statedef 5030]
+[state ]
+type=null
+trigger1=1
+[Statedef 5035]
+[state ]
+type=null
+trigger1=1
+[Statedef 5040]
+[state ]
+type=null
+trigger1=1
+[Statedef 5050]
+[state ]
+type=null
+trigger1=1
+[Statedef 5070]
+[state ]
+type=null
+trigger1=1
+[Statedef 5071]
+[state ]
+type=null
+trigger1=1
+[Statedef 5080]
+[state ]
+type=null
+trigger1=1
+[Statedef 5081]
+[state ]
+type=null
+trigger1=1
+[Statedef 5100]
+[state ]
+type=null
+trigger1=1
+[Statedef 5101]
+[state ]
+type=null
+trigger1=1
+[Statedef 5110]
+[state ]
+type=null
+trigger1=1
+[Statedef 5120]
+[state ]
+type=null
+trigger1=1
+[Statedef 5200]
+[state ]
+type=null
+trigger1=1
+[Statedef 5201]
+[state ]
+type=null
+trigger1=1
+[Statedef 5210]
+[state ]
+type=null
+trigger1=1
+;---------------------------------------------------------------------------
+;==============================================================================
+;AliveOverride
+[Statedef 999]
+[state ]
+type=PlaySND
+trigger1=1
+value=200,0
+volume=75
+channel=5
+ignorehitpause=1
+[state ]
+type=lifeset
+trigger1=1
+value=1
+ignorehitpause=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+[state ]
+type=null
+trigger1=1
+ignorehitpause=1
+[state 554]
+type=changestate
+trigger1=1
+value=191
+ignorehitpause=1
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;Nachel氏NACH04_Reimuより
+;■■■■■■■■■■■■■■■■■■■■■■■■■
+;	[エフェクト]霊撃エフェクト - 輪
+;--------------------------------------------------
+;各Animについて
+;30000		高速ジャンプエフェクト
+;
+;各Varについて（St30100独自）
+;  Var( 1)	フェードアウト
+;  Var( 2)	拡大率
+; FVar( 1)	拡大率増加分
+;
+;------------------------------
+[StateDef 30100]
+Type=A
+MoveType=I
+Physics=N
+Anim=30000
+SprPriority=100
+
+[State 30100, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+
+[State 30100, Helper]
+Type = Helper
+Trigger1 = Time = 0
+Persistent = 0
+OwnPal = 1
+PosType = P1
+Pos = 0, 0
+StateNo = 30110
+Name = " "
+
+;----------エフェクトの大きさ
+[State 30100, VarSet] 
+Type = VarSet
+Trigger1 = Time = 0
+FV = 1
+Value = 25
+
+[State 30100, VarSet] 
+Type = VarSet
+Trigger1 = Time > 0
+FV = 1
+Value = 0.83*FVar(1)
+
+[State 30100, VarSet] 
+Type = VarSet
+Trigger1 = Time = 0
+V = 2
+Value = 50
+
+[State 30100, VarAdd] 
+Type = VarAdd
+Trigger1 = Time > 0
+V = 2
+Value = Floor(FVar(1))
+
+;----------エフェクトの明るさ
+[State 30100, VarSet] 
+Type = VarSet
+Trigger1 = Time = 0
+V = 1
+Value = 255
+
+[State 30100, VarAdd] 
+Type = VarAdd
+Trigger1 = Time > 9
+Trigger1 = Var(1) > 0
+V = 1
+Value = -25
+
+[State 30100, VarSet] 
+Type = VarSet
+Trigger1 = Var(1) < 0
+V = 1
+Value = 0
+
+;----------透明化＆大きさ変更
+[State 30100, Trans]
+Type = Trans
+Trigger1 = 1
+Trans = Add
+
+[State 30100, PalFX]
+Type = PalFX
+Trigger1 = 1
+Time = 1
+Add = 0, 0, 0
+Mul = Var(1), Var(1), Var(1)
+
+[State 30100, AngleDraw]
+Type = AngleDraw
+Trigger1 = 1
+Value = 0
+Scale = 1.2*Var(2)/122, 0.5*Var(2)/122
+
+;----------消滅条件
+[State 30100, DestroySelf]
+Type = DestroySelf
+Trigger1 = Var(1) = 0
+
+;■■■■■■■■■■■■■■■■■■■■■■■■■
+;	[エフェクト]霊撃エフェクト - 拡散
+;--------------------------------------------------
+;各Animについて
+;30110		霊撃エフェクト - 拡散
+;
+;各Varについて（St30110独自）
+;  Var( 1)	フェードアウト
+;  Var( 2)	拡大率
+;  Var( 3)	拡大率増加分
+;
+;------------------------------
+[StateDef 30110]
+Type = A
+MoveType = I
+Physics = N
+Anim = 30110
+SprPriority = 100
+
+[State 30110, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+
+;----------エフェクトの大きさ
+[State 30110, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 3
+Value = 100
+
+[State 30110, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) = [2, 6]
+V = 3
+Value = -10
+
+[State 30110, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 2
+Value = 460
+
+[State 30110, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) > 0
+V = 2
+Value = Var(3)
+
+;----------エフェクトの明るさ
+[State 30110, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 1
+Value = 255
+
+[State 30110, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) > 3
+Trigger1 = Var(1) > 0
+V = 1
+Value = -40
+
+[State 30110, VarSet] 
+Type = VarSet
+Trigger1 = Var(1) < 0
+V = 1
+Value = 0
+
+;----------透明化＆大きさ変更
+[State 30110, Trans]
+Type = Trans
+Trigger1 = 1
+Trans = Add
+
+[State 30110, PalFX]
+Type = PalFX
+Trigger1 = 1
+Time = 1
+Add = 0, 0, 0
+Mul = Var(1), Var(1), Var(1)
+
+[State 30110, AngleDraw]
+Type = AngleDraw
+Trigger1 = 1
+Value = 0
+Scale = 0.5*Var(2)/240, 0.5*Var(2)/240
+
+;----------消滅条件
+[State 30110, DestroySelf]
+Type = DestroySelf
+Trigger1 = Var(1) = 0
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;--------------------------------------------------
+;各Animについて
+;30000		高速ジャンプエフェクト
+;
+;各Varについて（St30100独自）
+;  Var( 1)	フェードアウト
+;  Var( 2)	拡大率
+; FVar( 1)	拡大率増加分
+;
+;------------------------------
+[StateDef 30200]
+Type=A
+MoveType=I
+Physics=N
+Anim=30000
+SprPriority=100
+
+[State 30200, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+
+[State 30200, Helper]
+Type = Helper
+Trigger1 = animelemtime(1) = 0
+Persistent = 0
+OwnPal = 1
+PosType = P1
+Pos = 0, 0
+StateNo = 30210
+Name = " "
+
+;----------エフェクトの大きさ
+[State 30200, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+FV = 1
+Value = 25
+
+[State 30200, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) > 0
+FV = 1
+Value = 0.83*FVar(1)
+
+[State 30200, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 2
+Value = 120
+
+[State 30200, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) > 0
+V = 2
+Value = -Floor(FVar(1))*5
+
+;----------エフェクトの明るさ
+[State 30200, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 1
+Value = 255
+
+[State 30200, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) > 9
+Trigger1 = Var(1) > 0
+V = 1
+Value = -15
+
+[State 30200, VarSet] 
+Type = VarSet
+Trigger1 = Var(1) < 0
+V = 1
+Value = 0
+
+;----------透明化＆大きさ変更
+[State 30200, Trans]
+Type = Trans
+Trigger1 = 1
+Trans = Add
+
+[State 30200, PalFX]
+Type = PalFX
+Trigger1 = 1
+Time = 1
+Add = 0, 0, 0
+Mul = Var(1), Var(1), Var(1)
+
+[State 30200, AngleDraw]
+Type = AngleDraw
+Trigger1 = 1
+Value = 0
+Scale = 1.2*Var(2)/122, 0.3*Var(2)/122
+;----------消滅条件
+[State 30200, DestroySelf]
+Type = DestroySelf
+Trigger1 = Var(1) = 0
+
+;■■■■■■■■■■■■■■■■■■■■■■■■■
+;	[エフェクト]霊撃エフェクト - 拡散
+;--------------------------------------------------
+;各Animについて
+;30110		霊撃エフェクト - 拡散
+;
+;各Varについて（St30110独自）
+;  Var( 1)	フェードアウト
+;  Var( 2)	拡大率
+;  Var( 3)	拡大率増加分
+;
+;------------------------------
+[StateDef 30210]
+Type = A
+MoveType = I
+Physics = N
+Anim = 30110
+SprPriority = 100
+
+[State 30210, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+Flag = NoShadow
+
+;----------エフェクトの大きさ
+[State 30210, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 3
+Value = 100
+
+[State 30210, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) = [2, 6]
+V = 3
+Value = -10
+
+[State 30210, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 2
+Value = 460
+
+[State 30210, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) > 0
+V = 2
+Value = Var(3)
+
+;----------エフェクトの明るさ
+[State 30210, VarSet] 
+Type = VarSet
+Trigger1 = animelemtime(1) = 0
+V = 1
+Value = 255
+
+[State 30210, VarAdd] 
+Type = VarAdd
+Trigger1 = animelemtime(1) > 3
+Trigger1 = Var(1) > 0
+V = 1
+Value = -40
+
+[State 30210, VarSet] 
+Type = VarSet
+Trigger1 = Var(1) < 0
+V = 1
+Value = 0
+
+;----------透明化＆大きさ変更
+[State 30210, Trans]
+Type = Trans
+Trigger1 = 1
+Trans = Add
+
+[State 30210, PalFX]
+Type = PalFX
+Trigger1 = 1
+Time = 1
+Add = 0, 0, 0
+Mul = Var(1), Var(1), Var(1)
+
+[State 30210, AngleDraw]
+Type = AngleDraw
+Trigger1 = 1
+Value = 0
+Scale = 0.5*Var(2)/240, 0.5*Var(2)/240
+
+[state ]
+type=explod
+trigger1=fvar(10):=-5+(random%100)*0.1
+trigger1=fvar(11):=-5+(random%100)*0.1
+ontop=0
+anim=8015
+ID=8015
+postype=p1
+random=40,40
+scale=.2+(random%20)*.003,.2+(random%20)*.003
+postype=p1
+vel=fvar(10),fvar(11)
+accel=fvar(10)*.2,fvar(11)*.2
+ownpal=1
+removetime=-2
+sprpriority=5
+supermovetime=9999999999
+pausemovetime=9999999999
+[state ]
+type=explod
+trigger1=fvar(10):=-5+(random%100)*0.1
+trigger1=fvar(11):=-5+(random%100)*0.1
+ontop=0
+anim=8015
+ID=8015
+postype=p1
+random=40,40
+scale=.1+(random%20)*.003,.1+(random%20)*.003
+postype=p1
+vel=fvar(10),fvar(11)
+ownpal=1
+removetime=-2
+sprpriority=5
+supermovetime=9999999999
+pausemovetime=9999999999
+[state ]
+type=explod
+trigger1=fvar(10):=-5+(random%100)*0.1
+trigger1=fvar(11):=-5+(random%100)*0.1
+ontop=0
+anim=8015
+ID=8015
+postype=p1
+scale=.1+(random%20)*.003,.1+(random%20)*.003
+postype=p1
+vel=fvar(10)*3,fvar(11)*3
+accel=fvar(10)*-.3,fvar(11)*-.3
+ownpal=1
+removetime=-2
+sprpriority=5
+supermovetime=9999999999
+pausemovetime=9999999999
+[state ]
+type=explod
+trigger1=fvar(10):=-5+(random%100)*0.1
+trigger1=fvar(11):=-5+(random%100)*0.1
+ontop=0
+anim=8015
+ID=8015
+postype=p1
+scale=.1+(random%20)*.003,.1+(random%20)*.003
+postype=p1
+vel=fvar(10)*2,fvar(11)*2
+accel=fvar(10)*-.05,fvar(11)*-.05
+ownpal=1
+removetime=-2
+sprpriority=5
+supermovetime=9999999999
+pausemovetime=9999999999
+[state ]
+type=explod
+trigger1=fvar(10):=-5+(random%100)*0.1
+trigger1=fvar(11):=-5+(random%100)*0.1
+ontop=0
+anim=8015
+ID=8015
+postype=p1
+scale=.1+(random%20)*.003,.1+(random%20)*.003
+postype=p1
+vel=fvar(10)*3,fvar(11)*3
+accel=fvar(10)*-.3,fvar(11)*-.3
+ownpal=1
+removetime=-2
+sprpriority=5
+supermovetime=9999999999
+pausemovetime=9999999999
+[state ]
+type=explod
+trigger1=fvar(10):=-5+(random%100)*0.1
+trigger1=fvar(11):=-5+(random%100)*0.1
+ontop=0
+anim=8015
+ID=8015
+postype=p1
+scale=.1+(random%20)*.003,.1+(random%20)*.003
+postype=p1
+vel=fvar(10)*2,fvar(11)*2
+accel=fvar(10)*-.05,fvar(11)*-.05
+ownpal=1
+removetime=-2
+sprpriority=5
+supermovetime=9999999999
+pausemovetime=9999999999
+
+;----------消滅条件
+[State 30210, DestroySelf]
+Type = DestroySelf
+Trigger1 = Var(1) = 0
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;------------------
+; カウンターの相手側制御開始 - 硬直時間
+[Statedef 1992]
+type=A
+movetype=H
+physics=N
+velset=0,0
+[State 1992, 制御した相手のアニメ変更]
+type=ChangeAnim
+trigger1=1
+value=5000+(selfanimexist(5007)*7)
+[State 1992, ステート変更]
+type=ChangeState
+trigger1=HitShakeOver=1
+value=1993
+;------------------
+; カウンターの相手側制御 - 吹っ飛ぶ
+[Statedef 1993]
+type     = A
+movetype = H
+physics  = N
+[State 1993, 攻撃を食らった時の移動速度]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 2
+[State 1993, 制御した相手のアニメ変更]
+type=ChangeAnim
+trigger1=anim!=5001
+value=5001
+[state ]
+type=angledraw
+trigger1=1
+value=30
+[State 1993, 相手すり抜け]
+type = PlayerPush
+trigger1 = 1
+value = 0                ;0にすると他の相手にぶつからない
+[State 1993, 速度加算]
+type = VelAdd
+trigger1 = 1
+y = .44
+[State 1993, ステート変更] ;壁に当たる時のステートに行く
+type = ChangeState
+triggerall = Pos Y < -1
+trigger1 = BackEdgeBodyDist <= 20
+trigger2 = FrontEdgeBodyDist <= 20
+value = 1994
+[State 1993, 相手ステートに戻す]
+type = SelfState
+trigger1 = (Vel y > 0) && (Pos y >= 0)
+value = 5100
+
+;------------------
+; カウンターの相手側制御 - 壁に当たる
+[Statedef 1994]
+type     = A
+movetype = H
+physics  = N
+[State 1994, 振り返る]
+type = Turn
+trigger1 = (Time = 0) && (FrontEdgeBodyDist <= 30)
+[State 1994, 軸位置移動]
+type = PosAdd
+trigger1 = Time = 0
+x = 15 - BackEdgeBodyDist
+y = -10
+[State 1994, 移動を止める]
+type = PosFreeze
+trigger1 = 1
+x = 1
+y = 1
+[State 1994, カメラスクロールの有無]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 0,1
+[State 1994, エフェクト表示]
+type = Explod
+trigger1 = Time = 0
+anim = F72
+pos = 0, floor(ScreenPos Y) - 50
+postype = Back
+sprpriority = 3
+[State 1994, 振動]
+type = EnvShake
+trigger1 = Time = 0
+time = 5
+ampl = 2
+[State 1994, 制御した相手のアニメ変更]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 1027
+[State 1994, 音を鳴らす]
+type = PlaySnd
+trigger1 = Time = 0
+value = F7,0
+[State 1994, ステート変更]
+type = ChangeState
+trigger1 = AnimTime>=0
+trigger2 = Time>=10
+value = 1995
+;------------------
+; カウンターの相手側制御 - 壁からのバウンド（萃夢想風味）
+[Statedef 1995]
+type     = A
+movetype = H
+physics  = N
+[State 1995, 軸位置移動]
+type = PosAdd
+trigger1 = Time = 0
+y = -30
+[State 1995, 当たらない攻撃の定義]
+type = NotHitBy
+trigger1 = 1
+value = , NA, NP, AT ;普通に当たると強すぎるので…
+[State 1995, 移動速度]
+type = VelSet
+trigger1 = Time = 0
+x = 1
+y = -8
+[State 1995, 重力代わり]
+type = VelAdd
+trigger1 = 1
+y = .33
+[State 1995, アニメ変更]
+type = ChangeAnim2
+trigger1 = Time = 0
+value = 1995
+[State 1995, 角度変更命令]
+type = AngleDraw       ;AngleDraw単体では効果がない
+trigger1 = Anim = 1995
+[State 1995, 角度指定]
+type = AngleSet
+trigger1 = Time <= 1   ;AngleDrawがないと効果がない
+value = 60             ;60度にセット
+[State 1995, 角度加算]
+type = AngleAdd
+trigger1 = Anim = 1995
+trigger1 = Pos Y <= -10
+value = -30            ;-30度ずつ増加する
+[State 1995, 角度乗算]
+type = AngleMul
+trigger1 = Pos Y > -10
+value = 0              ;×0で0度に強制(ここでは特に意味は無し)
+[State 1995, ステート変更]
+type = ChangeState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = Alive
+triggerall = Time > 40
+trigger1 = command = "recovery"
+value = 5200
+[State 1995, 相手のステートに戻る]
+type = SelfState
+triggerall = Vel Y > 0
+triggerall = Alive
+triggerall = Time > 40
+trigger1 = command = "recovery"
+value = 5210
+[State 1995, 相手ステートに戻す]
+type = SelfState
+trigger1 = (Vel Y > 0) && (Pos Y >= 0)
+value = 5100
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;"Rorschach"
+[statedef 5151]
+[State ]
+type=sprpriority
+trigger1=1
+value=5
+[State ]
+type=assertspecial
+trigger1=1
+flag=nobardisplay
+[State ]
+type=changeanim2
+trigger1=animtime=0
+value=170
+[State 0, Explod]
+type=Explod
+trigger1=!numexplod(8000)
+anim=8000
+ID=8000
+pos=-120,0
+postype=p1
+facing=1
+vfacing=1
+bindtime=1
+vel=0,0
+accel=0,0
+random=0,0
+removetime=-1
+supermove
+pausemove
+scale=1,1
+sprpriority=3
+ontop=0
+shadow=0,0,0
+ownpal=1
+removeongethit=0
+[State 0, Explod]
+type=Explod
+trigger1=!numexplod(8001)
+anim=8001
+ID=8001
+pos=40,0
+postype=p1
+facing=1
+vfacing=1
+bindtime=1
+vel=0,0
+accel=0,0
+random=0,0
+removetime=-1
+supermove
+pausemove
+scale=1,1
+sprpriority=1
+ontop=0
+shadow=0,0,0
+ownpal=1
+removeongethit=0
+[State 0, Explod]
+type=Explod
+trigger1=!numexplod(7998)
+anim=7998
+ID=7998
+pos=40,-5
+postype=p1;
+facing=1
+vfacing=1
+bindtime=1
+vel=0,0
+accel=0,0
+random=0,0
+removetime=-1
+supermove
+pausemove
+scale=1,2
+sprpriority=3
+ontop=0
+shadow=0,0,0
+ownpal=1
+removeongethit=0
+;---------------------------------------------------------------------------

@@ -1,0 +1,598 @@
+;----------------------------Riddle Example v1.0 by Axellord-----------------------------------------------
+
+;----------------------------Riddle Example v1.0 by Axellord-----------------------------------------------
+;DIZZY
+[Statedef 3300]
+type    = S
+movetype= A
+physics = N
+juggle  = 1
+velset = 0,0
+anim = 3300
+ctrl = 0
+sprpriority = 2
+
+[State 3000, 1]
+type = AssertSpecial
+trigger1 = 1
+flag = nobardisplay
+ignorehitpause = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = Time<8
+value = SCA
+time = 1
+
+[State 3000, 2]
+type = SuperPause
+trigger1 = AnimElem = 1
+time = 33
+anim = -1
+sound = S8889,0
+pos = 10,-70
+poweradd = -1000
+
+[State 3000, Hyper Explode]
+type = Explod
+trigger1 = animelem = 1
+anim = 10006
+postype = p1
+pos = 0,-80
+ownpal = 1
+sprpriority = 5
+supermovetime = 40
+
+
+[State 3000, superportrait]
+type = Explod
+trigger1 = AnimElem = 1
+trigger1 = facing = 1
+anim = 10007
+ID = 10007
+pos = 0,35
+facing = 1
+postype = back
+bindtime = 999
+removetime = 70
+supermovetime = 40
+pausemovetime = 40
+sprpriority = -2
+ownpal = 1
+
+[State 3000, superportrait]
+type = Explod
+trigger1 = AnimElem = 1
+trigger1 = facing = -1
+anim = 10077
+ID = 10077
+pos = 0,35
+facing = -1
+postype = back
+bindtime = 999
+removetime = 70
+supermovetime = 40
+pausemovetime = 40
+sprpriority = -2
+ownpal = 1
+
+[State 3000, HYPER portrait]
+type = Explod
+trigger1 = AnimElem = 1
+anim = 11000+random%5
+ID = 11000
+pos = 0,35
+postype = back
+bindtime = 999
+removetime = 70
+supermovetime = 40
+pausemovetime = 40
+sprpriority = -1
+ownpal = 1
+
+[State 3000, superportrait]
+type = null;Explod
+trigger1 = AnimElem = 1
+anim = 10009
+ID = 10009
+pos = 160,120;0,0;15,10
+postype = back
+bindtime = 999
+removetime = 60
+supermovetime = 40
+pausemovetime = 40
+sprpriority = -3
+ownpal = 1
+
+[State 3000, superportrait black]
+type = Explod
+trigger1 = AnimElem = 1
+anim = 10005
+ID = 10005
+pos = 15,10
+postype = back
+bindtime = 999
+removetime = 60
+supermovetime = 40
+pausemovetime = 40
+sprpriority = -4
+ownpal = 1
+scale = .6,.6
+
+[State 0, Helper]; ====================================calls hyperbg
+type = Helper
+trigger1 =  AnimElem = 1
+helpertype = normal ;player
+name ="Hyper fx"
+ID = 9600
+stateno = 9600
+pos = 0,0
+postype = back    ;p2,front,back,left,right
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 0
+pausemovetime = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S195,1+random%3
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = AnimElem = 2
+x = 11
+
+[State 3300]
+type = Helper
+trigger1 = animelem = 6
+helpertype = normal
+name = "Riddle"
+ID = 12345
+stateno = 15001
+pos = 0,-40
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 0
+pausemovetime = 0
+
+[State 3300]
+type = ChangeState
+trigger1 = helper(12345), stateno = 15002
+value = 15003
+ctrl = 0
+
+[State 3300]
+type = ChangeState
+trigger1 = !numhelper(12345)
+trigger1 = time >= 38
+value = 0
+ctrl = 1
+
+;anim =
+;ignorehitpause =
+;persistent =
+
+;--------------------------------------------------------------------------
+[Statedef 15001]
+type    = A
+movetype= A
+physics = N
+anim = 3301
+velset = 3,0
+
+[State 15001]
+type = AssertSpecial
+trigger1 = 1
+flag = unguardable
+
+[State 15001]
+type = VelAdd
+trigger1 = 1
+x = 0.3
+
+[State 15001]
+type = HitDef
+trigger1 = !movecontact
+attr = S, SP
+damage = 0
+animtype = Light
+guardflag = M
+hitflag = M
+priority = 1, Hit
+pausetime = 0,0
+sparkno = S30000
+guard.sparkno = s30040
+sparkxy = -10, -77
+hitsound = S5, 0
+guardsound = S30, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 5
+ground.velocity = 0,0
+
+[State 15001]
+type = TargetState
+triggerall = NumTarget
+trigger1 = movehit
+value = 15006
+
+[State 15001]
+type = ChangeState
+trigger1 = movehit
+value = 15002
+
+[State 15001]
+type = Destroyself
+trigger1 = !movehit && root, animtime = 0
+;------------------------------------------------------------------------------------------
+;Helper question
+[Statedef 15002]
+type    = A
+movetype= I
+physics = N
+anim = 9999
+velset = 0,0
+
+[State 15002]
+type = VarSet
+trigger1 = time = 0
+v = 4
+value = random%2
+
+[State 15002]
+type = VarSet
+trigger1 = time = 0
+v = 15
+value = random%15
+
+[State 15002]
+type = VarSet
+trigger1 = time = 0
+v = 5
+value = random%100
+
+[State 15002]
+type = Explod
+triggerall = !numexplod(15000)
+trigger1 = var(15) = 0
+anim = 15000
+ID = 15000
+pos = ((backedgedist+frontedgedist)/2)-65, 20
+postype = back
+facing = 1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -1
+pausemovetime = 0
+scale = 1,1
+sprpriority = 500
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 15002] ;Wrong
+type = Explod
+triggerall = !numexplod(15010)
+trigger1 = var(15) = 0
+anim = 15020+var(15)
+ID = 15010
+pos = ((backedgedist+frontedgedist)/2)-40, cond (var(5)>=50,60,40)
+postype = back
+facing = 1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -1
+pausemovetime = 0
+scale = 1,1
+sprpriority = 500
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 15002] ;Correct
+type = Explod
+triggerall = !numexplod(15020)
+trigger1 = var(15) = 0
+anim = 15040+var(15)
+ID = 15020
+pos = ((backedgedist+frontedgedist)/2)-40, cond (var(5)>=50,40,60)
+postype = back
+facing = 1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -1
+pausemovetime = 0
+scale = 1,1
+sprpriority = 500
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 15002]
+type = Explod
+triggerall = var(5)>=50
+triggerall = !numexplod(15030)
+trigger1 = var(15) = 0
+anim = 15060
+ID = 15030
+pos = ((backedgedist+frontedgedist)/2)-40, cond(var(4)=0&&var(5)>=50,60,40)
+postype = back
+facing = 1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -1
+pausemovetime = 0
+scale = 1,1
+sprpriority = 502
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 15002]
+type = Explod
+triggerall = var(5)<50
+triggerall = !numexplod(15030)
+trigger1 = var(15) = 0
+anim = 15060
+ID = 15030
+pos = ((backedgedist+frontedgedist)/2)-40, cond(var(4)=0&&var(5)<50,40,60)
+postype = back
+facing = 1
+vfacing = 1
+bindtime = -1
+vel = 0,0
+accel = 0,0
+random = 0,0
+removetime = -1
+pausemovetime = 0
+scale = 1,1
+sprpriority = 502
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 15002]
+type = VarAdd
+trigger1 = enemy, teammode != simul
+trigger1 = enemy, command = "up"
+trigger1 = enemy, stateno = 15006
+trigger2 = enemy, teammode = simul
+trigger2 = enemy(0), stateno = 15006
+trigger2 = enemy(0), command = "up"
+trigger3 = enemy, teammode = simul
+trigger3 = enemy(1), stateno = 15006
+trigger3 = enemy(1), command = "up"
+v = 4
+value = 1
+
+[State 15002]
+type = VarAdd
+trigger1 = enemy, teammode != simul
+trigger1 = enemy, command = "down"
+trigger1 = enemy, stateno = 15006
+trigger2 = enemy, teammode = simul
+trigger2 = enemy(0), stateno = 15006
+trigger2 = enemy(0), command = "down"
+trigger3 = enemy, teammode = simul
+trigger3 = enemy(1), stateno = 15006
+trigger3 = enemy(1), command = "down"
+v = 4
+value = -1
+
+[State 15002]
+type = VarSet
+trigger1 = var(4) > 1
+v = 4
+value = 0
+
+[State 15002]
+type = VarSet
+trigger1 = var(4) < 0
+v = 4
+value = 1
+
+[State 15002]
+type = RemoveExplod
+trigger1 = enemy, teammode != simul
+trigger1 = (enemy, command = "up") ||  (enemy, command = "down")
+trigger1 = enemy, stateno = 15006
+trigger2 = enemy, teammode = simul
+trigger2 = enemy(0), stateno = 15006
+trigger2 = (enemy(0), command = "up") ||  (enemy(0), command = "down")
+trigger3 = enemy, teammode = simul
+trigger3 = enemy(1), stateno = 15006
+trigger3 = (enemy(1), command = "up") ||  (enemy(1), command = "down")
+trigger4 = root, stateno != 15003
+trigger4 = root, stateno != 3300
+id = 15030
+
+[State 15002]
+type = RemoveExplod
+trigger1 = root, stateno != 15003
+trigger1 = root, stateno != 3300
+id = 15020
+
+[State 15002]
+type = RemoveExplod
+trigger1 = root, stateno != 15003
+trigger1 = root, stateno != 3300
+id = 15010
+
+[State 15002]
+type = RemoveExplod
+trigger1 = root, stateno != 15003
+trigger1 = root, stateno != 3300
+id = 15000
+
+[State 15002]
+type = DestroySelf
+trigger1 = root, stateno != 15003
+trigger1 = root, stateno != 3300
+;-------------------------------------------------------------------------------------------
+;Riddle hit
+[Statedef 15005]
+type    = A
+physics = A
+ctrl = 0
+anim = 105
+sprpriority = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S1005,1
+
+[State 0, Dust]
+type = Explod
+trigger1 = Time%2=0
+anim = 102
+ID = 102
+pos = -20,-random%90
+postype = p1  ;p2,front,back,left,right
+facing = -1
+velocity = 2,0
+sprpriority = 20
+ownpal = 1
+
+[State 105, 2]
+type = VelSet
+trigger1 = Time = 0
+x = const(velocity.run.back.x)
+y = const(velocity.run.back.y)
+
+[State 105, 3]
+type = CtrlSet
+trigger1 = Time = 2
+value = 1
+
+[State 105, End]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 15003
+
+;---------------------------------------------------------------
+
+[Statedef 15003]
+type    = S
+movetype= I
+physics = S
+anim = 191
+
+[State 15003]
+type = ChangeState
+triggerall = helper(12345), var(4) = 1
+trigger1 = enemy, teammode != simul
+trigger1 = (enemy, command = "a") || (enemy, command = "b")  || (enemy, command = "c")  || (enemy, command = "x")  || (enemy, command = "y")  || (enemy, command = "z")
+trigger1 = enemy, stateno = 15006
+trigger2 = enemy, teammode = simul
+trigger2 = enemy(0), stateno = 15006
+trigger2 = (enemy(0), command = "a") || (enemy(0), command = "b")  || (enemy(0), command = "c")  || (enemy(0), command = "x")  || (enemy(0), command = "y")  || (enemy(0), command = "z")
+trigger3 = enemy, teammode = simul
+trigger3 = enemy(1), stateno = 15006
+trigger3 = (enemy(1), command = "a") || (enemy(1), command = "b")  || (enemy(1), command = "c")  || (enemy(1), command = "x")  || (enemy(1), command = "y")  || (enemy(1), command = "z")
+value = 15004
+ctrl = 1
+
+[State 15003]
+type = ChangeState
+triggerall = helper(12345), var(4) = 0
+trigger1 = enemy, teammode != simul
+trigger1 = (enemy, command = "a") || (enemy, command = "b")  || (enemy, command = "c")  || (enemy, command = "x")  || (enemy, command = "y")  || (enemy, command = "z")
+trigger1 = enemy, stateno = 15006
+trigger2 = enemy, teammode = simul
+trigger2 = enemy(0), stateno = 15006
+trigger2 = (enemy(0), command = "a") || (enemy(0), command = "b")  || (enemy(0), command = "c")  || (enemy(0), command = "x")  || (enemy(0), command = "y")  || (enemy(0), command = "z")
+trigger3 = enemy, teammode = simul
+trigger3 = enemy(1), stateno = 15006
+trigger3 = (enemy(1), command = "a") || (enemy(1), command = "b")  || (enemy(1), command = "c")  || (enemy(1), command = "x")  || (enemy(1), command = "y")  || (enemy(1), command = "z")
+value = 5300
+ctrl = 0
+;------------------------------------------------------------------------------------------------------
+;Taunt, you are wrong.
+[Statedef 15004]
+type    = S
+movetype= I
+physics = S
+anim = 196
+
+[State 15004]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------------------------------
+;Custom P2stateno
+[Statedef 15006]
+type    = S
+movetype= I
+physics = S
+anim = 0
+
+[State 15006]
+type = ChangeState
+trigger1 = enemy, teammode != simul
+trigger1 = enemy, name = "Riddler"
+trigger1 = (enemy, stateno != 5300) && (enemy, movetype != H)
+trigger1 = enemy, prevstateno = 15003
+trigger2 = enemy, teammode = simul
+trigger2 = enemy(0), name = "Riddler"
+trigger2 = (enemy(0), stateno != 5300) && (enemy(0), movetype != H)
+trigger2 = enemy(0), prevstateno = 15003
+trigger3 = enemy, teammode = simul
+trigger3 = enemy(1), name = "Riddler"
+trigger3 = (enemy(1), stateno != 5300)  && (enemy(1), movetype != H)
+trigger3 = enemy(1), prevstateno = 15003
+value = 5300
+ctrl = 0
+
+[State 15006]
+type = SelfState
+trigger1 = enemy, teammode != simul
+trigger1 = enemy, name = "Riddler"
+trigger1 = enemy, stateno = 5300
+trigger1 = enemy, prevstateno = 15003
+trigger2 = enemy, teammode = simul
+trigger2 = enemy(1), name = "Riddler"
+trigger2 = enemy(0), stateno = 5300
+trigger2 = enemy(0), prevstateno = 15003
+trigger3 = enemy, teammode = simul
+trigger3 = enemy(1), name = "Riddler"
+trigger3 = enemy(1), stateno = 5300
+trigger3 = enemy(1), prevstateno = 15003
+trigger4 = enemy, teammode != simul
+trigger4 = enemy, name = "Riddler"
+trigger4 = (enemy, stateno != 5300) && (enemy, movetype = H)
+trigger4 = enemy, prevstateno = 15003
+trigger5 = enemy, teammode = simul
+trigger5 = enemy(0), name = "Riddler"
+trigger5 = (enemy(0), stateno != 5300) && (enemy(0), movetype = H)
+trigger5 = enemy(0), prevstateno = 15003
+trigger6 = enemy, teammode = simul
+trigger6 = enemy(1), name = "Riddler"
+trigger6 = (enemy(1), stateno != 5300)  && (enemy(1), movetype = H)
+trigger6 = enemy(1), prevstateno = 15003
+value = 0
+ctrl = 1
+

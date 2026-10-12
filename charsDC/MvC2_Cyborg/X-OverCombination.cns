@@ -1,0 +1,814 @@
+;Cross-Over Combination Jump-In
+[Statedef 150000]
+type = A
+movetype = I
+physics = N
+anim = 42  ; <- Jumping In (Ready or not, I'm jumping in!!!)
+sprpriority = 2
+ctrl = 0
+
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time = 0
+flag = invisible
+ignorehitpause = 1
+
+
+; NEW !! Tag active definers --------------------------------
+[State 4701, 1a]
+type = VarSet
+triggerall = Palno = [1,4]
+trigger1 = time = [0,1]         ;alpha-Assist (Projectile Type)
+var(33) = 3
+
+[State 4701, 1a]
+type = VarSet
+triggerall = Palno = [5,8]
+trigger1 = time = [0,1]         ;beta-Assist (Expansion Type)
+var(33) = 4
+
+[State 4701, 1a]
+type = VarSet
+triggerall = Palno = [9,12]
+trigger1 = time = [0,1]         ;gamma-Assist (Balance Type)
+var(33) = 5
+; -----------------------------------------------------------
+
+[State 4701, 2] ; Prevents the camera from following the char
+type = ScreenBound
+trigger1 = 1
+value = 0
+
+; Starting position
+[State 4701, 3]
+type = PosSet
+trigger1 = time = 0
+x = (partner, pos x) - (200*(facing)) ; variable pos
+y = -100
+
+; Attack velocity
+[State 4701, 4]
+type = VelSet
+trigger1 = Time = 0
+x = 15
+y = 7
+
+[State 4701, 5]
+type = PosSet
+trigger1 = Pos Y >= 0
+y = 0
+
+; --------------------------------------------------------------------
+; This part is customizable, you can add what you need to be done here
+
+; Do assist attack depending on what dir is holding the partner
+[State 4701, 6]
+type = ChangeState
+triggerall = Roundstate = [2,3]
+triggerall = Var(33) = [3,5]
+trigger1 = Pos Y >= 0
+trigger1 = Vel Y >= 0
+value = 170000
+ctrl = 0
+
+[State 0, SuperPause]
+type = SuperPause
+trigger1 = 1
+time = 37 
+anim = -1
+sound = -1
+pos = 0,0
+;movetime = 0
+darken = 0
+p2defmul = 1
+poweradd = 0
+;unhittable = 1
+;ignorehitpause = 
+persistent = 0
+
+[State 3000, Helper]
+type = Helper
+trigger1 = 1
+stateno = 150005
+supermovetime = 99999999
+pos = 0,ceil(-50*const(size.yscale))
+ownpal = 1
+id = 8500
+persistent = 0
+
+
+
+[Statedef 150005]
+type = A
+physics = N
+anim = 9999
+velset = 0,0
+ctrl = 0
+
+[State 8500, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 8905
+sprpriority = 5
+pos = 60,162
+postype = back
+ontop = 1
+supermovetime = 37
+bindtime = 6
+removetime = 37
+vel = 0,0
+scale = 1,1
+ID = 8900
+ownpal = 1
+ignorehitpause = 1
+
+;[State 8500, Explod]
+;type = Explod
+;trigger1 = time = 0
+;anim = f9951
+;sprpriority = -2
+;postype = left
+;under = 1
+;supermove = 1
+;bindtime = -1
+;removetime = 37
+;scale = 1,1
+;ownpal = 1
+
+
+[State 9999,0]
+type = ModifyExplod
+trigger1 = time = [0,6]
+ID = 8900
+scale = .75- (.0415*time), .75- (.0415*time)
+sprpriority = -1
+ignorehitpause = 1
+under = 1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = Time = 37
+
+
+
+;Player X-Over Combo Trigger
+[Statedef 150099]
+type    = S
+movetype= I
+physics = S
+juggle= 0
+ctrl = 0
+velset = 0,0
+anim = 0
+sprpriority = 2
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = 1
+value = 160000
+
+
+
+;Player X-Over Combo: Dark Wolf Legion
+[Statedef 160000]
+type = S
+movetype = I
+physics = S
+anim = 3100
+velset = 0,0
+sprpriority = 2
+ctrl = 0
+
+[State 195, 3]
+type = PlaySnd
+trigger1 = animelem = 3
+value = s10,9
+channel = 0
+
+
+[State 3000, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 8300
+id = 8300
+supermove = 1
+sprpriority = 4
+ownpal = 1
+
+[State 3000, VarSet]
+type = VarSet
+trigger1 = animelem = 2
+var(4) = 1
+
+[State 3000, Helper]
+type = Helper
+trigger1 = animelem = 2
+stateno = 8502
+supermovetime = 99999999
+pos = 0,ceil(-10*const(size.yscale))
+ownpal = 1
+id = 8500
+
+[State 3000, SuperPause]
+type = SuperPause
+trigger1 = animelem = 2
+time = 36
+movetime = 36
+darken = 1
+anim = -1
+p2defmul = 1
+poweradd = -1000
+
+
+
+
+[State 1200, Helper]
+type = Helper
+trigger1 = animelem = 2,>0 && animelem = 6,<0 && Time % 5 = 1 && stateno = 160000
+stateno = 160001
+name = "Dark Wolf Charge"
+id = 160000
+ownpal = 1
+postype = back
+pos = -90,0
+keyctrl = 0
+size.xscale = 1.2
+size.yscale = 1.2
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = animelem = 2,>0 && animelem = 6,<0 && Time % 5 = 0 && stateno = 160000
+v  =36
+range = -20,-110
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = animelem = 2,>0 && animelem = 6,<0 && Time % 6 = 0 && stateno = 160000
+v  = 38
+range = -20,-110
+
+
+[State 1200, Helper]
+type = Helper
+trigger1 = animelem = 2,>0 && animelem = 6,<0&& Time % 5 = 0 && stateno = 160000
+stateno = 160002
+name = "Dark Wolf Air 1"
+id = 160000
+ownpal = 1
+postype = back
+pos = -90,var(36)
+keyctrl = 0
+size.xscale = 1.2
+size.yscale = 1.2
+
+[State 1200, Helper]
+type = Helper
+trigger1 = animelem = 2,>0 && animelem = 6,<0&& Time % 6 = 0 && stateno = 160000
+name = "Dark Wolf Air 2"
+stateno = 160002
+id = 160000
+ownpal = 1
+postype = back
+pos = -90,var(38)
+keyctrl = 0
+size.xscale = 1.2
+size.yscale = 1.2
+
+
+[State 3000, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+var(4) = 0
+
+[State 3000, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+var(36) = 0
+
+[State 3000, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+var(38) = 0
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+[Statedef 160001]
+type = S
+movetype= A
+physics = S
+ctrl = 0
+anim = 3103
+sprpriority = 2
+velset = 0,0
+poweradd = 0
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = Time >= 0
+x = 8
+y = 0
+
+[State 0, ParentVarAdd]
+type = ParentVarAdd
+trigger1 = movehit = 1
+var(18) = 1
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = 1
+fvar(0) = 1.0-(parent,var(18)>3)*((parent,var(18)-3)*.075)
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = parent,fvar(0) < .0
+fvar(0) = .025
+
+[State -2, コンボ補正]
+type = AttackMulSet
+trigger1 = 1
+value = parent,fvar(0)
+
+[State 7125, HitOverRide]
+type = HitOverRide
+trigger1 = 1
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 1250
+time = -1
+
+[State 7001, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+movecamera = 0,0
+value = 0
+
+[State 7100, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 220, HitDef]
+type = HitDef
+trigger1 = Time = 0
+attr = S,HA
+hitflag = MAF
+guardflag = MA
+animtype = Hard
+damage = 5,2
+getpower = 5,0
+givepower = 2,0
+pausetime = 0,12
+guard.pausetime = 0,12
+sparkno = S8002
+guard.sparkno = S8050
+sparkxy = -10,-20
+hitsound = S5,3
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 18
+ground.hittime = 20
+air.hittime = 3
+yaccel = .53
+ground.velocity = -6,-3
+air.velocity = -2,-6
+airguard.velocity = -6,-3
+fall.xvelocity = 0
+fall.yvelocity = -2
+air.fall = 1
+fall = 1
+fall.recover = 0
+id = 1
+
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = FrontEdgeDist < -85
+
+
+;Dark Wolf Air Attack
+[Statedef 160002]
+type = A
+movetype= A
+physics = N
+ctrl = 0
+anim = 3101
+sprpriority = 2
+velset = 0,0
+poweradd = 0
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = time = 0
+v = 37
+range = 8,16
+;ignorehitpause = 
+;persistent = 
+
+[State 0, ParentVarAdd]
+type = ParentVarAdd
+trigger1 = movehit = 1
+var(18) = 1
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = 1
+fvar(0) = 1.0-(parent,var(18)>3)*((parent,var(18)-3)*.075)
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = parent,fvar(0) < .0
+fvar(0) = .025
+
+[State -2, コンボ補正]
+type = AttackMulSet
+trigger1 = 1
+value = parent,fvar(0)
+
+[State 7125, HitOverRide]
+type = HitOverRide
+trigger1 = 1
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 1250
+time = -1
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = Animelem = 3
+x = var(37)
+y = -6
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 =  Time >= 5
+y = .53
+
+[State 7100, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+
+[State 7001, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+movecamera = 0,0
+value = 0
+
+[State 220, HitDef]
+type = HitDef
+trigger1 = Time = 0
+attr = S,HA
+hitflag = MAF
+guardflag = MA
+animtype = Hard
+damage = 5,2
+getpower = 5,0
+givepower = 2,0
+pausetime = 0,12
+guard.pausetime = 0,12
+sparkno = S8002
+guard.sparkno = S8050
+sparkxy = -10,-20
+hitsound = S5,3
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 18
+ground.hittime = 20
+air.hittime = 3
+yaccel = .53
+ground.velocity = -6,-3
+air.velocity = -2,-6
+airguard.velocity = -6,-3
+fall.xvelocity = 0
+fall.yvelocity = -2
+air.fall = 1
+fall = 1
+fall.recover = 0
+id = 1
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = Pos Y >= 0 && Vel Y > 0
+value = 1212
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = Parent,Stateno != 160000
+var(37) = 0
+
+;Partner X-Over Combo: Dark Wolf Legion
+[Statedef 170000]
+type = S
+movetype = I
+physics = S
+anim = 3100
+velset = 0,0
+sprpriority = 2
+ctrl = 0
+
+[State 195, 3]
+type = PlaySnd
+trigger1 = animelemtime(3) = 2
+value = s10,9
+channel = 0
+
+
+[State 3000, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 8300
+id = 8300
+supermove = 1
+sprpriority = 4
+ownpal = 1
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = animelemtime(2) = 3
+value = 3100
+elem = 3
+;ignorehitpause = 
+;persistent = 
+
+
+
+[State 1200, Helper]
+type = Helper
+trigger1 = animelem = 2,>0 && animelem = 6,<0 && Time % 5 = 1 && stateno = 170000
+stateno = 170001
+name = "Dark Wolf Charge"
+id = 170000
+ownpal = 1
+postype = back
+pos = -90,0
+keyctrl = 0
+size.xscale = 1.2
+size.yscale = 1.2
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = animelem = 2,>0 && animelem = 6,<0 && Time % 5 = 0 && stateno = 170000
+v  = 46
+range = -20,-110
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = animelem = 2,>0 && animelem = 6,<0 && Time % 6 = 0 && stateno = 170000
+v  = 48
+range = -20,-110
+
+
+[State 1200, Helper]
+type = Helper
+trigger1 = animelem = 2,>0 &&animelem = 6,<0 &&  Time % 5 = 0 && stateno = 170000
+stateno = 170002
+name = "Dark Wolf Air 1"
+id = 170000
+ownpal = 1
+postype = back
+pos = -90,var(46)
+keyctrl = 0
+size.xscale = 1.2
+size.yscale = 1.2
+
+
+
+[State 1200, Helper]
+type = Helper
+trigger1 = animelem = 2,>0 && animelem = 6,<0 && Time % 6 = 0 && stateno = 170000
+name = "Dark Wolf Air 2"
+stateno = 170002
+id = 170000
+ownpal = 1
+postype = back
+pos = -90,var(48)
+keyctrl = 0
+size.xscale = 1.2
+size.yscale = 1.2
+
+[State 3000, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+var(46) = 0
+
+[State 3000, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+var(48) = 0
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = animtime = 0
+value = ifelse(roundstate = 3,0,100511)
+ctrl = ifelse(roundstate = 3,1,0)
+
+[Statedef 170001]
+type = S
+movetype= A
+physics = S
+ctrl = 0
+anim = 3103
+sprpriority = 2
+velset = 0,0
+poweradd = 0
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = Time >= 0
+x = 8
+y = 0
+
+[State 0, ParentVarAdd]
+type = ParentVarAdd
+trigger1 = movehit = 1
+var(18) = 1
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = 1
+fvar(0) = 1.0-(parent,var(18)>3)*((parent,var(18)-3)*.075)
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = parent,fvar(0) < .0
+fvar(0) = .025
+
+[State -2, コンボ補正]
+type = AttackMulSet
+trigger1 = 1
+value = parent,fvar(0)
+
+[State 7125, HitOverRide]
+type = HitOverRide
+trigger1 = 1
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 1250
+time = -1
+
+[State 7001, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+movecamera = 0,0
+value = 0
+
+[State 7100, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 220, HitDef]
+type = HitDef
+trigger1 = Time = 0
+attr = S,HA
+hitflag = MAF
+guardflag = MA
+animtype = Hard
+damage = 5,2
+getpower = 5,0
+givepower = 2,0
+pausetime = 0,12
+guard.pausetime = 0,12
+sparkno = S8002
+guard.sparkno = S8050
+sparkxy = -10,-20
+hitsound = S5,3
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 18
+ground.hittime = 20
+air.hittime = 3
+yaccel = .53
+ground.velocity = -6,-3
+air.velocity = -2,-6
+airguard.velocity = -6,-3
+fall.xvelocity = 0
+fall.yvelocity = -2
+air.fall = 1
+fall = 1
+fall.recover = 0
+id = 1
+
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = FrontEdgeDist < -85
+
+
+;Dark Wolf Air Attack
+[Statedef 170002]
+type = A
+movetype= A
+physics = N
+ctrl = 0
+anim = 3101
+sprpriority = 2
+velset = 0,0
+poweradd = 0
+
+[State 0, ParentVarAdd]
+type = ParentVarAdd
+trigger1 = movehit = 1
+var(18) = 1
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = 1
+fvar(0) = 1.0-(parent,var(18)>3)*((parent,var(18)-3)*.075)
+
+[State -2, コンボ補正]
+type = ParentVarSet
+trigger1 = parent,fvar(0) < .0
+fvar(0) = .025
+
+[State -2, コンボ補正]
+type = AttackMulSet
+trigger1 = 1
+value = parent,fvar(0)
+
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = time = 0
+v = 47
+range = 8,16
+;ignorehitpause = 
+;persistent = 
+
+[State 7125, HitOverRide]
+type = HitOverRide
+trigger1 = 1
+attr = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+stateno = 1250
+time = -1
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = Animelem = 3
+x = var(47)
+y = -6
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 =  Time >= 5
+y = .53
+
+[State 7100, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+
+[State 7001, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+movecamera = 0,0
+value = 0
+
+[State 220, HitDef]
+type = HitDef
+trigger1 = Time = 0
+attr = S,HA
+hitflag = MAF
+guardflag = MA
+animtype = Hard
+damage = 5,2
+getpower = 5,0
+givepower = 2,0
+pausetime = 0,12
+guard.pausetime = 0,12
+sparkno = S8002
+guard.sparkno = S8050
+sparkxy = -10,-20
+hitsound = S5,3
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 18
+ground.hittime = 20
+air.hittime = 3
+yaccel = .53
+ground.velocity = -6,-3
+air.velocity = -2,-6
+airguard.velocity = -6,-3
+fall.xvelocity = 0
+fall.yvelocity = -2
+air.fall = 1
+fall = 1
+fall.recover = 0
+id = 1
+
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = Pos Y >= 0 && Vel Y > 0
+value = 1212
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = Parent,Stateno != 170000
+var(47) = 0

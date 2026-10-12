@@ -1,0 +1,1132 @@
+; Bastone Giro
+[StateDef 1000]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1000
+poweradd = 40
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 = time = 15
+value = S80, 0
+
+[State 1000, Helper]
+type = Helper
+triggerall = numhelper(1002) = 0
+trigger1 = time = 0
+ID = 1002
+pos = 0,0
+postype = p1
+stateno = 1002
+helpertype = normal
+name = "weak-counter"
+keyctrl = 0
+ownpal = 1
+supermovetime = 0
+
+[State 1000, 1]
+type = notHitBy
+triggerall = numhelper(1002) = 1
+trigger1 = 1
+value = SCA,NA,SA,HA,NT,ST,HT,HP,NP,SP
+
+[State 1000, HitDef]
+type = HitDef
+trigger1 = TimeMod = 10,5
+attr = S,SA
+hitflag = MAF
+guardflag = MA
+getpower = 12,5
+givepower = 5,2
+animtype = light
+air.animtype = light
+fall.animtype = Back
+priority = 4,Hit
+damage = 8,1
+pausetime = 1,10
+sparkno = s30002
+
+sparkxy = -20,-60
+hitsound = s80,1
+guardsound = 6,0
+ground.type = High
+ground.hittime = 20
+ground.slide = 0
+ground.hit = 0
+air.hittime = 20
+ground.velocity = 0,0
+air.velocity = 0,0
+sprpriority = 2
+p1sprpriority = 2
+p2sprpriority = 1
+p1facing = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1000, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Bastone giro2
+[StateDef 1001]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1000
+poweradd = 40
+sprpriority = 2
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 = time = 15
+value = S80, 0
+
+[State 1001, Helper]
+type = Helper
+triggerall = numhelper(1005) = 0
+trigger1 = time = 0
+ID = 1005
+pos = 0,0
+postype = p1
+stateno = 1005
+helpertype = normal
+name = "strong-counter"
+keyctrl = 0
+ownpal = 1
+supermovetime = 0
+
+[State 1001, 1]
+type = notHitBy
+triggerall = numhelper(1005) = 1
+trigger1 = 1
+value = SCA,NA,SA,HA,NT,ST,HT,HP,NP,SP
+
+[State 1001, an1]
+type = HitDef
+trigger1 = TimeMod = 8,3
+attr = S,SA
+hitflag = MAF
+guardflag = MA
+getpower = 6,2
+givepower = 5,1
+animtype = light
+air.animtype = light
+priority = 4,Hit
+damage = 15,3
+pausetime = 7,9
+sparkno = s30002
+
+sparkxy = -10,-88
+hitsound = s80,1
+guardsound = S6, 0
+ground.type = High
+air.type = High
+ground.slide = 6
+guard.slide = 5
+ground.hittime = 24
+ground.velocity = -5
+sprpriority = 5
+p1sprpriority = 2
+p2sprpriority = 1
+p1facing = 1
+p2facing = 1
+air.fall = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1001, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+; Mille colpi col bastone_1
+[StateDef 1010]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1013
+poweradd = 50
+sprpriority = 2
+
+[State 1010, PlaySnd]
+type = PlaySnd
+value = S200, 2
+trigger1 = animelem = 3
+trigger2 = animelem = 5
+
+[State 1010, an1]
+type = HitDef
+trigger1 = animelem = 3
+trigger2 = animelem = 5
+attr = S,SA        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 6,2
+givepower = 5,1
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 20,3
+pausetime = 7,7
+sparkno = s30002
+
+sparkxy = -10,-88
+hitsound = s80,2
+guardsound = S6, 0
+ground.type = High      ;Low,Trip,None
+air.type = High
+ground.slide = 6
+guard.slide = 5
+ground.hittime = 24
+ground.velocity = -5
+;snap = 140,0
+sprpriority = 5
+p1sprpriority = 5;(winmugen only)
+p2sprpriority = 4;(winmugen only)
+p1facing = 1
+p2facing = 1
+air.fall = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+
+[State 1010, an2]
+type = HitDef
+trigger1 = animelem = 4
+attr = S,SA        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 12,5
+givepower = 5,2
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 15,3
+pausetime = 7,7
+sparkno = s30002
+
+sparkxy = -10,-68
+hitsound = s80,2
+guardsound = S6, 0
+ground.type = low      ;Low,Trip,None
+air.type = High
+ground.slide = 6
+guard.slide = 5
+ground.hittime = 20
+ground.velocity = -5
+;snap = 140,0
+sprpriority = 5
+p1sprpriority = 5;(winmugen only)
+p2sprpriority = 4;(winmugen only)
+p1facing = 1
+p2facing = 1
+air.fall = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+
+[State 1010, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+; Mille colpi col bastone_2
+[StateDef 1011]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1010
+poweradd = 60
+sprpriority = 2
+
+[State 1011, PlaySnd]
+type = PlaySnd
+value = S200, 2
+trigger1 = animelem = 3
+trigger2 = animelem = 5
+trigger3 = animelem = 6
+trigger4 = animelem = 8
+
+[State 1011, an1]
+type = HitDef
+trigger1 = animelem = 3
+trigger2 = animelem = 5
+trigger3 = animelem = 6
+trigger4 = animelem = 8
+attr = S,SA        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 6,2
+givepower = 5,1
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 15,3
+pausetime = 7,7
+sparkno = s30002
+
+sparkxy = -10,-88
+hitsound = s80,2
+guardsound = S6, 0
+ground.type = High      ;Low,Trip,None
+air.type = High
+ground.slide = 6
+guard.slide = 5
+ground.hittime = 24
+ground.velocity = -5
+;snap = 140,0
+sprpriority = 5
+p1sprpriority = 5;(winmugen only)
+p2sprpriority = 4;(winmugen only)
+p1facing = 1
+p2facing = 1
+air.fall = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+
+[State 1011, an2]
+type = HitDef
+trigger1 = animelem = 4
+trigger2 = animelem = 7
+attr = S,SA        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 6,2
+givepower = 5,1
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 15,3
+pausetime = 7,7
+sparkno = s30002
+
+sparkxy = -10,-68
+hitsound = 5,0
+guardsound = S6, 0
+ground.type = low      ;Low,Trip,None
+air.type = High
+ground.slide = 6
+guard.slide = 5
+ground.hittime = 20
+ground.velocity = -5
+;snap = 140,0
+sprpriority = 5
+p1sprpriority = 5;(winmugen only)
+p2sprpriority = 4;(winmugen only)
+p1facing = 1
+p2facing = 1
+air.fall = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+
+[State 1011, VarSet]
+type = VarSet
+trigger1 = time = 0
+v = 3
+value = 1
+
+[State 1011, extrahit]
+type = ChangeState
+triggerall = animelemtime(7) >=0 && animelemtime(8)<=0
+trigger1 = command = "b"
+value = 1012
+ctrl = 1
+
+[State 1011, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[StateDef 1012]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1011
+poweradd = 20
+sprpriority = 2
+
+[State 1012, an1]
+type = HitDef
+triggerall = anim = 1011
+trigger1 = animelem = 1
+trigger2 = animelem = 3
+trigger3 = animelem = 4
+trigger4 = animelem = 6
+attr = S,SA        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 6,2
+givepower = 5,1
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 10,3
+pausetime = 7,7
+sparkno = s30002
+
+sparkxy = -10,-88
+hitsound = s80,2
+guardsound = S6, 0
+ground.type = High      ;Low,Trip,None
+air.type = High
+ground.slide = 6
+guard.slide = 5
+ground.hittime = 24
+ground.velocity = -2
+sprpriority = 5
+p1sprpriority = 5;(winmugen only)
+p2sprpriority = 4;(winmugen only)
+p1facing = 1
+p2facing = 1
+air.fall = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1012, an2]
+type = HitDef
+triggerall = anim = 1011
+trigger1 = animelem = 2
+trigger2 = animelem = 5
+attr = S,SA        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 6,2
+givepower = 5,1
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 12,3
+pausetime = 7,7
+sparkno = s30002
+
+sparkxy = -10,-68
+hitsound = s80,2
+guardsound = S6, 0
+ground.type = low      ;Low,Trip,None
+air.type = High
+ground.slide = 6
+guard.slide = 5
+ground.hittime = 20
+ground.velocity = -2
+sprpriority = 5
+p1sprpriority = 5;(winmugen only)
+p2sprpriority = 4;(winmugen only)
+p1facing = 1
+p2facing = 1
+air.fall = 1
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1012, VarAdd]
+type = VarAdd
+triggerall = command = "b" && anim = 1011
+trigger1 = animelemtime(6) >=0
+v = 3
+value = 1
+
+[State 1012, Varset]
+type = Varset
+trigger1 = var(3) >=3
+v = 3
+value = 3
+
+[State 1012, repeat]
+type = Changeanim
+trigger1 = var(3) <= 2 && animelemtime(6) >= 0 && command = "b"
+value = 1011
+
+[State 1012, ChangeAnim]
+type = ChangeAnim
+triggerall =anim = 1011 && animtime = 0
+trigger1 = var(3) >=1 && command != "b"
+trigger2 = var(3) = 3 && command != "b"
+value = 1012
+
+[State 1012, end]
+type = ChangeState
+trigger1 = anim = 1012 && AnimTime = 0
+value = 0
+ctrl = 1
+
+;sfera - helper1
+[StateDef 1020]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 1020
+ctrl = 0
+poweradd = 20
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 = time = 35
+value = S99, 4
+
+[State 1030, PlaySnd]
+type = PlaySnd
+trigger1 = time = 30
+value = S70,4
+
+[State 1020, Helper]
+type = Helper
+trigger1 = animelem = 9
+ID = 1021
+pos = 50,-60
+postype = p1
+stateno = 1021
+helpertype = normal
+name = "sfera"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+
+[State 1020, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[Statedef 1021]
+type = S
+movetype = A
+physics = N
+anim = 7000
+;velset = .4,0
+ctrl = 0
+
+[State 1021, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+
+[State 1021, VelSet]
+type = VelSet
+trigger1 = animelem = 7
+x = .5
+y = 0
+
+[State 1021, SprPriority]
+type = SprPriority
+trigger1 = 1
+value = 3
+
+[State 1021, nhb]
+type = NotHitBy
+trigger1 = 1
+time = 1
+value = SCA, NA, SA, HA, NT, ST, HT
+ignorehitpause = 1
+
+[State 1021,hb ]
+type = HitBy
+trigger1 = 1
+value = SCA, AP
+time = 1
+
+[State 1021,hb ]
+type = HitOverride
+trigger1 = 1
+attr = SCA, NP, SP, HP
+slot = 1
+stateno = 1021
+time = 2
+ignorehitpause = 1
+
+
+[State 1021, HitDef]
+type = HitDef
+trigger1 = TimeMod = 8,3
+attr = S,SP       ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 12,5
+givepower = 0,0
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+fall.animtype = Back
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 20,2
+pausetime = 1,7
+sparkno = s30002
+guard.sparkno = 41
+sparkxy = -20,0
+hitsound = s80,9
+guardsound = S6, 0
+ground.type = High      ;Low,Trip,None
+ground.slide = 0
+ground.hit = 0
+air.hittime = 20
+ground.velocity = 0,0
+air.velocity = 0,0
+sprpriority = 2
+p1sprpriority = 2;(winmugen only)
+p2sprpriority = 1;(winmugen only)
+p1facing = 1
+palfx.time = 5
+palfx.mul = 120,20,124
+palfx.add = 100,0,100
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1021, HitDef]
+type = HitDef
+trigger1 = Time = 35
+attr = S,SP        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 12,5
+givepower = 0,0
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+fall.animtype = Back
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 30,2
+pausetime = 1,7
+sparkno = s30002
+guard.sparkno = 41
+sparkxy = -20,0
+hitsound = s80,9
+guardsound = S6, 0
+ground.type = High      ;Low,Trip,None
+ground.slide = 0
+ground.hit = 0
+air.hittime = 20
+ground.velocity = -6,-3
+air.velocity = -5,-2
+fall = 1
+fall.recovertime = 10
+sprpriority = 2
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+p1sprpriority = 2;(winmugen only)
+p2sprpriority = 1;(winmugen only)
+p1facing = 1
+palfx.time = 5
+palfx.mul = 120,20,124
+palfx.add = 100,0,100
+
+[State 1021, 3]
+type = DestroySelf
+trigger1 = animtime = 0
+
+;sfera - helper2
+[StateDef 1022]
+type = S
+movetype = A
+physics = S
+juggle = 0
+anim = 1020
+ctrl = 0
+poweradd = 20
+
+[State 181, PlaySnd]
+type = PlaySnd
+trigger1 = time = 35
+value = S99, 4
+
+[State 1030, PlaySnd]
+type = PlaySnd
+trigger1 = time = 30
+value = S70,4
+
+[State 1022, Helper]
+type = Helper
+trigger1 = animelem = 9
+ID = 1023
+pos = 50,-60
+postype = p1
+stateno = 1023
+helpertype = normal
+name = "sfera"
+keyctrl = 0
+ownpal = 1
+supermovetime = 1
+size.xscale = 1.3
+size.yscale = 1.3
+
+[State 1022, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+[Statedef 1023]
+type = S
+movetype = A
+physics = N
+anim = 70001
+;velset = 1,0
+ctrl = 0
+
+[State 1023, VelSet]
+type = VelSet
+trigger1 = animelem = 7
+x = 1
+y = 0
+
+[State 1023, SprPriority]
+type = SprPriority
+trigger1 = 1
+value = 3
+
+[State 1021, nhb]
+type = NotHitBy
+trigger1 = 1
+time = 1
+value = SCA, NA, SA, HA, NT, ST, HT
+ignorehitpause = 1
+
+[State 1021,hb ]
+type = HitBy
+trigger1 = 1
+value = SCA, AP
+time = 1
+
+[State 1021,hb ]
+type = HitOverride
+trigger1 = 1
+attr = SCA, NP, SP, HP
+slot = 1
+stateno = 1023
+time = 2
+ignorehitpause = 1
+
+[State 1023, HitDef]
+type = HitDef
+trigger1 = TimeMod = 8,3
+attr = S,SP        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 12,5
+givepower = 0,0
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+fall.animtype = Back
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 30,3
+pausetime = 1,7
+sparkno = s30002
+
+sparkxy = -20,0
+hitsound = s80,9
+guardsound = S6, 0
+ground.type = High      ;Low,Trip,None
+ground.slide = 0
+ground.hit = 0
+air.hittime = 20
+ground.velocity = 0,0
+air.velocity = 0,0
+sprpriority = 2
+p1sprpriority = 2;(winmugen only)
+p2sprpriority = 1;(winmugen only)
+p1facing = 1
+p1getp2facing = 0
+palfx.time = 5
+palfx.mul = 120,20,124
+palfx.add = 100,0,100
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1021, HitDef]
+type = HitDef
+trigger1 = Time = 35
+attr = S,SP        ;SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+hitflag = MAF        ;HLAFD+-
+guardflag = MA         ;HLA
+getpower = 12,5
+givepower = 0,0
+animtype = light          ;light,medium,hard,back,up,diagup
+air.animtype = light
+fall.animtype = Back
+priority = 4,Hit   ;Hit,Miss,Dodge
+damage = 30,2
+pausetime = 1,7
+sparkno = s30002
+guard.sparkno = 41
+sparkxy = -20,0
+hitsound = s80,9
+guardsound = S6, 0
+ground.type = High      ;Low,Trip,None
+ground.slide = 0
+ground.hit = 0
+air.hittime = 20
+ground.velocity = -6,-3
+air.velocity = -5,-2
+fall = 1
+fall.recovertime = 10
+sprpriority = 2
+p1sprpriority = 2;(winmugen only)
+p2sprpriority = 1;(winmugen only)
+p1facing = 1
+palfx.time = 5
+palfx.mul = 120,20,124
+palfx.add = 100,0,100
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1023, 3]
+type = DestroySelf
+trigger1 = animtime = 0
+
+;sparo dal bastone1
+[StateDef 1030]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1030
+poweradd = 30
+
+[State 1030, Width]
+type = Width
+trigger1 = animelem = 3
+edge = 120,0
+player = 80,0
+
+[State 1030, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S1030,0
+
+[State 1030, 1]
+type = Projectile
+trigger1 = AnimElem = 3,1
+projanim = 8006
+projremove = 0
+projremovetime = 36
+projpriority = 2
+offset = 120,-80
+velocity = 0,0
+attr = S, SP
+damage   = 70,10
+animtype = heavy
+guardflag = MA
+hitflag = MAFP
+pausetime = 0,10
+hitsound   = s70,8
+sparkno = S30002
+sparkxy = 20,0
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 25
+ground.hittime  = 25
+ground.velocity = -6,-4
+air.animtype = Back
+air.velocity = -4,-6
+air.juggle = 7
+fall = 1
+fall.recover = 11
+down.velocity = -4,-6
+down.hittime = 30
+down.bounce = 0
+palfx.time = 30
+palfx.color = 60
+palfx.invertall = 1
+palfx.add = 1,1,1
+palfx.mul = 256,256,256
+palfx.sinadd = 126,126,126,4
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1030, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;sparo dal bastone 2
+[StateDef 1031]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1031
+poweradd = 40
+
+[State 1031, Width]
+type = Width
+trigger1 = animelem = 3
+edge = 120,0
+player = 80,0
+
+[State 1030, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = S1030,0
+
+[State 1030, 1]
+type = Projectile
+trigger1 = AnimElem = 3,1
+projanim = 8006
+projremove = 0
+projremovetime = 36
+projpriority = 2
+offset = 120,-80
+velocity = 0,0
+attr = S, SP
+damage   = 100,10
+animtype = heavy
+guardflag = MA
+hitflag = MAFP
+pausetime = 0,10
+hitsound   = s70,8
+sparkno = S30002
+sparkxy = 20,0
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 25
+ground.hittime  = 25
+ground.velocity = -6,-4
+air.animtype = Back
+air.velocity = -4,-6
+air.juggle = 7
+fall = 1
+fall.recover = 11
+down.velocity = -4,-6
+down.hittime = 30
+down.bounce = 0
+palfx.time = 30
+palfx.color = 60
+palfx.invertall = 1
+palfx.add = 1,1,1
+palfx.mul = 256,256,256
+palfx.sinadd = 126,126,126,4
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1031, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Sparo dalla mano  1
+[StateDef 1040]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1040
+poweradd = 30
+
+[State 1040, Explod]
+type = Explod
+trigger1 =animelem = 3
+anim =8005
+ID = 7007
+pos = 55,-44
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = -2
+supermove
+pausemove
+scale = .5,.5
+sprpriority = 1
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 1040, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 1040,0
+
+[State 1040, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 80,5
+
+[State 1040, 1]
+type = Projectile
+trigger1 = AnimElem = 4
+projanim = 7001
+projhitanim = 7002
+projpriority = 1
+projheightbound = -240, 100
+projedgebound = 100
+projscreenbound = 100
+offset = 52,-44
+velocity = 3
+attr = S, SP
+damage   = 50,2
+animtype = heavy
+guardflag = MA
+hitflag = MAFD
+pausetime = 10,10
+hitsound   = s80,4
+sparkno = S30002
+sparkxy = 20,0
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 25
+ground.hittime  = 25
+ground.velocity = -6
+air.animtype = Back
+air.velocity = -4,-6
+air.juggle = 3
+air.fall = 1
+down.velocity = -4,-6
+down.hittime = 30
+down.bounce = 0
+palfx.time = 10
+palfx.mul = 256,256,256
+palfx.add = 40,-70,-200
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+
+[State 1040, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Sparo dalla mano  2
+[StateDef 1041]
+type = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 1040
+poweradd = 40
+
+[State 1041, Explod]
+type = Explod
+trigger1 =animelem = 3
+anim =8005
+ID = 7007
+pos = 55,-44
+postype = p1  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = -2
+supermove
+pausemove
+scale = .7,.7
+sprpriority = 1
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 1
+
+[State 1040, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 1040,0
+
+[State 1040, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 4
+value = 80,5
+
+[State 1041, 1]
+type = Projectile
+trigger1 = AnimElem = 4
+projanim = 7001
+projhitanim = 7002
+projpriority = 1
+projheightbound = -240, 100
+projedgebound = 100
+projscreenbound = 100
+offset = 52,-44
+velocity = 6
+attr = S, SP
+damage   = 60,3
+animtype = heavy
+guardflag = MA
+hitflag = MAFD
+pausetime = 10,10
+hitsound   = s80,4
+sparkno = S30002
+sparkxy = 20,0
+guardsound = S6,0
+ground.type = Low
+ground.slidetime = 25
+ground.hittime  = 25
+ground.velocity = -6
+air.animtype = Back
+air.velocity = -4,-6
+air.juggle = 3
+air.fall = 1
+down.velocity = -4,-6
+down.hittime = 30
+down.bounce = 0
+palfx.time = 10
+palfx.mul = 256,256,256
+palfx.add = 40,-70,-200
+envshake.time = 12
+envshake.ampl = 6; or 7
+fall.envshake.time = 20
+fall.envshake.ampl = 8
+
+[State 1041, end]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1

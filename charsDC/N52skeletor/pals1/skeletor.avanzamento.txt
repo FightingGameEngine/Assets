@@ -1,0 +1,667 @@
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 13-01-2008
+Frames e anim inserite nell'sff e nel file air ( senza collition box ):
+
+Tipo animazione | Animazine di appartenenza -> frame finale ( tutte le anim partono da zero )
+Stand | 0 -> 5
+Stand Turning | 5 -> 3
+Crouch Turning | 6 -> 3
+To Crouch ( abbassarsi ) | 10 -> 3
+Crouch | 11 -> 3
+Walk Forward | 20 -> 7
+Walk Backward | 21 -> 7
+Start Jump | 40 -> 3
+Jump Neutral/forward/backward | 41 -> 5
+Run Forward | 100 -> 3
+Run Backward | 105 -> 3
+Stand block | 120 -> 2
+Crouch block | 121 -> 2
+Air block | 122 -> 1
+Special block | 123 -> 2 ( una parata bassa da stand... per colpi bassi in + non so se riesco ad usarla cmq è dentro )
+Lose | 170 -> 1 ( da usare con l'abbassamento ghghgh )
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 14-01-2008
+Creati i collition box per tutte le animazioni precedenti e per quelle nuove.
+
+Tipo animazione | Animazine di appartenenza -> frame finale ( tutte le anim partono da zero )
+Win 1 | 181 -> 5
+Win 2 | 182 -> 11 + 12 ( manetello )
+Intro 1 | 191 -> 11 ( usa il mantello della win 2 )
+Taunt | 195 -> 5
+Attacco - Pugno debole stand | 200 -> 4
+Attacco - Pugno forte stand | 205 -> 9
+Attacco - Pugno debole crouch | 400 -> 3
+Attacco - Pugno forte crouch | 405 -> 10
+Attacco - Pugno debole air | 600 -> 3
+Attacco - Pugno forte air | 605 -> 1
+Attacco - Scettro debole stand | 210 -> 6
+Attacco - Scettro forte stand | 215 -> 4
+Attacco - Scettro debole crouch | 410 -> 4
+Attacco - Scettro forte crouch | 415 -> 4
+Attacco - Scettro debole air | 610 -> 3
+Attacco - Scettro forte air | 615 -> 2
+Attacco - Montante | 220 -> 5
+Attacco - Schiacciata | 225 -> 7
+Attacco - Traffigeratrice | 230 -> 4
+Attacco - Uppercut | 235 -> 4
+Attacco - Bastonata dal basso | 240 -> 3
+Attacco - Bastonata dall'alto | 245 -> 5
+Attacco - Bastonata in avanti | 250 -> 5
+Attacco - Uppercut | 255 -> 12
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 15-01-2008
+
+Tipo animazione | Animazine di appartenenza -> frame finale ( tutte le anim partono da zero )
+Gethit - alzato light | 5000/5001/5002 ->40 
+Gethit - alzato heavy | 5010/5011/5012 ->30 
+Gethit - seduto | 5020/5021/5022 -> 40
+Gethit - Air hit | 5030 -> 60/70
+Gethit - laydown | 5040 -> 20
+Gethit - diag-up air hit | 5052 -> 30
+Gethit - getup | 5120 -> 20
+
+Codificato inoltre:
+Intro 1
+Win 1
+Win 2 ( il mantello mi ha fatto uscire pazzo )
+Attacchi base: ( pugno/bastone light e heavy per stand, crouch e air  - logicamente sono provvisori )
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 16-01-2008
+
+Tipo animazione | Animazine di appartenenza -> frame finale ( tutte le anim partono da zero )
+Gethit - hit up | 5041 ->40/50
+Gethit - hit up | 5101 -> 40
+Gethit - getup type2 | -> 2
+Gethit - Morte in parata | 5199 -> 20 ( messo solo nel file sff non so se verrà mai usata... )
+Attacchi speciali - Bastone giro | 1000 -> 15
+Attacchi speciali - Mille colpi | 1010 -> 4
+Attacchi speciali - Sfera | 1020 -> 8
+Attacchi speciali - Sparo dal bastone | 1030 -> 2
+Attacchi speciali - Sparo dalla mano | 1040 -> 1
+Attacchi super - Fuoco | 1100 -> 9
+Presa 1 | 800 -> 12
+Presa 2 | 805 -> 5
+
+Programmate le due prese ( Avanti + y e la seconda avanti + B )
+Programmate le special solo per vedere come sono animate... attendo gli fx nuovi...
+D,F, a bastone giro
+D,F, b sfera
+D,F, x sparo dal bastone
+D,F, y sparo dalla mano
+a,a,a mille bastoni
+
+D,F, a+b 1powerbar super FUOCO
+
+Con start fate la taunt ma è da un pezzo che c'è ghghghgh
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 17-01-2008
+
+Fixed air a little bit
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 18-01-2008
+
+Calcolata corretta posizione degli hitsparks
+attacchi base
+specials 
+super fuoco
+
+Inserito codice per explod nei seguenti casi:
+Dizzy ( stellette )
+Camminata ( polvere quando appoggia il bastone )
+
+RIFATTO TUTTO L'AIR PORCO ZIO E ORA VELO FATE PIACERE STOP
+****************************************************
+
+Filosofia degli attacchi base
+
+I colpi deboli dati con i pugni infliggono un danno pari a 23 punti e se parati ad 1 punto di danno.
+
+Pugno debole
+Comando: X
+200 stomaco - light [ animtype = light groundtype = low  time 20 ]
+400 stomaco - light [ animtype = light groundtype = low  time 20 ]
+600 testa indietro - medium [ animtype = medium groundtype = high  time 24 ]
+
+I colpi forti dati con i pugni infliggono un danno pari a 26 punti e se parati ad 2 punti di danno.
+
+Pugno forte
+Comando: Y
+205 stomaco - light [ animtype = medium groundtype = low  time 24 ]
+405 stomaco - light [ animtype = medium groundtype = low  time 24 ]
+605 testa indietro - medium [ animtype = medium groundtype = high  time 24 ]
+
+I colpi deboli dati con il bastone infliggono un danno pari a 33 punti e se parati ad 3 punti di danno.
+
+Bastone debole
+Comando: A
+210 stomaco [ animtype = medium groundtype = low  time 24 ]
+410 testa indietro [ animtype = hard groundtype = high  time 28 ]
+610 testa indietro [ animtype = hard groundtype = high  time 28 ]
+
+I colpi forti dati con il bastone infliggono un danno pari a 36 punti e se parati ad 4 punti di danno.
+
+Bastone forte
+Comando: B
+215 testa indietro [ animtype = hard groundtype = high  time 28 ]
+415 stomaco [ animtype = medium groundtype = low  time 24 ]
+615 stomaco [ animtype = medium groundtype = low  time 24 ]
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 19-01-2008
+
+Tolta frame 235,4 difettata sostituita nell'animazione dalal 1020,0 in quanto identiche ( cosi è un pò + leggero il file sff gghgh )
+
+Fixata frame 210,3 presentava un anomalo puntino bianco su un dito °_°
+
+Modificati ( per differenziare un minimo ) i vari attacchi il ground.slidetime in questo modo:
+( il ground.slidetime serve a far scivoalre indietro il nemico dopo ogni colpo... logicamente qui non ho esagerato e ho diversificato rispetto al tipo di animazione e di colpo )
+
+200 = 5
+205 = 8
+210 = 8
+215 = 5
+
+400 = 5
+405 = 8
+410 = 7
+415 = 6
+
+600 = 7
+605 = 7
+610 = 5
+615 = 6
+
+** BETA NON UPPATA ( Non finita ) **
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 20-01-2008
+
+Inserito codice e animazione per la "morte in parata" grazie ad Elphizo per l'aiuto e i suggerimenti ghghghghg ^_^
+
+Modificandolo un pò sono riuscito ad avere questi risultati:
+
+Prenderò i miei chars per esempio
+
+SF2GUILE // AOF KING // DADDYSD VS SKELETOR
+se si fa la fireball da lontano ( che skeletor sia in crouch o stand guard ) skeletor viene sconfitto con la caduta indietro.
+se si fa la fireball da vicino pare andare bene
+
+SKELETOR VS SKELETOR
+Per ora fa tutto come deve fare.
+
+In poche parole il codice funziona:
+per attacchi che nel loro hitdef hanno settato pure il damage se il colpo viene parato
+per attacchi effettuati a corto raggio
+
+Io + di cosi non ci son riuscito.
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 21-01-2008
+
+modificato l'air... per i colpi aerei
+modificato animazione ( air file ) per la taunt grazie a Darkdevil ^_^
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 22-01-2008
+creato codice per la mossa "mille bastoni"
+*D,B, A per i primi sei colpi ( fanno un danno di 15lifepoint)
+ premendo il tasto a prima della fine dell'animazione potete ripetere l'attacco per un massimo di altre 3 volte MA il damage nelle ripetizioni è di soli 8lifepoint
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 29-01-2008
+
+Cambiato comando per mille colpi
+la weak move si fa: F,B,F, a
+la strong move si fa: F,B,F, b
+EXTRA HIT premete "b" ripetutamente. ( forse verrà eliminata )
+
+FIxato alcune cose come air per salto, stand to crouch e hit nel pugno forte da stand
+
+Bug: problemi di infinity coi mille pugni ( non so dove minchai ho toppato )
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 31-01-2008
+
+Modificate prese....
+ora quando il nemico ha le spalle al lato estremo dello schermo il nostro skeletor durante la presa si sposta indietro ( in entrambe le prese )
+la presa del tornado dopo aver lanciato il nemico lo fa cadere alle spalle di skeletor
+
+velocizzato il pugno forte da stand.
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 01-02-2008
+
+Velocizzato il tempo di pausa del bastone milli colpi
+
+Aggiunte le seguenti mosse base:
+Stand
+B+x trafiggeratore
+F+y montante non è possibile farlo da vicinissimo per evitare conflitti con la presa
+
+Crouch
+DF+y uppercut
+
+Taunt
+Ora ci sono due taunt che escono ad random
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 02-01-2008
+
+Heka ha creato ( ieri ) e fixato ( oggi ) una paletta alternativa quella con la pella rossa
+Io ho creato la paletta skeletor2.act ma è da perfezionare datemi tempo ghghgh
+fixata mossa df,y ( uppercut )
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 03-01-2008
+
+Fix all'air 
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 04-01-2008
+
+Special SFERA resa funzionante con fx trovato da jarrot e modificato da me ( kaints )
+D,F, a weak
+D,F, b strong
+
+Special Sparo dal Bastone
+D,B, x weak
+D,B, y strong
+
+Special Sparo dalla mano
+D,F, x weak
+D,F, y strong
+
+Special bastone giro
+D,B, a weak
+D,B, b strong
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 05-01-2008
+
+Modificate special SFERA e Sparo dalla mano
+Messo FX nella presa del tornado
+Fixata presa del tornado ora il nemico è d'avanti a skeletor
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 08-01-2008
+
+Bastone giro weak ora può respingere le fireballs rimandandone una indietro 
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 09-01-2008
+
+Bastone giro strong non riflette i proiettili o gli attacchi ma ha 4 diverse finisher moves
+Bastone dal basso = HOLD F,b
+Bastone in avanti = HOLD F,a
+Bastone in basso = HOLD D,a
+Bastone uppercut = HOLD D,b
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 13-01-2008
+
+Fixato bastone giro strong, ora riflette tutti gli attacchi o per meglio dire fa una counter durante un attacco muahahahahahaahahahahaha
+Allora...
+
+Se viene colpito da un pugno o da una fireball e avete inserito ilcomando per la risposta ( vedi aggiornamento precedente ) skeletor farà
+la sua contro mossa..... non può essere colpito mentre la fa....
+
+Se eseguite il comando supplementare e non viene colpito non fa nulla.... ma va ehheeh
+
+Iniziato a metter le mani sulla super.... per ora non colpisce cmq potete vedere come sta venendo su ^_^
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 14-01-2008
+
+Ora la super colpisce..... notare lo sfondo che "pulsa" muahaahahahahahahahaahah
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 15-01-2008
+
+Aggiunti pal fx agli attacchi: Sparo dalla mano, sparo dal bastone e sfera!
+Se non piacciono si prova a trovarne di altri ( usate Fighter factory er eventuali test ) o si toglie questo effetto
+quando il nemico viene colpito
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 16-01-2008
+
+Aggiunti fx alla presa "fiamma" avanti + y ( se ricordo bene ghgh )
+e alla super.... questo non è proprio il massimo... ma per ora.. non so fare di meglio :\
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 21-01-2008
+
+Fixato un bug nella super che lasciava sempre il bgfx se skeletor veniva colpito.
+Fixato bug nella special "bastone giro strong" muahahahaha pare funzionare..... beta testate!!!
+Aggiunta nuova pal
+Eliminata una pal
+
+Le Pal ( palette - i file act ) sono questi:
+pal1=pals/skeletor.act			;paletta di base
+pal2=pals/obscure_pal_complete.act		;paletta alternativa creata da Heka
+pal3=pals/skele_humanpal.act		;paletta alternativa creata da Heka
+pal4=pals/skeletor_drdoom.act		;paletta alternativa creata da Kain the supreme... con i colori di dr.doom ( victor van-doom )
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 29-01-2008
+
+Le Pal ( palette - i file act ) sono questi:
+pal1=pals/skeletor.act			;paletta di base
+pal2=pals/obscure_pal_complete.act		;paletta alternativa creata da Heka
+pal3=pals/skele_humanpal.act		;paletta alternativa creata da Heka
+pal4=pals/skeletor_drdoom.act		;paletta alternativa creata da Kain the supreme... con i colori di dr.doom ( victor van-doom )
+pal5=pals/skeletor_kts.act			;paletta alternativa creata da Kain the supreme
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 17-03-2008 (Rik)
+
+Sistemata la velocità delle varie animazioni...
+Sistemato il danno delle hitdef
+Rimodernate le special
+Il Montante (F+Y) è stato rimosso e l'animazione è stata riusata per il pugno debole da vicino
+L'animazione 210 è usata per la bastonata debole da vicino
+Al posto della fireball del bastone adesso c'è un fulmine da vicino
+La fireball del bastone è stata riusata per la fireball dalla mano
+Rifatta quasi per intero la super della nuvola di gas
+Modificata l'azione 235
+il 'trafiggeratore' è stato modificato
+La counter del bastone che gira è stata rimossa
+L'animazione del bastone che gira è stata accelerata
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 18-03-2008 (Rik)
+
+L'animazione del bastone che gira è stata rallentata...nota che la special non funziona ancora correttamente
+Inserito un super portrait del cavolo per le super
+Messo un sistema di combo base
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 22-04-2008 ( kain the supreme )
+
+Tolto il codice sperimentale per le counter ora il bastone gira solamente ( bastone giro forte )
+Sia la weak che la strong respingolo solo le fireball ( projectle ) creandone una al centro...
+Si differenziano solo per la velocità delle fireball stesse.
+
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 26-04-2008 ( kain the supreme )
+
+Aggiornato codice delle prese per seguire le trasformazioni di He-man cosi le animazioni ora funzionano meglio^_^
+aggiunto il sonoro dei colpi base ( tranne quelli col bastone )
+aggiunto sonoro nella win della risata con la risata della sigla italiana... fa ena ma mi ero scocciato di tutto sto silenzio.
+
+Se iniziate a far muovere Crono per le sigle e se riesce pure per qualche fx caruccio è buona cosa 
+
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 27-04-2008 ( kain the supreme )
+
+Aggiunta la risata della win pure alal super ^_^ non è il massimo ma ci sta bene ehehehe 
+Aggiunto effetto sonoro nell'intro col mantello di skelly
+aggiunto effetto sonoro alla win col mantello di skelly
+aggiunto effetto sonoro quando salta
+aggiunto effetto sonoro elettrico per la special sparo dal bastone
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 28-04-2008 ( kain the supreme )
+
+Aggiunta paletta come da indicazioni di Jarrot ^_^
+
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 02-05-2008 ( kain the supreme )
+
+Aggiunto un posset nello statedef 0 e nelle prese ( ogni tanto si blocca in aria... )
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 03-09-2008 ( kain the supreme )
+
+Fixata presa della fiamma verde ora i persoanggi che non hanno le animazioni necesarie ne usano di alternative ^_^
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 06-12-2008 ( kain the supreme )
+
+- il pugno forte base ora non va + in avanti
+- Le prese le ho controllate.. e a me vanno bene forse è sul serio vecchia la versione sul forum boh ora cmq la devo aggiornare eheh
+- eliminato faccione di skeletor povero rick che l'aveva editato gh
+- gh la standing da seduto quando la fai la cambio gh
+- uppercut corretto
+- mantello rallentato un pò, resta d+ sullo schermo
+- la tua paletta c'è devo solo riordinare un pò i file nel def ;)
+
+cambiate frame della win ( risata )
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 07/12/2008 kain the supreme
+
+cambiate la crouching animation
+aggiunto il big protrait di skeletor
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 13/01/2009 kain the supreme
+
+Aggiunte tutte le nuove frames per le nuove super
+Programmata solo una nuova super "Mirror illusion" ( D,B, a+b )
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 15/01/2009 kain the supreme
+
+Modificato come richiesto da Jarrot la "Mirror illusion" ( D,B, a+b )
+Vedi un pò come va ghghghgh
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 16/01/2009 kain the supreme
+
+Modificato ancora la "Mirror illusion" ( D,B, a+b )
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+
+Lavoro del 21/01/2009 kain the supreme
+
+Modificato ancora la "Mirror illusion" ( D,B, a+b )
+ora saprisce con lo scettro in mano e riapapre senza come jarrot ha richiesto muahahahahaahahah
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 29/01/2009 kain the supreme
+
+Modificato ancora la "Mirror illusion" ( D,B, a+b )
+aggiunto fx ( helper ) che colpisce il nemico
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 31/01/2009 kain the supreme
+
+Creata prima versione della super  "Sphere" ( D,F, x+y )
+
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 01/02/2009 kain the supreme
+
+modificata super  "Sphere" ( D,F, x+y )
+ora si ferma un pò di il nemico
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 04/03/2009 kain the supreme
+
+aggiunta la prima versione della nuova intro di skeletor
+per motivi di semplicità di dimostrazione dell'intro per ora si può vedere solo quella nuova appena finita quest'intro si vedrano entrambe come al solito
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 05/03/2009 kain the supreme
+
+modifcata nuova intro
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 17/03/2009 kain the supreme
+
+Cambiateframe della prima intro ( quella col mantello )
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 21/03/2009 kain the supreme
+
+Aggiornata nuova intro con timing diverso e con un nuovo fx
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 21/03/2009 kain the supreme
+bis
+Aggiornata nuova intro ora ha la polvere
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 15/04/2009 kain the supreme
+
+aggiunti fx sonori all'intro con beastman e trapjaw
+aggiunta nuova lose by time over ( portale ) e sonoro
+Adeguata al sonoro l'intro con beastman e trapjaw
+cambiata risata
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 16/04/2009 kain the supreme
+
+aggiunto fx sonoro all'intro con beastman e trapjaw ( voce di skeletor )
+rimpicciolito il portale nella lose e tolto il codice che lo faceva lievitare.
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 27/04/2009 kain the supreme
+
+Iniziata prima versione della nuova super difensiva
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 28/04/2009 kain the supreme
+
+Finita prima versione della nuova super difensiva
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 25/05/2009 kain the supreme
+
+Create 4 nuove palette per sostituire quelle vecchie.
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 26/05/2009 kain the supreme
+
+Fixs delle palette... ho dovuto far tornare il colore dei pantaloncini ( mutande ) di skeletor griggie, in quanto il mantello e ste benedette mutande hanno alcuni colori identici.
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 19/02/2010 kain the supreme
+
+Fixs alle prese - L'ai riusciva a farle pure in aria
+Inizio ricodifica AI per Skeletor
+Fix ad Havoc Staff - ora non ci si può + difendere se si è colpiti
+Fix al tempo del mirror illution
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 20/02/2010 kain the supreme
+
+Fatta AI per Skeletor con i fix della presa
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 21/02/2010 Count Monte & Kain the supreme
+
+Nuovi fx sonori
+new sound fx by Count Monte
+Fixs to the ai 
+Fixs to envshake for every attacks
+redone poweradd for basic special and supers
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+Lavoro del 22/02/2010 Count Monte & Kain the supreme
+
+aggiunto un nuovo fx - parata S6,0
+added a new guard sound fx  S6,0
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 23/02/2010 Count Monte & Kain the supreme
+
+skeletor
+99,9 = Skeletor Intro.wav 
+99,10 = Skeletor Intro2.wav 
+182,1= skeletor win.wav
+( other sounds send to me wasn't used cause... I don't understand what they said/means )
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+
+Lavoro del 25/02/2010 Count Monte & Kain the supreme
+
+11,0 = dead voice for skeletor °_°
+3010,0 = fx per la super della sfera ( fx elettrico ghgh )
+
+***
+deleted the second taunt - cancellata la seconda taunt 
+
+************************************************************************************************************************************************************
+************************************************************************************************************************************************************
+by
+kain the supreme
