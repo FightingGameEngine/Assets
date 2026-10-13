@@ -1,0 +1,197 @@
+;KIBLAST
+[Statedef 1000]
+type=S
+physics=S
+movetype=A
+anim=1000
+ctrl=0
+velset=0,0
+poweradd=72
+sprpriority=1
+facep2=1
+
+
+[State 1000, Strength]
+type = varset
+trigger1 = !time && !AIlevel
+var(10) = ifelse(command = "z", 3, ifelse(command = "y", 2, 1))
+[State 1000, Strength AI]
+type = varset
+trigger1 = !time && AIlevel
+var(10) = ifelse((p2movetype = H || random < 500), 3, ifelse(random < 500, 2, 1))
+
+[State 1000, width]
+type = width
+trigger1 = animelemtime(5) = -1
+value = 30,0
+
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelemtime(3)=1;animelem = 3
+helpertype = normal
+name = "kiblast"
+ID = 1000
+stateno = 1005
+pos = 12,-50
+postype = p1
+ownpal = 1
+supermovetime = 0
+pausemovetime = 0
+size.xscale = .70
+size.yscale = .70
+
+[State 1000, End]
+type = changestate
+trigger1 = !animtime
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Ki Blast
+[Statedef 1005]
+type    = S
+movetype= A
+physics = N
+ctrl = 0
+anim = 1005
+velset = 0,0
+sprpriority = 5
+
+[State 1005, HitOverride]
+type = hitoverride
+trigger1 = 1
+time = -1
+attr = SCA, AA, AP, AT
+stateno = 1006
+ignorehitpause = 1
+[State 1005, HB]
+type = hitby
+trigger1 = 1
+time = -1
+value = SCA, NP, SP, HP
+ignorehitpause = 1
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 =1
+flag = noshadow
+ignorehitpause =1
+
+[State 1005, Strength]
+type = varset
+trigger1 = !time
+var(10) = root, var(10)
+
+[State 1005, movehitvar]
+type = varset
+trigger1 = movecontact && numtarget
+trigger1 = !(target, ishelper)
+var(3) = 1
+ignorehitpause = 1
+
+[State 1005, Vel]
+type = velset
+trigger1 = 1
+x = 3+1*var(10)
+y = 0
+
+
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S9000,1
+volumescale = 100
+channel = -1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S9001,1
+volumescale = 100
+channel = -1
+;[State 0, AngleDraw]
+;type = AngleDraw
+;trigger1 = 1
+;value = -(vel y)*5
+
+
+[State 300, Hitdef]
+type = HitDef
+trigger1 = Time = 0
+attr = A, SP
+damage = 105
+animtype = Medium
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 0, 4
+guard.pausetime = 0,0
+sparkno = s7030 + (random % 8)
+guard.sparkno =  s7001
+sparkxy = 0 + 0*(var(16):=50), var(17):=0
+hitsound = s2, 4
+guardsound = s2, 10
+ground.type = Low
+air.type = Low
+ground.slidetime = 5
+ground.velocity = -6
+air.velocity = -1.4,-3
+ground.hittime  = 11
+air.hittime = 11
+airguard.velocity = -1.9,-.8
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall = 0
+getpower = 0,0
+
+
+[State 1005, end]
+type=changestate
+trigger1= movecontact
+value=1006
+ignorehitpause=1
+
+[State 1006, end]
+type=destroyself
+trigger1=pos x!=[-240,240]
+;---------------------------------------------------------------------------
+; Ki Blast Hit
+[Statedef 1006]
+type    = A
+movetype= A
+physics = N
+ctrl = 0
+anim = 1006
+velset = 0,0
+sprpriority = 5
+
+[State 0, Trans]
+type = Trans
+trigger1 = 1
+trans = add
+ignorehitpause = 1
+
+[State 0, AfterImageTime]
+type = AfterImageTime
+trigger1 = !time
+time = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S9000,0
+volumescale = 100
+channel = -1
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = 1
+value = -(vel y)*5
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = !animtime

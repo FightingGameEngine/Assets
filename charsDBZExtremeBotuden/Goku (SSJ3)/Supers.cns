@@ -1,0 +1,1476 @@
+;Kamehameha Start 
+[Statedef 2000]
+type    = S
+movetype= I
+physics = S
+velset = 0,0
+ctrl = 0
+juggle = 0
+anim = 2000
+poweradd = -1000
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+v = 12    
+value = 0
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 9
+freqmul = 200
+volumescale = 100
+
+[State 0, VarAdd]
+type = VarAdd
+triggerall = var(10) = 0
+trigger1 = animelem = 1
+v = 11    
+value = 50
+
+[State 0]
+type = Helper
+trigger1 = time = 0
+ID = 2000
+pos = 0,0
+postype = p1
+stateno = 8000
+helpertype = normal
+name = "Super Flash"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 3000, SuperPause]
+type = SuperPause
+trigger1 = time = 0
+time = 30
+movetime = 30
+anim = -1
+sound = -1
+pos = 32,-80
+darken = 1
+unhittable = 1
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 2001
+ctrl = 0
+
+;Kamehameha Charging 
+[Statedef 2001]
+type    = S
+movetype= I
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2001
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 1
+v = 12    
+value = 1
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+name = "Kamehameha Charge Ball"
+ID = 2000
+stateno = 8005
+pos = -50,-25
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 50
+v = 12    
+value = 2
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 120
+v = 12    
+value = 3
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 1
+triggerall = time > 20
+trigger1 = command != "Hold Punch Kick"
+value =2002
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 2
+trigger1 = command != "Hold Punch Kick"
+value =2003
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 3
+trigger1 = command != "Hold Punch Kick"
+value =2004
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 3
+trigger1 = animtime = 0
+value =2004
+ctrl = 0
+
+;Kamehameha Level 1
+[Statedef 2002]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2002
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "Kamehameha"
+ID = 2000
+stateno = 8016
+pos = 100,-35
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Kamehameha Level 2 
+[Statedef 2003]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2002
+
+[State 0, PowerAdd]
+type = PowerAdd
+triggerall = prevstateno = 1251131
+trigger1 = time = 0
+value = -1000
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "Kamehameha"
+ID = 2000
+stateno = 8016
+pos = 100,-35
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Kamehameha Level 3 
+[Statedef 2004]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2006
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "Kamehameha"
+ID = 2000
+stateno = 8017
+pos = 215,25
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 200, 1]
+type = HitDef
+trigger1 = timemod = 3,0
+attr = S, HP                    
+damage = 14, 5                   
+animtype = Heavy                 
+guardflag =                  
+hitflag = MAF                    
+priority = 10, Hit                
+pausetime = 0, 0                 
+sparkno = -1                      
+sparkxy = -10, -76               
+hitsound = s7, 2                  
+guardsound = s2, 0                
+ground.type = Low               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -4             
+airguard.velocity = -1.9,-.8     
+air.type = High                  
+air.velocity = -1.4,-3          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall = 1
+fall.recover = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Air Kamehameha Start 
+[Statedef 2010]
+type    = A
+movetype= I
+physics = N
+velset = 0,0
+ctrl = 0
+juggle = 0
+anim = 2000
+poweradd = -1000
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+v = 12    
+value = 0
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 9
+freqmul = 200
+volumescale = 100
+
+[State 0, VarAdd]
+type = VarAdd
+triggerall = var(10) = 0
+trigger1 = animelem = 1
+v = 11    
+value = 50
+
+[State 0]
+type = Helper
+trigger1 = time = 0
+ID = 2000
+pos = 0,0
+postype = p1
+stateno = 8000
+helpertype = normal
+name = "Super Flash"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 3000, SuperPause]
+type = SuperPause
+trigger1 = time = 0
+time = 30
+movetime = 30
+anim = -1
+sound = -1
+pos = 32,-80
+darken = 1
+unhittable = 1
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 2011
+ctrl = 0
+
+;Air Kamehameha Charging 
+[Statedef 2011]
+type    = A
+movetype= I
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 2001
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 1
+v = 12    
+value = 1
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+name = "Kamehameha Charge Ball"
+ID = 2000
+stateno = 8026
+pos = -50,-25
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 50
+v = 12    
+value = 2
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 120
+v = 12    
+value = 3
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 1
+triggerall = time > 20
+trigger1 = command != "Hold Punch Kick"
+value =2012
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 2
+trigger1 = command != "Hold Punch Kick"
+value =2013
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 3
+trigger1 = command != "Hold Punch Kick"
+value =2014
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 3
+trigger1 = animtime = 0
+value =2014
+ctrl = 0
+
+;Air Kamehameha Level 1
+[Statedef 2012]
+type    = A
+movetype= A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 2002
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "Kamehameha"
+ID = 2000
+stateno = 8016
+pos = 100,-35
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 0
+
+;Air Kamehameha Level 2 
+[Statedef 2013]
+type    = A
+movetype= A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 2002
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "Kamehameha"
+ID = 2000
+stateno = 8016
+pos = 100,-35
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 0
+
+;Air Kamehameha Level 3 
+[Statedef 2014]
+type    = A
+movetype= A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 2006
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "Kamehameha"
+ID = 2000
+stateno = 8017
+pos = 215,25
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 200, 1]
+type = HitDef
+trigger1 = timemod = 3,0
+attr = S, HP                    
+damage = 14, 5                   
+animtype = Heavy                 
+guardflag =                  
+hitflag = MAF                    
+priority = 10, Hit                
+pausetime = 0, 0                 
+sparkno = -1                      
+sparkxy = -10, -76               
+hitsound = s7, 2                  
+guardsound = s2, 0                
+ground.type = Low               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -4             
+airguard.velocity = -1.9,-.8     
+air.type = High                  
+air.velocity = -1.4,-3          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall = 1
+fall.recover = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 0
+
+;Anti Air Kamehameha Start 
+[Statedef 2100]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+juggle = 0
+anim = 2000
+poweradd = -1000
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+v = 12    
+value = 0
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 9
+freqmul = 200
+volumescale = 100
+
+[State 0, VarAdd]
+type = VarAdd
+triggerall = var(10) = 0
+trigger1 = animelem = 1
+v = 11    
+value = 50
+
+[State 0]
+type = Helper
+trigger1 = time = 0
+ID = 2000
+pos = 0,0
+postype = p1
+stateno = 8000
+helpertype = normal
+name = "Super Flash"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 3000, SuperPause]
+type = SuperPause
+trigger1 = time = 0
+time = 30
+movetime = 30
+anim = -1
+sound = -1
+pos = 32,-80
+darken = 1
+unhittable = 1
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 2101
+ctrl = 0
+
+;Anti Air Kamehameha Charging 
+[Statedef 2101]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2001
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 1
+v = 12    
+value = 1
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = time = 0
+helpertype = normal
+name = "Kamehameha Charge Ball"
+ID = 2000
+stateno = 8022
+pos = -50,-25
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 50
+v = 12    
+value = 2
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 120
+v = 12    
+value = 3
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 1
+triggerall = time > 20
+trigger1 = command != "Hold Punch Kick"
+value =2102
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 2
+trigger1 = command != "Hold Punch Kick"
+value =2103
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 3
+trigger1 = command != "Hold Punch Kick"
+value =2104
+ctrl = 0
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) = 3
+trigger1 = animtime = 0
+value =2104
+ctrl = 0
+
+;Anti Air Kamehameha Level 1
+[Statedef 2102]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2100
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "DKamehameha"
+ID = 2000
+stateno = 8020
+pos = 115,-115
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 200, 1]
+type = HitDef
+triggerall = enemy,var(30) >= 500
+trigger1 = timemod = 3,0
+attr = S, HP                    
+damage = 5, 1                   
+animtype = Medium                 
+guardflag = M                   
+hitflag = MAF                    
+priority = 8, Hit                
+pausetime = 0, 0                 
+sparkno = -1                      
+sparkxy = -10, -65               
+hitsound = s7, 2 
+guard.sparkno = s8007                 
+guardsound = s2, 0                
+ground.type = High               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -4             
+airguard.velocity = -1.9,-.8     
+air.type = High                  
+air.velocity = -1.4,-3          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall.recover = 0
+
+[State 200, 1]
+type = HitDef
+triggerall = enemy,var(30) <= 499
+trigger1 = timemod = 3,0
+attr = S, HP                      
+damage = 5, 1                   
+animtype = Medium                 
+guardflag = M                   
+hitflag = MAF                    
+priority = 8, Hit                
+pausetime = 0, 0                 
+sparkno = -1                      
+sparkxy = -10, -65               
+hitsound = s7, 2 
+guard.sparkno = s8031                 
+guardsound = s2, 0                
+ground.type = High               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -4             
+airguard.velocity = -1.9,-.8     
+air.type = High                  
+air.velocity = -1.4,-3          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall.recover = 0
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Anti Air Kamehameha Level 2 
+[Statedef 2103]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2100
+
+[State 0, PowerAdd]
+type = PowerAdd
+triggerall = prevstateno = 1251131
+trigger1 = time = 0
+value = -1000
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "DKamehameha"
+ID = 2000
+stateno = 8020
+pos = 115,-115
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 200, 1]
+type = HitDef
+triggerall = enemy,var(30) >= 500
+trigger1 = timemod = 3,0
+attr = S, HP                      
+damage = 8, 2                   
+animtype = Medium                 
+guardflag = M                  
+hitflag = MAF                    
+priority = 10, Hit                
+pausetime = 0, 0                 
+sparkno = -1
+guard.sparkno = s8007              
+sparkxy = -10, -65               
+hitsound = s7, 2                  
+guardsound = s2, 0                
+ground.type = High               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -4             
+airguard.velocity = -1.9,-.8     
+air.type = High                  
+air.velocity = -1.4,-3          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall.recover = 0
+
+[State 200, 1]
+type = HitDef
+triggerall = enemy,var(30) <= 499
+trigger1 = timemod = 3,0
+attr = S, HP                      
+damage = 8, 2                   
+animtype = Medium                 
+guardflag = M                   
+hitflag = MAF                    
+priority = 10, Hit                
+pausetime = 0, 0                 
+sparkno = -1
+guard.sparkno = s8031             
+sparkxy = -10, -65               
+hitsound = s7, 2                  
+guardsound = s2, 0                
+ground.type = High               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -4             
+airguard.velocity = -1.9,-.8     
+air.type = High                  
+air.velocity = -1.4,-3          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall.recover = 0
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Anti Air Kamehameha Level 3 
+[Statedef 2104]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2101
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 0
+value = 6, 10
+freqmul = 200
+volumescale = 100
+
+[State 0, Kamehameha]
+type = Helper
+trigger1 = animelem = 2
+helpertype = normal
+name = "DKamehameha"
+ID = 2000
+stateno = 8021
+pos = 245,-145
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+size.xscale = .7
+size.yscale = .7
+supermovetime = 999
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = animtime = 0
+v = 12    
+value = 0
+
+[State 200, 1]
+type = HitDef
+trigger1 = timemod = 3,0
+attr = S, HP                    
+damage = 9, 5                   
+animtype = Heavy                 
+guardflag =                  
+hitflag = MAF                    
+priority = 10, Hit                
+pausetime = 0, 0                 
+sparkno = -1                      
+sparkxy = -10, -76               
+hitsound = s7, 2                  
+guardsound = s2, 0                
+ground.type = Low               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -4             
+airguard.velocity = -1.9,-.8     
+air.type = High                  
+air.velocity = -1.4,-3          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall = 1
+fall.recover = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Dragon Fist Start
+[Statedef 2200]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2200
+poweradd = -3000
+juggle = 0
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 25
+ignorehitpause = 1
+persistent = 1
+
+
+[State 0, VarAdd]
+type = VarAdd
+triggerall = var(10) = 0
+trigger1 = animelem = 1
+v = 11    
+value = 50
+
+[State 0]
+type = Helper
+trigger1 = time = 0
+ID = 2000
+pos = 0,0
+postype = p1
+stateno = 8000
+helpertype = normal
+name = "Super Flash"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 3000, SuperPause]
+type = SuperPause
+trigger1 = time = 0
+time = 30
+movetime = 0
+anim = -1
+sound = -1
+pos = 32,-80
+darken = 0
+unhittable = 1
+
+[State 210, 2]
+type = HitDef
+triggerall = enemy,var(30) >= 500
+trigger1 = Time = 0
+attr = S, HT
+animtype  = heavy
+damage    = 20
+guardflag = M
+priority = 10, Hit
+pausetime = 12,12
+sparkno = s8008
+guard.sparkno = s8007
+sparkxy = -10,-70
+hitsound   = s1,5
+guardsound = s2, 0 
+ground.type = low
+ground.slidetime = 12
+ground.hittime  = 16
+ground.velocity = 0,-25.5
+guard.velocity = -2.5
+air.velocity = -0,-25.5
+p1stateno = 2201
+p2stateno = 0007
+kill = 0
+
+[State 210, 2]
+type = HitDef
+triggerall = enemy,var(30) <= 499
+trigger1 = Time = 0
+attr = S, HT
+animtype  = heavy
+damage    = 20
+guardflag = M
+priority = 10, Hit
+pausetime = 12,12
+sparkno = s8008
+guard.sparkno = s8007
+sparkxy = -10,-70
+hitsound   = s1,5
+guardsound = s2, 0 
+ground.type = low
+ground.slidetime = 12
+ground.hittime  = 16
+ground.velocity = 0,-25.5
+guard.velocity = -2.5
+air.velocity = -0,-25.5
+p1stateno = 2201
+p2stateno = 0007
+kill = 0
+
+[State 230, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;Dragon Fist
+[Statedef 2201]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 2201
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 1
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 20
+x = 0
+y = 0
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 80
+value = 6, 11
+freqmul = 200
+volumescale = 100
+
+[State 111]
+type = PlaySnd
+trigger1 = time = 130
+value = S8,9
+volume = 200
+
+[State 111]
+type = PlaySnd
+trigger1 = time = 130
+value = S8,10
+volume = 200
+channel  = 1
+loop = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 130
+anim = 901
+ID = 2200
+pos = 0,5
+postype = p1
+bindtime = -1
+removetime = -1
+pausemovetime = 0
+supermovetime = 0
+scale = 3,3
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+
+[State 0]
+type = Helper
+trigger1 = time = 0
+ID = 2200
+pos = 0,0
+postype = p1
+stateno = 8007
+helpertype = normal
+name = "Cutscene 1"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1.5
+size.yscale = 1.5
+
+[State 0]
+type = Helper
+trigger1 = time = 0
+ID = 2200
+pos = 0,0
+postype = p1
+stateno = 8008
+helpertype = normal
+name = "Super Background"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1.5
+size.yscale = 1.5
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time = 180
+y = -15
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 180
+value = 8, 8
+freqmul = 200
+volumescale = 100
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time = 200
+y = 0
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 200
+x = 0
+y = 0
+ 
+[State 0]
+type = Helper
+trigger1 = time = 180
+ID = 2200
+pos = 0,0
+postype = p1
+stateno = 8007
+helpertype = normal
+name = "Cutscene 2"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 0]
+type = Helper
+trigger1 = time = 200
+ID = 2200
+pos = 0,0
+postype = p1
+stateno = 8011
+helpertype = normal
+name = "DSuper Background"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 280
+value = 6, 12
+freqmul = 200
+volumescale = 100
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 280
+value = 0, 0
+freqmul = 200
+volumescale = 100
+
+[State 0]
+type = Helper
+trigger1 = time = 330
+ID = 2200
+pos = -50,150
+postype = p1
+stateno = 8015
+helpertype = normal
+name = "EXPLODE!"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 10
+size.yscale = 10
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time > 369
+flag = invisible
+
+[State 0]
+type = Helper
+trigger1 = time = 370
+ID = 2200
+pos = 0,0
+postype = p1
+stateno = 8023
+helpertype = normal
+name = "Dragon"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time  > 370
+id = 7000
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = time = 370
+channel = 1
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time = 370
+id = 2200
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 370
+v = 9    
+value = 0
+
+[State 0]
+type = Helper
+trigger1 = time = 500
+ID = 2200
+pos = 0,0
+postype = p1
+stateno = 8007
+helpertype = normal
+name = "Cutscene 3"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 1
+size.yscale = 1
+
+[State 0]
+type = Helper
+trigger1 = time = 565
+ID = 2200
+pos = 0,0
+postype = p1
+stateno = 8024
+helpertype = normal
+name = "Dragon Hit"
+ownpal = 1
+supermovetime = 100
+pausemovetime = 100
+size.xscale = 2
+size.yscale = 2
+
+[State 200, 1]
+type = HitDef
+trigger1 = timemod = 3,0
+attr = S, HA                   
+damage = 20, 5                   
+animtype = Heavy                 
+guardflag =                  
+hitflag = MAF                    
+priority = 10, Hit                
+pausetime = 0, 0                 
+sparkno = s1006                      
+sparkxy = -10, -76               
+hitsound = s7, 2                  
+guardsound = s2, 0                
+ground.type = Low               
+ground.slidetime = 5             
+ground.hittime  = 11             
+ground.velocity = -0             
+airguard.velocity = -1.9,-.8     
+air.type = Low                 
+air.velocity = -7,-7          
+air.hittime = 15
+ground.cornerpush.veloff = 0
+air.cornerpush.veloff = 0
+down.cornerpush.veloff = 0
+guard.cornerpush.veloff = 0
+airguard.cornerpush.veloff = 0
+fall = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 635
+anim = 1006
+ID = 1006
+pos = 0,50
+postype = p1
+bindtime = -1
+removetime = -1
+pausemovetime = 0
+supermovetime = 0
+scale = 3,3
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 649
+anim = 8003
+ID = 8003
+pos = 0,50
+postype = p1
+bindtime = -1
+removetime = -1
+pausemovetime = 0
+supermovetime = 0
+scale = 3,3
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = time = 635
+value = 7, 2
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time = 659
+id = 1006
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = time = 719
+id = 8003
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time = 724
+x = ifelse(facing = 1,-200,200)
+y = -200
+
+[State 0, TargetVelAdd]
+type = TargetVelAdd
+trigger1 = time = 724
+x = -5
+y = -10
+
+[State 230, 3]
+type = ChangeState
+trigger1 = Time = 725
+value = 50
+ctrl = 0
