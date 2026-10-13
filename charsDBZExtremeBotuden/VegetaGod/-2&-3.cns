@@ -1,0 +1,1337 @@
+;---------------------------------------------------------------------------
+; 常時監視ステ
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+[State -2, デバッグ表示]
+type = null
+trigger1 = 1
+text = "Var(5)-Button=%d,Pos X=%d,Y=%d"
+params = var(5),floor(Pos X),floor(Pos Y)
+
+;---------------------------------------------------------------------------
+;演出系
+
+[State -2,覇気]
+type=helper
+trigger1=palno=12
+trigger1=!IsHelper
+trigger1=!numhelper(77)
+helpertype=player
+stateno=77
+ID=77
+name="Holiness"
+postype=p1
+pausemovetime=65535
+supermovetime=65535
+
+[State -2];保護
+type = SelfState
+trigger1 = Ishelper(77)
+value = 77
+IgnoreHitPause = 1
+
+[State 2200, sparking]
+type = Explod
+triggerall = gametime%100 = 1
+triggerall = stateno != 183
+trigger1 = PalNo = 12
+trigger2 = stateno = 1300
+anim = 4600
+ID = 4600
+pos = 0,-55
+postype = p1
+facing = ifelse(random<500,-1,1)
+vfacing = ifelse(random<500,-1,1)
+bindtime = -1
+random = 0,80
+scale = 1.3,1.3
+sprpriority = 5
+ownpal = 1
+removeongethit = 1
+supermove = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[state ]
+type=playsnd
+triggerall=gametime%100=1
+triggerall=stateno!=183
+trigger1=palno=12
+trigger2=stateno=1300
+value=190,6
+
+;---------------------------------------------------------------------------
+;システム系
+[state 195]
+type = RemoveExplod
+trigger1 = Stateno != 211
+ID = 17001
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State -2, 喰らいボイス]
+type = PlaySnd
+triggerall = Time = 1
+triggerall = Alive
+trigger1 = StateNo = 5000 || StateNo = 5010 || StateNo = 5020
+trigger2 = StateNo = 5070 || StateNo = 5080 || StateNo = 5100
+value = 5000,Random%4
+
+[State -2 Get Up!];復帰時のボイス
+type = PlaySnd
+trigger1 = Time = 1
+trigger1 = StateNo = 5120
+value = 5001,random%6
+
+[State -2, ラウンド２以降のイントロ]
+type = selfState
+triggerall = RoundState = 0
+triggerall = RoundNo > 1
+triggerall = !IsHelper
+trigger1 = time = 0
+value = 193
+
+[state -2,チャージのボイスを切る]
+type = stopsnd
+trigger1 = stateno != 1300
+channel = 1
+
+[state -2,チャージの音を切る]
+type = stopsnd
+trigger1 = stateno != 1300
+channel = 2
+
+[State 1100, 5]
+type = Projectile
+trigger1 = NumExplod(1000)
+trigger1 = gametime%4 = 1
+attr = A, NA
+damage = ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.005))
+projremovetime = 1
+animtype = Heavy
+getpower = 0
+givepower = 0
+projid = 35600
+guardflag = MA
+hitflag = MAFDPLH
+pausetime = 0,1
+sparkno = -1
+guard.sparkno = -1
+sprpriority = 5
+sparkxy = 0,0
+hitsound = s6002,5
+guardsound = 6,0
+ground.type = High
+ground.slidetime = 12
+ground.hittime = 18 
+ground.velocity = -4,6.0
+air.velocity = -4,1
+projanim = 7776
+projhitanim = -1
+velocity = 0,0
+fall = 1
+air.fall = 1
+fall.recover = 0
+offset = 0,0
+projremove = 0
+yaccel = 0.4
+supermovetime = 999999
+pausemovetime = 999999
+
+[State ]
+type=explod
+trigger1 = NumExplod(1000)
+trigger1 = gametime%7 = 1
+anim=7250
+sprpriority=5
+postype=back
+bindtime=-1
+pos=0+random%320,265
+scale=1,1.5
+ownpal=1
+ontop=1
+facing=ifelse(random%2,-1,1)
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[state ]
+type=playsnd
+trigger1 = NumExplod(1000)
+trigger1 = gametime%7 = 1
+value=190,2
+
+;-------------------------------
+;チャージ処理
+
+[State -2, パワー溜めエフェクトを消す]
+type = RemoveExplod
+triggerall = NumExplod(1302) > 0
+trigger1 = StateNo != 1300
+trigger2 = MoveType != I
+ID = 1302
+[State -2, パワー溜めエフェクトを消す]
+type = RemoveExplod
+triggerall = NumExplod(1303) > 0
+trigger1 = StateNo != 1300
+trigger2 = MoveType != I
+ID = 1303
+[State -2, パワー溜めエフェクトを消す]
+type = RemoveExplod
+triggerall = NumExplod(1304) > 0
+trigger1 = StateNo != 1300
+trigger2 = MoveType != I
+ID = 1304
+[State -2, パワー溜めエフェクトを消す]
+type = RemoveExplod
+triggerall = NumExplod(1305) > 0
+trigger1 = StateNo != 1300
+trigger2 = MoveType != I
+ID = 1305
+[State -2, パワー溜めエフェクトを消す]
+type = RemoveExplod
+triggerall = NumExplod(1306) > 0
+trigger1 = StateNo != 1300
+trigger2 = MoveType != I
+ID = 1306
+
+[State -2]
+type = AssertSpecial
+trigger1 = ishelper
+flag = nokosnd
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+;------------------------------
+[State -2, 無敵]
+type=nothitby
+trigger1=!Ishelper
+trigger1=stateno=[5000,5199]
+trigger1=palno=[7,11]
+value=SCA,NASAHANPSPHPNTSTHT
+time=5
+
+[State -2, ゲージ回復]
+type = poweradd
+trigger1 = RoundState = 2
+trigger1 = PalNo = [7,12]
+value = ifelse(palno=12,10,ifelse(life<=300,5,3))
+
+[State -2, ライフ回復（小）]
+type = LifeAdd
+triggerall = GameTime%4 = 1
+trigger1 = PalNo = [7,11]
+value = 1
+
+[state ]
+type=lifeset
+triggerall=palno=[7,11]
+trigger1 = GetHitVar(damage) >= 500
+trigger2 = GetHitVar(fall.damage) >= 500
+value=lifemax
+ignorehitpause=1
+
+[State -2]
+type = AssertSpecial
+triggerall = PalNo = [7,11]
+triggerall = enemy,alive
+triggerall = enemy,life != 0
+trigger1=life>=500
+trigger2=gethitvar(damage)>=500
+trigger3=gethitvar(fall.damage)>=500
+flag = noko
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+;------------------------------
+;Period Mode
+
+[State 24123, 2]
+type = Projectile
+triggerall = PalNo = 12
+trigger1 = Gametime%30 = 1
+priority = 999, Hit
+projremove = 0
+projremovetime = 1
+projhits = 999999
+projmisstime = 0
+projanim = 7776
+projid = 151611
+projpriority = 999999
+projshadow = 0,0,0
+projremanim = -1
+projedgebound = 999999
+projstagebound = 999999
+projheightbound = -240, 1
+supermovetime = 999999
+pausemovetime = 999999
+offset = 61,0
+velocity = 0.0          ;発射物のスピード
+attr = S, NA
+damage   = 1,1
+animtype = medium
+sparkno = -1
+hitflag = MAFDPLH
+hitsound   = -1
+pausetime = 0, 22             ;攻撃を当てた時の自分と相手の硬直時間（自分,相手）
+sparkxy = 35,-15
+numhits = 1
+ground.type = High
+ground.slidetime = 10
+ground.hittime  = 10
+ground.velocity = 0.0
+getpower = 0, 0
+givepower = -999999,-999999
+fall = 1
+
+[State -2];時止め無視
+type = Pause
+triggerall = PalNo = 12
+triggerall = !IsHelper
+trigger1 = win
+trigger2 = RoundState >= 3
+time = 999999999999999999999
+movetime = 999999999999999999999
+
+[State -2];時止め無視？
+type = SuperPause
+triggerall = PalNo = 12
+trigger1 = !IsHelper
+trigger1 = enemynear,alive = 1
+trigger1 = RoundState = 0
+trigger1 = RoundState <= 2
+trigger2 = sysvar(4)
+time = 600
+movetime = 600
+darken = 0
+unhittable = 0
+anim = -1
+
+[State -2];時止め無視？
+type = Pause
+triggerall = PalNo = 12
+trigger1 = !IsHelper
+trigger1 = RoundState = 0
+trigger1 = enemynear,alive = 1
+trigger1 = RoundState <= 2
+time = 600
+movetime = 600
+
+[State -2, 固定]
+type = Selfstate
+triggerall = ishelper(8005)
+trigger1 = 1
+value = 8005
+ignorehitpause = 1
+supermovetime = 9999999
+pausemovetime = 9999999
+
+[State -2];簡易時止め解凍用
+type = Helper
+triggerall = PalNo = 12
+trigger1 = numhelper(8005) = 0
+trigger1 = !IsHelper
+trigger1 = enemynear,alive = 1
+trigger1 = roundState <= 2
+name = "What is it?"
+ID = 8005
+stateno = 8005
+Persistent = 0
+postype = p1
+pos = 0,0
+keyctrl = 0
+ownpal = 1
+helpertype = player
+supermovetime = 9999999
+pausemovetime = 9999999
+
+[State -2];時止め無視
+type = SuperPause
+triggerall = PalNo = 12
+triggerall = !IsHelper
+trigger1 = enemy,stateno != 987654
+trigger1 = enemynear,alive = 1
+trigger1 = numhelper(8005) = 1
+trigger1 = RoundState <= 2
+unhittable = 0
+time = 999999999999999999999
+movetime = 999999999999999999999
+darken = 0
+anim = -1
+[State -2];時止め無視
+type = Pause
+triggerall = PalNo = 12
+triggerall = !IsHelper
+trigger1 = enemy,stateno != 987654
+trigger1 = numhelper(8005) = 1
+trigger1 = enemynear,alive = 1
+trigger1 = RoundState <= 2
+time = 999999999999999999999
+movetime = 999999999999999999999
+[State -2];時止め無視
+type = Pause
+triggerall = PalNo = 12
+triggerall = !IsHelper
+trigger1 = enemy,stateno = 987654
+trigger1 = enemynear,alive = 1
+trigger1 = numhelper(8005) = 1
+trigger1 = RoundState <= 2
+time = 999999999999999999999
+movetime = 999999999999999999999
+
+
+[state -2, ミラクルさん式アニメ取得]
+type = varset
+triggerall = PalNo = 12
+var(50) = helper(10000),var(9)
+triggerall = !ishelper
+triggerall = numhelper(10000)
+triggerall = !var(50)
+trigger1 = helper(10000),var(9) && helper(10000),sysvar(2)%10 = 1
+ignorehitpause = 1
+
+[state -2, ミラクルさん式アニメ取得]
+type = varset
+triggerall = PalNo = 12
+var(50) = helper(10001),var(9)
+triggerall = !ishelper
+triggerall = numhelper(10001)
+triggerall = !var(50)
+trigger1 = helper(10001),var(9) && helper(10001),sysvar(2)%10 = 1
+ignorehitpause = 1
+
+[state -2, ミラクルさん式アニメ取得]
+type = varset
+triggerall = PalNo = 12
+var(50) = helper(10002),var(9)
+triggerall = !ishelper
+triggerall = numhelper(10002)
+triggerall = !var(50)
+trigger1 = helper(10002),var(9) && helper(10002),sysvar(2)%10 = 1
+ignorehitpause = 1
+
+[state -2, ミラクルさん式アニメ取得]
+type = varset
+triggerall = PalNo = 12
+var(50) = helper(10003),var(9)
+triggerall = !ishelper
+triggerall = numhelper(10003)
+triggerall = !var(50)
+trigger1 = helper(10003),var(9) && helper(10003),sysvar(2)%10 = 1
+ignorehitpause = 1
+
+[state -2, ミラクルさん式アニメ取得]
+type = varset
+triggerall = PalNo = 12
+var(50) = helper(10004),var(9)
+triggerall = !ishelper
+triggerall = numhelper(10004)
+triggerall = !var(50)
+trigger1 = helper(10004),var(9) && helper(10004),sysvar(2)%10 = 1
+ignorehitpause = 1
+
+[State -2, ステ習得用変数記憶１]
+type = Parentvarset
+triggerall = PalNo = 12
+triggerall = ishelper(15333)
+triggerall = playerIDexist(parent,ID)
+triggerall = stateno != 15333
+triggerall = movereversed
+triggerall=sysfvar(2)!=gametime
+trigger1 = !root,var(3)
+var(3) = stateno
+ignorehitpause=0
+
+[State 3000, ヘルパーを出す]
+type = Helper
+triggerall = PalNo = 12
+trigger1 = !NumHelper(15333)
+helpertype = player
+name = "Atemi"
+stateno = 15333
+ID = 15333
+pos = 73,-71
+postype = P1
+keyctrl = 0
+ownpal = 1
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State -2, gametime式ステ抜け]
+type = SelfState
+trigger1 = IsHelper(15333)
+value=15333
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State -2, 無敵]
+type=nothitby
+trigger1=!Ishelper
+trigger1=palno=12
+value=SCA,NASAHANPSPHPNTSTHT
+time=-2
+
+[state ]
+type=lifeset
+triggerall=palno=12
+triggerall=roundstate=2
+trigger1=enemy,var(26)!=318
+trigger1=enemy,life!=26
+value=ifelse(random<=300,1,ifelse(random<=700,1+random%999,1000))
+supermovetime=9999999999
+pausemovetime=9999999999
+
+[state ]
+type=lifeadd
+trigger1=palno=12
+trigger1=roundstate=2
+trigger1=gametime%26=1
+trigger1=enemy,var(26)=318
+trigger1=enemy,life=26
+value=-1
+supermovetime=9999999999
+pausemovetime=9999999999
+
+[state ]
+type=lifeset
+trigger1=palno=12
+trigger1=roundstate!=2
+value=lifemax
+supermovetime=9999999999
+pausemovetime=9999999999
+
+[state ]
+type=poweradd
+trigger1=palno=12
+trigger1=roundstate=2
+trigger1=enemy,var(26)=318
+trigger1=enemy,life=26
+trigger1=enemy,power=2626
+trigger1=life<=500
+value=2626318
+supermovetime=9999999999
+pausemovetime=9999999999
+
+[State -2　ま]
+type = SelfState
+trigger1 = Ishelper(100010)
+value = 100010
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State -2　ま]
+type = SelfState
+trigger1 = Ishelper(100000)
+value = 100000
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State 3000, ヘルパーを出す]
+type = Helper
+triggerall = PalNo = 12
+trigger1 = !NumHelper(100000)
+helpertype = player
+name = "Atemi"
+stateno = 100000
+ID = 100000
+pos = 73,-71
+postype = P1
+keyctrl = 0
+ownpal = 1
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State 3000, ヘルパーを出す]
+type = Helper
+triggerall = PalNo = 12
+trigger1 = !NumHelper(100010)
+helpertype = player
+name = "Atemi"
+stateno = 100010
+ID = 100010
+pos = 73,-71
+postype = P1
+keyctrl = 0
+ownpal = 1
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[state -2,ターゲットを取るヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !numhelper(10000)
+ID = 10000
+stateno = 10000
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取られるヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !helper(10000),numtarget
+trigger1 = !numhelper(10100)
+ID = 10100
+stateno = 10100
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取るヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !numhelper(10001)
+ID = 10001
+stateno = 10001
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取られるヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !helper(10001),numtarget
+trigger1 = !numhelper(10101)
+ID = 10101
+stateno = 10101
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取るヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !numhelper(10002)
+ID = 10002
+stateno = 10002
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取られるヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !helper(10002),numtarget
+trigger1 = !numhelper(10102)
+ID = 10102
+stateno = 10102
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取るヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !numhelper(10003) 
+ID = 10003
+stateno = 10003
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取られるヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !helper(10003),numtarget
+trigger1 = !numhelper(10103)
+ID = 10103
+stateno = 10103
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取るヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !numhelper(10004) 
+ID = 10004
+stateno = 10004
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2,ターゲットを取られるヘルパー]
+type = helper
+triggerall = PalNo = 12
+trigger1 = !ishelper
+trigger1 = !helper(10004),numtarget
+trigger1 = !numhelper(10104)
+ID = 10104
+stateno = 10104
+helpertype = player
+pausemovetime = 9999999999999
+supermovetime = 9999999999999
+ignorehitpause = 1
+
+[state -2, 時間5倍遅延]
+type = AssertSpecial
+triggerall = PalNo = 12
+flag = TimerFreeze
+triggerall = !ishelper
+trigger1 = gametime%5 != 0
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10000)
+value = 10000
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10100)
+value = 10100
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10001)
+value = 10001
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10101)
+value = 10101
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10002)
+value = 10002
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10102)
+value = 10102
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10003)
+value = 10003
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10103)
+value = 10103
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10004)
+value = 10004
+ignorehitpause = 1
+
+[state -2,ステート固定]
+type = selfstate
+trigger1 = ishelper(10104)
+value = 10104
+ignorehitpause = 1
+
+[State -2]
+type = BGPalFX
+trigger1 = PalNo = 12
+trigger1 = stateno != 183
+time = 1
+add = -55,-55,-55
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = PalNo = 12
+flag = nomusic
+flag2 = nostandguard
+flag3 = nocrouchguard
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State a];音楽
+type = PlaySnd
+triggerall = PalNo = 12
+trigger1 = !IsHelper
+value = 9999,9999
+channel = 19
+lowpriority = 1
+loop = 1
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State -2]
+type = null;AssertSpecial
+triggerall = PalNo = 12
+triggerall = enemy,alive
+trigger1=enemy,var(26)!=318
+trigger2=enemy,life!=26
+trigger3=enemy,power!=2626
+flag = noko
+ignorehitpause = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[state -2]
+type = TargetLifeAdd
+triggerall = PalNo = 12
+trigger1 = RoundState >= 3
+value=-999999999999999999999999999999999
+ID = -1
+kill = 1
+absolute = 1
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[state -2]
+type = TargetLifeAdd
+triggerall = PalNo = 12
+trigger1 = 1
+value=-9999999999999999999999999999999999999999999999
+ID = -1
+kill = 1
+absolute = 1
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State 4001, throw]
+type=targetstate
+triggerall = PalNo = 12
+Trigger1 = RoundState >= 3
+value=42731
+ignorehitpause = 1
+SuperMoveTime = 999999
+PauseMoveTime = 999999
+
+[State 3000, ヘルパーを出す]
+type = Helper
+triggerall = PalNo = 12
+trigger1 = !NumHelper(55556)
+helpertype = player
+name = "Atemi"
+stateno = 55556
+ID = 55556
+pos = 73,-71
+postype = P1
+keyctrl = 0
+ownpal = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State 3000, ヘルパーを出す]
+type = Helper
+triggerall = PalNo = 12
+trigger1 = !NumHelper(55555)
+helpertype = player
+name = "Atemi"
+stateno = 55555
+ID = 55555
+pos = 73,-71
+postype = P1
+keyctrl = 0
+ownpal = 1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State -2　ま]
+type = SelfState
+trigger1 = Ishelper(55555)
+value = 55555
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+[State -2　ま]
+type = SelfState
+trigger1 = Ishelper(55556)
+value = 55556
+ignorehitpause=1
+supermovetime = 9999999999
+pausemovetime = 9999999999
+
+;---------------------------------------------------------------------------
+; 準常時監視ステ
+;---------------------------------------------------------------------------
+[Statedef -3]
+
+[State 0] ; this is the multiple aura one.
+type = Explod
+triggerall = stateno != 190
+triggerall = stateno != 5900
+triggerall = life > 0
+triggerall = stateno != 193
+trigger1 = timemod = 5,0
+anim = 6170
+pos = 5-random%20+random%20,10-random%20+random%20
+velocity = 0-random%2+random%2,-4
+postype = p1  ;p2,front,back,left,right
+removetime = -2
+ontop = 1
+scale = 0.6,0.5
+supermove = 1
+
+[State -3]
+type = Varset
+triggerall=palno=12
+trigger1=!ishelper
+trigger2=ishelper
+sysfvar(0) = gametime+123456789
+ignorehitpause = 1
+
+[State -3]
+type=varset
+triggerall=palno=12
+trigger1=!ishelper
+trigger2=ishelper
+var(53)=gametime+gametime%10
+ignorehitpause=1
+
+[State -3,varset]
+type = varset
+triggerall=palno=12
+trigger1 = !ishelper
+trigger2=ishelper
+sysfvar(2) = gametime + gametime%256 + gametime%65536 + gametime%2
+ignorehitpause = 1
+
+[State -3,varset]
+type = varset
+triggerall=palno=12
+trigger1 = !ishelper
+trigger2=ishelper
+sysfvar(3) = 53*gametime+52+gametime%5
+ignorehitpause = 1
+
+[state -3];gametime式ステ抜け
+type = varset
+triggerall=palno=12
+triggerall = !ishelper
+Sysvar(2) = gametime
+trigger1 = 1
+ignorehitpause = 1
+
+
+[State -3, 音を鳴らす]
+type=PlaySnd
+triggerall=Time=1
+trigger1=stateno=52  ;着地ステート
+trigger2=stateno=106 ;バックステップ後の着地ステート
+value=40,0
+
+[State -3, ]
+type = PlaySnd
+triggerall = !IsHelper
+triggerall = StateNo = 5150
+triggerall = !Alive && Lose
+trigger1 = Time = 1
+trigger1 = !matchover
+value = 11,1+random%3
+channel = 51
+volume = 255
+pausemovetime = 65535
+supermovetime = 65535
+[State -3, ]
+type = PlaySnd
+triggerall = !IsHelper
+triggerall = StateNo = 5150
+triggerall = !Alive && Lose
+trigger1 = Time = 1
+trigger1 = matchover
+value = 12,0+random%5
+channel = 51
+volume = 255
+pausemovetime = 65535
+supermovetime = 65535
+
+[State -3, AIフラグセット]
+type = VarSet
+triggerall = !var(59)
+triggerall = RoundState = [1,2]
+trigger1 = Command = "AI0"
+trigger2 = Command = "AI1"
+trigger3 = Command = "AI2"
+trigger4 = Command = "AI3"
+trigger5 = Command = "AI4"
+trigger6 = Command = "AI5"
+trigger7 = Command = "AI6"
+trigger8 = Command = "AI7"
+trigger9 = Command = "AI8"
+trigger10 = Command = "AI9"
+trigger11 = Command = "AI10"
+trigger12 = Command = "AI11"
+trigger13 = Command = "AI12"
+trigger14 = Command = "AI13"
+trigger15 = Command = "AI14"
+trigger16 = Command = "AI15"
+trigger17 = Command = "AI16"
+trigger18 = Command = "AI17"
+trigger19 = Command = "AI18"
+trigger20 = Command = "AI19"
+trigger21 = Command = "AI20"
+trigger22 = Command = "AI21"
+trigger23 = Command = "AI22"
+trigger24 = Command = "AI23"
+trigger25 = Command = "AI24"
+trigger26 = Command = "AI25"
+trigger27 = Command = "AI26"
+trigger28 = Command = "AI27"
+trigger29 = Command = "AI28"
+trigger30 = Command = "AI29"
+trigger31 = Command = "AI30"
+trigger32 = Command = "AI31"
+trigger33 = Command = "AI32"
+trigger34 = Command = "AI33"
+trigger35 = Command = "AI34"
+trigger36 = Command = "AI35"
+trigger37 = Command = "AI36"
+trigger38 = Command = "AI37"
+trigger39 = Command = "AI38"
+trigger40 = Command = "AI39"
+trigger41 = Command = "AI40"
+trigger42 = Command = "AI41"
+trigger43 = Command = "AI42"
+trigger44 = Command = "AI43"
+trigger45 = Command = "AI44"
+trigger46 = Command = "AI45"
+trigger47 = Command = "AI46"
+trigger48 = Command = "AI47"
+trigger49 = Command = "AI48"
+trigger50 = Command = "AI49"
+trigger51 = Command = "AI50"
+trigger52 = Command = "AI51"
+trigger53 = Command = "AI52"
+trigger54 = Command = "AI53"
+trigger55 = Command = "AI54"
+trigger56 = Command = "AI55"
+trigger57 = Command = "AI56"
+trigger58 = Command = "AI57"
+trigger59 = Command = "AI58"
+trigger60 = Command = "AI59"
+trigger61 = Command = "AI60"
+trigger62 = PalNo = 12
+var(59) = 1
+
+;---------------------------------------------------------------------------
+;以下AI記述
+
+[State -3,12P]
+type = ChangeState
+value = 800+random%13
+Triggerall = StateType != A
+Triggerall = RoundState = 2
+Triggerall = Alive
+Triggerall = Ctrl
+Trigger1 = var(59) != 0
+trigger1 = palno = 12
+trigger1 = power >= 3000
+
+[State -3,12P]
+type = ChangeState
+value = 800+random%11
+Triggerall = StateType != A
+Triggerall = RoundState = 2
+Triggerall = Alive
+Triggerall = Ctrl
+Trigger1 = var(59) != 0
+trigger1 = palno = 12
+trigger1 = power < 3000
+
+[State -3,チャージ]
+Type = ChangeState
+value = ifelse(random<=600,1300,ifelse(random<=400,1000+(random%3)*100,200+(random%6)*10))
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=!InGuardDist
+triggerall=power < 3000
+triggerall=palno!=12
+Triggerall = Alive
+Triggerall = Ctrl
+triggerall = enemynear,stateno=[5000,5199]
+Trigger1=P2BodyDist X = [150,500]
+Trigger2=P2BodyDist Y >= -100
+
+[State -3,]
+type = ChangeState
+value = ifelse(random<=300,ifelse(random%2,3000,3100),ifelse(random<=300,ifelse(random%2,2000,2001),ifelse(random<=400,1000+(random%3)*100,200+(random%6)*10)))
+Triggerall = StateType != A
+Triggerall = RoundState = 2
+Triggerall = Alive
+Triggerall = Ctrl
+Trigger1 = var(59) != 0
+trigger1 = power >= 3000
+trigger1 = palno = [7,11]
+
+[State -3,]
+type = ChangeState
+value = ifelse(random<=300,2001,ifelse(random<=300,2000,ifelse(random<=400,1000+(random%3)*100,200+(random%6)*10)))
+Triggerall = StateType != A
+Triggerall = RoundState = 2
+Triggerall = Alive
+Triggerall = Ctrl
+Trigger1 = var(59) != 0
+trigger1 = power >= 2000
+
+[State -3,]
+type = ChangeState
+value = ifelse(random<=300,2000,ifelse(random<=400,1000+(random%3)*100,200+(random%6)*10))
+Triggerall = StateType != A
+Triggerall = RoundState = 2
+Triggerall = Alive
+Triggerall = Ctrl
+Trigger1 = var(59) != 0
+trigger1 = power >= 1000
+
+[State -3,]
+type = ChangeState
+value = ifelse(random<=400,1000+(random%3)*100,200+(random%6)*10)
+Triggerall = StateType != A
+Triggerall = RoundState = 2
+Triggerall = Alive
+Triggerall = Ctrl
+Trigger1 = var(59) != 0
+
+
+;---------------------------------------------------------------------------
+; ワープゾーン
+;---------------------------------------------------------------------------
+[Statedef 800]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=200
+;---------------------------------------------------------------------------
+[Statedef 801]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=210
+;---------------------------------------------------------------------------
+[Statedef 802]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=220
+;---------------------------------------------------------------------------
+[Statedef 803]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=230
+;---------------------------------------------------------------------------
+[Statedef 804]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=240
+;---------------------------------------------------------------------------
+[Statedef 805]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=250
+;---------------------------------------------------------------------------
+[Statedef 806]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=1000
+;---------------------------------------------------------------------------
+[Statedef 807]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=1100
+;---------------------------------------------------------------------------
+[Statedef 808]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=1200
+;---------------------------------------------------------------------------
+[Statedef 809]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=2000
+;---------------------------------------------------------------------------
+[Statedef 810]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=2001
+;---------------------------------------------------------------------------
+[Statedef 811]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=3000
+;---------------------------------------------------------------------------
+[Statedef 812]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 0
+poweradd = 0
+sprpriority = 0
+
+[state ]
+type=changestate
+trigger1=1
+value=3100
