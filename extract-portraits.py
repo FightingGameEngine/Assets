@@ -251,15 +251,18 @@ def parse_sff(path):
             shofs = nxt  # v1 subheaders chain via their first u32
         return {"ver": 1, "data": data, "sprites": sprites}
 
-    # v2: fixed 32-byte sprite headers
-    nspr = _u32(data, 28)
-    shofs0 = _u32(data, 24)
-    palhdr0 = _u32(data, 32)
-    npal = _u32(data, 36)
-    lofs = _u32(data, 40)
-    tofs = _u32(data, 48)
+    # v2: fixed-size sprite headers (28 bytes — verified against the engine's
+    # SFFSprite2 and every v2 file in the Assets repo). Header fields:
+    # sprite table @36, count @40, palette table @44, npal @48,
+    # sprite-data base @52, palette-data base @60.
+    nspr = _u32(data, 40)
+    shofs0 = _u32(data, 36)
+    palhdr0 = _u32(data, 44)
+    npal = _u32(data, 48)
+    lofs = _u32(data, 52)
+    tofs = _u32(data, 60)
     for i in range(nspr):
-        o = shofs0 + i * 32
+        o = shofs0 + i * 28
         w, h = _u16(data, o + 4), _u16(data, o + 6)
         sel = _u16(data, o + 26)
         base = tofs if sel & 1 else lofs
