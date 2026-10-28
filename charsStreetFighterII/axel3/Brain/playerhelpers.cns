@@ -1,0 +1,852 @@
+;===============================================================
+;Player Helpers
+;===============================================================
+;========================<Bike>=============================
+[Statedef 194]
+type=S
+physics=N
+movetype=I
+anim=194
+ctrl=0
+velset=0,0
+sprpriority=0
+
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S194,0
+freqmul = 1
+
+[State 1005, vel]
+type=velset
+trigger1= 1
+x= 6
+
+[State 0, VelMul]
+type = VelMul
+trigger1 = time>= 65
+x = .8
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 25
+value = S800,1
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = animelem = 25
+time = 19
+
+[State 1005, end]
+type=destroyself
+trigger1=animtime=0;pos x!=[-800,800]
+;====================<Bare Knuckle>========================================
+[Statedef 1032]
+type=S
+physics=N
+movetype=I
+anim=1032
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 1105, assert]
+type=assertspecial
+trigger1=1
+flag=noshadow
+
+[State 1105, bind]
+type=bindtoroot
+trigger1=1
+pos=0,0
+time = -1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(2)<0
+trigger2=root,anim=1010&&root,animelemtime(4)<0
+trigger3=root,anim=1020&&root,animelemtime(6)<0
+value=1032
+elem=1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(3)>=0&&root,animelemtime(4)<0
+trigger2=root,anim=1010&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+trigger3=root,anim=1020&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+value=1032
+elem=2
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(4)>=0&&root,animelemtime(5)<0
+trigger2=root,anim=1010&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+trigger3=root,anim=1020&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+value=1032
+elem=3
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+trigger2=root,anim=1010&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+trigger3=root,anim=1020&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+value=1032
+elem=4
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+trigger2=root,anim=1010&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+trigger3=root,anim=1020&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+value=1032
+elem=5
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+trigger2=root,anim=1010&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+trigger3=root,anim=1020&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+value=1032
+elem=6
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+trigger2=root,anim=1010&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+trigger3=root,anim=1020&&root,animelemtime(12)>=0&&root,animelemtime(13)<0
+value=1032
+elem=7
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+trigger2=root,anim=1010&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+trigger3=root,anim=1020&&root,animelemtime(13)>=0&&root,animelemtime(14)<0
+value=1032
+elem=8
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1000&&root,animelemtime(10)>=0&&root,animelemtime(10)<0
+trigger2=root,anim=1010&&root,animelemtime(12)>=0&&root,animelemtime(6)<0
+trigger3=root,anim=1020&&root,animelemtime(14)>=0&&root,animelemtime(6)<0
+value=1032
+elem=9
+
+
+
+[State 1105, vel]
+type=velset
+trigger1=animelemtime(1)>=0
+x=(root,vel x)
+y=(root,vel y)
+persistent=1
+
+;[State 0, PosAdd]
+;type = PosAdd
+;triggerall = root,stateno = 1000
+;trigger1 = root,anim=1000&&root,animelem=6time(6)>=0
+;x = ceil(40*const(size.xscale))
+
+[State 1105, turn]
+type=turn
+trigger1=facing!=(root,facing)
+
+[State 1105, end]
+type=destroyself
+trigger1=!animtime
+;trigger2=animelemtime(6)<0
+trigger2=(root,stateno!=1000||root,anim!=1000)
+trigger2=(root,stateno!=1010||root,anim!=1010)
+trigger2=(root,stateno!=1020||root,anim!=1020)
+;trigger4=root,stateno=3000&&root,animelemtime(23)<0
+;====================<Dragon Wing>========================================
+[Statedef 1051]
+type=S
+physics=N
+movetype=I
+anim=1051
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 1105, assert]
+type=assertspecial
+trigger1=1
+flag=noshadow
+
+[State 1105, bind]
+type=bindtoroot
+trigger1=1
+pos=0,0
+time = -1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(1)<0
+;trigger2=root,anim=1010&&root,animelemtime(4)<0
+;trigger3=root,anim=1020&&root,animelemtime(6)<0
+value=1051
+elem=1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(2)>=0&&root,animelemtime(3)<0
+;trigger2=root,anim=1010&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger3=root,anim=1020&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+value=1051
+elem=2
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(3)>=0&&root,animelemtime(4)<0
+;trigger2=root,anim=1010&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger3=root,anim=1020&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+value=1051
+elem=3
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(4)>=0&&root,animelemtime(5)<0
+;trigger2=root,anim=1010&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger3=root,anim=1020&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+value=1051
+elem=4
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger2=root,anim=1010&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+;trigger3=root,anim=1020&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+value=1051
+elem=5
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger2=root,anim=1010&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+;trigger3=root,anim=1020&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+value=1051
+elem=6
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger2=root,anim=1010&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+;trigger3=root,anim=1020&&root,animelemtime(12)>=0&&root,animelemtime(13)<0
+value=1051
+elem=7
+
+
+
+[State 1105, vel]
+type=velset
+trigger1=animelemtime(1)>=0
+x=(root,vel x)
+y=(root,vel y)
+persistent=1
+
+;[State 0, PosAdd]
+;type = PosAdd
+;triggerall = root,stateno = 1000
+;trigger1 = root,anim=1000&&root,animelem=6time(6)>=0
+;x = ceil(40*const(size.xscale))
+
+[State 1105, turn]
+type=turn
+trigger1=facing!=(root,facing)
+
+[State 1105, end]
+type=destroyself
+trigger1=!animtime
+;trigger2=animelemtime(6)<0
+trigger2=(root,stateno!=1050||root,anim!=1050)
+;trigger2=(root,stateno!=1010||root,anim!=1010)
+;trigger2=(root,stateno!=1020||root,anim!=1020)
+;trigger4=root,stateno=3000&&root,animelemtime(23)<0
+;========================<Projectile Blocker>=============================
+[Statedef 1055]
+type=A
+physics=N
+movetype=A
+anim=1055
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 1030, hitoverride]
+type=hitoverride
+trigger1= 1
+time=-1
+attr=SCA,AA,AP,AT
+stateno=1056
+ignorehitpause=1
+
+[State 1030, hitby]
+type=hitby
+trigger1= 1
+time=-1
+value=SCA,NP,SP,HP
+ignorehitpause=1
+
+[State 1105, assert]
+type=assertspecial
+trigger1=1
+flag=noshadow
+
+[State 1105, bind]
+type=bindtoroot
+trigger1=1
+pos=0,0
+time = -1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(1)<0
+;trigger2=root,anim=1010&&root,animelemtime(4)<0
+;trigger3=root,anim=1020&&root,animelemtime(6)<0
+value=1055
+elem=1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(2)>=0&&root,animelemtime(3)<0
+;trigger2=root,anim=1010&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger3=root,anim=1020&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+value=1055
+elem=2
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(3)>=0&&root,animelemtime(4)<0
+;trigger2=root,anim=1010&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger3=root,anim=1020&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+value=1055
+elem=3
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(4)>=0&&root,animelemtime(5)<0
+;trigger2=root,anim=1010&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger3=root,anim=1020&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+value=1055
+elem=4
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger2=root,anim=1010&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+;trigger3=root,anim=1020&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+value=1055
+elem=5
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger2=root,anim=1010&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+;trigger3=root,anim=1020&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+value=1055
+elem=6
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1050&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger2=root,anim=1010&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+;trigger3=root,anim=1020&&root,animelemtime(12)>=0&&root,animelemtime(13)<0
+value=1055
+elem=7
+
+
+
+[State 1105, vel]
+type=velset
+trigger1=animelemtime(1)>=0
+x=(root,vel x)
+y=(root,vel y)
+persistent=1
+
+;[State 0, PosAdd]
+;type = PosAdd
+;triggerall = root,stateno = 1000
+;trigger1 = root,anim=1000&&root,animelem=6time(6)>=0
+;x = ceil(40*const(size.xscale))
+
+[State 1105, turn]
+type=turn
+trigger1=facing!=(root,facing)
+
+[State 211, 3]
+type = DestroySelf
+trigger1 = root, StateNo != 1050
+trigger2 = root, MoveType = H
+
+[State 1055, end]
+type=destroyself
+trigger1=animtime = 0
+
+
+;========================<Projectile Blocker>=============================
+[Statedef 1056]
+type=A
+physics=N
+movetype=A
+anim=9997
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 211, 3]
+type = DestroySelf
+trigger1 = root, StateNo != 1050
+trigger2 = root, MoveType = H
+
+[State 1055, end]
+type=destroyself
+trigger1= time = 5
+;====================<Weapon-Sword>========================================
+[Statedef 1201]
+type=S
+physics=N
+movetype=I
+anim=1201
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 1105, assert]
+type=assertspecial
+trigger1=1
+flag=noshadow
+
+[State 1105, bind]
+type=bindtoroot
+trigger1=1
+pos=0,0
+time = -1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(1)<0
+;trigger2=root,anim=1010&&root,animelemtime(4)<0
+;trigger3=root,anim=1020&&root,animelemtime(6)<0
+value=1201
+elem=1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(2)>=0&&root,animelemtime(3)<0
+;trigger2=root,anim=1010&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger3=root,anim=1020&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+value=1201
+elem=2
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(3)>=0&&root,animelemtime(4)<0
+;trigger2=root,anim=1010&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger3=root,anim=1020&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+value=1201
+elem=3
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(4)>=0&&root,animelemtime(5)<0
+;trigger2=root,anim=1010&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger3=root,anim=1020&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+value=1201
+elem=4
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger2=root,anim=1010&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+;trigger3=root,anim=1020&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+value=1201
+elem=5
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger2=root,anim=1010&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+;trigger3=root,anim=1020&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+value=1201
+elem=6
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger2=root,anim=1010&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+;trigger3=root,anim=1020&&root,animelemtime(12)>=0&&root,animelemtime(13)<0
+value=1201
+elem=7
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+;trigger2=root,anim=1010&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+;trigger3=root,anim=1020&&root,animelemtime(13)>=0&&root,animelemtime(14)<0
+value=1201
+elem=8
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1200&&root,animelemtime(9)>=0;&&root,animelemtime(10)<0
+;trigger2=root,anim=1010&&root,animelemtime(12)>=0;&&root,animelemtime(6)<0
+;trigger3=root,anim=1020&&root,animelemtime(14)>=0&&root,animelemtime(6)<0
+value=1201
+elem=9
+
+
+
+[State 1105, vel]
+type=velset
+trigger1=animelemtime(1)>=0
+x=(root,vel x)
+y=(root,vel y)
+persistent=1
+
+;[State 0, PosAdd]
+;type = PosAdd
+;triggerall = root,stateno = 1000
+;trigger1 = root,anim=1000&&root,animelem=6time(6)>=0
+;x = ceil(40*const(size.xscale))
+
+[State 1105, turn]
+type=turn
+trigger1=facing!=(root,facing)
+
+[State 1105, end]
+type=destroyself
+trigger1=!animtime
+;trigger2=animelemtime(6)<0
+trigger2=(root,stateno!=1200||root,anim!=1200)
+;trigger2=(root,stateno!=1010||root,anim!=1010)
+;trigger2=(root,stateno!=1020||root,anim!=1020)
+;trigger4=root,stateno=3000&&root,animelemtime(23)<0
+;====================<Weapon-Bat>========================================
+[Statedef 1211]
+type=S
+physics=N
+movetype=I
+anim=1211
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 1105, assert]
+type=assertspecial
+trigger1=1
+flag=noshadow
+
+[State 1105, bind]
+type=bindtoroot
+trigger1=1
+pos=0,0
+time = -1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(1)<0
+;trigger2=root,anim=1010&&root,animelemtime(4)<0
+;trigger3=root,anim=1020&&root,animelemtime(6)<0
+value=1211
+elem=1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(2)>=0&&root,animelemtime(3)<0
+;trigger2=root,anim=1010&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger3=root,anim=1020&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+value=1211
+elem=2
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(3)>=0&&root,animelemtime(4)<0
+;trigger2=root,anim=1010&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger3=root,anim=1020&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+value=1211
+elem=3
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(4)>=0&&root,animelemtime(5)<0
+;trigger2=root,anim=1010&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger3=root,anim=1020&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+value=1211
+elem=4
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger2=root,anim=1010&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+;trigger3=root,anim=1020&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+value=1211
+elem=5
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger2=root,anim=1010&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+;trigger3=root,anim=1020&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+value=1211
+elem=6
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger2=root,anim=1010&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+;trigger3=root,anim=1020&&root,animelemtime(12)>=0&&root,animelemtime(13)<0
+value=1211
+elem=7
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+;trigger2=root,anim=1010&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+;trigger3=root,anim=1020&&root,animelemtime(13)>=0&&root,animelemtime(14)<0
+value=1211
+elem=8
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1210&&root,animelemtime(9)>=0;&&root,animelemtime(10)<0
+;trigger2=root,anim=1010&&root,animelemtime(12)>=0;&&root,animelemtime(6)<0
+;trigger3=root,anim=1020&&root,animelemtime(14)>=0&&root,animelemtime(6)<0
+value=1211
+elem=9
+
+
+
+[State 1105, vel]
+type=velset
+trigger1=animelemtime(1)>=0
+x=(root,vel x)
+y=(root,vel y)
+persistent=1
+
+;[State 0, PosAdd]
+;type = PosAdd
+;triggerall = root,stateno = 1000
+;trigger1 = root,anim=1000&&root,animelem=6time(6)>=0
+;x = ceil(40*const(size.xscale))
+
+[State 1105, turn]
+type=turn
+trigger1=facing!=(root,facing)
+
+[State 1105, end]
+type=destroyself
+trigger1=!animtime
+;trigger2=animelemtime(6)<0
+trigger2=(root,stateno!=1210||root,anim!=1210)
+;trigger3=root,stateno=3000
+;trigger2=(root,stateno!=1020||root,anim!=1020)
+;trigger4=root,stateno=3000&&root,animelemtime(23)<0
+;====================<Weapon-Knife>========================================
+[Statedef 1221]
+type=S
+physics=N
+movetype=I
+anim=1221
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 1105, assert]
+type=assertspecial
+trigger1=1
+flag=noshadow
+
+[State 1105, bind]
+type=bindtoroot
+trigger1=1
+pos=0,0
+time = -1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1220&&root,animelemtime(1)<0
+;trigger2=root,anim=1010&&root,animelemtime(4)<0
+;trigger3=root,anim=1020&&root,animelemtime(6)<0
+value=1221
+elem=1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1220&&root,animelemtime(2)>=0&&root,animelemtime(3)<0
+;trigger2=root,anim=1010&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger3=root,anim=1020&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+value=1221
+elem=2
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1220&&root,animelemtime(3)>=0&&root,animelemtime(4)<0
+;trigger2=root,anim=1010&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger3=root,anim=1020&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+value=1221
+elem=3
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1220&&root,animelemtime(4)>=0&&root,animelemtime(5)<0
+;trigger2=root,anim=1010&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger3=root,anim=1020&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+value=1221
+elem=4
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1220&&root,animelemtime(5)>=0&&root,animelemtime(6)<0
+;trigger2=root,anim=1010&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+;trigger3=root,anim=1020&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+value=1221
+elem=5
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1220&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+;trigger2=root,anim=1010&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+;trigger3=root,anim=1020&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+value=1221
+elem=6
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=1220&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+;trigger2=root,anim=1010&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+;trigger3=root,anim=1020&&root,animelemtime(12)>=0&&root,animelemtime(13)<0
+value=1221
+elem=7
+
+[State 1105, vel]
+type=velset
+trigger1=animelemtime(1)>=0
+x=(root,vel x)
+y=(root,vel y)
+persistent=1
+
+;[State 0, PosAdd]
+;type = PosAdd
+;triggerall = root,stateno = 1000
+;trigger1 = root,anim=1000&&root,animelem=6time(6)>=0
+;x = ceil(40*const(size.xscale))
+
+[State 1105, turn]
+type=turn
+trigger1=facing!=(root,facing)
+
+[State 1105, end]
+type=destroyself
+trigger1=!animtime
+;trigger2=animelemtime(6)<0
+trigger2=(root,stateno!=1220||root,anim!=1220)
+;trigger2=(root,stateno!=1010||root,anim!=1010)
+;trigger2=(root,stateno!=1020||root,anim!=1020)
+;trigger4=root,stateno=3000&&root,animelemtime(23)<0
+;====================<Grand Upper>========================================
+[Statedef 3005]
+type=S
+physics=N
+movetype=I
+anim=3005
+ctrl=0
+velset=0,0
+sprpriority=4
+
+[State 1105, assert]
+type=assertspecial
+trigger1=1
+flag=noshadow
+
+[State 1105, bind]
+type=bindtoroot
+trigger1=1
+pos=0,0
+time = -1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3000&&root,animelemtime(6)>=0&&root,animelemtime(7)<0
+trigger2=root,anim=3000&&root,animelemtime(10)>=0&&root,animelemtime(11)<0
+trigger3=root,anim=3000&&root,animelemtime(14)>=0&&root,animelemtime(15)<0
+trigger4=root,anim=3000&&root,animelemtime(18)>=0&&root,animelemtime(19)<0
+value=3005
+elem=1
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3000&&root,animelemtime(7)>=0&&root,animelemtime(8)<0
+trigger2=root,anim=3000&&root,animelemtime(11)>=0&&root,animelemtime(12)<0
+trigger3=root,anim=3000&&root,animelemtime(15)>=0&&root,animelemtime(16)<0
+value=3005
+elem=2
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3000&&root,animelemtime(8)>=0&&root,animelemtime(9)<0
+trigger2=root,anim=3000&&root,animelemtime(12)>=0&&root,animelemtime(13)<0
+trigger3=root,anim=3000&&root,animelemtime(16)>=0&&root,animelemtime(17)<0
+value=3005
+elem=3
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3000&&root,animelemtime(9)>=0&&root,animelemtime(10)<0
+trigger2=root,anim=3000&&root,animelemtime(13)>=0&&root,animelemtime(14)<0
+trigger3=root,anim=3000&&root,animelemtime(17)>=0&&root,animelemtime(18)<0
+value=3005
+elem=4
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3000&&root,animelemtime(19)>=0&&root,animelemtime(20)<0
+value=3005
+elem=5
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3000&&root,animelemtime(20)>=0&&root,animelemtime(21)<0
+value=3005
+elem=6
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3000&&root,animelemtime(21)>=0;&&root,animelemtime(20)<0
+value=3005
+elem=7
+
+[State 1105, anim]
+type=changeanim
+trigger1=root,anim=3001&&root,animelem=1;&&root,animelemtime(20)<0
+value=3005
+elem=8
+
+
+[State 1105, vel]
+type=velset
+trigger1=animelemtime(1)>=0
+x=(root,vel x)
+y=(root,vel y)
+persistent=1
+
+;[State 0, PosAdd]
+;type = PosAdd
+;triggerall = root,stateno = 1000
+;trigger1 = root,anim=1000&&root,animelem=6time(6)>=0
+;x = ceil(40*const(size.xscale))
+
+[State 1105, turn]
+type=turn
+trigger1=facing!=(root,facing)
+
+[State 1105, end]
+type=destroyself
+trigger1=!animtime
+;trigger2=animelemtime(6)<0
+trigger2=(root,stateno!=3000||root,anim!=3000)
+trigger2=(root,stateno!=3001||root,anim!=3001)
+;trigger2=(root,stateno!=1020||root,anim!=1020)
+;trigger4=root,stateno=3000&&root,animelemtime(23)<0

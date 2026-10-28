@@ -1,0 +1,196 @@
+[Statedef -2]
+;---------------------------------------------------------------------------
+;リアルバウトモード用
+[State -2, real]
+type = VarSet
+trigger1 = PalNo = 7
+var(20) = 1
+;---------------------------------------------------------------------------
+
+[State 180, 2]
+type = VarSet
+triggerall = Time = 1
+trigger1 = P2name != "DUDLEY"
+var(20) = 10
+;---------------------------------------------------------------------------
+;ダウン
+[State -2, Landing Sound]
+type = PlaySnd
+triggerall =alive = 1
+triggerall = Time = 1
+trigger1 = alive = 0
+value = 20, 0
+;---------------------------------------------------------------------------
+;着地
+[State -2, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52
+value = 20, 0
+;---------------------------------------------------------------------------
+;ジャンプ
+[State -2, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 50
+value = 80, 0
+;---------------------------------------------------------------------------
+;空中ガード
+[State -2,junp]
+Type = AssertSpecial
+Trigger1 = 1
+flag = NoAirGuard
+;===========================================================================
+;攻撃声ランダム
+[State -2, 音]
+type = VarRandom
+trigger1 = stateno = 200
+trigger2 = stateno = 210
+trigger3 = stateno = 220
+trigger4 = stateno = 230
+trigger5 = stateno = 400
+trigger6 = stateno = 410
+trigger7 = stateno = 600
+trigger8 = stateno = 610
+trigger9 = stateno = 640
+trigger10 = stateno = 820
+v = 11
+range = 0, 2
+
+[State -2, 音]
+type = PlaySnd
+triggerall = Animelem = 2
+triggerall = var(11) = 0
+trigger1 = stateno = 200
+trigger2 = stateno = 210
+trigger3 = stateno = 220
+trigger4 = stateno = 230
+trigger5 = stateno = 400
+trigger6 = stateno = 410
+trigger7 = stateno = 600
+trigger8 = stateno = 240
+trigger9 = stateno = 250
+trigger10 = stateno = 260
+trigger11 = stateno = 270
+trigger12 = stateno = 280
+trigger13 = stateno = 420
+trigger14 = stateno = 430
+value = 50, 0
+
+[State -2, 音]
+type = PlaySnd
+triggerall = Animelem = 2
+triggerall = var(11) = 1
+trigger1 = stateno = 200
+trigger2 = stateno = 210
+trigger3 = stateno = 220
+trigger4 = stateno = 230
+trigger5 = stateno = 400
+trigger6 = stateno = 410
+trigger7 = stateno = 600
+trigger8 = stateno = 240
+trigger9 = stateno = 250
+trigger10 = stateno = 260
+trigger11 = stateno = 270
+trigger12 = stateno = 280
+trigger13 = stateno = 420
+trigger14 = stateno = 430
+value = 50, 1
+
+[State -2, 音]
+type = PlaySnd
+triggerall = Animelem = 2
+triggerall = var(11) = 2
+trigger1 = stateno = 200
+trigger2 = stateno = 210
+trigger3 = stateno = 220
+trigger4 = stateno = 230
+trigger5 = stateno = 400
+trigger6 = stateno = 410
+trigger7 = stateno = 600
+trigger8 = stateno = 240
+trigger9 = stateno = 250
+trigger10 = stateno = 260
+trigger11 = stateno = 270
+trigger12 = stateno = 280
+trigger13 = stateno = 420
+trigger14 = stateno = 430
+value = 50, 3
+;===========================================================================
+;やられ声
+[State -2, Landing Sound]
+type = VarRandom
+trigger1 = stateno = 5000
+trigger2 = stateno = 5001
+trigger3 = stateno = 5010
+trigger4 = stateno = 5011
+trigger5 = stateno = 5020
+trigger6 = stateno = 5021
+trigger7 = stateno = 5002
+trigger8 = stateno = 5012
+trigger9 = stateno = 5022
+v = 12
+range = 0, 2
+
+[State -2, 音]
+type = PlaySnd
+triggerall = time = 1
+triggerall =alive = 1
+triggerall = var(12) = 0
+trigger1 = stateno = 5000
+trigger2 = stateno = 5001
+trigger3 = stateno = 5010
+trigger4 = stateno = 5011
+trigger5 = stateno = 5020
+trigger6 = stateno = 5021
+trigger7 = stateno = 5002
+trigger8 = stateno = 5012
+trigger9 = stateno = 5022
+value = 30, 0
+
+[State -2, 音]
+type = PlaySnd
+triggerall = time = 1
+triggerall =alive = 1
+triggerall = var(12) = 1
+trigger1 = stateno = 5000
+trigger2 = stateno = 5001
+trigger3 = stateno = 5010
+trigger4 = stateno = 5011
+trigger5 = stateno = 5020
+trigger6 = stateno = 5021
+trigger7 = stateno = 5002
+trigger8 = stateno = 5012
+trigger9 = stateno = 5022
+value = 30, 1
+
+[State -2, 音]
+type = PlaySnd
+triggerall = time = 1
+triggerall =alive = 1
+triggerall = var(12) = 2
+trigger1 = stateno = 5000
+trigger2 = stateno = 5001
+trigger3 = stateno = 5010
+trigger4 = stateno = 5011
+trigger5 = stateno = 5020
+trigger6 = stateno = 5021
+trigger7 = stateno = 5002
+trigger8 = stateno = 5012
+trigger9 = stateno = 5022
+value = 30, 2
+;===========================================================================
+[State 181,lose]
+type = helper
+trigger1 = LoseKO&&NumHelper(181) != 1
+name = "mouse"
+id = 181
+pos = -10,-55
+postype = p1
+stateno = 181
+helpertype = normal
+ownpal = 1
+keyctrl = 1
+persistent = 0
+ignorehitpause = 1
+;===========================================================================

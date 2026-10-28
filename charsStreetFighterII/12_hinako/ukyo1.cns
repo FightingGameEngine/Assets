@@ -1,0 +1,93 @@
+[Statedef -2]
+
+;---------------------------------------------------------------------------
+[State -2, Poses]
+type = PlaySnd
+trigger1 = (stateno = 181 || stateno = 190 || stateno = 195) && AnimElem = 2
+value = ifelse((Stateno=181),5,4), 0
+
+[State -2, sons normais]
+type = VarRandom
+trigger1 = 1
+v = 1
+range = 0,3
+
+[State -2, golpes normais]
+type = PlaySnd
+trigger1 = (stateno = 210 || stateno = 215 || stateno = 240 || stateno = 245 || stateno = 410 || stateno = 440 || stateno = 610 || stateno = 640) && Time = 6
+value = 0, 0 + Var(1)
+
+[State -2, Agarrão]
+type = PlaySnd
+trigger1 = (AnimElem = 3 || AnimElem = 7 || AnimElem = 11 || AnimElem = 15) && Stateno = 810
+value = f5, 2
+
+[State -2, Magia]
+type = PlaySnd
+trigger1 = (stateno = 1000 || stateno = 1020) && AnimElem = 2
+value = 2, ifelse((Stateno=1000),0,1)
+
+[State -2, Pimenta]
+type = PlaySnd
+trigger1 = (stateno = 1100 || stateno = 1105) && AnimElem = 2
+value = 3, ifelse((Stateno=1100),2,3)
+
+[State -2, Poeira]
+type = PlaySnd
+trigger1 = (stateno = 1200 || stateno = 1210) && AnimElem = 2
+trigger2 = (stateno = 1300 || stateno = 1310) && AnimElem = 4
+value = 0, ifelse((Stateno=1300),1,0)
+
+[State -2, Hyper1,0]
+type = PlaySnd
+trigger1 = (AnimElem = 2 || AnimElem = 39) && stateno = 3000
+value = 3, ifelse((AnimElem=2),1,0)
+
+[State -2, Hyper1,1]
+type = PlaySnd
+trigger1 = (AnimElem = 21 || AnimElem = 30) && stateno = 3000
+value = 3, ifelse((AnimElem=21),2,3)
+
+;---------------------------------------------------------------------------
+[State -2, transformation1]
+type = VarSet
+trigger1 = StateNo = 3100 && Time > 16; && var(2)=0;Command = "c"
+v = 2
+value = 10000
+
+[State -2, transformation2]
+type = VarSet
+trigger1 = StateNo = 3100 && (Anim = 13100 || Anim = 13105) && Time > 16; && var(2);Command = "z"
+v = 2
+value = 0
+
+[State -2, attack transformation]
+type = AttackMulSet
+trigger1 = 1
+value = ifelse((var(2)),1.2,1)
+
+[State -2, defence transformation]
+type = DefenceMulSet
+trigger1 = 1
+value = ifelse((var(2)),0.8,1)
+
+[State -2, turn]
+type = ChangeAnim
+trigger1 = StateNo = 0 && Anim = 5 && var(2)
+trigger2 = StateNo = 11 && Anim = 6 && var(2)
+trigger3 = StateNo = 52 && Anim = 5 && var(2)
+value = anim+var(2)
+
+;---------------------------------------------------------------------------
+[Statedef -3]
+
+;---------------------------------------------------------------------------
+[State -3, NotHitBy]
+type = NotHitBy
+triggerall = var(2) = 10000
+trigger1 = P2StateNo != 800 && P2Name = "Hinako"
+trigger2 = P2StateNo != 850 && P2Name = "Hinako"
+value = ,NT,ST,HT
+
+;---------------------------------------------------------------------------
+

@@ -1,0 +1,246 @@
+﻿;; DAMN, ANDORE SUCKS
+[Statedef -2]
+[state -2, AI Charging]
+type = VarSet
+triggerall = (AILevel > 0)
+trigger1 = 1
+var(1) = IfElse((stateno = (41||42||100||299||819||799||399) && time = 0),0,(var(1) + 1))
+
+[state -2, AI nocheat]
+type = VarSet
+triggerall = (AILevel > 0)
+trigger1 = stateno = (0||20)
+var(1) = 0
+
+[state -2, AI Charged]
+type = VarSet
+triggerall = (AILevel > 0)
+trigger1 = 1
+var(2) = IfElse((var(1) >= 45),1,0)
+
+[state -2, AI LP]
+type = ChangeState
+value = 200
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 12) + ifelse(movehit||moveguarded && (p2bodydist x < 70),100,50))
+triggerall = p2bodydist x < 70
+triggerall = (((pos y) * -1) + 80) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 80) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = S
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+
+[state -2, AI HP]
+type = ChangeState
+value = 201
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse(movehit||moveguarded && (p2bodydist x < 70),150,0))
+triggerall = p2bodydist x < 70
+triggerall = (((pos y) * -1) + 50) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 50) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = S
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+
+[state -2, AI LK]
+type = ChangeState
+value = 202
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse(movehit||moveguarded && (p2bodydist x < 51),80,0))
+triggerall = p2bodydist x < 51
+triggerall = (((pos y) * -1) + 50) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 50) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = S
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+
+[state -2, AI HK]
+type = ChangeState
+value = 203
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse(movehit||moveguarded && (p2bodydist x < 51),90,20))
+triggerall = p2bodydist x < 51
+triggerall = (((pos y) * -1) + 50) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 50) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = S
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+
+[state -2, AI CLP]
+type = ChangeState
+value = 204
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse(movehit||moveguarded && (p2bodydist x < 51),90,0))
+triggerall = p2bodydist x < 51
+triggerall = (((pos y) * -1) + 60) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 60) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = C
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+
+[state -2, AI CHP]
+type = ChangeState
+value = 205
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse(movehit||moveguarded && (p2bodydist x < 51),90,0))
+triggerall = p2bodydist x < 51
+triggerall = (((pos y) * -1) + 60) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 60) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = C
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+-
+[state -2, AI CLK]
+type = ChangeState
+value = 206
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = enemynear, statetype != A
+triggerall = random < ((AILevel * 10) + ifelse(movehit||moveguarded && (p2bodydist x < 47),90,0))
+triggerall = p2bodydist x < 47
+trigger1 = statetype = C
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+
+[state -2, AI CHK]
+type = ChangeState
+value = 207
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = enemynear, statetype != A
+triggerall = random < ((AILevel * 10) + ifelse(movehit||moveguarded && (p2bodydist x < 51),120,0))
+triggerall = p2bodydist x < 51
+trigger1 = statetype = C
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = (time >= 11 || movehit||moveguarded)
+
+[state -2, AI ALP]
+type = ChangeState
+value = 208
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse((p2bodydist x < 51),60,0))
+triggerall = p2bodydist x < 51
+triggerall = p2bodydist y < 10
+triggerall = (((pos y) * -1) + 80) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 80) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = A && stateno != [300,400]
+trigger1 = ctrl
+
+[state -2, AI AHP]
+type = ChangeState
+value = 209
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse((p2bodydist x < 51),60,0))
+triggerall = p2bodydist x < 51
+triggerall = p2bodydist y < 10
+triggerall = (((pos y) * -1) + 80) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 80) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = A && stateno != [300,400]
+trigger1 = ctrl
+
+[state -2, AI ALK]
+type = ChangeState
+value = 210
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse((p2bodydist x < 5),120,0))
+triggerall = p2bodydist x < 5
+triggerall = (((pos y) * -1) + 0) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 0) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = A && stateno != [300,400]
+trigger1 = ctrl
+
+[state -2, AI AHK]
+type = ChangeState
+value = 210
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < ((AILevel * 10) + ifelse((p2bodydist x < 25),120,0))
+triggerall = p2bodydist x < 25
+triggerall = (((pos y) * -1) + 50) <= ((enemynear, pos y) * -1) + ((enemynear, Const(size.height)) * IfElse(enemynear, statetype = S,1,0.5))
+triggerall = (((pos y) * -1) + 50) >= ((enemynear, pos y) * -1)
+trigger1 = statetype = A && stateno != [300,400]
+trigger1 = ctrl
+
+[state -2, AI Crash]
+type = ChangeState
+value = 399
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = statetype != A
+triggerall = enemynear, statetype != L
+triggerall = p2bodydist x < 110
+triggerall = random < ((AILevel * (AILevel / 1.75)) + (2/(110 - (p2bodydist x))) + (ifelse(movehit,100,0)))
+trigger1 = ctrl
+trigger1 = var(2) = 1
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = movehit
+
+[state -2, AI Ass]
+type = ChangeState
+value = 299
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = statetype != A
+triggerall = random < ((AILevel * (AILevel / 2.75)) + (ifelse((enemynear, statetype = L),100,0)) + (2/(110 - (p2bodydist x))) + (ifelse(movehit,100,0)))
+trigger1 = ctrl
+trigger2 = stateno = [200,400]
+trigger2 = movehit
+
+;Choke Throw
+[State -1, Throw]
+type = ChangeState
+value = 799
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < (AILevel * 20) + ((-30 + (p2dist x)) * 5)
+trigger1 = statetype = S
+trigger1 = ctrl
+trigger1 = p2bodydist x <= 13
+
+;SPD
+[State -1, SPD]
+type = ChangeState
+value = 819
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = enemynear, statetype != L
+triggerall = random < (AILevel * 30) + ((-30 + (p2dist x)) * 5)
+trigger1 = statetype != A || stateno = 40
+trigger1 = ctrl || stateno = 40
+trigger1 = p2bodydist x <= 13
+
+
+[state -2, AI Encroach]
+type = ChangeState
+value = 20
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = statetype = S
+triggerall = p2bodydist x >= 160
+triggerall = random < ((AILevel * 10) + Ifelse((enemynear, statetype = L),150,40))
+trigger1 = stateno = 0
+trigger1 = ctrl
+
+[state -2, AI Anti-Projectile]
+type = ChangeState
+value = 399
+triggerall = (AILevel > 0) && (roundstate = 2)
+triggerall = statetype != A
+triggerall = random < IfElse((InGuardDist && (stateno = 130 || stateno = 131) && (time >= 35)),(150 + (AILevel * 10)),0)
+trigger1 = ctrl
+trigger1 = var(2) = 1
+trigger2 = stateno = 200 || stateno = 204 || stateno = 206
+trigger2 = movehit

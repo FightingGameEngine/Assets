@@ -1,0 +1,281 @@
+;===========================================================================
+; 投げ
+;===========================================================================
+; だきつきパンチ
+;---------------------------------------------------------------------------
+[Statedef 1000]
+type = S
+movetype= A
+physics = S
+juggle = 0
+velset = 0,0
+ctrl = 0
+anim = 1200
+sprpriority = 2
+ctrl = 0
+
+[State 1000, 1]
+type = HitDef
+Trigger1 = Time = 0
+attr = S, NT ;ｓ：立ち　ｎ：通常　ｔ：投げ
+hitflag = M- ;コンボの途中から投げが入らないよう設定してある
+『M-』の『-』を消せば、相手が攻撃食らっている状態(GetHit)の場合でも投げに
+移行できます。
+『-』の代わりに『+』を入れればGetHit状態のみ受けつけるようになります。
+priority = 1, Miss ;１は優先順位が低いので技がでないかミスするという設定
+sparkno = -1 ;-1をつければスパークエフェクトは無い
+sprpriority = 1 ;２Ｐより上に１Pが表示される
+p2facing = 1 ;？
+p1stateno = 1001 ;投げが成功した場合の移動する１Ｐのステート
+p2stateno = 1010 ;投げが成功した場合の移動する２Ｐのステート
+fall = 1 ;落ちる力を２Ｐにかけるか
+
+[State 1000, 2]
+type = ChangeState
+Trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+;だきつきパンチ
+[Statedef 1001]
+type = S
+movetype= A
+physics = N
+anim = 1000
+poweradd = 0
+sprpriority = 0
+
+[State 1001,ヒットエフェクト]
+type = Explod
+trigger1 = animelem = 3||animelem = 5||animelem = 7||animelem = 9||animelem = 11||animelem = 13||animelem = 15||animelem = 17
+anim = 10008
+id = 10008
+pos = 0,-80
+postype = p2
+sprpriority = 3
+bindtime = -1
+
+[State 1001, Bind 1]
+type = TargetBind
+trigger1 = AnimElem=1
+value = s100, 0
+pos = 30,-30
+
+[State 1001, Bind 1]
+type = TargetBind
+trigger1 = AnimElem=2
+value = s100, 0
+pos = 35,-47
+
+[State 1001, Bind 1]
+type = TargetBind
+trigger1 = AnimElem=3
+value = s100, 0
+pos = 48,-47
+
+[State 1001, Hurt 11]
+type = TargetLifeAdd
+trigger1 = AnimElem = 16
+value = -88
+
+[State 1001, Throw 11]
+type = TargetState
+trigger1 = AnimElem = 18
+value = 1011
+
+[State 210, snd]
+type = PlaySnd
+trigger1 = animelem = 3||animelem = 7||animelem = 11||animelem = 15
+value = 60, 1
+
+[State 1001, State End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+;だきつきパンチ相手
+[Statedef 1010]
+type = S
+movetype= H
+physics = N
+velset = 0,0
+sprpriority = 1
+
+[State 1010, 1]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 1010
+;---------------------------------------------------------------------------
+;吹っ飛び
+[Statedef 1011]
+type    = A
+movetype= H
+physics = N
+velset = -2.5,-9
+poweradd = 40
+
+[State 1011, 1]
+type = VelAdd
+trigger1 = 1
+y = .45
+
+[State 1011, end]
+type = SelfState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 5100
+;---------------------------------------------------------------------------
+;仮面ひっかけ
+[Statedef 1100]
+type = S
+movetype= A
+physics = S
+juggle = 0
+velset = 0,0
+ctrl = 0
+anim = 1200
+sprpriority = 2
+ctrl = 0
+
+[State 1101, 1]
+type = HitDef
+Trigger1 = Time = 0
+attr = S, NT ;ｓ：立ち　ｎ：通常　ｔ：投げ
+hitflag = M- ;コンボの途中から投げが入らないよう設定してある
+『M-』の『-』を消せば、相手が攻撃食らっている状態(GetHit)の場合でも投げに
+移行できます。
+『-』の代わりに『+』を入れればGetHit状態のみ受けつけるようになります。
+priority = 1, Miss ;１は優先順位が低いので技がでないかミスするという設定
+sparkno = -1 ;-1をつければスパークエフェクトは無い
+sprpriority = 1 ;２Ｐより上に１Pが表示される
+p2facing = 1 ;？
+p1stateno = 1101 ;投げが成功した場合の移動する１Ｐのステート
+p2stateno = 1110 ;投げが成功した場合の移動する２Ｐのステート
+fall = 1 ;落ちる力を２Ｐにかけるか
+
+[State 1101, end]
+type = ChangeState
+Trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+;だきつきパンチ
+[Statedef 1101]
+type = S
+movetype= A
+physics = N
+anim = 1100
+poweradd = 0
+sprpriority = 0
+
+[State 1001,ヒットエフェクト]
+type = Explod
+trigger1 = animelem = 4||animelem = 6||animelem = 8||animelem = 10||animelem = 12||animelem = 14||animelem = 16
+anim = 10006
+id = 10006
+pos = 0,-70
+postype = p2
+sprpriority = 3
+bindtime = -1
+
+[State 1001,ヒットエフェクト]
+type = Explod
+trigger1 = animelem = 20
+anim = 10006
+id = 10016
+pos = 40,-90
+postype = p1
+sprpriority = 3
+bindtime = -1
+
+[State 1001, Bind 1]
+type = TargetBind
+trigger1 = AnimElem= 1
+value = s100, 0
+pos = 48,-25
+
+[State 1001, Bind 1]
+type = TargetBind
+trigger1 = AnimElem= 2
+value = s100, 0
+pos = 40,-35
+
+[State 1001, Bind 1]
+type = TargetBind
+trigger1 = AnimElem= 3
+value = s100, 0
+pos = 48,-55
+
+[State 1001, Bind 1]
+type = TargetBind
+trigger1 = AnimElem= 18
+value = s100, 0
+pos = 50,-35
+
+[State 1001, Hurt 11]
+type = TargetLifeAdd
+trigger1 = Animtime = 0
+value = -88
+
+[State 1001, Throw 11]
+type = TargetState
+trigger1 = AnimElem = 20
+value = 1011
+
+[State 210, snd]
+type = PlaySnd
+trigger1 = animelem = 4||animelem = 6||animelem = 8||animelem = 10||animelem = 12||animelem = 14||animelem = 16
+value = 0, 1
+
+[State 210, snd]
+type = PlaySnd
+trigger1 = animelem = 20
+value = 0, 3
+
+[State 1001, State End]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+;仮面ひっかけ相手投げられ
+[Statedef 1110]
+type = A
+movetype= H
+physics = N
+velset = 0,0
+sprpriority = 1
+
+[State 1110, 1]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 1110
+
+[State 1110, 2]
+type = VelSet
+trigger1 = animtime = 20
+x = 3.8
+y = -2
+
+[State 1110,3];空中になるので、重力を与える
+type = gravity
+trigger1 = Animtime = 20
+
+[State 1110,4]
+type = EnvShake
+trigger1 = Pos Y >= 0
+trigger1 = Vel Y > 0
+time = 10
+ampl = -8
+
+[State 1110,5]
+type = Lifeadd
+trigger1 = Pos Y >= 0
+trigger1 = Vel Y > 0
+value = -95
+
+[State 1110, end]
+Type = SelfState
+Trigger1 = (Vel Y > 0 && Pos Y >= 0) || !Alive
+Value = 5100

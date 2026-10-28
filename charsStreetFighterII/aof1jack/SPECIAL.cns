@@ -1,0 +1,485 @@
+;-------------------------------------------------------------------
+;-------------------- COUPS SPECIAUX 240 ---------------------------
+;-------------------------------------------------------------------
+
+;----------------------------------------------------
+;--- COUPS DE POING ---------------------------------
+;----------------------------------------------------
+[Statedef 250]
+type    = S
+movetype= A
+physics = N
+poweradd= -1000
+ctrl = 0
+anim = 250
+sprpriority = 2
+
+[State 250, 1]
+type = velset
+trigger1 = animelem = 2
+x = 3
+y = -3
+
+[State 250, 2]
+type = PlaySnd
+trigger1 = time = 1
+value = S6, 0
+
+[State 250, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 251
+ctrl = 1
+;-------------------------
+[Statedef 251]
+type    = U
+movetype= A
+physics = N
+ctrl = 0
+anim = 251
+sprpriority = 2
+
+[State 251, 1]
+type = velset
+trigger1 = time =0
+x = 3
+y = 0
+
+[State 251, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 252
+ctrl = 1
+;-------------------------
+[Statedef 252]
+type    = U
+movetype= A
+physics = A
+ctrl = 0
+anim = 252
+sprpriority = 2
+
+[State 252, end state]
+type = ChangeState
+trigger1 = pos y >= -8
+value = 253
+ctrl = 0
+;-------------------------
+[Statedef 253]
+type    = S
+movetype= A
+physics = N
+ctrl = 0
+anim = 250
+sprpriority = 2
+
+[State 253, 1]
+type = velset
+trigger1 = animelem = 2
+x = 3
+y = -3
+
+[State 253, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 254
+ctrl = 1
+;------------------------
+[Statedef 254]
+type    = U
+movetype= A
+physics = N
+ctrl = 0
+anim = 251
+sprpriority = 2
+
+[State 254, 1]
+type = velset
+trigger1 = time =0
+x = 3
+y = 0
+
+[State 254, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 255
+ctrl = 1
+;-------------------------
+[Statedef 255]
+type    = U
+movetype= A
+physics = A
+ctrl = 0
+anim = 252
+sprpriority = 2
+
+[State 255, end state]
+type = ChangeState
+trigger1 = pos y >= -8
+value = 256
+ctrl = 0
+;-------------------------
+[Statedef 256]
+type    = U
+movetype= A
+physics = S
+ctrl = 0
+anim = 253
+sprpriority = 2
+
+[State 256, 0]
+type = velset
+trigger1 = time = 0
+y = 0
+
+[State 256, 1]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[State 256, 2]
+type = velset
+trigger1 = time = 15
+x = 10
+
+[State 256, 3]
+type = veladd
+trigger1 = time = 20
+x = 5
+
+[State 256, 4]
+type = PlaySnd
+trigger1 = MoveGuarded
+value = s5, 4
+ignorehitpause = 1
+persistent= 0
+
+[State 256, 5]
+type = HitDef
+triggerall = UniqHitCount = 0
+trigger1 = AnimElem = 10
+trigger2 = AnimElem = 12
+trigger3 = AnimElem = 14
+trigger4 = AnimElem = 16
+trigger5 = AnimElem = 18
+trigger6 = AnimElem = 20
+trigger7 = AnimElem = 22
+trigger8 = AnimElem = 24
+attr = S, SA
+animtype = back
+ground.type = trip
+damage = 300, 10
+hitflag = MAF
+guardflag = HA
+pausetime = 0,15
+priority = 7
+sparkno = s352
+guard.sparkno = s350
+sparkxy = -10, -110
+hitsound = s5, 4
+ground.slidetime = 0
+ground.hittime = 10
+ground.velocity = -5,-3
+air.velocity = 0, 0
+
+[State 256, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;----------------------------------------------------
+;--- COUPS DE PIED VOLANT ---------------------------
+;----------------------------------------------------
+[Statedef 260]
+type    = S
+movetype= A
+physics = S
+juggle  = 40
+poweradd= -1000
+ctrl = 0
+velset = 0,0
+anim = 260
+sprpriority = 2
+
+[State 260, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 261
+
+;-----------------------------------
+[Statedef 261]
+type    = A
+movetype= A
+physics = A
+ctrl = 0
+velset = 9,-9
+anim = 261
+sprpriority = 5
+
+[State 261, 1]
+type = PlaySnd
+trigger1 = time = 1
+value = S0, 0
+
+[State 261, 2]
+type = PlaySnd
+trigger1 = time = 1
+value = S6, 3
+
+[State 261, 3]
+type = PlaySnd
+trigger1 = MoveGuarded
+value = s5, 4
+ignorehitpause = 1
+persistent= 0
+
+[State 261, 4]
+type = HitDef
+triggerall = UniqHitCount = 0
+trigger1 = AnimElem = 2
+trigger2 = AnimElem = 3
+trigger3 = AnimElem = 5
+trigger4 = AnimElem = 7
+trigger5 = AnimElem = 9
+trigger6 = AnimElem = 11
+trigger7 = AnimElem = 13
+trigger8 = AnimElem = 15
+trigger9 = AnimElem = 17
+attr = S, SA
+animtype = back
+ground.type = trip
+damage = 300, 10
+hitflag = MAF
+guardflag = HA
+pausetime = 10,0
+priority = 7
+sparkno = s352
+guard.sparkno = s350
+sparkxy = -10, -100
+hitsound = s5, 4
+ground.slidetime = 0
+ground.hittime = 10
+ground.velocity = -5,-4
+air.velocity = 0, 0
+
+[State 261, end state]
+type = ChangeState
+trigger1 = time > 20
+trigger1 = pos y >= -8
+value = 262
+ctrl = 0
+;-----------------------------
+[Statedef 262]
+StateType = S
+MoveType = A
+Physics = S
+anim = 262
+sprpriority = 2
+vel = 0,0
+ctrl = 0
+
+[State 262, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 262, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 262, 3]
+type = PlaySnd
+trigger1 = Time = 1
+value = s7, 0
+
+[State 262, end state]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;----------------------------------------------------
+;--- GLISSADE ---------------------------------------
+;----------------------------------------------------
+[Statedef 270]
+type    = S
+movetype= A
+physics = S
+juggle  = 4
+poweradd= -500
+ctrl = 0
+velset = 0,0
+anim = 260
+sprpriority = 2
+
+[State 270, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 271
+
+;-----------------------------------
+[Statedef 271]
+type    = S
+movetype= A
+physics = N
+ctrl = 0
+velset = 7,0
+anim = 270
+sprpriority = 5
+
+[State 271, 1]
+type = PlaySnd
+trigger1 = time = 1
+value = S6, 1
+
+[State 271, 2]
+type = VelSet
+trigger1 = animelem = 2
+x = 0
+
+[State 271, 3]
+type = HitDef
+trigger1 = AnimElem = 1
+attr = S, SA
+animtype = back
+ground.type = trip
+damage = 200, 10
+hitflag = MAF
+guardflag = LA
+pausetime = 10,0
+priority = 7
+sparkno = s352
+guard.sparkno = s350
+sparkxy = -10, -60
+guardsound = s5,4
+hitsound = s5, 4
+ground.slidetime = 0
+ground.hittime = 10
+ground.velocity = -3,-2
+air.velocity = 0, 0
+
+[State 271, end state]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-------------------------------------------------------------------
+;-------------------------- PROJECTION -----------------------------
+;-------------------------------------------------------------------
+
+[Statedef 400]
+Type = S
+MoveType = A
+Physics = S
+anim = 400
+ctrl = 0
+
+[State 400, hitdef]
+type = HitDef
+trigger1 = animelem = 1
+priority = 3
+attr = S, NT
+hitflag = M
+sparkno = -1
+P2facing = 1
+P1StateNo = 401
+P2StateNo = 405
+
+[State 400, end state]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 230
+ctrl = 1
+
+;---------------------------
+[Statedef 401]
+Type = S
+MoveType = A
+Physics = S
+anim = 401
+
+[State 401, 1]
+type = PlaySnd
+trigger1 = time = 0
+value = S6, 4
+
+[State 401, end state]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------
+; Ennemy Animation
+
+[Statedef 405, animation1]
+Type = A
+movetype = H
+physics = N
+ctrl = 0
+velset = 0,0
+
+[State 405, animation2]
+type = ChangeAnim2
+trigger1 = time = 0
+value = 405
+
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 1
+x = -14
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 2
+x = -3
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 3
+x = 1
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 4
+x = 1
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 5
+x = 70
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 6
+x = 7
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 7
+x = 1
+
+[State 405]
+type = PosAdd
+trigger1 = AnimElem = 8
+x = 40
+
+[State 405, vie]
+type = lifeadd
+trigger1 = time = 27
+value = -250
+
+[State 405, ghost]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 405, fin state]
+type = SelfState
+trigger1 = AnimTime = 0
+value = 5100
+
