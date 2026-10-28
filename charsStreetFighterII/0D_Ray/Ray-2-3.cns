@@ -1,0 +1,142 @@
+
+;-----------------------------------------------------------------------------
+[Statedef -2];常時監視ステート(相手に行動を制御されても関係無く常に実行される)
+;-----------------------------------------------------------------------------
+
+
+;デバッグモードに白い文字の表示を加える
+[State -2, デバッグ表示]
+type = DisplayToClipboard
+trigger1 = 1
+text = "V1-C=%d,V2-S=%d,V3-J=%d,V4-D=%d,V5-B=%d"
+params = var(1),var(2),var(3),var(4),var(5)
+ignorehitpause = 1
+
+;表示を横に加える
+[State -2, デバッグ表示その2]
+type = AppendToClipboard
+trigger1 = 1
+text = " V59-A=%d,V21-R=%d,Pos X=%d,Y=%d"
+params = var(59),var(21),ceil(Pos X),floor(Pos Y)
+ignorehitpause = 1
+
+;表示を下に加える
+[State -2, デバッグ表示その3]
+type = AppendToClipboard
+trigger1 = 1
+text = "\nDist X=%d,Y=%d, Vel X=%d/10,Y=%d/10 : Power=%d"
+params = floor(P2BodyDist X),ceil(P2BodyDist Y),ceil(Vel X*10),floor(Vel Y*10),Power
+ignorehitpause = 1
+
+;***************************************************************************
+;--------------------------補正---------------------------------------------
+;***************************************************************************
+
+[State -2, 空中ガード不可]
+Type = AssertSpecial
+Trigger1 = 1
+trigger2 = roundstate = 2
+flag = NoAirGuard
+ignorehitpause = 1
+
+[State -2, スクロール];負けて倒れたらカメラワークを相手に移す処理
+type = ScreenBound
+triggerall = (Life <= 0) || (!Alive) || (Lose)
+trigger1 = (StateNo = 5150) && (RoundState = 4)
+value = 0
+MoveCamera = 0,0
+IgnoreHitPause = 1
+;---------------補正合計----------------------------------------
+
+[State -2, アタック]
+type = AttackMulSet
+trigger1 = roundstate = 2
+value = fVar(10)
+ignorehitpause = 1
+
+[State -2, 補正合計]
+type = VarSet
+trigger1 = roundstate = 2
+fv = 10
+value = fVar(11)
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+; コンボ補正
+[State -2, damage]
+type = VarSet
+triggerall = roundstate = 2
+triggerall = EnemyNear,movetype = H
+trigger1 = EnemyNear,GethitVar(hitcount) >= 1
+fv = 11
+value = 1.0 - (EnemyNear,GethitVar(hitcount) * 0.21)
+ignorehitpause = 1
+
+[State -2, damage_reset]
+type = VarSet
+trigger1 = p2movetype != H
+trigger2 = EnemyNear,GethitVar(hitcount) < 0
+fv = 11
+value = 1
+
+[State -2, 0.1]
+type = VarSet
+trigger1 = fVar(11) < 0
+fv = 11
+value = 0.1
+ignorehitpause = 1
+
+
+;******************パレット・残像消去******************************************************
+[State -2,00]
+type = Palfx
+trigger1 = StateNo = 0
+trigger2 = StateNo = 52
+trigger3 = StateNo = [5000,5210]
+trigger4 = MoveType = H
+time = 0
+
+[State -2, 残像]
+type = AfterImage
+trigger1 = StateNo = 0
+trigger2 = StateNo = 52
+trigger3 = StateNo = [5000,5210]
+trigger4 = MoveType = H
+Time = 0
+;******************パレット・残像消去******************************************************
+
+[State -2,KO時BGM消去]
+type = AssertSpecial
+trigger1 = MatchOver = 1
+trigger1 = Win
+flag = nomusic
+
+[state -2, コマンドリセット]
+type = VarSet
+trigger1 = StateNo = 0
+trigger2 = StateNo = 52
+trigger3 = StateNo = [5000,5210]
+trigger4 = MoveType = H
+var(1) = 0
+ignorehitpause = 1
+Persistent = 1
+
+;これはジャンプ後とバックステップ後に着地音を鳴らすコントローラです。
+[State -2, 音を鳴らす]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52
+value = 0, 2
+channel = 5
+
+[State -2, 3]
+type = StopSnd
+trigger1 = movecontact = 1
+channel = 5
+IgnoreHitPause = 1
+Persistent = 1
+
+
+;※常時監視ステートは常に有効にしたいステートコントローラをどんどん追加していきます。
+
+

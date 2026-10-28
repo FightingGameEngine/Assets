@@ -1,0 +1,4434 @@
+[Data] 
+life = 1000
+attack=100
+defence=100
+fall.defence_up=50
+liedown.time=40
+airjuggle=15
+sparkno=2
+guard.sparkno=40
+KO.echo=0
+volume=50
+IntPersistIndex=10
+FloatPersistIndex=40
+
+[Size]
+xscale=1
+yscale=1
+ground.back=15
+ground.front=14
+air.back=12
+air.front=12
+height=60
+attack.dist=140
+proj.attack.dist=80
+proj.doscale=0
+head.pos=0,-80
+mid.pos=0,-60
+shadowoffset=0
+draw.offset=0,0
+
+[Velocity]
+walk.fwd=2.5
+walk.back=-1.7
+run.fwd=5.6,0
+run.back=-4.5,-3
+jump.neu=0,-8.0
+jump.back=-2.85
+jump.fwd=2.8
+runjump.back=-2.95,-8.0
+runjump.fwd=4.3,-8.0
+airjump.neu=0,-7.5
+airjump.back=-2.55
+airjump.fwd=2.5
+
+[Movement]
+airjump.num=0
+airjump.height=35
+yaccel=.5
+stand.friction=.85
+crouch.friction=.82
+;---------------------------------------------------------------------------
+;タイムオーバー
+[Statedef 170]
+type=S
+ctrl=0
+anim=170
+velset=0,0
+
+[State 170,1]
+type=NotHitBy
+trigger1=1
+value=SCA
+time=1
+
+;---------------------------------------------------------------------------
+;勝
+[Statedef 180]
+type=S
+
+[State 180,1]
+type=ChangeState
+trigger1=Time=1
+value=181
+
+;---------------------------------------------------------------------------
+;勝
+[Statedef 181]
+type=S
+ctrl=0
+anim=181
+velset=0,0
+
+[State 181,1]
+type=NotHitBy
+trigger1=1
+value=SCA
+time=1
+
+[State 191,2]
+type=AssertSpecial
+trigger1=time=[0,180]
+flag=roundnotover
+
+[STate 182]
+type=PlaySnd
+trigger1=Animelem=5
+value=0,1
+
+;---------------------------------------------------------------------------
+[Statedef 191]
+type=S
+ctrl=0
+anim=190
+velset=0,0
+
+[State 195,1]
+type=PlaySnd
+trigger1=Animelem=7
+value=S0,9
+channel=0
+
+[State 191,2]
+type=AssertSpecial
+trigger1=1
+flag=Intro
+
+[State 191,4]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+
+;---------------------------------------------------------------------------
+;挑発
+[Statedef 195]
+type=S
+ctrl=0
+velset=0,0
+movetype=I
+physics=S
+sprpriority=2
+anim=195
+
+[State 195,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,0
+channel=0
+
+[State 195,2]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+;---------------------------------------------------------------------------
+[Statedef 200]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=200
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 200,1]
+type=HitDef
+trigger1=time=0
+attr=S,NA
+damage=50/(hitcount+1)
+getpower=60,30
+animtype=Light
+guardflag=MA
+hitflag=MAF
+priority=4,Hit
+pausetime=10,8
+guard.pausetime=10,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=-10,-85
+hitsound=S1,7
+guardsound=S1,14
+ground.type=High
+ground.slidetime=8
+ground.hittime=12
+ground.velocity=-6
+airguard.velocity=-4,-5
+air.type=low
+air.velocity=-4.4,-6
+air.hittime=12
+
+[State 200,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 200,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,0
+;---------------------------------------------------------------------------
+[Statedef 205]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=205
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 200,1]
+type=HitDef
+trigger1=time=0
+attr=S,NA
+damage=60
+getpower=60,30
+animtype=Light
+guardflag=MA
+hitflag=MAF
+priority=4,Hit
+pausetime=10,8
+guard.pausetime=10,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=-10,-85
+hitsound=S1,7
+guardsound=S1,14
+ground.type=High
+ground.slidetime=8
+ground.hittime=12
+ground.velocity=-6
+airguard.velocity=-4,-5
+air.type=low
+air.velocity=-4.4,-6
+air.hittime=12
+
+[State 200,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 200,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,0
+
+;---------------------------------------------------------------------------
+[Statedef 210]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=210
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 210,1]
+type=HitDef
+trigger1=time=0
+attr=S,NA
+damage=80
+getpower=120,50
+animtype=hard
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=10,10
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-80
+hitsound=S1,8
+guardsound=S1,14
+ground.type=High
+ground.slidetime=15
+ground.hittime=20
+ground.velocity=-9
+airguard.velocity=-4,-5
+air.type=low
+air.velocity=-4.4,-6
+air.hittime=12
+
+[State 210,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 610,4]
+type=PlaySnd
+trigger1=Animelem=3
+value=S1,0
+;---------------------------------------------------------------------------
+[Statedef 215]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=215
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=3
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 210,1]
+type=HitDef
+trigger1=animelem=3
+attr=S,NA
+damage=50
+getpower=80,40
+animtype=hard
+guardflag=MA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,10
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-76
+hitsound=S1,8
+guardsound=S1,14
+ground.type = high
+ground.slidetime = 15
+ground.hittime  = 18
+ground.velocity = -5
+airguard.velocity = -2.9,-5.3
+air.type = High
+air.velocity=-3.4,-6.3
+air.hittime = 12
+;id = 1000023001
+
+[State 210,1]
+type=HitDef
+trigger1=animelem=4
+attr=S,NA
+damage=50
+getpower=80,40
+animtype=hard
+guardflag=MA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,10
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-65
+hitsound=S1,8
+guardsound=S1,14
+ground.type = low
+ground.slidetime = 15
+ground.hittime  = 18
+ground.velocity = -12
+airguard.velocity = -2.9,-5.3
+air.type = High
+air.velocity=-3.4,-6.3
+air.hittime = 12
+;id = 1000023001
+
+[State 210,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 610,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,0
+;---------------------------------------------------------------------------
+[Statedef 230]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=230
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 210,1]
+type=HitDef
+trigger1=time=0
+attr=S,NA
+damage=50
+getpower=60,30
+animtype=medium
+guardflag=MA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,8
+guard.pausetime=10,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=0,-85
+hitsound=S1,7
+guardsound=S1,14
+ground.type = low
+ground.slidetime = 15
+ground.hittime  = 18
+ground.velocity = -8
+airguard.velocity = -2,-4.3
+air.type = High
+air.velocity=-2.4,-5.3
+air.hittime = 12
+;id = 1000023001
+
+[State 210,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 230,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+
+;---------------------------------------------------------------------------
+[Statedef 235]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=235
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 210,1]
+type=HitDef
+trigger1=time=0
+attr=S,NA
+damage=50
+getpower=60,30
+animtype=medium
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=10,8
+guard.pausetime=10,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=0,-50
+hitsound=S1,8
+guardsound=S1,14
+ground.type=low
+ground.slidetime=8
+ground.hittime=12
+ground.velocity=-10
+airguard.velocity=-1.9,-4
+air.type=High
+air.velocity=-2.4,-4.3
+air.hittime=12
+
+[State 210,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 235,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+;---------------------------------------------------------------------------
+[Statedef 240]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=240
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 210,1]
+type=HitDef
+trigger1=animelem=6
+attr=S,NA
+damage=100/(hitcount+1)
+getpower=60,30
+animtype=medium
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=8,10
+guard.pausetime=8,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-85
+hitsound=S1,8
+guardsound=S1,14
+ground.type=high
+ground.slidetime=10
+ground.hittime=15
+ground.velocity=-10
+airguard.velocity=-3.9,-4
+air.type=High
+air.velocity=-4.6,-5.3
+air.hittime=12
+
+[State 210,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 240,4]
+type=PlaySnd
+trigger1=animelem=5
+value=S1,1
+;---------------------------------------------------------------------------
+[Statedef 245]
+type=S
+movetype=A
+physics=S
+juggle=8
+velset=0,0
+ctrl=0
+anim=245
+poweradd=0
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=2
+
+[STate 0]
+type=varadd
+trigger1=time=0&&Enemy,Movetype=H
+fvar(24)=1
+
+[State 210,1]
+type=HitDef
+trigger1=animelem=1
+attr=S,NA
+damage=80/(hitcount+1)
+getpower=60,30
+animtype=medium
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=8,15
+guard.pausetime=8,15
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-80
+hitsound=S1,8
+guardsound=S1,14
+ground.type = High
+ground.slidetime = 15
+ground.hittime  = 18
+ground.velocity = -3
+airguard.velocity = -1.9,-2.3
+air.type = High
+air.velocity = -3.4,-3.4
+air.hittime = 12
+;id = 1000023001
+
+[State 245, 1]
+type = hitDef
+trigger1 = AnimElem =5
+attr = S, NA
+damage=80/(hitcount+1)
+animtype = hard
+guardflag = M
+hitflag = MAF
+priority = 7, Hit
+pausetime = 10, 9
+sparkno = s81
+guard.sparkno=s84
+sparkxy = -5, -80
+hitsound = s1,8
+guardsound = s1,14
+ground.type = High
+ground.slidetime = 17
+ground.hittime  = 22
+ground.velocity = -12
+airguard.velocity = -3.9,-4.3
+air.type = High
+air.velocity = -4.4,-5.4
+air.hittime = 20
+;id = 1000023001
+getpower=70,35
+
+[State 210,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+[State 240,4]
+type=PlaySnd
+trigger1=animelem=2
+value=S1,1
+;---------------------------------------------------------------------------
+;しゃがみa
+[Statedef 400]
+type=C
+movetype=A
+physics=C
+juggle=8
+velset=0,0
+ctrl=0
+poweradd=0
+sprpriority=2
+anim=400
+
+[State 8400]
+type=PlaySnd
+trigger1=var(16)
+trigger1=Animelem=2
+value=0,22
+channel=0
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[State 200,1]
+type=HitDef
+trigger1=time=0
+attr=C,NA
+damage=50,0
+getpower=50,30
+animtype=Light
+guardflag=M
+hitflag=MAF
+priority=4,Hit
+pausetime=8,8
+guard.pausetime=8,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=0,-55
+hitsound=S1,7
+guardsound=S1,14
+ground.type=low
+ground.slidetime=8
+ground.hittime=10
+ground.velocity=-5
+airguard.velocity=-2.2,-5
+air.type=High
+air.velocity=-2.2,-5
+air.hittime=12
+
+[State 400,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=11
+ctrl=1
+
+[State 400,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,0
+
+;---------------------------------------------------------------------------
+;しゃがみC
+[Statedef 410]
+type=C
+movetype=A
+physics=C
+juggle=8
+velset=0,0
+ctrl=0
+poweradd=0
+sprpriority=2
+anim=410
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[State 200,1]
+type=HitDef
+trigger1=time=0
+attr=C,NA
+damage=100,0
+getpower=120,60
+animtype=hard
+guardflag=M
+hitflag=MAF
+priority=5,Hit
+pausetime=7,7
+guard.pausetime=7,7
+sparkno=S81
+guard.sparkno=S84
+sparkxy=0,-80
+hitsound=S1,8
+guardsound=S1,14
+ground.type=high
+ground.slidetime=13
+ground.hittime=18
+ground.velocity=-9
+airguard.velocity=-2.9,-7
+air.type=low
+air.velocity=-2.4,-7
+air.hittime=12
+
+[State 400,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=11
+ctrl=1
+
+[State 410,4]
+type=PlaySnd
+trigger1=animelem=4
+value=S1,1
+
+;---------------------------------------------------------------------------
+;しゃがみB
+[Statedef 430]
+type=C
+movetype=A
+physics=C
+juggle=8
+velset=0,0
+ctrl=0
+poweradd=0
+sprpriority=2
+anim=430
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[State 200,1]
+type=HitDef
+trigger1=time=0
+attr=C,NA
+damage=60,0
+getpower=60,30
+animtype=light
+guardflag=L
+hitflag=MAF
+priority=5,Hit
+pausetime=8,8
+guard.pausetime=8,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=0,-15
+hitsound=S1,7
+guardsound=S1,14
+ground.type=low
+ground.slidetime=10
+ground.hittime=15
+ground.velocity=-5
+airguard.velocity=-1.9,-4
+air.type=low
+air.velocity=-1.4,-5
+air.hittime=12
+
+[State 400,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=11
+ctrl=1
+
+[State 400,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+
+;---------------------------------------------------------------------------
+;しゃがみD
+[Statedef 440]
+type=C
+movetype=A
+physics=C
+juggle=10
+velset=0,0
+ctrl=0
+poweradd=0
+sprpriority=2
+anim = 440
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[State 200,1]
+type=HitDef
+trigger1=time=0
+attr=C,NA
+damage=95,0
+getpower=120,60
+animtype=hard
+guardflag=L
+hitflag=MAF
+priority=5,Hit
+pausetime=10,10
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-15,-15
+hitsound=S1,8
+guardsound=S1,14
+ground.type=low
+ground.slidetime=15
+ground.hittime=20
+ground.velocity=-3,-3
+airguard.velocity=-2.9,-5
+air.type=low
+air.velocity=-3.4,-6
+air.hittime=12
+fall=1
+
+[State 400,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=11
+ctrl=1
+
+[State 440,4]
+type=PlaySnd
+trigger1=animelem=2
+value=S1,1
+
+;---------------------------------------------------------------------------
+;空中・弱・パンチ
+[Statedef 600]
+type=A
+movetype=A
+physics=A
+juggle=10
+ctrl=0
+poweradd=0
+sprpriority=2
+anim=600
+
+[STate 0]
+type=varadd
+trigger1=movehit
+fvar(24)=2
+persistent=0
+
+[State 600,1]
+type=HitDef
+trigger1=time=0
+attr=A,NA
+damage=30,0
+getpower=60,30
+animtype=light
+guardflag=HA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,8
+guard.pausetime=10,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=-10,-36
+hitsound=S1,7
+guardsound=S1,14
+ground.type=low
+ground.slidetime=5
+ground.hittime=12
+ground.velocity=-3
+airguard.velocity=-2,-2
+air.type=low
+air.velocity=-2,-3
+air.hittime=12
+
+[State 600,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,0
+
+;---------------------------------------------------------------------------
+;空中
+[Statedef 610]
+type=A
+movetype=A
+physics=A
+juggle=10
+ctrl=0
+poweradd=0
+sprpriority=2
+anim=610
+
+[STate 0]
+type=varadd
+trigger1=movehit
+fvar(24)=2
+persistent=0
+
+[State 600,1]
+type=HitDef
+trigger1=time=0
+attr=A,NA
+damage=90,0
+getpower=120,60
+animtype=hard
+guardflag=HA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,10
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-60
+hitsound=S1,8
+guardsound=S1,14
+ground.type=low
+ground.slidetime=15
+ground.hittime=20
+ground.velocity=-4
+airguard.velocity=-3,-2
+air.type=low
+air.velocity=-2.5,-3
+air.hittime=12
+
+[State 600,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+
+;---------------------------------------------------------------------------
+;空中パンチ
+[Statedef 615]
+type=A
+movetype=A
+physics=A
+juggle=10
+ctrl=0
+poweradd=0
+sprpriority=2
+anim=615
+
+[STate 0]
+type=varadd
+trigger1=movehit
+fvar(24)=2
+persistent=0
+
+[State 600,1]
+type=HitDef
+trigger1=time=0
+attr=A,NA
+damage=95,0
+getpower=120,60
+animtype=hard
+guardflag=HA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,10
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-36
+hitsound=S1,8
+guardsound=S1,14
+ground.type=low
+ground.slidetime=12
+ground.hittime=17
+ground.velocity=-4.7
+airguard.velocity=-2.9,-2
+air.type=low
+air.velocity=-2.4,-3
+air.hittime=12
+
+[State 600,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+;---------------------------------------------------------------------------
+;空中
+[Statedef 630]
+type=A
+movetype=A
+physics=A
+juggle=10
+ctrl=0
+poweradd=0
+sprpriority=2
+
+[State 0, 1]
+type = ChangeAnim
+triggerall=Time=0
+trigger1 = Anim!=630
+value = 630
+
+[STate 0]
+type=varadd
+trigger1=movehit
+fvar(24)=2
+persistent=0
+
+[State 600,1]
+type=HitDef
+trigger1=time=0
+attr=A,NA
+damage=40,0
+getpower=60,30
+animtype=mid
+guardflag=HA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,8
+guard.pausetime=10,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=-10,-36
+hitsound=S1,7
+guardsound=S1,14
+ground.type=low
+ground.slidetime=10
+ground.hittime=15
+ground.velocity=-3
+airguard.velocity=-2,-2
+air.type=low
+air.velocity=-2,-3
+air.hittime=12
+
+[State 600,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+
+;空中
+[Statedef 635]
+type=A
+movetype=A
+physics=A
+juggle=10
+ctrl=0
+poweradd=0
+sprpriority=2
+
+[State 0, 1]
+type = ChangeAnim
+triggerall=Time=0
+trigger1 = Anim!=635
+value = 635
+
+[STate 0]
+type=varadd
+trigger1=movehit
+fvar(24)=2
+persistent=0
+
+[State 600,1]
+type=HitDef
+trigger1=time=0
+attr=A,NA
+damage=40,0
+getpower=60,30
+animtype=mid
+guardflag=HA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,8
+guard.pausetime=10,8
+sparkno=S80
+guard.sparkno=S84
+sparkxy=-10,-36
+hitsound=S1,7
+guardsound=S1,14
+ground.type=low
+ground.slidetime=10
+ground.hittime=15
+ground.velocity=-3.6
+airguard.velocity=-2,-2
+air.type=low
+air.velocity=-2,-3
+air.hittime=12
+
+[State 600,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+
+;空中
+[Statedef 640]
+type=A
+movetype=A
+physics=A
+juggle=10
+ctrl=0
+poweradd=0
+sprpriority=2
+
+[State 0, 1]
+type = ChangeAnim
+triggerall=Time=4
+trigger1 = Anim!=640
+value = 640
+
+[STate 0]
+type=varadd
+trigger1=movehit
+fvar(24)=2
+persistent=0
+
+[State 600,1]
+type=HitDef
+trigger1=animelem=2
+trigger2=animelem=3
+attr=A,NA
+damage=50,0
+getpower=120,60
+animtype=hard
+guardflag=HA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,14
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-60
+hitsound=S1,7
+guardsound=S1,15
+ground.type=low
+ground.slidetime=15
+ground.hittime=20
+ground.velocity=-5
+airguard.velocity=-2.9,-3.8
+air.type=low
+air.velocity=-4.4,-3.3
+air.hittime=12
+
+[State 600,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+
+;空中
+[Statedef 645]
+type=A
+movetype=A
+physics=A
+juggle=10
+ctrl=0
+poweradd=0
+sprpriority=2
+anim=645
+
+
+[STate 0]
+type=varadd
+trigger1=movehit
+fvar(24)=2
+persistent=0
+
+[State 600,1]
+type=HitDef
+trigger1=Animelem=2
+attr=A,NA
+damage=100,0
+getpower=120,60
+animtype=hard
+guardflag=HA
+hitflag=MAF
+priority=5,Hit
+pausetime=10,14
+guard.pausetime=10,10
+sparkno=S81
+guard.sparkno=S84
+sparkxy=-10,-60
+hitsound=S1,8
+guardsound=S1,15
+ground.type=low
+ground.slidetime=13
+ground.hittime=18
+ground.velocity=-5
+airguard.velocity=-3.9,-2.8
+air.type=low
+air.velocity=-3.4,-3.3
+air.hittime=12
+
+[State 600,4]
+type=PlaySnd
+trigger1=Time=2
+value=S1,1
+
+;---------------------------------------------------------------------------
+;P投げ
+[Statedef 800]
+type=S
+movetype=A
+physics=S
+juggle=0
+velset=0,0
+ctrl=0
+anim=800
+sprpriority=2
+
+[State 800,1]
+type=HitDef
+Trigger1=Time=0
+attr=S,NT
+hitflag=M-
+priority=5,Miss
+sparkno=-1
+sprpriority=1
+p1facing=1
+p2facing=1
+p1stateno=810
+p2stateno=820
+
+[State 800,2]
+type=ChangeState
+Trigger1=Time=1
+value=215
+
+;---------------------------------------------------------------------------
+[Statedef 810]
+type=A
+movetype=A
+physics=N
+anim=810
+poweradd=0
+velset=0,0
+
+[STate 810]
+type=PosAdd
+trigger1=Time=0
+trigger1=Frontedgebodydist>=50
+x=30
+
+[STate 810]
+type=PosAdd
+trigger1=Time=0
+trigger1=Frontedgebodydist<20
+x=-30
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=1
+pos=-50,-80
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=2
+pos=-35,-100
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=3
+pos=-15,-135
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=4
+pos=0,-120
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=5
+pos=20,0
+postype=p1
+
+[State 810,2]
+type=TargetLifeAdd
+trigger1=Animelem=5
+value=-120
+
+[State 810,2]
+type=Targetstate
+trigger1=Animelem=5
+value=825
+
+[State 810,State End]
+type=ChangeState
+trigger1=animtime=0
+value=0
+ctrl=1
+
+[State 1510]
+type=Explod
+trigger1=Animelem=1
+anim=86
+pos=-30,-80
+sprpriority = 1
+ownpal=1
+
+[State 1510]
+type=Explod
+trigger1=Animelem=5
+anim=88
+pos=30,0
+sprpriority = 1
+ownpal=1
+
+[STate 1510]
+type=PlaySnd
+trigger1=Animelem=1
+value=1,13
+channel=1
+
+[STate 1510]
+type=PlaySnd
+trigger1=Animelem=4
+value=1,5
+channel=2
+
+[STate 1510]
+type=PlaySnd
+trigger1=Animelem=5
+value=1,16
+channel=1
+
+[STate 1510]
+type=PlaySnd
+trigger1=Animelem=3
+value=0,2
+channel=0
+
+[State 810]
+type=EnvShake
+trigger1=Animelem=5
+ampl=8
+time=8
+;---------------------------------------------------------------------------
+[Statedef 820]
+type=A
+movetype=H
+physics=N
+velset=0,0
+
+[State 820,1]
+type=ChangeAnim2
+Trigger1=Time=0
+value=820
+
+[STate 820]
+type=ScreenBound
+trigger1=1
+value=0
+;---------------------------------------------------------------------------
+[Statedef 825]
+type=A
+movetype=H
+physics=N
+velset=0,0
+
+[State 820,1]
+type=ChangeAnim2
+Trigger1=Time=0
+value=825
+
+[State 821,2]
+type=ChangeState
+triggerall=vel Y>0
+triggerall=pos Y>=-15
+triggerall=alive
+trigger1=Command="recovery"
+value=5200
+
+[State 820,2]
+type=selfState
+trigger1=vel Y>0
+trigger1=pos Y>=0
+value=5100
+
+[State 821,0]
+type=VelSet
+trigger1=Animelem=1
+x=-4
+y=-6
+
+[State 821,0]
+type=Veladd
+trigger1=Animelem=1,>=0
+y=.4
+;---------------------------------------------------------------------------
+;K投げ
+[Statedef 900]
+type=S
+movetype=A
+physics=S
+juggle=0
+velset=0,0
+ctrl=0
+anim=800
+sprpriority=2
+
+[State 900,1]
+type=HitDef
+Trigger1=Time=0
+attr=S,NT
+hitflag=M-
+priority=5,Miss
+sparkno=-1
+sprpriority=1
+p1facing=-1
+p2facing=-1
+p1stateno=910
+p2stateno=920
+
+[State 800,2]
+type=ChangeState
+Trigger1=Time=1
+value=245
+
+;---------------------------------------------------------------------------
+[Statedef 910]
+type=A
+movetype=A
+physics=N
+anim=910
+poweradd=0
+velset=0,0
+
+[STate 910]
+type=PosAdd
+trigger1=Time=0
+trigger1=backEdgeBodyDist<=50
+x=40
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=1
+pos=-30,-80
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=2
+pos=-30,-85
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=3
+pos=-20,-85
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=4
+pos=-10,-85
+postype=p1
+
+[State 810,1]
+type=TargetBind
+trigger1=animelem=5
+pos=20,0
+postype=p1
+
+[STate 910]
+type=ScreenBound
+trigger1=1
+value=0
+
+[State 1510]
+type=Explod
+trigger1=Animelem=1
+anim=86
+pos=20,-70
+sprpriority = 1
+ownpal=1
+
+[STate 1510]
+type=PlaySnd
+trigger1=Animelem=1
+value=1,13
+channel=1
+
+[STate 1510]
+type=PlaySnd
+trigger1=Animelem=4
+value=0,3
+channel=0
+
+[STate 1510]
+type=PlaySnd
+trigger1=Animelem=5
+value=1,5
+channel=2
+
+[State 810,2]
+type=TargetLifeAdd
+trigger1=Animelem=5
+value=-120
+
+[State 810,State End]
+type=ChangeState
+trigger1=animtime=0
+value=0
+ctrl=1
+
+[State 910]
+type=TargetState
+trigger1=Animelem=5
+value=925
+;---------------------------------------------------------------------------
+[Statedef 920]
+type=A
+movetype=H
+physics=N
+velset=0,0
+
+[State 820,1]
+type=ChangeAnim2
+Trigger1=Time=0
+value=920
+
+[State 925]
+type=SelfState
+trigger1=time=50
+value=5100
+
+[STate 910]
+type=ScreenBound
+trigger1=1
+value=0
+
+;---------------------------------------------------------------------------
+[Statedef 925]
+type=A
+movetype=H
+physics=N
+velset=5,-5
+
+[State 820,1]
+type=ChangeAnim2
+Trigger1=time=0
+value=925
+
+[STate 925]
+type=VelAdd
+trigger1=1
+y=.4
+
+[State 925]
+type=SelfState
+trigger1=pos Y>=30&&Vel Y>0
+value=5100
+
+;----------------------タイガーバズーカ・弱
+[Statedef 1000]
+type=S
+movetype=A
+physics=S
+anim=1000
+ctrl=0
+sprpriority=2
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,7
+channel=0
+
+[State 1000]
+type=PosAdd
+trigger1=Animelem=5
+x=10
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=5
+value=S1,6
+channel=2
+
+[State 1400,2]
+type = Projectile
+trigger1 = AnimElem = 5
+projanim = 1050
+hitflag = MAFP
+projhitanim = 1060
+projremovetime = 120
+projpriority = 3
+offset = 20,-58
+velocity = 6
+attr = S, SP
+damage = 80,8
+animtype = hard
+pausetime = 10,10
+sparkno = S1460
+sparkxy = 5,-1
+hitsound   =S1,10
+guardsound = S1,19
+guardflag = MA
+ground.type =high
+ground.slidetime = 15
+ground.hittime = 18
+ground.velocity = -4,-5
+air.velocity = -5,-6
+id=10
+fall=1
+palfx.time = 50
+palfx.mul= 120,120,120
+palfx.sinadd = 150,50,50,15
+palfx.add = 150,20,20
+
+[State 1000,3]
+type=Changestate
+trigger1=Animtime=0
+value=0
+ctrl=1
+
+;----------------------タイガーバズーカ・強
+[Statedef 1010]
+type=S
+movetype=A
+physics=S
+anim=1010
+ctrl=0
+sprpriority=2
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,7
+channel=0
+
+[State 1000]
+type=PosAdd
+trigger1=Animelem=5
+x=10
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=5
+value=S1,6
+channel=2
+
+[State 1400,2]
+type = Projectile
+trigger1 = AnimElem = 5
+projanim = 1050
+hitflag = MAFP
+projhitanim = 1060
+projremovetime = 120
+projpriority = 3
+offset = 20,-58
+velocity = 7
+attr = S, SP
+damage = 120,12
+animtype = heavy
+pausetime = 10,10
+sparkno = S1460
+sparkxy = 5,-1
+hitsound   =S1,11
+guardsound = S1,19
+guardflag = MA
+ground.type =high
+ground.slidetime = 15
+ground.hittime = 18
+ground.velocity = -5,-6
+air.velocity = -5,-6
+id=10
+fall=1
+palfx.time = 50
+palfx.mul= 120,120,120
+palfx.sinadd = 150,50,50,15
+palfx.add = 150,20,20
+
+[State 1000,3]
+type=Changestate
+trigger1=Animtime=0
+value=0
+ctrl=1
+;---------------------------------------------------------------------------
+;チェスト・一発目・強
+[Statedef 1100]
+type=A
+movetype=A
+physics=N
+juggle=10
+velset=0,0
+ctrl=0
+anim=1100
+poweradd=150
+sprpriority=2
+
+[STate 1100]
+type=VelSet
+trigger1=Animelem=3
+x=3.5
+y=-1
+
+[STate 1100]
+type=Width
+trigger1=1
+value=20,0
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=2
+
+[STate 0]
+type=varset
+trigger1=fvar(24)<5
+trigger1=time=0
+trigger1=PrevStateno=215||PrevStateno=245
+var(25)=1
+
+[STate 0]
+type=varadd
+trigger1=fvar(24)<5
+trigger1=time=0
+trigger1=PrevStateno=215||PrevStateno=245
+fvar(24)=3
+
+[STate 0]
+type=posadd
+trigger1=PrevStateno!=50
+trigger1=animelem=3
+y=-15
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=4
+value=S0,5
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=4
+value=S1,1
+channel=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=5
+attr=A,SA
+damage=30,3
+getpower=60,20
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=7,7
+guard.pausetime=8,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=18
+ground.hittime=21
+ground.velocity=-6.4
+airguard.velocity=-3.9,-3
+air.type=High
+air.velocity=-5.4,-4.4
+air.hittime=18
+
+[STate 1100]
+type=VarSet
+trigger1=Time<2
+var(11)=0
+
+[STate 1100]
+type=Varset
+trigger1=command="波動a"||command="波動b"
+var(11)=1
+
+[State 1210,7]
+type=ChangeState
+trigger1=var(11)=1
+trigger1=Animelem=7,>=0
+trigger1=Vel Y<=0
+value=1110
+
+[STate 0]
+type=velset
+trigger1=animelem=5
+y=0
+
+[STate 0]
+type=velset
+trigger1=animelem=10
+x=2.5
+
+[State 1210,7]
+type=veladd
+trigger1=Animelem=9,>=0
+y=.5
+
+[State 1210,7]
+type=ChangeState
+trigger1=pos Y>=10&&Vel Y>0
+value=52
+
+;---------------------------------------------------------------------------
+;チェスト・一発目・弱
+[Statedef 1101]
+type=A
+movetype=A
+physics=N
+juggle=10
+velset=0,0
+ctrl=0
+anim=1100
+poweradd=150
+sprpriority=2
+
+[STate 1100]
+type=VelSet
+trigger1=Animelem=3
+x=3.5
+y=-1
+
+[STate 1100]
+type=Width
+trigger1=1
+value=20,0
+
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=2
+
+[STate 0]
+type=varset
+trigger1=fvar(24)<5
+trigger1=time=0
+trigger1=PrevStateno=215||PrevStateno=245
+var(25)=1
+
+[STate 0]
+type=varadd
+trigger1=fvar(24)<5
+trigger1=time=0
+trigger1=PrevStateno=215||PrevStateno=245
+fvar(24)=3
+
+[STate 0]
+type=posadd
+trigger1=PrevStateno!=50
+trigger1=animelem=3
+y=-25
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=4
+value=S0,5
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=4
+value=S1,1
+channel=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=5
+attr=A,SA
+damage=30,3
+getpower=60,20
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=7,7
+guard.pausetime=8,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=18
+ground.hittime=21
+ground.velocity=-6.4
+airguard.velocity=-3.9,-3
+air.type=High
+air.velocity=-5.4,-4.4
+air.hittime=18
+
+[STate 1100]
+type=VarSet
+trigger1=Time<2
+var(11)=0
+
+[STate 1100]
+type=Varset
+trigger1=command="波動a"||command="波動b"
+var(11)=1
+
+[State 1210,7]
+type=ChangeState
+trigger1=var(11)=1
+trigger1=Animelem=7,>=0
+trigger1=Vel Y<=0
+value=1110
+
+[STate 0]
+type=velset
+trigger1=animelem=5
+y=0
+
+[STate 0]
+type=velset
+trigger1=animelem=10
+x=2.5
+
+[State 1210,7]
+type=veladd
+trigger1=Animelem=9,>=0
+y=.5
+
+[State 1210,7]
+type=ChangeState
+trigger1=pos Y>=10&&Vel Y>0
+value=52
+
+;---------------------------------------------------------------------------
+;チェスト・２発目
+[Statedef 1110]
+type=A
+movetype=A
+physics=N
+juggle=0
+velset=4,0
+ctrl=0
+anim=1110
+poweradd=100
+sprpriority=2
+
+[STate 1100]
+type=Width
+trigger1=1
+value=20,0
+
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,5
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S1,1
+channel=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=4
+attr=A,SA
+damage=30,3
+getpower=60,20
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=7,7
+guard.pausetime=8,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=18
+ground.hittime=21
+ground.velocity=-6.4
+airguard.velocity=-3.9,-3
+air.type=High
+air.velocity=-5.4,-4.4
+air.hittime=18
+
+[STate 1100]
+type=VarSet
+trigger1=Time<2
+var(11)=0
+
+[STate 1100]
+type=Varset
+trigger1=command="波動a"||command="波動b"
+var(11)=1
+
+[State 1210,7]
+type=ChangeState
+trigger1=var(11)=1
+trigger1=Animelem=6,>=0
+trigger1=Vel Y<=0
+value=1120
+
+[STate 0]
+type=velset
+trigger1=animelem=8
+x=2.5
+
+[State 1210,7]
+type=veladd
+trigger1=Animelem=8,>=0
+y=.5
+
+[State 1210,7]
+type=ChangeState
+trigger1=pos Y>=10&&Vel Y>0
+value=52
+;---------------------------------------------------------------------------
+;チェスト・3発目
+[Statedef 1120]
+type=A
+movetype=A
+physics=N
+juggle=10
+velset=4,0
+ctrl=0
+anim=1101
+poweradd=100
+sprpriority=2
+
+[STate 1100]
+type=Width
+trigger1=1
+value=20,0
+
+
+[STate 0]
+type=null;varadd
+trigger1=time=0
+trigger1=Var(25)=1
+fvar(24)=1
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,5
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S1,1
+channel=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=3
+attr=A,SA
+damage=30,3
+getpower=60,20
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=7,7
+guard.pausetime=8,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=18
+ground.hittime=21
+ground.velocity=-6.4
+airguard.velocity=-3.9,-3
+air.type=High
+air.velocity=-5.4,-4.4
+air.hittime=18
+
+[STate 1100]
+type=VarSet
+trigger1=Time<2
+var(11)=0
+
+[STate 1100]
+type=Varset
+trigger1=command="波動a"||command="波動b"
+var(11)=1
+
+[State 1210,7]
+type=ChangeState
+trigger1=var(11)=1
+trigger1=Animelem=5,>=0
+value=1130
+
+[STate 0]
+type=velset
+trigger1=animelem=8
+x=2.5
+
+[State 1210,7]
+type=veladd
+trigger1=Animelem=7,>=0
+y=.5
+
+[State 1210,7]
+type=ChangeState
+trigger1=pos Y>=10&&Vel Y>0
+value=52
+
+;---------------------------------------------------------------------------
+;チェスト・4発目
+[Statedef 1130]
+type=A
+movetype=A
+physics=N
+juggle=0
+velset=3,0
+ctrl=0
+anim=1110
+poweradd=100
+sprpriority=2
+
+[STate 1100]
+type=Width
+trigger1=1
+value=20,0
+
+
+[STate 0]
+type=null;varadd
+trigger1=time=0
+trigger1=fvar(24)<=7
+fvar(24)=1
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,5
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S1,1
+channel=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=4
+attr=A,SA
+damage=60,6
+getpower=60,20
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=7,7
+guard.pausetime=8,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=23
+ground.hittime=28
+ground.velocity=-6.4
+airguard.velocity=-3.9,-3
+air.type=High
+air.velocity=-5.4,-4.4
+air.hittime=28
+
+[STate 1100]
+type=VarSet
+trigger1=Time<2
+var(11)=0
+
+[STate 1100]
+type=Varset
+trigger1=command="波動a"||command="波動b"
+var(11)=1
+
+[State 1210,7]
+type=ChangeState
+trigger1=var(11)=1
+trigger1=Animelem=6,>=0
+value=1140
+
+[STate 0]
+type=velset
+trigger1=animelem=8
+x=2
+
+[State 1210,7]
+type=veladd
+trigger1=Animelem=8,>=0
+y=.5
+
+[State 1210,7]
+type=ChangeState
+trigger1=pos Y>=10&&Vel Y>0
+value=52
+;---------------------------------------------------------------------------
+;チェスト・決め
+[Statedef 1140]
+type=A
+movetype=A
+physics=N
+juggle=0
+velset=3,0
+ctrl=0
+anim=1130
+poweradd=100
+sprpriority=2
+
+[STate 1100]
+type=Width
+trigger1=1
+value=20,0
+
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,5
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S1,1
+channel=1
+
+[STate 0]
+type=varadd
+trigger1=time=0
+trigger1=Var(25)=1
+fvar(24)=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=5
+attr=A,SA
+damage=80,8
+getpower=160,80
+animtype=digup
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=9,9
+guard.pausetime=10,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=15
+ground.hittime=18
+ground.velocity=-6.4
+airguard.velocity=-3.9,4
+air.type=High
+air.velocity=-5.4,4.4
+air.hittime=18
+fall=1
+fall.recover=0
+
+[STate 1100]
+type=VarSet
+trigger1=Time=0
+var(11)=0
+
+[State 1210,7]
+type=veladd
+trigger1=Animelem=7,>=0
+y=.5
+
+[State 1210,7]
+type=ChangeState
+trigger1=pos Y>=10&&Vel Y>0
+value=52
+
+;---------------------------------------------------------------------------
+;虎竜砕・弱
+[Statedef 1200]
+type=S
+movetype=A
+physics=S
+juggle=10
+velset=0,0
+ctrl=0
+anim=1200
+poweradd=150
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=velset
+trigger1=animelem=3
+x=7
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,4
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=5
+value=S1,5
+channel=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=5
+attr=S,SA
+damage=130,13
+getpower=160,80
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=10,10
+guard.pausetime=10,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,10
+guardsound=S1,19
+ground.type=high
+ground.slidetime=15
+ground.hittime=18
+ground.velocity=-4.4,-5
+airguard.velocity=-3.9,-4
+air.type=High
+air.velocity=-4.4,-5.4
+air.hittime=18
+fall=1
+
+[State 1200,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+;---------------------------------------------------------------------------
+;虎竜砕・強
+[Statedef 1210]
+type=S
+movetype=A
+physics=S
+juggle=10
+velset=0,0
+ctrl=0
+anim=1200
+poweradd=150
+sprpriority=2
+
+[STate 0]
+type=varadd
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=velset
+trigger1=animelem=3
+x=12
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,4
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=5
+value=S1,5
+channel=1
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=5
+attr=S,SA
+damage=150,13
+getpower=160,80
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=10,10
+guard.pausetime=12,5
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=15
+ground.hittime=18
+ground.velocity=-4.4,-5.5
+airguard.velocity=-3.9,-4.5
+air.type=High
+air.velocity=-4.4,-5.9
+air.hittime=18
+fall=1
+
+[State 1210,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=0
+ctrl=1
+
+;---------------------------------------------------------------------------
+;通天砕
+[Statedef 1300]
+type=C
+movetype=A
+physics=C
+juggle=10
+velset=0,0
+ctrl=0
+anim=1300
+poweradd=150
+sprpriority=2
+
+[STate 0]
+type=varset
+trigger1=time=0
+fvar(24)=1
+
+[STate 0]
+type=velset
+trigger1=animelem=2
+x=12
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,8
+channel=0
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=3
+trigger2=Animelem=4
+attr=S,SA
+damage=50/(hitcount+1),5
+getpower=50,10
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=7,7
+guard.pausetime=7,7
+sparkno=S83
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=25
+ground.hittime=30
+ground.velocity=-.4
+airguard.velocity=-3.9,-3
+air.type=High
+air.velocity=-4.4,-4.4
+air.hittime=18
+
+[State 1200,7]
+type=ChangeState
+trigger1=AnimTime=0
+value=1310
+
+;---------------------------------------------------------------------------
+;通天砕
+[Statedef 1310]
+type=A
+movetype=A
+physics=N
+juggle=10
+velset=0,-8
+ctrl=0
+anim=1310
+poweradd=0
+sprpriority=2
+
+[STate 1310]
+type=EnvShake
+trigger1=Time=1
+ampl=5
+time=5
+
+[STate 0]
+type=veladd
+trigger1=animelem=11,>=0
+y=.5
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=1
+attr=A,SA
+damage=50,5
+getpower=50,10
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=4,3
+guard.pausetime=4,3
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=25
+ground.hittime=30
+ground.velocity=.6,-12
+airguard.velocity=.9,-10
+air.type=High
+air.velocity=.6,-10
+air.hittime=18
+
+[State 250,1]
+type=HitDef
+trigger1=Animelem=2
+trigger2=Animelem=3
+trigger3=Animelem=4
+trigger4=Animelem=5
+trigger5=Animelem=6
+trigger6=Animelem=7
+trigger7=Animelem=8
+trigger8=Animelem=9
+attr=A,SA
+damage=20,5
+getpower=50,10
+animtype=heavy
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=4,3
+guard.pausetime=4,3
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=-1;S1,11
+guardsound=-1;S1,19
+ground.type=high
+ground.slidetime=25
+ground.hittime=30
+ground.velocity=.6,-8
+airguard.velocity=.9,-8
+air.type=High
+air.velocity=.6,-8
+air.hittime=20
+fall=1
+fall.recover=0
+
+[STate 1300]
+type=PLaySnd
+triggerall=Movehit
+trigger1=Animelem=2
+trigger2=Animelem=4
+trigger3=Animelem=6
+trigger4=Animelem=8
+value=1,11
+channel=1
+
+[STate 1300]
+type=PLaySnd
+triggerall=Movehit
+trigger1=Animelem=3
+trigger2=Animelem=5
+trigger3=Animelem=7
+trigger4=Animelem=9
+value=1,11
+channel=2
+
+[STate 1300]
+type=PLaySnd
+triggerall=Moveguarded
+trigger1=Animelem=2
+trigger2=Animelem=4
+trigger3=Animelem=6
+trigger4=Animelem=8
+value=1,19
+channel=1
+
+[STate 1300]
+type=PLaySnd
+triggerall=Moveguarded
+trigger1=Animelem=3
+trigger2=Animelem=5
+trigger3=Animelem=7
+trigger4=Animelem=9
+value=1,19
+channel=2
+
+[STate 1300]
+type=MoveHitReset
+trigger1=Animelem=2
+trigger2=Animelem=3
+trigger3=Animelem=4
+trigger4=Animelem=5
+trigger5=Animelem=6
+trigger6=Animelem=7
+trigger7=Animelem=8
+trigger8=Animelem=9
+
+[State 250,1]
+type=HitDef
+trigger1=animelem=10
+attr=A,SA
+damage=90/(hitcount+1),5
+getpower=50,10
+animtype=digup
+guardflag=MA
+hitflag=MAF
+priority=6,Hit
+pausetime=7,7
+guard.pausetime=7,7
+sparkno=S82
+guard.sparkno=S84
+sparkxy=-15,-80
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=25
+ground.hittime=30
+ground.velocity=-5,-9
+airguard.velocity=-5,-9
+air.type=High
+air.velocity=-5,-9
+air.hittime=18
+fall=1
+fall.recover=0
+
+[State 1200,7]
+type=ChangeState
+trigger1=pos Y>=0&&Vel Y>0
+value=52
+;----------------------ぱちき
+[Statedef 1400]
+type=S
+movetype=A
+physics=S
+anim=800
+ctrl=0
+sprpriority=2
+poweradd=-1000
+velset=0,0
+
+[State 900,1]
+type=HitDef
+Trigger1=Time=0
+attr=S,HT
+hitflag=M-
+priority=7,Miss
+sparkno=-1
+sprpriority=1
+p1facing=1
+p2facing=1
+p1stateno=1410
+p2stateno=1420
+
+[State 800,2]
+type=ChangeState
+Trigger1=Time=1
+value=1405
+
+;----------------------ぱちき
+[Statedef 1405]
+type=S
+movetype=A
+physics=S
+anim=1410
+ctrl=0
+sprpriority=2
+poweradd=0
+velset=0,0
+
+;===================
+;MAX演出
+[STate 3000]
+type=envcolor
+trigger1=Time=0
+value=0,0,0
+time=32
+under=1
+
+[State 3000]
+type=Explod
+trigger1=Time=9
+anim=89
+pos=0,-95
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 3000]
+type=Explod
+trigger1=Time=5
+anim=90
+pos=0,-95
+ownpal=1
+supermovetime=32
+sprpriority=-3
+
+[State 3000,0]
+type=superPause
+trigger1=time=0
+movetime =32
+time = 32
+anim = -1
+pos =0,0
+
+[STate 3000]
+type=NotHitBy
+trigger1=Time<=40
+value=SAC
+
+[State 3000]
+type=PLaySnd
+trigger1=time=0
+value=1,17
+channel=1
+
+[State 800,2]
+type=ChangeState
+Trigger1=animTime=0
+value=0
+ctrl=1
+
+;----------------------ぱちき
+[Statedef 1410]
+type=S
+movetype=A
+physics=S
+anim=1400
+ctrl=0
+sprpriority=1
+poweradd=0
+velset=0,0
+
+[State 3000]
+type=Explod
+trigger1=Time=0
+anim=87
+pos=0,-85
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=1
+pos=-10,-80
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=2
+trigger2=Animelem=4
+pos=-10,-110
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=3
+pos=-10,-125
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=5
+pos=20,-90
+
+[State 1410]
+type=TargetBind
+trigger1=Animelem=6
+pos=30,-90
+
+[STate 1410]
+type=TargetBind
+trigger1=Animelem=7
+pos=40,0
+
+[State 1410]
+type=TargetLifeAdd
+trigger1=Animelem=7
+value=-270
+
+[State 1410]
+type=TargetState
+trigger1=Animelem=7
+value=1430
+
+[State 3000]
+type=Explod
+trigger1=animelem=7
+anim=94
+pos=20,-60
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 1410]
+type=EnvShake
+trigger1=Animelem=7
+ampl=10
+time=10
+;===================
+;MAX演出
+[STate 3000]
+type=envcolor
+trigger1=Time=0
+value=0,0,0
+time=32
+under=1
+
+[State 3000]
+type=Explod
+trigger1=Time=9
+anim=89
+pos=0,-95
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 3000]
+type=Explod
+trigger1=Time=5
+anim=90
+pos=0,-95
+ownpal=1
+supermovetime=32
+sprpriority=-3
+
+[State 3000,0]
+type=superPause
+trigger1=time=0
+movetime =32
+time = 32
+anim = -1
+pos =0,0
+
+[STate 3000]
+type=NotHitBy
+trigger1=Time<=40
+value=SAC
+
+[State 3000]
+type=PLaySnd
+trigger1=time=0
+value=1,17
+channel=1
+
+[State 3000]
+type=AfterImage
+trigger1=Time=0
+time=60
+length=9
+
+[State 3000]
+type=AfterImagetime
+trigger1=AnimTime=0
+time=0
+
+[State 1410]
+type=Changestate
+trigger1=animtime=0
+value=0
+ctrl=1
+
+;----------------------ぱちき
+[Statedef 1420]
+type=A
+movetype=H
+physics=N
+ctrl=0
+sprpriority=2
+poweradd=0
+
+[State 1410]
+type=ChangeAnim2
+trigger1=Time=0
+value=1420
+
+[STate 1420]
+type=ScreenBound
+trigger1=1
+value=0
+
+[STatedef 1430]
+type=A
+physics=N
+velset=-4,-9
+
+[State 1410]
+type=ChangeAnim2
+trigger1=Time=0
+value=1430
+
+[State 1430]
+type=VelAdd
+trigger1=1
+y=.4
+
+[State 1530]
+type=PalFx
+trigger1=Time=0
+add=200,50,20
+sinadd=60,10,5,10
+time=60
+
+[State 1420]
+type=SelfState
+trigger1=Pos Y>=0&&Vel Y>0
+value=5100
+
+[STate 1430]
+type=PauSe
+trigger1=TimeMod=3,0
+time=1
+;----------------------ごっついタイガーバズーカ
+[Statedef 3000]
+type=S
+movetype=A
+physics=S
+anim=3000
+ctrl=0
+sprpriority=2
+poweradd=200
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,6
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=30
+value=S0,7
+channel=0
+
+[State 1400,2]
+type = helper
+trigger1 = AnimElem = 30
+id=10
+stateno=3050
+pos=-20,-10
+postype=p1
+sprpriority=3
+
+[State 1000,3]
+type=Changestate
+trigger1=Animtime=0
+value=0
+ctrl=1
+;----------------------ものごっついタイガーバズーカ
+[Statedef 3100]
+type=S
+movetype=A
+physics=S
+anim=3001
+ctrl=0
+sprpriority=2
+poweradd=-1000
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,6
+channel=0
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=30
+value=S0,7
+channel=0
+
+;===================
+;MAX演出
+[STate 3000]
+type=envcolor
+trigger1=Time=0
+value=0,0,0
+time=45
+under=1
+
+[State 3000]
+type=Explod
+trigger1=Time=9
+anim=89
+pos=-20,-45
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 3000]
+type=Explod
+trigger1=Time=5
+anim=90
+pos=-20,-45
+ownpal=1
+supermovetime=32
+sprpriority=-3
+
+[State 3000,0]
+type=superPause
+trigger1=time=0
+movetime =45
+time = 45
+anim = -1
+pos =0,0
+
+[STate 3000]
+type=NotHitBy
+trigger1=Time<=50
+value=SAC
+
+[State 3000]
+type=PLaySnd
+trigger1=time=0
+value=1,17
+channel=1
+
+[STate 3100]
+type=VarSet
+trigger1=Time=0
+var(13)=0
+
+[STate 3100]
+type=Varadd
+trigger1=Timemod=5,0
+trigger1=Time>=80
+var(13)=1
+
+[State 1000,3]
+type=Changestate
+trigger1=time>=80
+trigger1=Command!="holdx"
+trigger1
+value=3102
+
+;----------------------ものごっついタイガーバズーカ
+[Statedef 3101]
+type=S
+movetype=A
+physics=S
+anim=3001
+ctrl=0
+sprpriority=2
+poweradd=-1000
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=2
+value=S0,6
+channel=0
+
+
+;===================
+;MAX演出
+[STate 3000]
+type=envcolor
+trigger1=Time=0
+value=0,0,0
+time=45
+under=1
+
+[State 3000]
+type=Explod
+trigger1=Time=9
+anim=89
+pos=-20,-45
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 3000]
+type=Explod
+trigger1=Time=5
+anim=90
+pos=-20,-45
+ownpal=1
+supermovetime=32
+sprpriority=-3
+
+[State 3000,0]
+type=superPause
+trigger1=time=0
+movetime =45
+time = 45
+anim = -1
+pos =0,0
+
+[STate 3000]
+type=NotHitBy
+trigger1=Time<=50
+value=SAC
+
+[State 3000]
+type=PLaySnd
+trigger1=time=0
+value=1,17
+channel=1
+
+[STate 3100]
+type=VarSet
+trigger1=Time=0
+var(13)=0
+
+[STate 3100]
+type=Varadd
+trigger1=Timemod=5,0
+trigger1=Time>=80
+var(13)=1
+
+[State 1000,3]
+type=Changestate
+trigger1=time>=80
+trigger1=Command!="holdy"
+trigger1
+value=3102
+
+;---------------------------------------------------------------------------
+;
+[Statedef 3102]
+type    = S
+movetype= A
+physics = S
+poweradd= 0
+ctrl = 0
+sprpriority = 3
+velset=0,0
+anim=3002
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=6
+value=S0,7
+channel=0
+
+[State 1400,2]
+type = helper
+trigger1 = AnimElem = 6
+id=10
+stateno=3060
+pos=-20,-10
+postype=p1
+sprpriority=3
+
+[STate 3102]
+type=EnvShake
+trigger1=Animelem=6
+ampl=6
+time=10
+
+[STate 3102]
+type=VelSet
+trigger1=Animelem=8
+x=-2
+
+[State 1000,3]
+type=Changestate
+trigger1=Animtime=0
+value=0
+ctrl=1
+
+;---------------------------------------------------------------------------
+;本体
+[Statedef 3050]
+type    = A
+movetype= A
+physics = N
+poweradd= 0
+ctrl = 0
+sprpriority = 3
+velset=10,0
+anim=3100
+
+[State 3100]
+type=NotHitBy
+trigger1=1
+value=SAC
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=1
+value=S1,6
+
+[State 250,1]
+type=HitDef
+trigger1=Root,Stateno=3000
+trigger1=root,animelem=31,>=0
+attr=A,SP
+damage=200,50
+getpower=0,0
+animtype=heavy
+guardflag=MA
+hitflag=MAFP
+priority=7,Hit
+pausetime=12,12
+guard.pausetime=9,9
+sparkno=S3110
+guard.sparkno=S3110
+sparkxy=0,-20
+hitsound=S1,11
+guardsound=S1,19
+ground.type=high
+ground.slidetime=45
+ground.hittime=50
+ground.velocity=-8.5
+airguard.velocity=-6,-5
+air.type=High
+air.velocity=-5,-5
+air.hittime=30
+palfx.time = 50
+palfx.mul= 120,120,120
+palfx.sinadd = 150,50,50,15
+palfx.add = 150,20,20
+envshake.ampl=8
+envshake.time=10
+p1stateno=3110
+sprpriority=3
+
+[State 3100]
+type=ChangeState
+trigger1=Movecontact
+value=3110
+
+[STate 3100]
+type=Destroyself
+trigger1=Time>=80
+trigger2=frontEdgeBodydist<=-50
+;---------------------------------------------------------------------------
+;本体
+[Statedef 3060]
+type    = A
+movetype= A
+physics = N
+poweradd= 0
+ctrl = 0
+sprpriority = 3
+velset=20,0
+anim=3100
+juggle=10
+
+[State 3100]
+type=NotHitBy
+trigger1=1
+value=SAC
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=1
+value=S1,6
+
+[State 250,1]
+type=HitDef
+trigger1=Root,Stateno=3102
+trigger1=root,animelem=8,>=0
+attr=A,HP
+damage=300+(parent,var(13)*5),30
+getpower=0,0
+animtype=heavy
+guardflag=MA
+hitflag=MAFP
+priority=7,Hit
+pausetime=15,15
+guard.pausetime=5,5
+sparkno=S3110
+guard.sparkno=S3110
+sparkxy=0,-20
+hitsound=S1,11
+guardsound=S1,15
+ground.type=high
+ground.slidetime=45
+ground.hittime=50
+ground.velocity=-8.5,-6
+airguard.velocity=-6,-5
+air.type=High
+air.velocity=-5,-5
+air.hittime=30
+palfx.time = 50
+palfx.mul= 120,120,120
+palfx.sinadd = 150,50,50,15
+palfx.add = 150,20,20
+envshake.ampl=12
+envshake.time=15
+p1stateno=3111
+fall=1
+sprpriority=3
+
+[State 3100]
+type=ChangeState
+trigger1=movecontact
+value=3111
+
+[STate 3100]
+type=Destroyself
+trigger1=Time>=80
+trigger2=frontEdgeBodydist<=-50
+
+;---------------------------------------------------------------------------
+;本体
+[Statedef 3110]
+type    = A
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+sprpriority = 3
+velset=0,0
+anim=3120
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=1
+value=S1,35
+
+[State 3050]
+type=EnvShake
+trigger1=Time=0
+ampl=10
+time=10
+
+[STate 3110]
+type=PosAdd
+trigger1=Time=0
+x=20
+
+[STate 3100]
+type=Destroyself
+trigger1=animTime=0
+
+;---------------------------------------------------------------------------
+;本体
+[Statedef 3111]
+type    = A
+movetype= I
+physics = N
+poweradd= 0
+ctrl = 0
+sprpriority = 3
+velset=0,0
+anim=3120
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=1
+value=S1,35
+
+[State 3050]
+type=EnvShake
+trigger1=Time=0
+ampl=10
+time=15
+
+[STate 3110]
+type=PosAdd
+trigger1=Time=0
+x=20
+
+[State 3000]
+type=Explod
+trigger1=time=0
+anim=94
+pos=0,0
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[STate 3100]
+type=Destroyself
+trigger1=animTime=0
+;----------------------必殺投げ
+[Statedef 3200]
+type=S
+movetype=A
+physics=S
+anim=3200
+ctrl=0
+sprpriority=2
+poweradd=-1000
+velset=0,0
+
+[State 3200]
+type=varAdd
+trigger1=PrevStateno=[200,3000]
+fvar(24)=1
+
+[State 900,1]
+type=HitDef
+Trigger1=Time=0
+attr=S,HT
+hitflag=M
+priority=7,Miss
+sparkno=-1
+sprpriority=1
+p1facing=1
+p2facing=1
+p1stateno=3210
+p2stateno=3220
+
+[State 800,2]
+type=ChangeState
+Trigger1=Time=1
+value=3205
+
+;----------------------ぱちき
+[Statedef 3205]
+type=S
+movetype=A
+physics=S
+ctrl=0
+sprpriority=2
+poweradd=0
+velset=0,0
+
+;===================
+;MAX演出
+[STate 3000]
+type=envcolor
+trigger1=animelem=4
+value=0,0,0
+time=32
+under=1
+
+[State 3000]
+type=Explod
+trigger1=Time=5
+anim=89
+pos=15,-125
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 3000]
+type=Explod
+trigger1=Time=1
+anim=90
+pos=15,-125
+ownpal=1
+supermovetime=32
+sprpriority=-3
+
+[State 3000,0]
+type=superPause
+trigger1=time=0
+movetime =25
+time = 32
+anim = -1
+pos =0,0
+
+[State 3000]
+type=PLaySnd
+trigger1=time=0
+value=1,17
+channel=1
+
+[State 800,2]
+type=ChangeState
+Trigger1=animTime=0
+value=0
+ctrl=1
+
+;----------------------ぱちき
+[Statedef 3210]
+type=S
+movetype=A
+physics=S
+anim=3210
+ctrl=0
+sprpriority=2
+poweradd=0
+velset=0,0
+
+[STate 3210]
+type=AfterImage
+trigger1=Time=0
+trans=add1
+time=2000
+
+[STate 3210]
+type=AfterImageTime
+trigger1=Animtime=0
+time=0
+
+[State 3210]
+type=PlaySnd
+trigger1=Time=0
+value=1,21
+
+[State 3000]
+type=Explod
+trigger1=Time=0
+anim=87
+pos=40,-70
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 1410]
+type=posadd
+trigger1=time=0
+trigger1=Frontedgebodydist<=40
+x=-30
+
+[State 3200]
+type=PlaySnd
+trigger1=Animelem=1
+value=0,0
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=1
+trigger2=Animelem=7
+trigger3=Animelem=13
+trigger4=Animelem=19
+trigger5=Animelem=25
+
+pos=40,-70
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=2
+trigger2=Animelem=8
+trigger3=Animelem=14
+trigger4=Animelem=20
+trigger5=Animelem=26
+
+pos=22,-93
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=3
+trigger2=Animelem=9
+trigger3=Animelem=15
+trigger4=Animelem=21
+trigger5=Animelem=27
+
+pos=10,-135
+
+[STate 1410]
+type=Targetbind
+trigger1=animelem=4
+trigger2=Animelem=10
+trigger3=Animelem=16
+trigger4=Animelem=22
+trigger5=Animelem=28
+
+pos=45,-120
+
+[State 1410]
+type=TargetBind
+trigger1=Animelem=5
+trigger2=Animelem=6
+trigger3=Animelem=11
+trigger4=Animelem=12
+trigger5=Animelem=17
+trigger6=Animelem=18
+trigger7=Animelem=23
+trigger8=Animelem=24
+trigger9=Animelem=29
+pos=80,-10
+
+[State 1410]
+type=TargetBind
+trigger1=Animelem=30
+pos=60,15
+
+[State 1410]
+type=TargetLifeAdd
+triggerall=fvar(24)=0
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+value=-60
+kill=0
+
+[State 1410]
+type=TargetLifeAdd
+triggerall=fvar(24)=1
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+value=-40
+kill=0
+
+[State 1410]
+type=TargetLifeAdd
+triggerall=fvar(24)>=2
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+value=-30
+kill=0
+
+
+[State 1410]
+type=TargetLifeAdd
+trigger1=Animelem=30
+value=-50
+
+[State 1410]
+type=TargetState
+trigger1=Animelem=7
+trigger2=Animelem=13
+trigger3=Animelem=19
+value=3230
+
+[State 1410]
+type=TargetState
+trigger1=Animelem=25
+value=3225
+
+[State 1410]
+type=TargetState
+trigger1=Animelem=30
+value=3240
+
+[State 1410]
+type=EnvShake
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+trigger5=Animelem=30
+ampl=10
+time=10
+
+[State 1510]
+type=Explod
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+trigger5=Animelem=30
+anim=88
+pos=65,0
+postype=p1
+sprpriority = 1
+ownpal=1
+
+[State 3200]
+type=PlaySnd
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+trigger5=Animelem=30
+value=1,16
+
+[State 3200]
+type=hitadd
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+trigger5=Animelem=30
+value=1
+
+[State 3200]
+type=PlaySnd
+trigger1=Animelem=5
+trigger2=Animelem=11
+trigger3=Animelem=17
+trigger4=Animelem=23
+value=1,10
+
+[State 3200]
+type=PlaySnd
+trigger1=Animelem=25
+value=0,1
+
+[State 3200]
+type=PlaySnd
+trigger1=Animelem=30
+value=1,11
+
+[State 1400,1]
+type=PlaySnd
+trigger1=Animelem=30
+value=S1,35
+
+[State 3000]
+type=Explod
+trigger1=animelem=30
+anim=94
+pos=70,0
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+;===================
+;MAX演出
+[STate 3000]
+type=envcolor
+trigger1=Time=0
+value=0,0,0
+time=32
+under=1
+
+[State 3000]
+type=Explod
+trigger1=Time=3
+anim=89
+pos=20,-65
+ownpal=1
+supermovetime=32
+sprpriority=3
+
+[State 3000]
+type=Explod
+trigger1=Time=0
+anim=90
+pos=20,-65
+ownpal=1
+supermovetime=32
+sprpriority=-3
+
+[State 3000,0]
+type=superPause
+trigger1=time=0
+movetime =3
+time = 32
+anim = -1
+pos =0,0
+
+[State 3000]
+type=PLaySnd
+trigger1=time=0
+value=1,17
+channel=1
+
+[STate 3210]
+type=POSadd
+trigger1=Animelem=31
+x=30
+
+[State 1410]
+type=Changestate
+trigger1=animtime=0
+value=0
+ctrl=1
+
+;----------------------ぱちき
+[Statedef 3220]
+type=A
+movetype=H
+physics=N
+ctrl=0
+sprpriority=-1
+poweradd=0
+
+[State 1410]
+type=ChangeAnim2
+trigger1=Time=0
+value=3220
+
+[STate 1420]
+type=ScreenBound
+trigger1=1
+value=0
+;----------------------ぱちき
+[Statedef 3225]
+type=A
+movetype=H
+physics=N
+ctrl=0
+sprpriority=-1
+poweradd=0
+
+[State 1410]
+type=ChangeAnim2
+trigger1=Time=0
+value=3225
+
+[STate 1420]
+type=ScreenBound
+trigger1=1
+value=0
+
+;----------------------ぱちき
+[Statedef 3230]
+type=A
+movetype=H
+physics=N
+ctrl=0
+sprpriority=-1
+poweradd=0
+
+[State 1410]
+type=ChangeAnim2
+trigger1=Time=0
+value=3230
+
+[STate 1420]
+type=ScreenBound
+trigger1=1
+value=0
+
+[STatedef 3240]
+type=A
+physics=N
+velset=-4,-9
+
+[State 1410]
+type=ChangeAnim2
+trigger1=Time=0
+value=1430
+
+[State 1430]
+type=VelAdd
+trigger1=1
+y=.4
+
+[State 1530]
+type=PalFx
+trigger1=Time=0
+add=200,50,20
+sinadd=60,10,5,10
+time=60
+
+[State 1420]
+type=SelfState
+trigger1=Pos Y>=0&&Vel Y>0
+value=5100
+
+[STate 1430]
+type=PauSe
+trigger1=TimeMod=3,0
+time=1
+
+;---------------------------------------------------------------------------
+;ダウン回避
+[Statedef 3999]
+type    = C
+movetype= I
+physics = C
+poweradd= 0
+ctrl = 0
+sprpriority = 2
+anim=3999
+
+[State 3999,0]
+type=PosSet
+trigger1=1
+y=0
+
+[state 3999,1]
+type=VelSet
+trigger1=Time=0
+y=0
+
+[State 3999,2]
+type=NotHitBy
+trigger1=1
+value=SAC,NT,ST,HT
+
+[State 3999,3]
+type=Changestate
+trigger1=Animtime=0
+value=0
+ctrl=1
+
+[State 3999,4]
+type=PalFx
+trigger1=Time=0
+add=255,255,255
+time=5
+
+[STate 3999,5]
+type=PlaySnd
+trigger1=Time=0
+value=0,0
+
+[State 3999,6]
+type=VelAdd
+trigger1=Time=0
+trigger1=Vel X=0
+x=-3
+
+[State 3999,6]
+type=VelAdd
+trigger1=Time=0
+trigger1=Vel X>0
+x=8
+
+[State 3999,7]
+type=VelAdd
+trigger1=Time=0
+trigger1=Vel X<=0
+x=-8
+
+[STate 3999,8]
+type=PlaySnd
+trigger1=Time=0
+value=1,2
+channel=1
+
+;////////////////////////////////
+;ジャンプ認識へるぱ
+[Statedef 4000]
+type=A
+movetype=I
+physics=N
+poweradd=0
+ctrl=0
+velset=0,0
+anim=5999
+
+[State 4000,2]
+type=ParentvarSet
+trigger1=parent,Statetype=A&&Parent,var(12)=1&&stateno!=40&&stateno!=53
+trigger2=Parent,time>=6
+var(12)=0
+
+[State 4000,3]
+type=ChangeState
+trigger1=Parent,command="holddown"
+value=4001
+
+[State 4100]
+type=BGPalFx
+triggerall=root,Movetype=A
+trigger1=(root,stateno=[3300,3399])
+trigger2=(root,stateno=[3260,3299])
+trigger3=(root,stateno=[3130,3199])
+trigger4=(root,stateno=3001)||(root,stateno=[3030,3099])
+trigger5=(root,stateno=3420)
+
+time=1
+add=-160,-166,-166
+sinadd =150,10,10,1
+invertall =1
+
+;ジャンプ認識へるぱ
+[Statedef 4001]
+type=A
+movetype=I
+physics=N
+poweradd=0
+ctrl=0
+velset=0,0
+
+[State 4000,2]
+type=ParentvarSet
+trigger1=time=0
+var(12)=1
+
+[State 4000,2]
+type=ParentvarSet
+trigger1=parent,Statetype=A&&Parent,var(12)=1&&stateno!=40&&stateno!=53
+trigger2=Parent,time>=6
+var(12)=0
+
+[State 4000,3]
+type=ChangeState
+triggerall=parent,command!="holddown"
+trigger1=stateno!=40
+trigger1=stateno!=[10,12]
+value=4000
+
+[State 4100]
+type=BGPalFx
+triggerall=root,Movetype=A
+trigger1=(root,stateno=[3300,3399])
+trigger2=(root,stateno=[3260,3299])
+trigger3=(root,stateno=[3130,3199])
+trigger4=(root,stateno=3001)||(root,stateno=[3030,3099])
+trigger5=(root,stateno=3420)
+
+time=1
+add=-160,-166,-166
+sinadd =150,10,10,1
+invertall =1
+
+;---------------------------------------------------------------------------
+;獅子王・ビーストブロー・ワイヤー
+[Statedef 7025]
+type=A
+movetype=H
+physics=N
+velset=0,0
+sprpriority=-2
+ctrl=0
+
+[STate 7025]
+type=ChangeAnim2
+trigger1=Time=0
+value=7025
+
+[STate 7025]
+type=ChangeAnim
+triggerall=SelfAnimexist(5900)&&Time=0
+trigger1=authorname="Tin"
+trigger2=authorname="H”"
+trigger3=authorname="M.M.R."
+trigger4=authorname="Mouser"
+value=5900
+
+[STate 7025]
+type=VelSet
+trigger1=Animelem=2||Time=5
+x=-20
+y=-4
+
+[STate 7025]
+type=null;selfstate
+trigger1=Time>=50
+value=5050
+
+[STate 7025]
+type=PosAdd
+triggerall=Time<=5
+trigger1=BackEdgeboDyDist =[-20,20]
+trigger2=frontEdgeboDyDist =[-20,20]
+y=-40
+persistent=0
+
+[STate 7025]
+type=ChangeState
+triggerall=Time>=5
+trigger1=BackEdgeboDyDist =[-20,20]
+trigger2=frontEdgeboDyDist =[-20,20]
+value=7026
+
+;---------------------------------------------------------------------------
+;獅子王・ビーストブロー・ワイヤー
+[Statedef 7026]
+type=A
+movetype=H
+physics=N
+velset=0,0
+sprpriority=-2
+ctrl=0
+
+[STate 7026]
+type=Turn
+trigger1=Time=0
+
+[STate 7025]
+type=ChangeAnim2
+trigger1=Time=0
+value=7026
+
+[STate 7026]
+type=EnvShake
+trigger1=Time=0
+ampl=10
+time=10
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 1
+;value = F7, 0 ;Hit ground
+value = F7,3; (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 7025]
+type = Explod
+trigger1 = Time = 0
+anim = F72
+pos = 0, -90
+postype = p1
+sprpriority = -3
+
+[State 7026]
+type=VelSet
+trigger1=Time=3
+x=-4.4
+y=-9
+
+[STate 7026]
+type=VelAdd
+trigger1=Time>=3
+y=.5
+
+[State 7026]
+type=ChangeAnim
+trigger1=Pos Y>=0&&Vel Y>0
+trigger1=SelfAnimExist(5062)
+value=5062
+
+[State 7026]
+type=selfState
+trigger1=Pos Y>=0&&Vel Y>0
+value=5100
+
+
+;///////////////////////////
+[Statedef -2]
+;////////////////////////
+
+[STate -2];ヒット確認
+type=varSet
+triggerall=MoveContact=0
+trigger1=enemy,movetype=A
+var(21)=1
+persistent=0
+
+[STate -2];カウンターヒット時のみ
+type=AssertSpecial
+trigger1=var(21)
+trigger1=Stateno=[250,255]
+trigger1=movehit
+trigger1=Enemy,Statetype=A
+trigger1=Enemy,Movetype=H
+flag=nojugglecheck
+persistent=0
+
+[State -2];カウンター
+type=Explod
+triggerall=var(18)=(Stateno)
+triggerall=var(21)=1
+triggerall=TeamSide=1
+triggerall=Stateno!=[800,950]
+triggerall=Stateno!=[1500,1550]
+triggerall=Stateno!=[1200,1299]
+triggerall=Stateno!=8700
+trigger1=Movehit=1
+id=92
+pos=40,200
+postype=left
+ontop=1
+persistent=0
+ownpal=1
+anim=92
+bindtime=22
+sprpriority=9999
+under=0
+
+[State -2];カウンター
+type=Explod
+triggerall=var(18)=(Stateno)
+triggerall=var(21)=1
+triggerall=TeamSide=2
+triggerall=Stateno!=[800,950]
+triggerall=Stateno!=[1500,1550]
+triggerall=Stateno!=[1200,1299]
+triggerall=Stateno!=8700
+trigger1=Movehit=1
+id=92
+pos=-40,200
+postype=right
+ontop=1
+persistent=0
+ownpal=1
+anim=92
+bindtime=22
+sprpriority=9999
+under=0
+
+[STate -2]
+type=EnvColor
+triggerall=var(18)=(Stateno)
+triggerall=NumExplod(92)=1
+triggerall=Stateno!=[800,950]
+triggerall=Stateno!=[1500,1550]
+triggerall=Stateno!=[1200,1299]
+triggerall=Stateno!=8700
+triggerall=var(21)=1
+trigger1=Movehit=1
+time=1
+under=0
+value=255,255,255
+persistent=0
+sprpriority=9999
+
+[STate -2];ヒット確認
+type=varSet
+trigger1=enemy,movetype!=A
+trigger2=Numexplod(92)=1
+var(21)=0
+
+[STate -2];ヒット確認
+type=varSet
+trigger1=Alive=0
+trigger2=hitcount=1
+trigger3=Movetype=H
+trigger4=enemy,movetype!=A
+var(21)=0
+
+[State -2]
+type=Helper
+trigger1=Numhelper(4000)=0
+stateno=4000
+id=4000
+pos=0,-9999
+postype=p1
+ownpal=1
+sprpriority=-1000
+
+[State -2]
+type=AfterImagetime
+trigger1=movetype=H
+time=0
+
+[State -2]
+type=stopSnd
+trigger1=Stateno!=100
+channel=6
+
+[State -2]
+type=stopSnd
+trigger1=movetype=H
+channel=7
+
+[State -2]
+type=stopSnd
+trigger1=Prevstateno=[1700,1720]
+trigger1=movetype=H
+channel=2
+
+[State -2]
+type=stopSnd
+trigger1=stateno!=195
+channel=8
+
+[STate -2]
+type=Width
+trigger1=Stateno=[5100,5110]
+trigger1=BackEdgeBodyDist<=12
+value=0,-12
+
+[STate -3]
+type=varset
+triggerall=Var(25)=1
+trigger1=Stateno=52
+trigger2=Movetype=H
+var(25)=0
+
+[Statedef -3]
+
+
+[State -3,LandingSound]
+type=PlaySnd
+triggerall=Time=1
+trigger1=stateno=52
+trigger2=stateno=106
+value=S1,2
+channel=5
+
+
+;/////////////////////設定////////////////////////
+;var
+[STate -3];性別
+type=varSet
+trigger1=RoundState=1
+var(40)=1
+[STate -3];年齢
+type=varSet
+trigger1=RoundState=1
+var(41)=18
+[STate -3];武器の有無
+type=varSet
+trigger1=RoundState=1
+var(42)=0
+[STate -3];血液の有無
+type=varSet
+trigger1=RoundState=1
+var(43)=0
+[STate -3];変身のアニメずらし
+type=varSet
+trigger1=RoundState=1
+var(44)=0
+[STate -3];変身のアニメずらし番号
+type=varSet
+trigger1=RoundState=1
+var(45)=0
+;------------------
+;システム系
+;------------------
+[State ガードゲージ値ＭＡＸ]
+type = varset
+trigger1 = time = 0
+var(53) = 60
+
+[State ガードゲージ値回復タイミング(*/60)]
+type = varset
+trigger1 = time = 0
+var(54) = 12
+
+[State ガードゲージ値回復までの待ち時間(*/60)]
+type = varset
+trigger1 = time = 0
+var(55) = 90
+
+[State 気絶値ＭＡＸ]
+type = varset
+trigger1 = time = 0
+var(56) = 60
+
+[State 気絶値回復タイミング(*/60)]
+type = varset
+trigger1 = time = 0
+var(57) = 12
+
+[State 気絶値回復までの待ち時間(*/60)]
+type = varset
+trigger1 = time = 0
+var(58) = 60
+
+;-------------------------
+;設定完了（以下変更不可）
+;-------------------------
+;[State 設定完了]
+;type = varset
+;trigger1 = time = 0
+;var(59) = 1
+
+;[State 5900, 3]
+;type = ChangeState
+;trigger1 = var(59) = 1
+;value = 5900
+
+;--------------------------------
+[State -3]
+type=DisplayToClipboard
+trigger1=1
+text="var(11):%d,fvar(24):%f,frontedgebodydist:%d"
+params=var(11),fvar(24),frontedgebodydist
+
+[State -3]
+type=attackMulSet
+triggerall=Alive&&Var(16)!=2
+trigger1=1
+value=(1-((fvar(24))/10))
+
+[State -3]
+type=attackMulSet
+triggerall=Alive&&Var(16)=2
+trigger1=1
+value=1
+
+[State -3]
+type=varSet
+triggerall=Enemy,Movetype!=H
+triggerall=Enemy,Stateno!=[5000,5090]
+triggerall=Stateno!=[200,4000]
+triggerall=fvar(24)!=0
+triggerall=Stateno!=52
+triggerall=prevStateno!=52
+trigger1=Time>=10
+trigger1=PrevStateno=52
+trigger2=Time>=10
+trigger2=stateno=[20,105]
+trigger3=Time>=10
+trigger3=stateno=[0,1]
+trigger4=Enemy,Stateno=[5100,5120]
+trigger5=Enemy,Stateno=[120,156]
+fvar(24)=0
+
+[State -3]
+type=varSet
+triggerall=fvar(24)!=0
+trigger1=Enemy,Stateno=[5100,5120]
+trigger2=Enemy,Stateno=[0,156]
+trigger3=Enemy,Name="Tin's Leona"
+trigger3=Enemy,Stateno=6000
+fvar(24)=0
+
+[State -3]
+type=varSet
+trigger1=fvar(24)>=10
+fvar(24)=10
+
+
+ 

@@ -1,0 +1,175 @@
+[statedef -2]
+
+[State 200, 2];相手気絶を有効にする　1でON 0でOFF
+type = varset
+trigger1 = 1
+var(12) = 1
+
+;-----------------------------------------------------------------------------------
+
+[State 180, 1]
+type = varset
+trigger1 = 1
+var(10) = -170
+
+;var(1)ヒットスパーク乱数
+;var(2)投げ左右
+;var(3)HP1
+;var(4)HP2
+;var(5)霊力1
+;var(6)霊力2
+;var(7)同キャラ判定1
+;var(8)同キャラ判定2
+;var(9)バグヒット用
+;var(10)ゲージ上下
+;var(11)
+;var(12)気絶有効無効
+;var(13)気絶値
+;var(14)気絶判定
+;var(15)気絶グラフアニメ
+;var(18) 空中回避時間算出
+;var(19) 空中回避時間算出
+;var(20) K投げ
+;var(21) K投げ2
+;var(22) ビーストタックル判定
+;var(23) 後ろ向き
+;var(24) フライング対策
+
+;var(59)AIスイッチ予定（1以上になるとライフバー横にAIアイコンが表示されます）
+
+;fvar(1)左右速度
+;fvar(2)ダメージ倍率
+
+[State 230, 1]
+type = varset
+triggerall = roundstate = 2
+trigger1 = ctrl = 1
+trigger2 = movetype = A
+var(24) = 1
+
+[State 200, 2]
+type = assertspecial
+trigger1 = 1
+flag = noairguard
+ignorehitpause = 1 
+pausemovetime = 123456789
+supermovetime = 123456789
+
+[State 180, 1]
+type = varset
+trigger1 = roundstate = 0
+trigger2 = movetype = H
+trigger3 = enemynear,BackEdgeBodyDist >= 5
+var(9) = 1
+[State 180, 1]
+type = varset
+trigger1 = facing = enemynear,facing
+var(23) = -1
+[State 180, 1]
+type = varset
+trigger1 = facing != enemynear,facing
+var(23) = 1
+
+[State 180, 1]
+type = varset
+trigger1 = 1
+fvar(1) = 1.4
+[State 180, 1]
+type = varset
+trigger1 = 1
+fvar(2) = 11.9
+[State 3000, Width]
+type = varset
+trigger1 = 1
+fvar(3) = 0.119*Const(data.attack)
+[State 180, 1]
+type = varset
+trigger1 = command = "FF"
+var(22) = 1
+[State 180, 1]
+type = varset
+trigger1 = statetype = A || movetype = H || movetype = A
+var(22) = 0
+
+[State 180, 1]
+type = varset
+trigger1 = teammode = simul
+var(7) = 2
+[State 180, 1]
+type = varset
+trigger1 = teammode = single || teammode = turns
+var(7) = 1
+
+[State -2];同キャラタッグ区別用
+type = VarSet
+trigger1 = roundstate = 0
+trigger1 = numpartner
+trigger1 = partner,Name = "Genkai_shihan" || partner,Name = "Toguro"
+trigger1 = partner,AuthorName = "Ohgaki"
+var(8) = ifelse(p2dist x >= partner,p2dist x, 61, 1)
+
+[State 180, 1]
+type = playsnd
+trigger1 = enemy(0),stateno = 53001 || enemy(0),stateno = 85202
+trigger1 = enemy(0),movetype = H
+trigger1 = enemy(0),time = 1
+trigger2 = numenemy = 2
+trigger2 = enemy(1),stateno = 53001 || enemy(1),stateno = 85202
+trigger2 = enemy(1),movetype = H
+trigger2 = enemy(1),time = 1
+value = 2,1
+
+[State -2]
+type = DisplayToClipboard
+trigger1 = 1
+text = "%d,%d,%d,%d,%d"
+params = var(18),var(21),var(13),var(14),var(15)
+ignorehitpause = 1
+
+;表示を横に加える
+[State -2, DisplayToClipboard2]
+Type = AppendToClipboard
+trigger1 = 1
+text = " P2Dist X=%d,Y=%d,Front=%d,PosY=%d"
+params = floor(P2BodyDist X), ceil(P2Dist Y), floor(FrontEdgeBodyDist), ceil(Pos Y)
+ignorehitpause = 1
+
+;表示を下に加える
+[State -2, DisplayToClipboard3]
+type = AppendToClipboard
+trigger1 = 1
+text = "\nVel X=%d/10,Y=%d/10,     \tP2Vel X=%d/10,Y=%d/10";
+params = ceil(Vel X*10),floor(Vel Y*10),ceil(EnemyNear,Vel X*10),floor(EnemyNear,Vel Y*10)
+ignorehitpause = 1
+
+;空中回避時間算出
+[State -1, Run Fwd]
+type = varset
+trigger1 = gethitvar(hitshaketime) > 0
+var(18) = gethitvar(fall.recovertime)
+persistent=0
+
+[State -1, Run Fwd]
+type = varset
+trigger1 = var(18) > 0
+var(19) = var(18)
+
+[State -1, Run Fwd]
+type = varset
+trigger1 = var(18) = 0
+var(19) = 0
+
+[State -1, Run Fwd]
+type = varadd
+trigger1 = var(18) > 0
+var(18) = -1
+
+[State -2]
+type = Helper
+trigger1 = numhelper(8000) = 0
+ID = 8000
+postype = p1
+pos = 0,0
+stateno = 8000
+pausemovetime = 123456789
+supermovetime = 123456789
